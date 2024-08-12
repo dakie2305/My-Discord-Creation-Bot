@@ -1,0 +1,6 @@
+À tưởng ai, {message.author.mention} thuộc diện danh sách đen. Miễn tiếp.
+Có thân nhau không {message.author.mention}?
+Từ chối tiếp chuyện {message.author.mention}?
+Không tiếp chuyện {message.author.mention}.
+Bot từ chối tiếp chuyện với {message.author.mention}.
+Bot từ chối tiếp chuyện với diện blacklist {message.author.mention}.

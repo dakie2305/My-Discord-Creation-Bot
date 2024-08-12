@@ -1,0 +1,3 @@
+Chào bạn dễ thương {message.author.mention} ha.
+Lô bạn {message.author.mention}, dạo này sao rồi?
+What'sup bro {message.author.mention}?

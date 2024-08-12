@@ -1,0 +1,8 @@
+Bạn nhắc gì mình à {message.author.mention}?
+Bạn gọi mình à {message.author.mention}?
+Từ từ tag gì tag lắm thế bạn {message.author.mention}?
+Có chuyện gì mà gọi vậy ba {message.author.mention}?"
+Đang bận lắm, có chuyện gì nói lẹ đi {message.author.mention}?
+Bạn không thấy mình đang bận à {message.author.mention}?
+Lại có chuyện gì nữa đây {message.author.mention}?
+{message.author.mention} Không mấy gọi mấy khứa admin đi á. Có khi đám đó trả lời nhanh hơn á.

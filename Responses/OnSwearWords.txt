@@ -1,0 +1,10 @@
+Bộ thích chửi thề lắm à {message.author.mention}?
+Có thân nhau không mà thích nói chuyện kiểu đó {message.author.mention}?
+Đây không tiếp loại người thích chửi thề nha {message.author.mention}?
+Mình là người văn minh, không nói chuyện với kẻ văng tục nói mồm nha {message.author.mention}.
+Server văn minh bạn ơi, coi chừng cái miệng đấy nha {message.author.mention}.
+Xin đấy, coi chừng cái miệng đấy nha {message.author.mention}.
+Xin đấy bồ, nói chuyện thế mách Darkie cho vào blacklist đấy {message.author.mention}.
+Ấy ấy, ở đây chúng ta ăn nói văn minh một chút đi {message.author.mention}.
+Ê, đừng tưởng là bot thì muốn nói gì nói nha bồ {message.author.mention}.
+Mình là người văn minh, nói chuyện như thế dễ vào blacklist lắm bạn ơi {message.author.mention}.

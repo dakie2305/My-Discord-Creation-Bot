@@ -1,0 +1,1152 @@
+import discord
+from datetime import datetime, timedelta
+import os
+from dotenv import load_dotenv
+import CustomFunctions
+import db.UserList as DefaultUserList
+import google.generativeai as genai
+import time
+import DailyLogger
+from discord.ext import commands, tasks
+from discord import app_commands
+import db.DbMongoManager as db
+from db.DbMongoManager import UserInfo, GuildExtraInfo
+import db.WordMatchingClass as WordMatchingClass
+import random
+import string
+import CustomButton
+from typing import Optional
+from collections import deque
+import asyncio
+
+load_dotenv()
+intents = discord.Intents.all()
+API_KEY = os.getenv("GOOGLE_CLOUD_KEY")
+genai.configure(api_key=API_KEY)
+
+interaction_logger = DailyLogger.get_logger("Creation1_Interaction")
+commands_logger = DailyLogger.get_logger("Creation1_Commands")
+
+
+bot = commands.Bot(command_prefix="!", intents=intents)
+#region Bot Prefix Commands
+@bot.command()
+async def ping(ctx):
+    await ctx.send(f"Online at {ctx.guild}")
+    commands_logger.info("Someone use ping!")
+
+@bot.command()
+@app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
+@app_commands.checks.has_role(1256989385744846989)
+async def sync(ctx):
+    if(ctx.author.id == CustomFunctions.user_darkie['user_id']):
+        fmt = await ctx.bot.tree.sync(guild = ctx.guild)
+        await ctx.send(f"Đồng bộ {len(fmt)} commands vào {ctx.guild}")
+        commands_logger.info(f"Synced commands for {ctx.guild}!")
+    else:
+        await ctx.send(f"Có phải là Darkie đâu mà dùng lệnh này?")
+        
+#region Nối Từ Commands
+@bot.command()
+@app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
+async def bat_dau_noi_tu_english(ctx):
+    message: discord.Message = ctx.message
+    if message:
+        req_roles = ['Supervisor', 'Server Master', 'Moderator', 'Ultimate Admins']
+        has_required_role = any(role.name in req_roles for role in message.author.roles)
+        if not has_required_role:
+            await ctx.send("Không đủ thẩm quyền để thực hiện lệnh.")
+            return
+        #Kiểm tra xem đã tồn tại WordMatchingClass cho channel này chưa
+        if db.find_word_matching_info_by_id(channel_id=message.channel.id, guild_id=message.guild.id, language='en'):
+            await ctx.send(f"Đã tồn tại thông tin Word Match Info cho channel này. Hãy cứ bắt đầu chơi.")
+        else:
+            data = db.WordMatchingInfo(channel_id=message.channel.id, channel_name=message.channel.name, current_word="a", first_character="a",last_character="a",remaining_word=12300)
+            result = db.create_word_matching_info(data=data, guild_id=message.guild.id, language='en')
+            message_tu_hien_tai = f"\nTừ hiện tại là: `'{data.current_word}'`, và có **{data.remaining_word if data.remaining_word else 0}** bắt đầu bằng chữ cái `{data.last_character if data.last_character else 0}`"
+            await ctx.send(f"Đã tạo thông tin Word Match Info cho channel này. Hãy bắt đầu nối từ đi. {message_tu_hien_tai}")
+        return
+    return
+#region Reset nối từ english
+@bot.command()
+@app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
+async def reset_noi_tu_english(ctx):
+    message: discord.Message = ctx.message
+    if message:
+        req_roles = ['Supervisor', 'Server Master', 'Moderator', 'Ultimate Admins']
+        has_required_role = any(role.name in req_roles for role in message.author.roles)
+        if not has_required_role:
+            await ctx.send("Không đủ thẩm quyền để thực hiện lệnh.")
+            return
+        #Kiểm tra xem đã tồn tại WordMatchingClass cho channel này chưa
+        if db.find_word_matching_info_by_id(channel_id=message.channel.id, guild_id=message.guild.id, language='en'):
+            #Xoá đi tạo lại
+            db.delete_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language='en')
+            data = db.WordMatchingInfo(channel_id=message.channel.id, channel_name=message.channel.name, current_word="a", first_character="a",last_character="a",remaining_word=12300)
+            result = db.create_word_matching_info(data=data, guild_id=message.guild.id, language='en')
+            message_tu_hien_tai = f"\nTừ hiện tại là: `'{data.current_word}'`, và có **{data.remaining_word if data.remaining_word else 0}** bắt đầu bằng chữ cái `{data.last_character if data.last_character else 0}`"
+            await ctx.send(f"Đã reset toàn bộ từ trong trò nối từ English. {message_tu_hien_tai}")
+        else:
+            await ctx.send(f"Chưa tồn tại thông tin Word Match Info cho channel này. Hãy dùng lệnh !bat_dau_noi_tu_english.")
+        return
+    return
+#region Give skill
+@bot.command()
+@app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
+async def give_skill(ctx, item_id: str = None, user: Optional[discord.Member] = None):
+    message: discord.Message = ctx.message
+    called_channel = message.channel
+    req_roles = ['Cai Ngục', 'Server Master']
+    has_required_role = any(role.name in req_roles for role in message.author.roles)
+    if not has_required_role:
+        await ctx.send("Không đủ thẩm quyền để dùng lệnh.")
+        return
+    #Kiểm tra xem ở đây là bảng channel nối từ hay không
+    word_matching_channel = db.find_word_matching_info_by_id(channel_id= called_channel.id, guild_id= called_channel.guild.id, language= 'en')
+    if word_matching_channel:
+        if item_id is None or user is None:
+            await ctx.send(f"Dùng sai câu lệnh. Vui lòng dùng câu lệnh đúng format sau.\n!give_skill skill_id @User")
+            return
+        #Lấy item theo item_id
+        special_item = get_special_item_by_id(item_id=item_id)
+        if special_item==None:
+            await ctx.send(f"{message.author.mention} Kỹ năng **`{item_id}`** không hợp lệ")
+            return
+        #Add item vào inven của player
+        db.update_player_special_item_word_matching_info(user_id=user.id, user_name=user.name, user_display_name=user.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language='en', special_item= special_item)
+        await ctx.send(f"Đã thêm kỹ năng **`{special_item.item_name}`** cho player {user.mention}!")
+        return
+    else:
+        word_matching_channel= db.find_word_matching_info_by_id(channel_id= called_channel.id, guild_id= called_channel.guild.id, language= 'vn')
+        if word_matching_channel:
+            if item_id is None or user is None:
+                await ctx.send(f"Dùng sai câu lệnh")
+                return
+            #Lấy item theo item_id
+            special_item = get_special_item_by_id(item_id=item_id)
+            if special_item==None:
+                await ctx.send(f"{message.author.mention} Kỹ năng **`{message.content}`** không hợp lệ")
+                return
+            #Add item vào inven của player
+            db.update_player_special_item_word_matching_info(user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language='vn', special_item= special_item)
+            await ctx.send(f"Đã thêm kỹ năng **`{special_item.item_name}`** cho player {message.author.mention}!")
+            return
+        else:
+            await ctx.send(f"Đây không phải là channel dùng để chơi nối từ. Chỉ dùng lệnh này trong channel chơi nối từ thôi!")
+    return
+
+#region remove skill
+@bot.command()
+@app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
+async def remove_skill(ctx, item_id: str = None, user: Optional[discord.Member] = None):
+    message: discord.Message = ctx.message
+    called_channel = message.channel
+    req_roles = ['Cai Ngục', 'Moderator','Server Master']
+    has_required_role = any(role.name in req_roles for role in message.author.roles)
+    if not has_required_role:
+        await ctx.send("Không đủ thẩm quyền để dùng lệnh.")
+        return
+    #Kiểm tra xem ở đây là bảng channel nối từ hay không
+    word_matching_channel = db.find_word_matching_info_by_id(channel_id= called_channel.id, guild_id= called_channel.guild.id, language= 'en')
+    if word_matching_channel:
+        if item_id is None or user is None:
+            await ctx.send(f"Dùng sai câu lệnh. Vui lòng dùng câu lệnh đúng format sau.\n!remove_skill skill_id @User")
+            return
+        selected_player = None
+        for player in word_matching_channel.player_profiles:
+            if player.user_id == user.id:
+                selected_player = player
+                break
+        if selected_player == None:
+            await ctx.send(f"Không tìm được user này trong bảng xếp hạng.")
+            return
+        if selected_player.special_items == None or len(selected_player.special_items) == 0:
+            await ctx.send(f"User không có bất kỳ kỹ năng đặc biệt nào cả.")
+            return
+        if item_id == "random":
+            #Xoá ngẫu nhiên skill của user
+            random_item = random.choice(selected_player.special_items)
+            if random_item:
+                db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=user.id, user_name=user.name, user_display_name=user.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language='en', special_item= random_item)
+                await ctx.send(f"Đã xoá kỹ năng **`{random_item.item_name}`** khỏi kho kỹ năng của người chơi {user.mention}.")
+            else:
+                await ctx.send(f"User không có bất kỳ kỹ năng đặc biệt nào cả.")
+            return
+        elif item_id == "all":
+            #Xoá toàn bộ skill của user
+            for player_item in selected_player.special_items:
+                db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=user.id, user_name=user.name, user_display_name=user.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language='en', special_item= player_item)
+            await ctx.send(f"Đã xoá toàn bộ kỹ năng khỏi kho kỹ năng của người chơi {user.mention}.")
+            return
+        #Lấy item theo item_id
+        special_item = get_special_item_by_id(item_id=item_id)
+        if special_item==None:
+            await ctx.send(f"{message.author.mention} Kỹ năng **`{item_id}`** không hợp lệ")
+            return
+        #xoá khỏi inven của player
+        db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=user.id, user_name=user.name, user_display_name=user.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language='en', special_item= special_item)
+        await ctx.send(f"Đã xoá kỹ năng **`{special_item.item_name}`** khỏi kho kỹ năng của người chơi {user.mention}!")
+        return
+    else:
+        word_matching_channel= db.find_word_matching_info_by_id(channel_id= called_channel.id, guild_id= called_channel.guild.id, language= 'vn')
+        if word_matching_channel:
+            if item_id is None or user is None:
+                await ctx.send(f"Dùng sai câu lệnh. Vui lòng dùng câu lệnh đúng format sau.\n!give_skill skill_id @User")
+                return
+            selected_player = None
+            for player in word_matching_channel.player_profiles:
+                if player.user_id == user.id:
+                    selected_player = player
+                    break
+            if selected_player == None:
+                await ctx.send(f"Không tìm được user này trong bảng xếp hạng.")
+                return
+            if selected_player.special_items == None:
+                await ctx.send(f"User không có bất kỳ kỹ năng đặc biệt nào cả.")
+                return
+            if item_id == "random":
+                #Xoá ngẫu nhiên skill của user
+                random_item = random.choice(selected_player.special_items)
+                if random_item:
+                    db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=user.id, user_name=user.name, user_display_name=user.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language='vn', special_item= random_item)
+                    await ctx.send(f"Đã xoá kỹ năng **`{random_item.item_name}`** khỏi kho kỹ năng của người chơi {user.mention}.")
+                else:
+                    await ctx.send(f"User không có bất kỳ kỹ năng đặc biệt nào cả.")
+                return
+            elif item_id == "all":
+                #Xoá toàn bộ skill của user
+                for player_item in selected_player.special_items:
+                    db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=user.id, user_name=user.name, user_display_name=user.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language='vn', special_item= player_item)
+                await ctx.send(f"Đã xoá toàn bộ kỹ năng khỏi kho kỹ năng của người chơi {user.mention}.")
+                return
+            #Lấy item theo item_id
+            special_item = get_special_item_by_id(item_id=item_id)
+            if special_item==None:
+                await ctx.send(f"{message.author.mention} Kỹ năng **`{item_id}`** không hợp lệ")
+                return
+            #xoá khỏi inven của player
+            db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=user.id, user_name=user.name, user_display_name=user.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language='vn', special_item= special_item)
+            await ctx.send(f"Đã xoá kỹ năng **`{special_item.item_name}`** khỏi kho kỹ năng của người chơi {user.mention}!")
+            return
+        else:
+            await ctx.send(f"Đây không phải là channel dùng để chơi nối từ. Chỉ dùng lệnh này trong channel chơi nối từ thôi!")
+    return
+
+#region Use skill
+@bot.command()
+@app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
+async def use_skill(ctx, item_id: str = None, user: Optional[discord.Member] = None):
+    message: discord.Message = ctx.message
+    called_channel = message.channel
+    #Kiểm tra xem ở đây là bảng channel nối từ hay không
+    word_matching_channel = db.find_word_matching_info_by_id(channel_id= called_channel.id, guild_id= called_channel.guild.id, language= 'en')
+    if word_matching_channel:
+        if item_id is None and user is None:
+            embed = danh_sach_ky_nang(word_matching_channel= word_matching_channel, user=message.author)
+            await message.reply(embed=embed)
+            return
+        #Lấy item theo item_id
+        special_item = get_special_item_by_id(item_id=item_id)
+        if special_item==None:
+            await message.reply(f"{message.author.mention} Kỹ năng **`{message.content}`** không hợp lệ")
+            return
+        #Kiểm xem kỹ năng có cần mục tiêu không
+        elif special_item.required_target==True and user is None:
+            await message.reply(f"{message.author.mention} Kỹ năng **`{special_item.item_name}`** yêu cầu phải có mục tiêu mới dùng được.")
+            return
+        #Kiểm xem user có kỹ năng đó không
+        player = find_player_profile_by_user_id(user_id=message.author.id, word_matching_channel=word_matching_channel)
+        if player == None:
+            await message.reply(f"{message.author.mention} Bạn không nằm trong danh sách người chơi.")
+            return
+        elif player.special_items == None:
+            await message.reply(f"{message.author.mention} Bạn không có bất kỳ kỹ năng nào để dùng.")
+            return
+        else:
+            matched = False
+            for user_item in player.special_items:
+                if user_item.item_id == item_id:
+                    matched = True
+                    break
+            if matched == False:
+                await message.reply(f"{message.author.mention} Bạn không có kỹ năng này.")
+                return
+        #Sau khi bắt lỗi, bắt đầu thực hiện chức năng kỹ năng
+        await process_special_item_functions(word_matching_channel=word_matching_channel, special_item=special_item, message=message, user_target=user, lan = 'en')
+        return
+    else:
+        word_matching_channel= db.find_word_matching_info_by_id(channel_id= called_channel.id, guild_id= called_channel.guild.id, language= 'vn')
+        if word_matching_channel:
+            #to-do
+            await ctx.send(f"Hệ thống kỹ năng đang phát triển, chưa dùng được đâu!")
+            return
+        else:
+            await ctx.send(f"Đây không phải là channel dùng để chơi nối từ. Chỉ dùng lệnh này trong channel chơi nối từ thôi!")
+    return
+
+
+#region xử lý skill nối từ
+async def process_special_item_functions(word_matching_channel: db.WordMatchingInfo, special_item: WordMatchingClass.SpecialItem, message: discord.Message, lan:str,user_target: discord.User = None):
+    #Kỹ năng hint, gợi ý từ
+    if special_item.item_id == "ct_hint":
+        #Tìm từ hợp lệ, bắt đầu bằng chữ cái trong word_matching_channel
+        suitable_word = None
+        for word in english_words_dictionary.keys():
+            if len(word) > 1 and word.startswith(word_matching_channel.last_character) and word not in word_matching_channel.used_words:
+                suitable_word = word
+        if suitable_word == None:
+            await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`**.\nRất tiếc là không có từ hợp lệ... lạ ta. <@315835396305059840>")
+        half_length = (len(suitable_word) + 1) // 2
+        suitable_word = suitable_word[:half_length] + "..."
+        #Gợi ý nửa từ
+        await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`**.\nGợi ý từ hợp lệ: **`{suitable_word}**`")
+        #xoá khỏi inven của player
+        db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
+        return
+    elif special_item.item_id == "cc_hint":
+        #Tìm từ hợp lệ, bắt đầu bằng chữ cái trong word_matching_channel
+        suitable_word = None
+        for word in english_words_dictionary.keys():
+            if word.startswith(word_matching_channel.last_character) and word not in word_matching_channel.used_words:
+                suitable_word = word
+        if suitable_word == None:
+            await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`**.\nRất tiếc là không có từ hợp lệ... lạ ta. <@315835396305059840>")
+        await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`**.\nGợi ý từ hợp lệ: **`{suitable_word}**`")
+        db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
+        return
+    
+    elif special_item.item_id =="ct_curr_player":
+        #Chuyển current_player_id sang user_target là được
+        await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`**. Người chơi {user_target.mention} sẽ mất quyền nối từ trong lượt chơi hiện tại.\n")
+        db.update_current_player_id_word_matching_info(channel_id=message.channel.id,guild_id=message.guild.id, language=lan, user_id=user_target.id)
+        #xoá khỏi inven của player
+        db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
+        return
+    
+    elif special_item.item_id =="ct_allow":
+        #Chuyển current_player_id sang số 1 là được
+        await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`**.\n")
+        db.update_current_player_id_word_matching_info(channel_id=message.channel.id,guild_id=message.guild.id, language=lan, user_id=1)
+        #xoá khỏi inven của player
+        db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
+        return
+    
+    #Những kỹ năng có id tận cùng là minus_first
+    #Đây là những kỹ năng trừ điểm của top 1
+    elif special_item.item_id.endswith("minus_first"):
+        #Tìm top 1 player để trừ điểm
+        sort = sorted(word_matching_channel.player_profiles, key=lambda x: x.points, reverse=True)
+        top_1_profile = sort[0]
+        top_1_user = message.guild.get_member(top_1_profile.user_id)
+        if top_1_user == None:
+            await message.reply(f"Không tìm ra player top 1 để trừ điểm.\n")
+            return
+        db.update_player_point_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id= top_1_user.id, user_name=top_1_user.name,user_display_name=top_1_user.display_name, point=-special_item.point)
+        await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`** để trừ {special_item.point} điểm của {top_1_user.mention}.\n")
+        #xoá khỏi inven của player
+        db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
+        return
+    
+    #Những kỹ năng có id tận cùng là minus_second
+    #Đây là những kỹ năng trừ điểm của top 2
+    elif special_item.item_id.endswith("minus_second"):
+        #Tìm top 2 player để trừ điểm
+        sort = sorted(word_matching_channel.player_profiles, key=lambda x: x.points, reverse=True)
+        top_profile = sort[1]
+        top_user = message.guild.get_member(top_profile.user_id)
+        if top_user == None:
+            await message.reply(f"Không tìm ra player top 2 để trừ điểm.\n")
+            return
+        db.update_player_point_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id= top_user.id, user_name=top_user.name,user_display_name=top_user.display_name, point=-special_item.point)
+        await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`** để trừ {special_item.point} điểm của {top_user.mention}.\n")
+        #xoá khỏi inven của player
+        db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
+        return
+    
+    elif special_item.item_id.endswith("steal_skill") or special_item.item_id.endswith("del_skill"):
+        #Lấy ra ngẫu nhiên skill trong bộ skils của đối thủ
+        selected_player = None
+        for player in word_matching_channel.player_profiles:
+            if player.user_id == user_target.id:
+                selected_player = player
+                break
+        if selected_player == None:
+            await message.reply(f"Không tìm được user này trong bảng xếp hạng.")
+            return
+        elif selected_player.special_items == None or len(selected_player.special_items) == 0:
+            await message.reply(f"Đối phương không có bất kỳ kỹ năng đặc biệt nào cả.")
+            return
+        random_item = random.choice(selected_player.special_items)
+        action = "xoá"
+        if special_item.item_id.endswith("steal_skill"): 
+            action = "cướp"
+            #Thêm cái random item kia cho user
+            db.update_player_special_item_word_matching_info(user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= random_item)
+        #xoá random item kia ra khỏi inven của user target
+        db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=user_target.id, user_name=user_target.name, user_display_name=user_target.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= random_item)
+        #xoá skill đã dùng khỏi inven của player
+        db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
+        await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`** để {action} kỹ năng **`{random_item.item_name}`** của {user_target.mention}.\n")
+        return
+
+    #Những kỹ năng có id chứa chữ "_random_skill_"
+    #Đây là những kỹ năng đổi điểm lấy skill
+    elif special_item.item_id.endswith("random_skill_dc") or special_item.item_id.endswith("random_skill_cc"):
+        random_skill = None
+        if special_item.item_id.endswith("dc"):
+            random_skill = random.choice(WordMatchingClass.list_special_items_dang_cap)
+        else:
+            random_skill = random.choice(WordMatchingClass.list_special_items_cap_cao)
+        #Thêm cái random item kia cho user
+        db.update_player_special_item_word_matching_info(user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= random_skill)
+        #Skill này yêu cầu hy sinh điểm để đổi skill
+        db.update_player_point_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id= message.author.id, user_name=message.author.name,user_display_name=message.author.display_name, point=-random_skill.point)
+        #xoá skill đã dùng khỏi inven của player
+        db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
+        await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`** để hy sinh {random_skill.point} điểm, và nhận được kỹ năng **`{random_skill.item_name}`**.\n")
+        return
+    
+    #Những kỹ năng có id tận cùng là _minus hoặc _add
+    #Đây là những kỹ năng trừ điểm hoặc cộng điểm của đối thủ
+    elif special_item.item_id.endswith("_minus") or special_item.item_id.endswith("_add"):
+        is_minus = special_item.item_id.endswith("_minus")
+        if user_target == None and is_minus:
+            await message.reply(f"Kỹ năng **`{special_item.item_name}`** cần phải tag tên của đối phương mới có hiệu nghiệm.\n")
+            return
+        if is_minus:
+            db.update_player_point_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id= user_target.id, user_name=user_target.name,user_display_name=user_target.display_name, point=-special_item.point)
+            await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`** để trừ {special_item.point} điểm của {user_target.mention}.\n")
+        else:
+            db.update_player_point_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id= message.author.id, user_name=message.author.name,user_display_name=message.author.display_name, point=special_item.point)
+            await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`** để cộng {special_item.point} điểm cho bản thân mình.\n")
+        #xoá khỏi inven của player
+        db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
+        return
+    
+    #Những kỹ năng có id tận cùng là _add_user
+    #Đây là những kỹ năng cộng điểm cho đối thủ
+    elif special_item.item_id.endswith("_add_user"):
+        if user_target == None:
+            await message.reply(f"Kỹ năng **`{special_item.item_name}`** cần phải tag tên của đối phương mới có hiệu nghiệm.\n")
+            return
+        elif user_target.id == message.author.id:
+            await message.reply(f"Ôi bạn ơi, kỹ năng **`{special_item.item_name}`** chỉ dành cho người khác chứ không phải dành cho bạn.\n")
+            return
+        db.update_player_point_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id= user_target.id, user_name=user_target.name,user_display_name=user_target.display_name, point=special_item.point)
+        await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`** để cộng {special_item.point} điểm của {user_target.mention}.\n")
+        #xoá khỏi inven của player
+        db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
+        return
+    
+    #Những kỹ năng có id tận cùng là minus_all
+    #Đây là những kỹ năng trừ điểm toàn bộ đối thủ
+    elif special_item.item_id.endswith("minus_all"):
+        await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`** để trừ {special_item.point} điểm cho toàn bộ đấu thủ!\n")
+        db.update_all_players_point_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, point=-special_item.point, immune_user_id=message.author.id)
+        #xoá khỏi inven của player
+        db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
+        return
+    
+    #Những kỹ năng có id chứa chữ "_swap_"
+    #Đây là những kỹ năng cộng điểm lên top
+    elif "_swap_" in special_item.item_id:
+        #Tìm top player để cộng điểm bản thân lên
+        sort = sorted(word_matching_channel.player_profiles, key=lambda x: x.points, reverse=True)
+        for player in word_matching_channel.player_profiles:
+            if player.user_id == message.author.id:
+                curr_player = player
+                break
+        top_profile = None
+        if special_item.item_id.endswith("2"): 
+            #Lấy profile top 2 ra
+            top_profile = sort[1]
+        else:
+            #Lấy profile top 3 ra
+            top_profile = sort[2]
+        if top_profile == None:
+            await message.reply(f"Không tìm ra profile player top để dùng kỹ năng này.\n")
+            return
+        top_user = message.guild.get_member(top_profile.user_id)
+        if top_user == None:
+            await message.reply(f"Không tìm ra user để dùng kỹ năng.\n")
+            return
+        #Lấy điểm của user_target ra và trừ điểm hiện tại của người chơi, đó sẽ là điểm cần cộng cho người chơi
+        calc_point = top_profile.points -curr_player.points
+        db.update_player_point_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id= message.author.id, user_name=message.author.name,user_display_name=message.author.display_name, point=calc_point)
+        #User target bị trừ năm điểm
+        db.update_player_point_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id= top_user.id, user_name=top_user.name,user_display_name=top_user.display_name, point=-special_item.point)
+        await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`** để thế vị trí của {top_user.mention}, và đối phương đã bị trừ {special_item.point} điểm.\n")
+        #xoá khỏi inven của player
+        db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
+        return
+    
+    await message.reply(f"Darkie chưa hoàn thành kỹ năng **`{special_item.item_name}`** đâu nhé. Vui lòng đợi Darkie hoàn thiện bộ kỹ năng.")
+    return
+
+def get_special_item_by_id(item_id: str):
+    for data in WordMatchingClass.list_special_items_cap_thap:
+        if data.item_id == item_id:
+            return data
+    for data in WordMatchingClass.list_special_items_cap_cao:
+        if data.item_id == item_id:
+            return data
+    for data in WordMatchingClass.list_special_items_dang_cap:
+        if data.item_id == item_id:
+            return data
+    for data in WordMatchingClass.list_special_items_toi_thuong:
+        if data.item_id == item_id:
+            return data
+    return None
+
+def danh_sach_ky_nang(word_matching_channel: db.WordMatchingInfo, user = discord.Member):
+    embed = discord.Embed(title=f"Danh sách kỹ năng", description= f"Player: {user.mention}", color=0xC3A757)  # Yellowish color
+    if word_matching_channel.player_profiles:
+        word_matching_channel.player_profiles.sort(key=lambda x: x.points, reverse=True)
+        matched = False
+        for profile in word_matching_channel.player_profiles:
+            if profile.user_id == user.id:
+                matched = True
+                if profile.special_items:
+                    for index_item, item in enumerate(profile.special_items):
+                        target_require = "Có" if item.required_target else "Không"
+                        embed.add_field(name=f"Kỹ năng {index_item+1}", value= f"Tên kỹ năng: *{item.item_name}*\nRank: {item.level} \n\nMô tả kỹ năng: {item.item_description}", inline=False)  # Single-line field
+                        embed.add_field(name=f"________________", value= f"")
+                else:
+                    embed.add_field(name="", value= "Bạn không có kỹ năng đặc biệt nào cả.", inline=False)
+                break
+        if matched == False:
+            embed.add_field(name="", value= "Bạn hãy nối từ trước đi đã.", inline=False)
+    else:
+        embed.add_field(name="", value= "Chưa có danh sách Player Profile.", inline=False)
+    return embed
+
+
+def find_player_profile_by_user_id(word_matching_channel: db.WordMatchingInfo, user_id = int):
+    if word_matching_channel.player_profiles:
+        for profile in word_matching_channel.player_profiles:
+            if profile.user_id == user_id:
+                return profile
+        return None
+    else:
+        return None
+#endregion   
+#endregion
+
+
+
+#region Bot Slash Commands
+
+#region say command
+@bot.tree.command(name = "say", description="Nói gì đó ẩn danh thông qua bot, có thể gắn hình ảnh và nhắn vào Channel khác", guild=discord.Object(id=1256987900277690470))
+@app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
+async def say(interaction: discord.Interaction, thing_to_say : str, image: Optional[discord.Attachment] = None, chosen_channel: Optional[discord.TextChannel]= None):
+    await interaction.response.send_message(content="Đã gửi tin nhắn ẩn danh thành công", ephemeral=True)
+    req_roles = ['Cai Ngục', 'Supervisor', 'Server Master', 'Moderator', 'Thần Dân']
+    has_required_role = any(role.name in req_roles for role in interaction.user.roles)
+    if not has_required_role:
+        await interaction.followup.send("Không đủ thẩm quyền để thực hiện lệnh.")
+        return
+    #Lấy channel mà người dùng gọi ra
+    current_channel_id = interaction.channel_id
+    current_channel = bot.get_channel(current_channel_id)
+    if chosen_channel != None:
+        current_channel = bot.get_channel(chosen_channel.id)
+
+    #Lấy user-id lật ngược lại
+    reversed_id = CustomFunctions.reverse_string_loop(str(interaction.user.id))
+    
+    #tạo random id
+    characters = string.ascii_letters
+    unique_id = ''.join(random.choices(characters, k=5))
+    
+    # Create embed object
+    embed = discord.Embed(title=f"Lời thú nhận ẩn danh ({unique_id})", color=0xC3A757)  # Yellowish color
+    embed.add_field(name="______________", value= "", inline=False)  # Single-line field
+    embed.add_field(name=f"'{thing_to_say}'", value= "", inline=False)
+    if image != None:
+        embed.set_image(url= image.url)
+    embed.add_field(name="______________", value= f"Anon: 0{reversed_id}", inline=False)  # Single-line field
+    embed.set_footer(text=f"❗Lưu ý không lạm dùng chức năng này. Nếu cảm thấy lời thú nhận này có vấn đề hãy thông báo ngay cho Server Master để giải quyết")  # Footer text
+    # await interaction.followup.send(content= "Đã gửi tin nhắn ẩn danh thành công.", ephemeral= True)
+    await current_channel.send(embed= embed)
+    commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} used /say to say: {thing_to_say}")
+#endregion
+
+#region jail command
+@bot.tree.command(name="jail", description="Tống ai đó vào đại lao trong khoảng thời gian nhất định.", guild=discord.Object(id=1256987900277690470))
+@app_commands.describe(user= "Người cần tống giam", duration= "Thời gian tống giam (nhập số)", time_format = "Thời gian tống giam (second, minute, hour, day, week, month)", reason="Lý do tống giam")
+async def first_command(interaction: discord.Interaction, user : discord.Member, duration: int, time_format : str, reason : str):
+    await interaction.response.defer()  # Defer the interaction early
+    req_roles = ['Cai Ngục', 'Supervisor', 'Server Master', 'Moderator']
+    jail_db = "jailed_user"
+    has_required_role = any(role.name in req_roles for role in interaction.user.roles)
+    if not has_required_role:
+        await interaction.followup.send("Không đủ thẩm quyền để tống giam.")
+        return
+    if time_format not in ['second', 'minute', 'hour', 'day', 'month']:
+        await interaction.followup.send("Sai định dạng thời gian. Chỉ dùng những từ sau: second, minute, hour, day, month.", ephemeral=True)
+        return
+    # Calculate the end time
+    end_time = datetime.now() + CustomFunctions.get_timedelta(duration, time_format)
+    mordern_date_time_format = end_time.strftime(f"%d/%m/%Y %H:%M")
+    # Save user's roles
+    original_roles = user.roles[1:]  # Exclude @everyone role
+    stored_original_roles = []
+    for role in original_roles:
+        old_role = {
+                        "role_id": role.id,
+                        "role_name": role.name
+                    }
+        stored_original_roles.append(old_role)
+    
+    # Remove all roles and add jail role
+    jail_role = discord.utils.get(user.guild.roles, name="Đáy Xã Hội")
+    if not jail_role:
+        jail_role = await user.guild.create_role(name="Đáy Xã Hội")
+
+    user_info = UserInfo(
+    user_id=user.id,
+    user_name=user.name,
+    user_display_name=user.display_name,
+    reason= reason,
+    jail_until= end_time,
+    roles=stored_original_roles
+    )
+    print(user_info)
+    
+    
+    #Tìm xem user này đã có chưa, chưa có thì insert
+    search_user = db.find_user_by_id(user_info.user_id, jail_db)
+    if search_user == None:
+        #Insert
+        db.create_user(user_info= user_info, chosen_collection= jail_db)
+    else:
+        #Update lại jail_until và reason
+        updated_data = {"jail_until": end_time.isoformat(), "reason" :user_info.reason }
+        db.update_guild_extra_info(guild_id=user_info.user_id, update_data= updated_data)
+    
+    await user.remove_roles(*original_roles)
+    await user.add_roles(jail_role)
+    # Create embed object
+    embed = discord.Embed(title="Đại Lao Thẳng Tiến", description=f"Kẻ tội đồ {user.mention} đã bị  {interaction.user.mention}bắt giữ và tống vào đại lao!", color=0x00FF00)  # Green color
+    embed.add_field(name="Lý do bị tù đày:", value=reason, inline=False)  # Single-line field
+    embed.add_field(name="Sẽ được ân xoá sau khoảng thời gian:", value=f"{duration} {time_format}", inline=False)
+    embed.add_field(name="Thời gian ra đại lao:", value=f"{mordern_date_time_format}", inline=True)
+    embed.add_field(name="Ghi chú", value="Nếu quá thời hạn phạt tù mà chưa được ra tù thì hãy la làng lên nhé!", inline=False) 
+    embed.set_footer(text=f"Đã bị tống giam bởi: {interaction.user.name}")  # Footer text
+
+    await interaction.followup.send(f"Kẻ tội độ {user.mention} đã bị {interaction.user.mention} bắt giữ và sẽ bị tống vào đại lao. Kẻ tội đồ này chỉ được thả ra xã hội sau {duration} {time_format}. Lý do tống giam: {reason}")
+    channel = bot.get_channel(1257012036718563380)
+    if channel:
+        await channel.send(content=f"{user.mention}",embed=embed)
+    print(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} jailed {user.display_name} for {duration} {time_format}. Reason: {reason}")
+    commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} jailed {user.display_name} for {duration} {time_format}. Reason: {reason}")
+#endregion
+
+#region unjail command
+@bot.tree.command(name="unjail", description="Ân xá tội đồ ra khỏi đại lao ngay lập tức.", guild=discord.Object(id=1256987900277690470))
+@app_commands.describe(user= "Người cần ân xá", reason = "Lý do tại sao ân xá")
+async def unjail(interaction: discord.Interaction, user : discord.Member, reason : str):
+    await interaction.response.defer()
+    req_roles = ['Cai Ngục', 'Supervisor', 'Server Master', 'Moderator']
+    jail_db = "jailed_user"
+    has_required_role = any(role.name in req_roles for role in interaction.user.roles)
+    if not has_required_role:
+        await interaction.followup.send("Không đủ thẩm quyền để ân xá tội đồ.")
+        return
+    
+    #Xoá role Đáy Xã Hội
+    jail_role = discord.utils.get(user.guild.roles, name="Đáy Xã Hội")
+    if jail_role:
+        await user.remove_roles(jail_role)
+    
+    #Tìm xem user này đã có chưa, có thì xoá khỏi db jail_user
+    search_user = db.find_user_by_id(user.id, jail_db)
+    if search_user:
+        #Restore lại roles cũ của user
+        for role in search_user.roles:
+            get_role_from_server = discord.utils.get(user.guild.roles, id = role["role_id"])
+            if get_role_from_server:
+                await user.add_roles(get_role_from_server)
+        #Xoá row khỏi database
+        db.delete_user_by_id(user_id= user.id, chosen_collection= jail_db)
+    # Create embed object
+    embed = discord.Embed(title="Ân Xá Khỏi Đại Lao", description=f"Kẻ tội đồ {user.mention} đã được {interaction.user.mention} ân xoá khỏi đại lao!", color=0x00FF00)  # Green color
+    embed.add_field(name="Lý do được ân xá:", value=reason, inline=False)  # Single-line field
+    embed.add_field(name="Thời gian ra đại lao:", value=f"{datetime.now().isoformat()}", inline=True)
+    embed.add_field(name="Ghi chú", value="Nhớ đừng vi phạm để bị tống vài đại lao nữa nhé!", inline=False) 
+    embed.set_footer(text=f"Đã được ân xoá bởi: {interaction.user.name}")  # Footer text
+
+    await interaction.followup.send(f"Kẻ tội độ {user.mention} đã được {interaction.user.mention} ân xá đại lao. Mong thần dân đừng vi phạm để thành kẻ tội đồ nữa. Lý do ân xá: {reason}")
+    channel = bot.get_channel(1257012036718563380)
+    if channel:
+        await channel.send(embed=embed)
+    print(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} unjailed {user.display_name}. Reason: {reason}")
+    commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} unjailed {user.display_name}. Reason: {reason}")
+#endregion
+
+#region delete_message command
+@bot.tree.command(name="delete_message", description="Xoá tin nhắn bất kỳ.", guild=discord.Object(id=1256987900277690470))
+@app_commands.describe(reason= "Lý do tại sao xoá tin nhắn này", message_id= "Chuột phải vào message muốn xoá, vào bấm Copy Id rồi dán vào đây")
+async def delete_message(interaction: discord.Interaction, reason : str, message_id: str):
+    await interaction.response.defer(ephemeral=True)
+    req_roles = ['Supervisor', 'Server Master', 'Moderator', 'Ultimate Admins']
+    has_required_role = any(role.name in req_roles for role in interaction.user.roles)
+    if not has_required_role:
+        await interaction.followup.send("Không đủ thẩm quyền để thực hiện lệnh.")
+        return
+    try:
+        mess_to_delete = await interaction.channel.fetch_message(int(message_id))
+        user_reported = mess_to_delete.author
+        is_user_admin = any(role.name in req_roles for role in user_reported.roles)
+        if is_user_admin and interaction.user.id != 315835396305059840:        #Chỉ Darkie mới được quyền xoá tin nhắn của admin, moderator
+            await interaction.followup.send("Không thể xoá tin nhắn của admin/moderator. Vui lòng liên hệ <@315835396305059840>.")
+            return
+        image_urls = [attachment.url for attachment in mess_to_delete.attachments]
+        # Create embed object
+        embed = discord.Embed(title="Một tin nhắn đã bị xoá", description=f"User {interaction.user.mention} đã xoá một tin nhắn của {mess_to_delete.author.mention} đăng tại <#{mess_to_delete.channel.id}>!", color=0xFC0345)
+        embed.add_field(name="Lý do xoá tin nhắn:", value=reason, inline=False)  # Single-line field
+        embed.add_field(name="Nội dung tin nhắn bị xoá:", value=mess_to_delete.content, inline=False)
+        if image_urls != None and len(image_urls) == 1:
+            embed.set_image(url= image_urls[0])
+        elif image_urls != None and len(image_urls) > 1:
+            embed.add_field(name="Tin nhắn chứa nhiều hình ảnh. Dưới đây là những hình ảnh trong tin nhắn đó.", value="", inline=False)
+            for index,url in enumerate(image_urls):
+                embed.add_field(name="", value=f"{index+1}. {url}", inline=False)
+        embed.set_footer(text=f"Message Id: {message_id}. User ID Invoke: {interaction.user.id}")  # Footer text
+        await mess_to_delete.delete()
+        await interaction.followup.send(f"Đã xoá tin nhắn ID: {message_id}. Lý do xoá: {reason}", ephemeral=True)
+        channel = bot.get_channel(1257150347017850990) #Log-text
+        await channel.send(embed=embed)
+        print(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} delete message of {mess_to_delete.author.display_name}.")
+        commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} delete message of {mess_to_delete.author.display_name}.")
+    except discord.NotFound:
+            await interaction.followup.send(f"Không tìm được tin nhắn với ID {message_id}. Vui lòng thử lại!", ephemeral=True)
+            commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} tried to delete message id{message_id} but not found.")
+    except discord.Forbidden:
+            await interaction.followup.send(f"Bot không có quyền xoá tin nhắn với ID {message_id}. Vui lòng cấp quyền Manage Message!", ephemeral=True)
+            commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} tried to delete message id{message_id} but bot has insufficient permissions.")
+    except Exception as e:
+            await interaction.followup.send(f"<@315835396305059840> Bot gặp exception trong lúc xoá message ID {message_id}. Exception: {str(e)}. Vui lòng liên hệ Darkie!")
+            commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} tried to delete message id{message_id} but got exception {str(e)}.")
+#endregion
+
+#region report command
+@bot.tree.command(name="report", description="Báo cáo user vi phạm luật về cho admin và moderator xem xét.", guild=discord.Object(id=1256987900277690470))
+@app_commands.describe(user="Chọn user đã phạm luật để báo cáo", reason="Lý do tại sao báo cáo", message_id= "Chuột phải vào message muốn xoá, vào bấm Copy Id rồi dán vào đây", image = "Chọn hình làm bằng chứng (sẽ xử lý nhanh hơn).")
+async def report(interaction: discord.Interaction, user : discord.Member, reason: str, message_id: Optional[str] = None, image: Optional[discord.Attachment] = None):
+    await interaction.response.defer(ephemeral=True)
+    req_roles = ['Thần Dân', 'Supervisor', 'Server Master', 'Moderator', 'Ultimate Admins']
+    has_required_role = any(role.name in req_roles for role in interaction.user.roles)
+    if not has_required_role:
+        await interaction.followup.send("Không đủ thẩm quyền để thực hiện lệnh. Phải có role 'Thần Dân'.")
+        return
+    try:
+        await interaction.followup.send(f"Đã thành công gửi báo cáo {user.mention} về cho dàn admin và moderator xem xét với lý do: {reason}.", ephemeral=True)
+        channel = bot.get_channel(1257004337989943370) #great-hall
+        if channel:
+            # Create embed object
+            embed = discord.Embed(title="Có người gửi báo cáo, admin và moderator vui lòng kiểm tra", description=f"User {interaction.user.mention} đã báo cáo {user.mention} tại <#{interaction.channel.id}>!", color=0xFC0345)
+            embed.add_field(name="Lý do báo cáo:", value=reason, inline=False)  # Single-line field
+            
+            if message_id!= None:
+                mess = await interaction.channel.fetch_message(int(message_id))
+                if mess:
+                    embed.add_field(name="Nội dung bị báo cáo:", value=mess.content, inline=True)
+                    embed.add_field(name="Id Message:", value=f"{mess.jump_url}", inline=True)
+            if image != None:
+                embed.set_image(url= image.url)
+            embed.set_footer(text=f"User ID Invoke: {interaction.user.id}")  # Footer text
+            view = CustomButton.CustomReportButtonView() #Gắn nút report
+            await channel.send(embed=embed, view= view)
+            print(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} report user id: {user.id} with Username {user.name}.")
+            commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} report user id: {user.id} with Username {user.name}.")
+        else:
+            await interaction.followup.send(f"<@315835396305059840> Bot không tìm được channel để gửi báo cáo!")
+    except Exception as e:
+        #Tag bản thân
+        await interaction.followup.send(f"<@315835396305059840> Bot gặp exception trong lúc thực hiện lệnh. Exception: {str(e)}. Vui lòng liên hệ Darkie!", ephemeral=True)
+        commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} tried report user id {user.id} but got exception {str(e)}.")
+#endregion
+
+#region Truth Or Dare
+@bot.tree.command(name="truth_dare", description="Tạo mới trò chơi Truth Or Dare.", guild=discord.Object(id=1256987900277690470))
+async def report(interaction: discord.Interaction):
+    await interaction.response.defer(ephemeral=True)
+    req_roles = ['Thần Dân', 'Supervisor', 'Server Master', 'Moderator', 'Ultimate Admins']
+    has_required_role = any(role.name in req_roles for role in interaction.user.roles)
+    if not has_required_role:
+        await interaction.followup.send("Không đủ thẩm quyền để thực hiện lệnh.")
+        return
+    channel = interaction.channel
+    #Random true false, true là Truth, false là Dare
+    ran = random.choice([True, False])
+    content = ""
+    question_type = "Sự Thật"
+    if ran == True:
+        #Truth
+        content = CustomFunctions.get_random_response("OnTruthChallenge.txt")
+        question_type = "Sự Thật"
+    else:
+        question_type = "Thách Thức"
+        content = CustomFunctions.get_random_response("OnDareChallenge.txt")
+    # Create embed object
+    embed = discord.Embed(title=f"Nhớ là đã tạo thì chơi cho tới cùng chứ đừng nhát quá bỏ qua nha :)", description=f"Tới lượt chơi của {interaction.user.mention}", color=0x03F8FC)
+    embed.add_field(name=f"", value=f"*Loại trò chơi: {question_type}*", inline=False)
+    embed.add_field(name=f"", value="___________________", inline=False)
+    embed.add_field(name=f"{content}", value=f"", inline=False)
+    embed.add_field(name=f"", value="___________________", inline=False)
+    embed.set_footer(text=f"User ID Invoke: {interaction.user.id}")
+    view = CustomButton.CustomTruthDareComboButtons()
+    await interaction.followup.send(f"Đã tạo thành công trò sự thật hoặc thách thức.", ephemeral=True)
+    await channel.send(embed=embed, view= view)
+    print(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} create Truth Or Dare in channel id {channel.id}.")
+    commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} create Truth Or Dare in channel id {channel.id}.")
+#endregion
+
+#region Snipe command
+@bot.tree.command(name="snipe", description="Hiện lại message mới nhất vừa bị xoá trong channel này.", guild=discord.Object(id=1256987900277690470))
+async def snipe(interaction: discord.Interaction):
+    await interaction.response.defer()
+    req_roles = ['Supervisor', 'Server Master', 'Moderator', 'Ultimate Admins', 'Thần Dân', 'Đã_Mở_Khóa_Full_Kênh_Seg', 'Mod']
+    has_required_role = any(role.name in req_roles for role in interaction.user.roles)
+    if not has_required_role:
+        await interaction.followup.send("Không đủ thẩm quyền để thực hiện lệnh.")
+        return
+    called_channel = interaction.channel
+    
+    snipe_channel_info = db.find_snipe_channel_info_by_id(called_channel.id, interaction.guild.id)
+    if snipe_channel_info:
+        # list_snipe_message = []
+        # for mess in snipe_channel_info.snipe_messages:
+        #     list_snipe_message.append(mess.to_dict)
+        list_snipe_message = snipe_channel_info.snipe_messages
+        if list_snipe_message == None:
+            await interaction.followup.send(f"Chưa thấy bất kỳ message nào bị xoá trong channel {interaction.channel.mention}. Vui lòng thử lại sau.")
+            return
+        
+        temp_files = []
+        first_message = list_snipe_message[0]
+        if first_message != None and first_message.user_attachments!= None and len(first_message.user_attachments)>0:
+            for att in first_message.user_attachments:
+                file = await CustomFunctions.get_attachment_file_from_url(url= att.url, content_type= att.content_type)
+                if file != None: temp_files.append(file)
+                
+        view = CustomButton.PaginationView(bot=bot, interaction=interaction, items= list_snipe_message)
+        await interaction.followup.send(embed=view.embed, view=view, files=temp_files)
+    else:
+        await interaction.followup.send(f"Chưa có dữ liệu snipe cho channel {interaction.channel.mention}. Vui lòng thử lại sau.")
+#endregion
+
+#region Bảng Xếp Hạng Nối Từ
+@bot.tree.command(name="bxh_noi_tu", description="Hiện bảng xếp hạng những người chơi nối từ trong channel này.", guild=discord.Object(id=1256987900277690470))
+@app_commands.describe(user="Chọn user cần muốn xem cụ thể xếp hạng")
+async def bxh_noi_tu(interaction: discord.Interaction, user: Optional[discord.Member] = None):
+    await interaction.response.defer()
+    called_channel = interaction.channel
+    #Kiểm tra xem ở đây là bảng channel nối từ hay không
+    word_matching_channel = db.find_word_matching_info_by_id(channel_id= called_channel.id, guild_id= called_channel.guild.id, language= 'en')
+    if word_matching_channel:
+        embed = get_bxh_noi_tu(interaction=interaction, lan='en',word_matching_channel=word_matching_channel, user_mention=user)
+        await interaction.followup.send(embed= embed)
+    else:
+        word_matching_channel= db.find_word_matching_info_by_id(channel_id= called_channel.id, guild_id= called_channel.guild.id, language= 'vn')
+        if word_matching_channel:
+            embed = get_bxh_noi_tu(interaction=interaction, lan='vn',word_matching_channel=word_matching_channel, user_mention=user)
+            await interaction.followup.send(embed= embed)
+        else:
+            await interaction.followup.send(f"Đây không phải là channel dùng để chơi nối từ. Chỉ dùng lệnh này trong channel chơi nối từ thôi!")
+
+def get_bxh_noi_tu(interaction: discord.Interaction,lan: str, word_matching_channel: db.WordMatchingInfo, user_mention: Optional[discord.Member] = None):
+    if lan == 'en' or 'eng':
+        lan = "Tiếng Anh"
+    elif lan == 'vn':
+        lan = "Tiếng Việt"
+    embed = discord.Embed(title=f"Xếp hạng các player theo điểm.", description=f"Trò Chơi Nối Từ {lan}", color=0x03F8FC)
+    embed.add_field(name=f"", value="___________________", inline=False)
+    embed.set_footer(text=f"User ID Invoke: {interaction.user.id}")
+    count = 0
+    if word_matching_channel.player_profiles:
+        word_matching_channel.player_profiles.sort(key=lambda x: x.points, reverse=True)
+        if user_mention == None:
+            for index, profile in enumerate(word_matching_channel.player_profiles):
+                user = interaction.guild.get_member(profile.user_id)
+                if user != None and (profile.points!= 0 or len(profile.special_items)> 0):
+                    embed.add_field(name=f"", value=f"**Hạng {index+1}.** {user.mention}. Tổng điểm: **{profile.points}**. Số lượng kỹ năng đặc biệt: **{len(profile.special_items)}**.", inline=False)
+                    count+=1
+                if count >= 25: break
+        else:
+            matched = False
+            for index, profile in enumerate(word_matching_channel.player_profiles):
+                if profile.user_id == user_mention.id:
+                    user = interaction.guild.get_member(profile.user_id)
+                    embed.add_field(name=f"", value=f"**Hạng {index+1}.** {user.mention}. Tổng điểm: **{profile.points}**. Số lượng kỹ năng đặc biệt: **{len(profile.special_items)}**.", inline=False)
+                    #Show kỹ năng luôn
+                    if profile.special_items:
+                        embed.add_field(name=f"________________", value= f"")
+                        for index_item, item in enumerate(profile.special_items):
+                            target_require = "Có" if item.required_target else "Không"
+                            embed.add_field(name=f"Kỹ năng {index_item+1}", value= f"Tên kỹ năng: *{item.item_name}*\nRank: {item.level} \n\nMô tả kỹ năng: {item.item_description}", inline=False)  # Single-line field
+                            embed.add_field(name=f"________________", value= f"")
+                    matched = True
+                    break
+            if matched == False:
+                embed.add_field(name=f"", value=f"*Chưa có dữ liệu về người chơi này*", inline=False)     
+    else:
+        embed.add_field(name=f"", value=f"*Chưa có dữ liệu về người chơi*", inline=False)       
+    embed.add_field(name=f"", value="___________________", inline=False)
+    return embed     
+#endregion
+
+#endregion
+
+#endregion
+
+
+# Task: Check jail expiry
+@tasks.loop(seconds=30)
+async def check_jail_expiry():
+    now = datetime.now()
+    jail_db = "jailed_user"
+    #Lấy tất cả dữ liệu db jail user ra
+    list_all_jailed_users = db.find_all_users(chosen_collection=jail_db)
+    if list_all_jailed_users:
+        for guid in bot.guilds:
+            for jail_user in list_all_jailed_users:
+                #Lấy thời hạn tù đày
+                jailed_time = (jail_user.jail_until)
+                if jailed_time > now:
+                    return
+                user = guid.get_member(jail_user.user_id)
+                if user:
+                    #Xoá role Đáy Xã Hội
+                    jail_role = discord.utils.get(user.guild.roles, name="Đáy Xã Hội")
+                    await user.remove_roles(jail_role)
+                    #Tìm xem user này đã có chưa, có thì xoá khỏi db jail_user
+                    search_user = db.find_user_by_id(jail_user.user_id, jail_db)
+                    if search_user:
+                        #Restore lại roles cũ của user
+                        for role in search_user.roles:
+                            get_role_from_server = discord.utils.get(user.guild.roles, id = role["role_id"])
+                            if get_role_from_server:
+                                await user.add_roles(get_role_from_server)
+                        #Xoá row khỏi database
+                        db.delete_user_by_id(jail_user.user_id, chosen_collection= jail_db)
+                        # Create embed object
+                    embed = discord.Embed(title="Ân Xá Khỏi Đại Lao", description=f"Kẻ tội đồ {user.mention} đã hoàn thành hạn tù và ân xoá khỏi đại lao!", color=0x00FF00)  # Green color
+                    embed.add_field(name="Lý do được ân xá:", value="Hoàn thành hạn tù", inline=False)  # Single-line field
+                    embed.add_field(name="Thời gian ra đại lao:", value=f"{datetime.now().isoformat()}", inline=True)
+                    embed.add_field(name="Ghi chú", value="Nhớ đừng vi phạm để bị tống vài đại lao nữa nhé!", inline=False) 
+                    embed.set_footer(text=f"Đã được ân xoá bởi: {bot.user}")  # Footer text
+                    channel = bot.get_channel(1257012036718563380)
+                    if channel:
+                        await channel.send(embed=embed)
+                    commands_logger.info(f"Bot {bot.user} automatically unjailed {user.display_name} for time is up")
+                    print(f"Bot {bot.user} automatically unjailed {user.display_name} for time is up.")
+
+# Task: Nói chuyện tự động
+@tasks.loop(hours=3, minutes= 30)
+async def automatic_speak_randomly():
+    guilds = bot.guilds
+    for guild in guilds:
+        guild_extra_info = db.find_guild_extra_info_by_id(guild.id)
+        if guild_extra_info != None and guild_extra_info.list_channels_ai_talk != None:
+            random_channel_id = random.choice(guild_extra_info.list_channels_ai_talk)
+            actual_channel = guild.get_channel(random_channel_id)
+            if actual_channel:
+                
+                model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
+                prompt = CustomFunctions.get_automatically_talk_prompt("Creation 1", guild, actual_channel)
+                response = model.generate_content(f"{prompt}")
+                print(f"{bot.user} started talking on its own at {guild_extra_info.guild_name}, channel {actual_channel.name}.")
+                async with actual_channel.typing():
+                    await actual_channel.send(f"{response.text}")
+ 
+@tasks.loop(hours=12)
+async def remove_old_conversation():
+    #Kiểm tra các collections user_conversation_info_creation xem
+    #có dữ liệu nào có last interaction cách đây 3 ngày không
+    #Nếu có thì xoá luôn
+    count = 0
+    three_day_before = datetime.now() - timedelta(days=3)
+    bot_name = "creation_1"
+    list_all_user_convo_info = db.find_all_user_convo_info(bot_name)
+    if list_all_user_convo_info:
+        for data in list_all_user_convo_info:
+            if data.last_time_interaction < three_day_before:
+                db.delete_user_convo_info(data.user_id, bot_name)
+                count+=1
+    print(f"Found {count} old conversation in collection 'user_conversation_info_{bot_name}' and deleted them.")
+
+async def sub_function_ai_response(message: discord.Message):
+    if message.channel.id == 1269029322950180977: return #Channel nối-từ-tiếng-anh, không cho bot nói chuyện ở đây
+    bots_creation1_name = ["creation 1", "creation số 1", "creation no 1", "creation no. 1"]
+    if message.reference is not None and message.reference.resolved is not None:
+        if message.reference.resolved.author == bot.user or CustomFunctions.contains_substring(message.content.lower(), bots_creation1_name):
+            flag, mess = await CustomFunctions.check_message_nsfw(message, bot)
+            if flag != 0:
+                await message.reply(mess)
+                interaction_logger.info(f"Username {message.author.name}, Display user name {message.author.display_name} violated chat when talking to {bot.user}")
+                interaction_logger.info(f"Username {message.author.name} violated chat {message.content} when talking to {bot.user}")
+                return
+            async with message.channel.typing():
+                referenced_message = await message.channel.fetch_message(message.reference.message_id)
+                model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
+                prompt = await CustomFunctions.get_proper_prompt(message,"Creation 1", referenced_message)
+                print(f"Prompt generated from {bot.user}: {prompt}")
+                response = model.generate_content(f"{prompt}")
+                bot_response = (f"{response.text}")
+                #Kiểm tra xem bot reponse có nhiều emoji không, nếu nhiều quá thì remove emoji
+                if CustomFunctions.count_emojis_in_text(bot_response) > 4:
+                    bot_response = CustomFunctions.remove_emojis(bot_response)
+                #Nếu là bot thì đương nhiên không reply, chỉ nhắn bình thường thôi
+                if(message.author.id == CustomFunctions.user_cr_1["user_id"] or message.author.id == CustomFunctions.user_cr_2["user_id"] or message.author.id == CustomFunctions.user_cr_3["user_id"]):
+                    await message.channel.send(f"{message.author.mention} {bot_response}")
+                else:
+                    await message.reply(f"{bot_response}")
+                CustomFunctions.save_user_convo_data(message=message, bot_reponse= bot_response, bot_name= "Creation 1")
+                print(f"Username {message.author.name}, Display user name {message.author.display_name} replied {bot.user}")
+                interaction_logger.info(f"Username {message.author.name}, Display user name {message.author.display_name} replied {bot.user}")
+            
+    elif CustomFunctions.contains_substring(message.content.lower(), bots_creation1_name):
+        async with message.channel.typing():
+            flag, mess = await CustomFunctions.check_message_nsfw(message, bot)
+            if flag != 0:
+                await message.channel.send(mess)
+                interaction_logger.info(f"Username {message.author.name}, Display user name {message.author.display_name} violated chat when talking to {bot.user}")
+                interaction_logger.info(f"Username {message.author.name} violated chat {message.content} when talking to {bot.user}")
+            else:
+                model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
+                prompt = await CustomFunctions.get_proper_prompt(message,"Creation 1")
+                print(f"Prompt generated from {bot.user}: {prompt}")
+                response = model.generate_content(f"{prompt}")
+                bot_response = (f"{response.text}")
+                #Kiểm tra xem bot reponse có nhiều emoji không, nếu nhiều quá thì remove emoji
+                if CustomFunctions.count_emojis_in_text(bot_response) > 4:
+                    bot_response = CustomFunctions.remove_emojis(bot_response)     
+                await message.channel.send(f"{message.author.mention} {bot_response}")
+                CustomFunctions.save_user_convo_data(message=message, bot_reponse= bot_response, bot_name= "Creation 1")
+                print(f"Username {message.author.name}, Display user name {message.author.display_name} directly call {bot.user}")
+                interaction_logger.info(f"Username {message.author.name}, Display user name {message.author.display_name} directly call {bot.user}")
+    return
+
+async def english_word_matching(message: discord.Message):
+    if len(message.content.split()) == 1 and message.content[0] not in string.punctuation and message.content[0] != ":":
+        #Kiểm xem nằm đúng channel không
+        word_matching_channel = db.find_word_matching_info_by_id(channel_id= message.channel.id, guild_id= message.guild.id, language= 'en')
+        if word_matching_channel == None: return
+        point = 1
+        if word_matching_channel.special_point != None and word_matching_channel.special_point > 0:
+            point = word_matching_channel.special_point
+        lan = 'en'
+        #Bắt đầu chơi
+        message_tu_hien_tai = f"\nTừ hiện tại là: `'{word_matching_channel.current_word}'`, và có **{word_matching_channel.remaining_word if word_matching_channel.remaining_word else 0}** bắt đầu bằng chữ cái `{word_matching_channel.last_character if word_matching_channel.last_character else 0}`"
+        if word_matching_channel.current_player_id == message.author.id:
+            await message.add_reaction('❌')
+            await message.reply(f"Bạn đã nối từ rồi, vui lòng né qua để cho người khác chơi đi. {message_tu_hien_tai}")
+        #Kiểm tra xem content có chứa first character là last character của current word không
+        elif message.content.lower()[0] != word_matching_channel.last_character:
+            await matching_words_fail(err= f"Từ mới phải bắt đầu bằng chữ cái `'{word_matching_channel.last_character}'` mới được nha.", message=message, word_matching_channel=word_matching_channel,lan=lan,point=point)
+        #Kiểm xem content có nằm trong list từ đã nối rồi chưa
+        elif message.content.lower() in word_matching_channel.used_words:
+            await matching_words_fail(err= f"Từ `{message.content}` đã có người nối rồi bạn ơi.", message=message, word_matching_channel=word_matching_channel,lan=lan,point=point)
+        #Kiểm tra xem từ này có tồn tại không
+        elif message.content.lower() not in english_words_dictionary.keys():
+            await matching_words_fail(err= f"Từ `{message.content}` không nằm trong từ điển.", message=message, word_matching_channel=word_matching_channel,lan=lan,point=point)
+        else:
+            #Coi như pass hết
+            await message.add_reaction('👍')
+            #Cập nhật lại thông tin
+            db.update_data_word_matching_info(language=lan,channel_id=message.channel.id, guild_id= message.guild.id, current_player_id=message.author.id, current_player_name=message.author.name,current_word=message.content.lower())
+            db.update_player_point_word_matching_info(user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= point, guild_id=message.guild.id, channel_id=message.channel.id,language=lan)
+            word_matching_channel = db.find_word_matching_info_by_id(channel_id= message.channel.id, guild_id= message.guild.id, language=lan)
+            if word_matching_channel.remaining_word>0:
+                message_tu_hien_tai = f"\nTừ hiện tại là: `'{word_matching_channel.current_word}'`, và có **{word_matching_channel.remaining_word if word_matching_channel.remaining_word else 0}** bắt đầu bằng chữ cái `{word_matching_channel.last_character if word_matching_channel.last_character else 0}`"
+                #Kiểm tra xem có special_item không, nếu có thì cộng cho player
+                chuc_mung_item = ""
+                if word_matching_channel.special_item:
+                    db.update_player_special_item_word_matching_info(user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= point, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= word_matching_channel.special_item)
+                    chuc_mung_item = f" và nhận được kỹ năng **{word_matching_channel.special_item.item_name}**. Nhớ đừng quên sử dụng nó nhé"
+                #Trả lời đúng thì reset special_points và special_item lại từ đầu
+                await message.channel.send(f"Hay lắm {message.author.mention}, bạn đã được cộng {point} điểm{chuc_mung_item}. Để kiểm tra điểm số của mình thì hãy dùng lệnh /bxh_noi_tu nhé. {message_tu_hien_tai}")
+                db.update_special_point_word_matching_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_point= 0)
+                db.update_special_item_word_matching_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_item= None)
+                
+            elif word_matching_channel.remaining_word==0:
+                #reset lại
+                await message.channel.send(f"Kinh nhờ, chơi hết từ khả dụng rồi. Cảm ơn mọi người đã chơi nhé. Đến lúc reset thông tin từ rồi. Mọi người bắt đầu lại nhé!")
+                temp = []
+                temp.append("aa")
+                db.update_special_point_word_matching_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_point= 0)
+                db.update_data_word_matching_info(language=lan,channel_id=message.channel.id, guild_id= message.guild.id, current_player_id=0, current_player_name="",current_word="aa", existed_words=temp)
+                word_matching_channel = db.find_word_matching_info_by_id(channel_id= message.channel.id, guild_id= message.guild.id, language=lan)
+                message_tu_hien_tai = f"\nTừ hiện tại là: `'{word_matching_channel.current_word}'`, và có **{word_matching_channel.remaining_word if word_matching_channel.remaining_word else 0}** từ bắt đầu bằng chữ cái `{word_matching_channel.last_character if word_matching_channel.last_character else 0}`"
+                await message.channel.send(f"{message_tu_hien_tai}")
+        # #Xổ số nếu chưa có special point
+        so_xo = random.randint(1, 10)
+        #Nếu sổ xố rơi trúng số 5 thì coi như cộng point lên x2, x3, x4 ngẫu nhiên
+        if so_xo == 10:
+            x_value = random.randint(2, 5)
+            special_point_english = 1*x_value
+            db.update_special_point_word_matching_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_point= special_point_english)
+            text_cong_point = f"\n**Cơ hội chỉ đến một lần duy nhất, nếu ai thắng nhận được {special_point_english} điểm nhaaa! Cơ hội duy nhất, duy nhất, suy nghĩ kỹ trước khi trả lời!**\n"
+            await message.channel.send(f"{text_cong_point}")
+        else:
+            #Sổ xố xem trúng kỹ năng đặc biệt không
+            so_xo = random.randint(0, 10)
+            if so_xo == 10:
+                text_cong_skill = f"\n**Cơ hội chỉ đến một lần duy nhất, nếu ai thắng nhận được kỹ năng đặc biệt bên dưới! Cơ hội duy nhất thôi!**\n"
+                percent = random.randint(0, 100)
+                item = None
+                if percent >= 0 and percent < 55:
+                    #Cấp thấp
+                    item = random.choice(WordMatchingClass.list_special_items_cap_thap)
+                elif percent >= 55 and percent < 80:
+                    #Cấp cao
+                    item = random.choice(WordMatchingClass.list_special_items_cap_cao)
+                elif percent >= 80 and percent < 95:
+                    #Đẳng cấp
+                    item = random.choice(WordMatchingClass.list_special_items_dang_cap)
+                else:
+                    #tối thượng
+                    item = random.choice(WordMatchingClass.list_special_items_toi_thuong)
+                result = db.update_special_item_word_matching_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_item=item)
+                embed = discord.Embed(title=f"Kỹ năng đặc biệt. Rank: {item.level}", description=f"", color=0x03F8FC)
+                embed.add_field(name=f"", value=f"Mã kỹ năng: {item.item_id}", inline=False)
+                embed.add_field(name=f"", value=f"Tên kỹ năng: {item.item_name}", inline=False)
+                embed.add_field(name=f"", value=f"Mô tả kỹ năng: {item.item_description}", inline=False)
+                await message.channel.send(content=text_cong_skill, embed=embed)
+                return
+
+
+async def matching_words_fail(message: discord.Message, err: str, word_matching_channel: db.WordMatchingInfo, lan: str, point: int):
+    #Reset special point nếu trả lời sai, và nếu trước đó đã có
+    message_tu_hien_tai = f"\nTừ hiện tại là: `'{word_matching_channel.current_word}'`, và có **{word_matching_channel.remaining_word if word_matching_channel.remaining_word else 0}** từ bắt đầu bằng chữ cái `{word_matching_channel.last_character if word_matching_channel.last_character else 0}`"
+    if word_matching_channel.special_point:
+        db.update_special_point_word_matching_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_point= 0)
+    if word_matching_channel.special_item:
+        db.update_special_item_word_matching_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_item= None)
+    await message.add_reaction('❌')
+    await message.reply(f"{err} {message_tu_hien_tai}")
+
+
+client = discord.Client(intents=intents)
+@bot.event
+async def on_ready():
+    print(f'We have logged in as {bot.user}')
+    interaction_logger.info(f"Successfully logged in as {bot.user}")
+    check_jail_expiry.start()
+    automatic_speak_randomly.start()
+    remove_old_conversation.start()
+@bot.event
+async def on_message(message):
+    # print(message)
+    if message.author == bot.user:
+        return
+    await sub_function_ai_response(message=message)
+    asyncio.create_task(english_word_matching(message=message))
+    await bot.process_commands(message)
+bot_token = os.getenv("BOT_TOKENN")
+# client.run(bot_token)
+english_words_dictionary = CustomFunctions.english_dict
+bot.run(bot_token)

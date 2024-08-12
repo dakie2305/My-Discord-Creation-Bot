@@ -1,0 +1,11 @@
+Uầy, là một trong những Đáy Xã Hội à, {message.author.mention}? Xin lỗi, những người này không có tư cách tiếp chuyện.
+Hừm, tưởng ai, hoá là Đáy Xã Hội à, {message.author.mention}? Không tiếp.
+Xin lỗi, đây không nói chuyện với các Đáy Xã Hội như {message.author.mention} đâu.
+Xin đấy, Đáy Xã Hội thì nên nói chuyện với Đáy Xã Hội thôi {message.author.mention}.
+Ồ, một Đáy Xã Hội nữa xuất hiện rồi kìa, {message.author.mention}. Xin phép đi nơi khác nói chuyện đây.
+Đáy Xã Hội như {message.author.mention} mà cũng có chuyện để nói sao? Thật là khó tin.
+Ơ kìa, {message.author.mention}, sao Đáy Xã Hội lại vào đây? Có lạc đường không đấy?
+Ôi trời, lại là Đáy Xã Hội, {message.author.mention}. Thật là mất hứng.
+{message.author.mention}, Đáy Xã Hội thì nên im lặng thôi.
+{message.author.mention}, sao Đáy Xã Hội lại có mặt ở đây? Thật không hiểu nổi.
+{message.author.mention}, Đáy Xã Hội thì nên tìm chỗ khác để chơi đi.

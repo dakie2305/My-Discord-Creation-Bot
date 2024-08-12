@@ -1,0 +1,530 @@
+import discord
+from datetime import datetime, timedelta
+import os
+from dotenv import load_dotenv
+import CustomFunctions
+import db.UserList as DefaultUserList
+import google.generativeai as genai
+import time
+import DailyLogger
+from discord.ext import commands, tasks
+from discord import app_commands
+import db.DbMongoManager as db
+from db.DbMongoManager import UserInfo, GuildExtraInfo, SnipeChannelInfo, ConversationInfo, SnipeMessage, SnipeMessageAttachments
+import random
+import string
+import CustomButton
+from typing import Optional
+from collections import deque
+import requests
+
+load_dotenv()
+intents = discord.Intents.all()
+API_KEY = os.getenv("GOOGLE_CLOUD_KEY_2")
+genai.configure(api_key=API_KEY)
+
+interaction_logger = DailyLogger.get_logger("Creation2_Interaction")
+commands_logger = DailyLogger.get_logger("Creation2_Commands")
+
+bot = commands.Bot(command_prefix="!", intents=intents)
+#region Bot Prefix Commands
+@bot.command()
+async def ping(ctx):
+    await ctx.send(f"Online at {ctx.guild}")
+    commands_logger.info("Someone use ping!")
+
+@bot.command()
+@app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
+async def synccre2(ctx):
+    if(ctx.author.id == CustomFunctions.user_darkie['user_id']):
+        fmt = await ctx.bot.tree.sync(guild = ctx.guild)
+        await ctx.send(f"Đã đồng bộ thêm {len(fmt)} các slash commands vào Server {ctx.guild}")
+    else:
+        await ctx.send(f"Có phải là Darkie đâu mà dùng lệnh này?")
+
+@bot.command()
+@app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
+async def global_sync_creation_2(ctx):
+    if(ctx.author.id == CustomFunctions.user_darkie['user_id']):
+        fmt = await bot.tree.sync()
+        await ctx.send(f"Đã đồng bộ hết {len(fmt)} slash commands của Creation 2 vào toàn bộ server hiện hành!")
+    else:
+        await ctx.send(f"Có phải là Darkie đâu mà dùng lệnh này?")        
+        
+@bot.command()
+async def guild_extra_info(ctx):
+    if(ctx.author.id != CustomFunctions.user_darkie['user_id']):
+        await ctx.send(f"Có phải là Darkie đâu mà dùng lệnh này?")
+    #Kiểm tra xem guild này đã có trong db extra info chưa
+    check_exist = db.find_guild_extra_info_by_id(int(ctx.guild.id))
+    if check_exist:
+        await ctx.send(f"Đã tồn tại thông tin Guild Extra Info về server này.")
+    else:
+        data = GuildExtraInfo(guild_id=ctx.guild.id, guild_name= ctx.guild.name, allowed_ai_bot=False)
+        db.update_or_insert_conversation_info(data)
+        await ctx.send(f"Lưu thành công thông tin Guild Extra Info về server này.", ephemeral=True)
+        
+        
+#endregion
+
+#region enable / disable Creation 2 in 2ten server
+@bot.tree.command(name="enable_in_server", description="Bật Bot Creation 2 trong khoảng thời gian nhất định.", guild=discord.Object(id=1194106864582004849))
+@app_commands.describe(duration= "Thời gian bật (nhập số)", time_format = "Time Format để xác định chính xác (second, minute, hour, day, week, month)")
+async def enable_in_server(interaction: discord.Interaction, duration: int, time_format : str):
+    await interaction.response.defer()  # Defer the interaction early
+    #Chỉ Darkie được quyền bật
+    if(interaction.user.id != CustomFunctions.user_darkie['user_id']):
+        await interaction.followup.send("Vui lòng liên hệ <@315835396305059840> để bật bot nhé.")
+        return
+    if time_format not in ['second', 'minute', 'hour', 'day', 'month']:
+        await interaction.followup.send("Sai định dạng thời gian. Chỉ dùng những từ sau: second, minute, hour, day, month.", ephemeral=True)
+        return
+    # Calculate the end time
+    end_time = datetime.now() + CustomFunctions.get_timedelta(duration, time_format)
+    
+    #Set enabled_ai_until trong db
+    guild = db.find_guild_extra_info_by_id(interaction.guild_id) 
+    if guild == None:
+        await interaction.followup.send("Chưa tồn tại server này trong database, vui lòng thêm trước.", ephemeral=True)
+        return
+    data_updated = {"allowed_ai_bot": True,"enabled_ai_until": end_time.isoformat()}
+    db.update_guild_extra_info(interaction.guild_id, data_updated)
+    temp = end_time.strftime(f"%d/%m/%Y %H:%M")
+    await interaction.followup.send(f"Darkie đã cho phép Creation 2 chạy trong server này trong vòng {duration} {time_format}. Thời gian Bot hoạt động là đến {temp} nếu không có bất cập.\n Vào <#1264455905756446740> để tương tác nhé!")
+    
+@bot.tree.command(name="disable_in_server", description="Tắt Bot Creation 2 cho đến khi bật lại.", guild=discord.Object(id=1194106864582004849))
+async def enable_in_server(interaction: discord.Interaction):
+    await interaction.response.defer()  # Defer the interaction early
+    #Chỉ Darkie được quyền tắt
+    if(interaction.user.id != CustomFunctions.user_darkie['user_id']):
+        await interaction.followup.send("Vui lòng liên hệ <@315835396305059840> để tắt bot nhé.")
+        return
+    global Enabled_In_Server
+    Enabled_In_Server = False
+    await interaction.followup.send(f"Darkie đã vô hiệu hoá chức năng AI của Creation 2 trong server này.")
+#endregion
+
+#region say command
+@bot.tree.command(name = "say", description="Nói gì đó ẩn danh thông qua bot, có thể gắn hình ảnh và nhắn vào Channel khác", guild=discord.Object(id=1194106864582004849)) #Học viện 2ten
+@app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
+async def say(interaction: discord.Interaction, thing_to_say : str, image: Optional[discord.Attachment] = None, chosen_channel: Optional[discord.TextChannel]= None):
+    await interaction.response.send_message(content="Đã gửi tin nhắn ẩn danh thành công", ephemeral=True)
+    req_roles = ['Đã_Mở_Khoá_Full_Kênh_Seg', 'Mod', 'Nâng_cấp_máy_chủ']
+    has_required_role = any(role.name in req_roles for role in interaction.user.roles)
+    if not has_required_role:
+        await interaction.followup.send("Không đủ thẩm quyền để thực hiện lệnh.")
+        return
+    #Lấy channel mà người dùng gọi ra
+    current_channel_id = interaction.channel_id
+    current_channel = bot.get_channel(current_channel_id)
+    if chosen_channel != None:
+        current_channel = bot.get_channel(chosen_channel.id)
+
+    #Lấy user-id lật ngược lại
+    reversed_id = CustomFunctions.reverse_string_loop(str(interaction.user.id))
+    
+    #tạo random id
+    characters = string.ascii_letters
+    unique_id = ''.join(random.choices(characters, k=5))
+    
+    # Create embed object
+    embed = discord.Embed(title=f"Lời thú nhận ẩn danh ({unique_id})", color=0xC3A757)  # Yellowish color
+    embed.add_field(name="______________", value= "", inline=False)  # Single-line field
+    embed.add_field(name=f"'{thing_to_say}'", value= "", inline=False)
+    if image != None:
+        embed.set_image(url= image.url)
+    embed.add_field(name="______________", value= f"Anon: 0{reversed_id}", inline=False)  # Single-line field
+    embed.set_footer(text=f"❗Lưu ý không lạm dùng chức năng này. Nếu cảm thấy lời thú nhận này có vấn đề hãy thông báo ngay cho Server Master để giải quyết")  # Footer text
+    # await interaction.followup.send(content= "Đã gửi tin nhắn ẩn danh thành công.", ephemeral= True)
+    await current_channel.send(embed= embed)
+    commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} used /say to say: {thing_to_say}")
+#endregion
+
+#region report command
+@bot.tree.command(name="report", description="Báo cáo user vi phạm luật về cho admin và moderator xem xét.", guild=discord.Object(id=1194106864582004849))#Học viện 2ten
+@app_commands.describe(user="Chọn user đã phạm luật để báo cáo", reason="Lý do tại sao báo cáo", message_id= "Chuột phải vào message muốn xoá, vào bấm Copy Id rồi dán vào đây", image = "Chọn hình làm bằng chứng (sẽ xử lý nhanh hơn).")
+async def report(interaction: discord.Interaction, user : discord.Member, reason: str, message_id: Optional[str] = None, image: Optional[discord.Attachment] = None):
+    await interaction.response.defer(ephemeral=True)
+    try:
+        await interaction.followup.send(f"Đã thành công gửi báo cáo {user.mention} về cho dàn admin và moderator xem xét với lý do: {reason}.", ephemeral=True)
+        channel = bot.get_channel(1264455905756446740) #sân chơi creation 2
+        if channel:
+            # Create embed object
+            embed = discord.Embed(title="Có người gửi báo cáo, admin và moderator vui lòng kiểm tra", description=f"User {interaction.user.mention} đã báo cáo {user.mention} tại <#{interaction.channel.id}>!", color=0xFC0345)
+            embed.add_field(name="Lý do báo cáo:", value=reason, inline=False)  # Single-line field
+            if message_id!= None:
+                mess = await interaction.channel.fetch_message(int(message_id))
+                if mess:
+                    embed.add_field(name="Nội dung bị báo cáo:", value=mess.content, inline=True)
+                    embed.add_field(name="Id Message:", value=f"{mess.jump_url}", inline=True)
+            if image != None:
+                embed.set_image(url= image.url)
+            embed.set_footer(text=f"User ID Invoke: {interaction.user.id}")  # Footer text
+            view = CustomButton.CustomReportButtonView() #Gắn nút report
+            await channel.send(embed=embed, view= view)
+            print(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} report user id: {user.id} with Username {user.name}.")
+            commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} report user id: {user.id} with Username {user.name}.")
+        else:
+            await interaction.followup.send(f"<@315835396305059840> Bot không tìm được channel để gửi báo cáo!")
+    except Exception as e:
+        #Tag bản thân
+        await interaction.followup.send(f"<@315835396305059840> Bot gặp exception trong lúc thực hiện lệnh. Exception: {str(e)}. Vui lòng liên hệ Darkie!", ephemeral=True)
+        commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} tried report user id {user.id} but got exception {str(e)}.")
+#endregion
+
+#region Truth Or Dare
+@bot.tree.command(name="truth_dare", description="Tạo mới trò chơi Truth Or Dare.", guild=discord.Object(id=1194106864582004849)) #Học viện 2ten
+async def report(interaction: discord.Interaction):
+    await interaction.response.defer(ephemeral=True)
+    channel = interaction.channel
+    #Random true false, true là Truth, false là Dare
+    ran = random.choice([True, False])
+    content = ""
+    question_type = "Sự Thật"
+    if ran == True:
+        #Truth
+        content = CustomFunctions.get_random_response("OnTruthChallenge.txt")
+        question_type = "Sự Thật"
+    else:
+        question_type = "Thách Thức"
+        content = CustomFunctions.get_random_response("OnDareChallenge.txt")
+    # Create embed object
+    embed = discord.Embed(title=f"Nhớ là đã tạo thì chơi cho tới cùng chứ đừng nhát quá bỏ qua nha :)", description=f"Tới lượt chơi của {interaction.user.mention}", color=0x03F8FC)
+    embed.add_field(name=f"", value=f"*Loại trò chơi: {question_type}*", inline=False)
+    embed.add_field(name=f"", value="___________________", inline=False)
+    embed.add_field(name=f"{content}", value=f"", inline=False)
+    embed.add_field(name=f"", value="___________________", inline=False)
+    embed.set_footer(text=f"User ID Invoke: {interaction.user.id}")
+    view = CustomButton.CustomTruthDareComboButtons()
+    await interaction.followup.send(f"Đã tạo thành công trò sự thật hoặc thách thức.", ephemeral=True)
+    await channel.send(embed=embed, view= view)
+    print(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} create Truth Or Dare in channel id {channel.id}.")
+    commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} create Truth Or Dare in channel id {channel.id}.")
+#endregion
+
+#region Snipe command
+
+@bot.tree.command(name="snipe", description="Hiện lại message mới nhất vừa bị xoá trong channel này.", guild=discord.Object(id=1194106864582004849)) #Học viện 2ten
+async def snipe(interaction: discord.Interaction):
+    await interaction.response.defer()
+    req_roles = ['Supervisor', 'Server Master', 'Moderator', 'Ultimate Admins', 'Thần Dân', 'Đã_Mở_Khóa_Full_Kênh_Seg', 'Mod']
+    has_required_role = any(role.name in req_roles for role in interaction.user.roles)
+    if not has_required_role:
+        await interaction.followup.send("Không đủ thẩm quyền để thực hiện lệnh.")
+        return
+    called_channel = interaction.channel
+    snipe_channel_info = db.find_snipe_channel_info_by_id(called_channel.id, interaction.guild.id)
+    if snipe_channel_info:
+        list_snipe_message = snipe_channel_info.snipe_messages
+        if list_snipe_message == None:
+            await interaction.followup.send(f"Chưa thấy bất kỳ message nào bị xoá trong channel {interaction.channel.mention}. Vui lòng thử lại sau.")
+            return
+        temp_files = []
+        first_message = list_snipe_message[0]
+        if first_message != None and first_message.user_attachments!= None and len(first_message.user_attachments)>0:
+            for att in first_message.user_attachments:
+                file = await CustomFunctions.get_attachment_file_from_url(url= att.url, content_type= att.content_type)
+                if file != None: temp_files.append(file)
+        view = CustomButton.PaginationView(bot=bot, interaction=interaction, items= list_snipe_message)
+        await interaction.followup.send(embed=view.embed, view=view, files=temp_files)
+    else:
+        await interaction.followup.send(f"Chưa có dữ liệu snipe cho channel {interaction.channel.mention}. Vui lòng thử lại sau.")
+#endregion
+
+
+# Task: Kiểm tra enabled_ai_until của collection guild_extra_info
+@tasks.loop(hours=2)
+async def check_enable_server():
+    now = datetime.now()
+    list_guild_extra_info = db.find_all_guild_extra_info()
+    for guild_info in list_guild_extra_info:
+        enabled_until = guild_info.enabled_ai_until
+        if enabled_until!= None and guild_info.allowed_ai_bot == True:
+            if enabled_until > now:
+                return
+            data_updated = {"allowed_ai_bot": False}
+            db.update_guild_extra_info(guild_info.guild_id, data_updated)
+            print(f"Updating allowed_ai_bot = False for guid_id: {guild_info.guild_id}. enabled_until = {enabled_until}, now = {now}")
+            commands_logger.info(f"Updating allowed_ai_bot = False for guid_id: {guild_info.guild_id}. ")
+            
+# Task: Nói chuyện tự động
+@tasks.loop(hours=3, minutes= 30)
+async def automatic_speak_randomly():
+    guilds = bot.guilds
+    for guild in guilds:
+        print(guild)
+        guild_extra_info = db.find_guild_extra_info_by_id(guild.id)
+        if guild_extra_info != None and guild_extra_info.list_channels_ai_talk != None:
+            random_channel_id = random.choice(guild_extra_info.list_channels_ai_talk)
+            actual_channel = guild.get_channel(random_channel_id)
+            if actual_channel:
+                model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
+                prompt = CustomFunctions.get_automatically_talk_prompt("Creation 2", guild, actual_channel)
+                response = model.generate_content(f"{prompt}")
+                print(f"{bot.user} started talking on its own at {guild_extra_info.guild_name}, channel {actual_channel.name}.")
+                async with actual_channel.typing():
+                    await actual_channel.send(f"{response.text}")
+@tasks.loop(hours=12)
+async def remove_old_conversation():
+    #Kiểm tra các collections user_conversation_info_creation xem
+    #có dữ liệu nào có last interaction cách đây 3 ngày không
+    #Nếu có thì xoá luôn
+    count = 0
+    three_day_before = datetime.now() - timedelta(days=3)
+    bot_name = "creation_2"
+    list_all_user_convo_info = db.find_all_user_convo_info(bot_name)
+    if list_all_user_convo_info:
+        for data in list_all_user_convo_info:
+            if data.last_time_interaction < three_day_before:
+                db.delete_user_convo_info(data.user_id, bot_name)
+                count+=1
+    print(f"Found {count} old conversation in collection 'user_conversation_info_{bot_name}' and deleted them.")
+        
+
+async def sub_function_ai_response(message: discord.Message):
+    bots_creation_name = ["creation 2", "creation số 2", "creation no 2", "creatiom 2", "creation no. 2"]
+    guild_info = db.find_guild_extra_info_by_id(message.guild.id)
+    if message.reference is not None and message.reference.resolved is not None:
+        if message.reference.resolved.author == bot.user or CustomFunctions.contains_substring(message.content.lower(), bots_creation_name):
+            if guild_info == None:
+                await message.channel.send(f"Vui lòng liên hệ Darkie thêm server vào cơ sở dữ liệu.")
+                return
+            if guild_info.guild_id != 1256987900277690470: #Chỉ True Heaven mới không bị dính
+                if guild_info.allowed_ai_bot != True:
+                    await message.channel.send(f"Darkie vẫn chưa bật tính năng AI của Bot trong server nên Bot không thể trả lời được.")
+                    return
+                elif guild_info.guild_id == 1194106864582004849 and message.channel.id != 1264455905756446740: #Học viện 2ten/ channel #sân-chơi-creation-2
+                    await message.channel.send(f"Bạn ơi vui lòng xuống <#1264455905756446740> để nói chuyện với mình nha, ở đây mình không muốn nói chuyện.")
+                    return
+            flag, mess = await CustomFunctions.check_message_nsfw(message, bot)
+            if flag != 0:
+                await message.reply(mess)
+                interaction_logger.info(f"Username {message.author.name}, Display user name {message.author.display_name} violated chat when talking to {bot.user}")
+                interaction_logger.info(f"Username {message.author.name} violated chat {message.content} when talking to {bot.user}")
+                return
+            async with message.channel.typing():
+                referenced_message = await message.channel.fetch_message(message.reference.message_id)
+                time.sleep(4)
+                model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
+                prompt = await CustomFunctions.get_proper_prompt(message,"Creation 2", referenced_message)
+                print(f"Prompt generated from {bot.user}: {prompt}")
+                response = model.generate_content(f"{prompt}")
+                bot_response = (f"{response.text}")
+
+                #Kiểm tra xem bot reponse có nhiều emoji không, nếu nhiều quá thì remove emoji
+                if CustomFunctions.count_emojis_in_text(bot_response) > 4:
+                    bot_response = CustomFunctions.remove_emojis(bot_response)
+                
+                #Nếu có chữ record thì tạo file và gửi ghi âm
+                if 'record' in message.content.lower():
+                    await CustomFunctions.bot_sending_sound(bot_name='Creation_2', bot_reponse=bot_response, message=message)
+                    print(f"Username {message.author.name}, Display user name {message.author.display_name} tell {bot.user} to send record")
+                    interaction_logger.info(f"Username {message.author.name}, Display user name {message.author.display_name} tell {bot.user} to send record")
+                    return
+                
+                #Nếu là bot thì đương nhiên không reply, chỉ nhắn bình thường thôi
+                if(message.author.id == CustomFunctions.user_cr_1["user_id"] or message.author.id == CustomFunctions.user_cr_2["user_id"] or message.author.id == CustomFunctions.user_cr_3["user_id"]):
+                    await message.channel.send(f"{message.author.mention} {bot_response}")
+                else:
+                    await message.reply(f"{bot_response}")
+                CustomFunctions.save_user_convo_data(message=message, bot_reponse= bot_response, bot_name= "Creation 2")
+                print(f"Username {message.author.name}, Display user name {message.author.display_name} replied {bot.user}")
+                interaction_logger.info(f"Username {message.author.name}, Display user name {message.author.display_name} replied {bot.user}")
+                time.sleep(4)
+            
+    elif CustomFunctions.contains_substring(message.content.lower(), bots_creation_name):
+        if guild_info == None:
+            await message.channel.send(f"Vui lòng liên hệ Darkie thêm server vào cơ sở dữ liệu.")
+            return
+        if guild_info.guild_id != 1256987900277690470: #Chỉ True Heaven mới không bị dính
+            if guild_info.allowed_ai_bot != True:
+                await message.channel.send(f"Darkie vẫn chưa bật tính năng AI của Bot trong server nên Bot không thể trả lời được.")
+                return
+            elif guild_info.guild_id == 1194106864582004849 and message.channel.id != 1264455905756446740: #Học viện 2ten/ channel #sân-chơi-creation-2
+                await message.channel.send(f"Bạn ơi vui lòng xuống <#1264455905756446740> để nói chuyện với mình nha, ở đây mình không muốn nói chuyện.")
+                return
+        async with message.channel.typing():
+            flag, mess = await CustomFunctions.check_message_nsfw(message, bot)
+            if flag != 0:
+                await message.channel.send(mess)
+            else:
+                model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
+                prompt = await CustomFunctions.get_proper_prompt(message,"Creation 2")
+                print(f"Prompt generated from {bot.user}: {prompt}")
+                response = model.generate_content(f"{prompt}")
+                bot_response = (f"{response.text}")
+                #Kiểm tra xem bot reponse có nhiều emoji không, nếu nhiều quá thì remove emoji
+                if CustomFunctions.count_emojis_in_text(bot_response) > 4:
+                    bot_response = CustomFunctions.remove_emojis(bot_response)
+                
+                #Nếu có chữ record thì tạo file và gửi ghi âm
+                if 'record' in message.content.lower():
+                    await CustomFunctions.bot_sending_sound(bot_name='Creation_2', bot_reponse=bot_response, message=message)
+                    print(f"Username {message.author.name}, Display user name {message.author.display_name} tell {bot.user} to send record")
+                    interaction_logger.info(f"Username {message.author.name}, Display user name {message.author.display_name} tell {bot.user} to send record")
+                    return
+                
+                await message.channel.send(f"{message.author.mention} {bot_response}")
+                CustomFunctions.save_user_convo_data(message=message, bot_reponse= bot_response, bot_name= "Creation 2")
+                print(f"Username {message.author.name}, Display user name {message.author.display_name} directly call {bot.user}")
+                interaction_logger.info(f"Username {message.author.name}, Display user name {message.author.display_name} directly call {bot.user}")
+                time.sleep(4)
+    return
+
+async def save_message_attachments(message: discord.Message):
+    if message.guild and message.attachments != None and len(message.attachments) >= 1:
+        #Lưu lại link từng attachment theo từng channel
+        user_attachments = []
+        for att in message.attachments:
+            if att.filename != "profile.png":
+                #cache lại link, tránh dead.
+                response = requests.get(url=att.url, stream=True)
+    return
+
+
+
+list_2tai_images = [] 
+
+async def steal_content_from_2tai(message: discord.Message):
+    if message.guild.id == 1194106864582004849 and message.attachments != None and len(message.attachments) >= 1:
+        random_chance =random.randint(1, 3)
+        # if random_chance == 3: return
+        #Tuỳ channel sẽ lấy attachment khác nhau
+        true_heaven_server = bot.get_guild(1256987900277690470) 
+        user_attachments = []
+        for att in message.attachments:
+            if att.filename != "profile.png":
+                file = await CustomFunctions.get_attachment_file_from_url(url=att.url, content_type=att.content_type)
+                if file != None: user_attachments.append(file)
+        if user_attachments != None and len(user_attachments):
+            #Lấy theo channel 2ten, post vào channel true heavens
+            source_channel = message.channel
+            des_channel = None
+            if source_channel.id == 1270013876439613470: #NTR
+                des_channel = true_heaven_server.get_channel(1270770520002138112)
+                if des_channel:
+                    await des_channel.send(files=user_attachments)
+            elif source_channel.id == 1246913457668886629: #châu á video
+                des_channel = true_heaven_server.get_channel(1259236604510212126)
+                if des_channel:
+                    await des_channel.send(files=user_attachments)
+            elif source_channel.id == 1246913434436763700: #châu á ảnh
+                des_channel = true_heaven_server.get_channel(1259236555575263273)
+                if des_channel:
+                    await des_channel.send(files=user_attachments)
+            elif source_channel.id == 1246913651638796340: #châu âu vid
+                des_channel = true_heaven_server.get_channel(1259236782466269255)
+                if des_channel:
+                    await des_channel.send(files=user_attachments)
+            elif source_channel.id == 1246914401810780190: #tiktok
+                des_channel = true_heaven_server.get_channel(1259236604510212126) #Châu á-video
+                if des_channel:
+                    await des_channel.send(files=user_attachments)
+            elif source_channel.id == 1246914035686051922: #vn ảnh
+                des_channel = true_heaven_server.get_channel(1259236667835945061)
+                if des_channel:
+                    await des_channel.send(files=user_attachments)
+            elif source_channel.id == 1246914054388449360: #vn video
+                des_channel = true_heaven_server.get_channel(1259236719287472263)
+                if des_channel:
+                    await des_channel.send(files=user_attachments)
+            elif source_channel.id == 1246914434845114500: #cosplay
+                des_channel = true_heaven_server.get_channel(1259236555575263273)  #Châu á-ảnh
+                if des_channel:
+                    await des_channel.send(files=user_attachments)
+            elif source_channel.id == 1246915235479031840: #ai-gen
+                des_channel = true_heaven_server.get_channel(1259237706387689574)  #AI
+                if des_channel:
+                    await des_channel.send(files=user_attachments)
+            elif source_channel.id == 1246910894353682482: #2-tai ảnh
+                #Vì quá nhiều nên giới hạn lại, đủ 7 attachments mới đăng một thể
+                global list_2tai_images
+                list_2tai_images.append(user_attachments)
+                if len(list_2tai_images>6):
+                    des_channel = true_heaven_server.get_channel(1259228154275434629)
+                    if des_channel:
+                        await des_channel.send(files=user_attachments)
+                    list_2tai_images.clear()
+                else: return                    
+            elif source_channel.id == 1246910996132401265: #2-tai video
+                des_channel = true_heaven_server.get_channel(1259233868628885667)
+                if des_channel:
+                    await des_channel.send(files=user_attachments)
+            elif source_channel.id == 1246911371535323197: #anime ảnh
+                des_channel = true_heaven_server.get_channel(1259234080810205315)
+                if des_channel:
+                    await des_channel.send(files=user_attachments)
+            elif source_channel.id == 1246911391873372251: #anime video
+                des_channel = true_heaven_server.get_channel(1259234158576664697)
+                if des_channel:
+                    await des_channel.send(files=user_attachments)
+            #Không nằm trên danh sách trên thì khỏi cần
+            else:
+                return
+            print(f"Found {len(message.attachments)} attachment(s) at channel {source_channel.name} and posted to channel {des_channel.name if des_channel else 'Unknow'}")                    
+    return
+
+client = discord.Client(intents=intents)
+@bot.event
+async def on_ready():
+    print(f'We have logged in as {bot.user}')
+    interaction_logger.info(f"Successfully logged in as {bot.user}")
+    check_enable_server.start()
+    automatic_speak_randomly.start()
+    remove_old_conversation.start()
+
+@bot.event
+async def on_message(message):
+    if message.author == bot.user:
+        return
+    await sub_function_ai_response(message=message)
+    await save_message_attachments(message=message)
+    await steal_content_from_2tai(message=message)
+    await bot.process_commands(message)
+
+@bot.event
+async def on_message_delete(message):
+    message: discord.Message = message
+    channel_where_message_deleted = message.channel
+    if message.guild.id == 1256987900277690470 and message.attachments != None and len(message.attachments)>0:
+        #Áp dụng log images cho server true Heavens
+        temp_files = []
+        true_heaven_server = bot.get_guild(1256987900277690470) 
+        log_image_channel = true_heaven_server.get_channel(1257004596426182757)
+        embed = discord.Embed(title=f"Một tin nhắn đã bị xoá trong server {message.guild.name}", description=f"Tin nhắn của {message.author.mention} đã bị xoá tại {channel_where_message_deleted.mention}!", color=0xFC0345)
+        embed.add_field(name="Nội dung tin nhắn bị xoá:", value=message.content, inline=False)
+        embed.add_field(name=f"Tin nhắn chứa {len(message.attachments)} Attachments.", value="", inline=False)
+        for index,attachment in enumerate(message.attachments):
+            file = await CustomFunctions.get_attachment_file_from_url(url=attachment.url, content_type=attachment.content_type)
+            if file != None: temp_files.append(file)
+        embed.set_footer(text=f"Message Id: {message.id}. User ID Invoke: {message.author.id}")  # Footer text
+        await log_image_channel.send(embed=embed, files=temp_files)
+    if message.guild:
+        #Kiểm tra coi có attachments không
+        user_attachments = []
+        if message.attachments:
+            for att in message.attachments:
+                new_url = att.url
+                data_attachmenta = db.SnipeMessageAttachments(filename=att.filename, url=new_url,content_type=att.content_type,size=att.size)
+                user_attachments.append(data_attachmenta)
+        snipe_message = db.SnipeMessage(author_id=message.author.id, author_username=message.author.name, author_display_name= message.author.display_name, deleted_date= datetime.now(), user_message_content=message.content, user_attachments=user_attachments)
+        print(snipe_message.to_dict())
+        #Kiểm tra coi đã tồn tại SnipeChannelInfo chưa, chưa thì tạo mới
+        existing_snipe_channel_info = db.find_snipe_channel_info_by_id(channel_id=channel_where_message_deleted.id, guild_id=message.guild.id)
+        if existing_snipe_channel_info == None:
+            list_temp = []
+            list_temp.append(snipe_message)
+            existing_snipe_channel_info = db.SnipeChannelInfo(channel_id=channel_where_message_deleted.id, channel_name=channel_where_message_deleted.name, snipe_messages=list_temp)
+            result = db.create_snipe_channel_info(snipe_channel_info=existing_snipe_channel_info, guild_id=message.guild.id)
+            print(f"Successfully create new Snipe Channel Info for guild {message.guild.name}")
+        else:
+            #Cập nhật snipe_messages của SnipeChannelInfo ấy
+            print(snipe_message)
+            result = db.update_or_insert_snipe_message_info(guild_id=message.guild.id, channel_id=channel_where_message_deleted.id, snipe_message=snipe_message)
+    else:
+        print("Message deleted in a private message.")
+    return
+    
+    
+bot_token = os.getenv("BOT_TOKEN_NO2")
+bot.run(bot_token)

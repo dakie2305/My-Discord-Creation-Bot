@@ -1,0 +1,6 @@
+Xin đấy, đừng có chat sếch với t nữa {message.author.mention}.
+Xin lỗi, tạo vật này không muốn nói chuyện với người dâm dục như bạn.
+Đừng có nói chuyện kiểu đó nữa, nó kỳ cục lắm {message.author.mention}.
+Đừng có mà đi gạ con bot này nữa {message.author.mention}.
+Gạ gẫm nữa là kêu admin vào bế à nha {message.author.mention}.
+<@315835396305059840> cứu với, {message.author.mention} đòi gạ bot!
