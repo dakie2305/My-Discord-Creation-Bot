@@ -323,15 +323,18 @@ def remove_emojis(text):
 async def get_attachment_file_from_url(url, content_type):
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as resp:
-            if resp.status == 200:
-                data = await resp.read()
-                extension = 'png'
-                if content_type:
-                    extension = content_type.split('/')[-1]
-                file = discord.File(io.BytesIO(data), filename=f"file.{extension}")
-                print(f"extension: {extension}")
-                return file
-    return None
+            try:
+                if resp.status == 200:
+                    data = await resp.read()
+                    extension = 'png'
+                    if content_type:
+                        extension = content_type.split('/')[-1]
+                    file = discord.File(io.BytesIO(data), filename=f"file.{extension}")
+                    print(f"extension: {extension}")
+                    return file
+                return None
+            except Exception as e:
+                return None
 
 def get_english_dict()->dict:
     filepath = os.path.join(os.path.dirname(__file__),"db", "english_dictionary.json")

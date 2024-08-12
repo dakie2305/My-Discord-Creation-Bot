@@ -440,7 +440,7 @@ async def steal_content_from_2tai(message: discord.Message):
                 #Vì quá nhiều nên giới hạn lại, đủ 7 attachments mới đăng một thể
                 global list_2tai_images
                 list_2tai_images.append(user_attachments)
-                if len(list_2tai_images>6):
+                if len(list_2tai_images)>6:
                     des_channel = true_heaven_server.get_channel(1259228154275434629)
                     if des_channel:
                         await des_channel.send(files=user_attachments)

@@ -55,7 +55,7 @@ class CustomTruthDareComboButtons(discord.ui.View):
 
 class PaginationView(discord.ui.View):
     def __init__(self, bot, interaction: discord.Interaction, items: List[SnipeMessage], per_page = 1):
-        super().__init__(timeout=180)
+        super().__init__(timeout=600)
         self.bot = bot
         self.interaction = interaction
         self.items = items
@@ -92,7 +92,6 @@ class PaginationView(discord.ui.View):
             new_embed.add_field(name=f"", value=f"**Tin nhắn của user: {user.mention}, username: {user.name}**", inline=False)
             file = None
             temp_files = []
-            
             if message.user_message_content != "" and message.user_message_content != None:
                 new_embed.add_field(name=f"", value=f"{message.user_message_content}", inline=False)
             if message.user_attachments!= None and len(message.user_attachments)>0:
