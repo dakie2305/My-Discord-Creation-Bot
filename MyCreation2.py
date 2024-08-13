@@ -498,7 +498,7 @@ async def on_ready():
     print(f'We have logged in as {bot.user}')
     interaction_logger.info(f"Successfully logged in as {bot.user}")
     check_enable_server.start()
-    # automatic_speak_randomly.start()
+    automatic_speak_randomly.start()
     remove_old_conversation.start()
 
 @bot.event
