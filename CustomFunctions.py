@@ -329,6 +329,7 @@ async def get_attachment_file_from_url(url, content_type):
                     extension = 'png'
                     if content_type:
                         extension = content_type.split('/')[-1]
+                    if extension == 'quicktime': extension = 'mp4'
                     file = discord.File(io.BytesIO(data), filename=f"file.{extension}")
                     print(f"extension: {extension}")
                     return file
