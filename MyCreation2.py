@@ -395,6 +395,8 @@ async def steal_content_from_2tai(message: discord.Message):
         user_attachments = []
         for att in message.attachments:
             if att.filename != "profile.png":
+                #trên 25mb không lấy
+                if att.size > 24 * 1024 * 1024: continue
                 file = await CustomFunctions.get_attachment_file_from_url(url=att.url, content_type=att.content_type)
                 if file != None: user_attachments.append(file)
         if user_attachments != None and len(user_attachments):
