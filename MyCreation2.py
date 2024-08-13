@@ -454,8 +454,9 @@ async def steal_content_from_2tai(message: discord.Message):
                 elif source_channel.id == 1246910894353682482: #2-tai ảnh
                     #Vì quá nhiều nên giới hạn lại, đủ 3 attachments mới đăng một thể
                     list_2tai_images
-                    for saved_attachment in user_attachments: 
-                        list_2tai_images.append(saved_attachment)
+                    for saved_attachment in user_attachments:
+                        if len(list_2tai_images)<=3:
+                            list_2tai_images.append(saved_attachment)
                     if len(list_2tai_images)>2:
                         des_channel = true_heaven_server.get_channel(1259228154275434629)
                         if des_channel:
@@ -470,8 +471,9 @@ async def steal_content_from_2tai(message: discord.Message):
                 elif source_channel.id == 1246911371535323197: #anime ảnh
                     #Vì quá nhiều nên giới hạn lại, đủ 3 attachments mới đăng một thể
                     list_anime_image
-                    for saved_attachment in user_attachments: 
-                        list_anime_image.append(saved_attachment)
+                    for saved_attachment in user_attachments:
+                        if len(list_anime_image)<=3:
+                            list_anime_image.append(saved_attachment)
                     if len(list_anime_image)>2:
                         des_channel = true_heaven_server.get_channel(1259234080810205315) #anime
                         if des_channel:
