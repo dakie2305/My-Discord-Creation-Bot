@@ -248,7 +248,7 @@ async def check_enable_server():
             commands_logger.info(f"Updating allowed_ai_bot = False for guid_id: {guild_info.guild_id}. ")
             
 # Task: Nói chuyện tự động
-@tasks.loop(hours=3, minutes= 30)
+@tasks.loop(hours=3, reconnect=True)
 async def automatic_speak_randomly():
     guilds = bot.guilds
     for guild in guilds:
@@ -264,7 +264,7 @@ async def automatic_speak_randomly():
                 print(f"{bot.user} started talking on its own at {guild_extra_info.guild_name}, channel {actual_channel.name}.")
                 async with actual_channel.typing():
                     await actual_channel.send(f"{response.text}")
-@tasks.loop(hours=12)
+@tasks.loop(hours=24)
 async def remove_old_conversation():
     #Kiểm tra các collections user_conversation_info_creation xem
     #có dữ liệu nào có last interaction cách đây 3 ngày không
@@ -384,6 +384,7 @@ async def save_message_attachments(message: discord.Message):
 
 
 list_2tai_images = [] 
+list_anime_image = []
 
 async def steal_content_from_2tai(message: discord.Message):
     if message.guild.id == 1194106864582004849 and message.attachments != None and len(message.attachments) >= 1:
@@ -397,71 +398,96 @@ async def steal_content_from_2tai(message: discord.Message):
                 file = await CustomFunctions.get_attachment_file_from_url(url=att.url, content_type=att.content_type)
                 if file != None: user_attachments.append(file)
         if user_attachments != None and len(user_attachments):
-            #Lấy theo channel 2ten, post vào channel true heavens
-            source_channel = message.channel
-            des_channel = None
-            if source_channel.id == 1270013876439613470: #NTR
-                des_channel = true_heaven_server.get_channel(1270770520002138112)
-                if des_channel:
-                    await des_channel.send(files=user_attachments)
-            elif source_channel.id == 1246913457668886629: #châu á video
-                des_channel = true_heaven_server.get_channel(1259236604510212126)
-                if des_channel:
-                    await des_channel.send(files=user_attachments)
-            elif source_channel.id == 1246913434436763700: #châu á ảnh
-                des_channel = true_heaven_server.get_channel(1259236555575263273)
-                if des_channel:
-                    await des_channel.send(files=user_attachments)
-            elif source_channel.id == 1246913651638796340: #châu âu vid
-                des_channel = true_heaven_server.get_channel(1259236782466269255)
-                if des_channel:
-                    await des_channel.send(files=user_attachments)
-            elif source_channel.id == 1246914401810780190: #tiktok
-                des_channel = true_heaven_server.get_channel(1259236604510212126) #Châu á-video
-                if des_channel:
-                    await des_channel.send(files=user_attachments)
-            elif source_channel.id == 1246914035686051922: #vn ảnh
-                des_channel = true_heaven_server.get_channel(1259236667835945061)
-                if des_channel:
-                    await des_channel.send(files=user_attachments)
-            elif source_channel.id == 1246914054388449360: #vn video
-                des_channel = true_heaven_server.get_channel(1259236719287472263)
-                if des_channel:
-                    await des_channel.send(files=user_attachments)
-            elif source_channel.id == 1246914434845114500: #cosplay
-                des_channel = true_heaven_server.get_channel(1259236555575263273)  #Châu á-ảnh
-                if des_channel:
-                    await des_channel.send(files=user_attachments)
-            elif source_channel.id == 1246915235479031840: #ai-gen
-                des_channel = true_heaven_server.get_channel(1259237706387689574)  #AI
-                if des_channel:
-                    await des_channel.send(files=user_attachments)
-            elif source_channel.id == 1246910894353682482: #2-tai ảnh
-                #Vì quá nhiều nên giới hạn lại, đủ 7 attachments mới đăng một thể
-                global list_2tai_images
-                list_2tai_images.append(user_attachments)
-                if len(list_2tai_images)>6:
-                    des_channel = true_heaven_server.get_channel(1259228154275434629)
+            try:
+                #Lấy theo channel 2ten, post vào channel true heavens
+                source_channel = message.channel
+                des_channel = None
+                if source_channel.id == 1270013876439613470: #NTR
+                    des_channel = true_heaven_server.get_channel(1270770520002138112)
                     if des_channel:
                         await des_channel.send(files=user_attachments)
-                    list_2tai_images.clear()
-                else: return                    
-            elif source_channel.id == 1246910996132401265: #2-tai video
-                des_channel = true_heaven_server.get_channel(1259233868628885667)
-                if des_channel:
-                    await des_channel.send(files=user_attachments)
-            elif source_channel.id == 1246911371535323197: #anime ảnh
-                des_channel = true_heaven_server.get_channel(1259234080810205315)
-                if des_channel:
-                    await des_channel.send(files=user_attachments)
-            elif source_channel.id == 1246911391873372251: #anime video
-                des_channel = true_heaven_server.get_channel(1259234158576664697)
-                if des_channel:
-                    await des_channel.send(files=user_attachments)
-            #Không nằm trên danh sách trên thì khỏi cần
-            else:
+                elif source_channel.id == 1246913457668886629: #châu á video
+                    des_channel = true_heaven_server.get_channel(1259236604510212126)
+                    if des_channel:
+                        await des_channel.send(files=user_attachments)
+                elif source_channel.id == 1246913434436763700: #châu á ảnh
+                    des_channel = true_heaven_server.get_channel(1259236555575263273)
+                    if des_channel:
+                        await des_channel.send(files=user_attachments)
+                elif source_channel.id == 1246913651638796340: #châu âu vid
+                    des_channel = true_heaven_server.get_channel(1259236782466269255)
+                    if des_channel:
+                        await des_channel.send(files=user_attachments)
+                elif source_channel.id == 1246914401810780190: #tiktok
+                    des_channel = true_heaven_server.get_channel(1259236604510212126) #Châu á-video
+                    if des_channel:
+                        await des_channel.send(files=user_attachments)
+                elif source_channel.id == 1246914035686051922: #vn ảnh
+                    des_channel = true_heaven_server.get_channel(1259236667835945061)
+                    if des_channel:
+                        await des_channel.send(files=user_attachments)
+                elif source_channel.id == 1246914054388449360: #vn video
+                    des_channel = true_heaven_server.get_channel(1259236719287472263)
+                    if des_channel:
+                        await des_channel.send(files=user_attachments)
+                elif source_channel.id == 1246914434845114500: #cosplay
+                    des_channel = true_heaven_server.get_channel(1259236555575263273)  #Châu á-ảnh
+                    if des_channel:
+                        await des_channel.send(files=user_attachments)
+                elif source_channel.id == 1246915235479031840: #ai-gen
+                    des_channel = true_heaven_server.get_channel(1259237706387689574)  #AI
+                    if des_channel:
+                        await des_channel.send(files=user_attachments)
+                        
+                elif source_channel.id == 1246912856021008445: #game video
+                    des_channel = true_heaven_server.get_channel(1259233868628885667)  #hentai video
+                    if des_channel:
+                        await des_channel.send(files=user_attachments)
+                        
+                elif source_channel.id == 1246911755888623687: #game ảnh
+                    des_channel = true_heaven_server.get_channel(1259228154275434629)  #hentai ảnh
+                    if des_channel:
+                        await des_channel.send(files=user_attachments)
+                        
+                elif source_channel.id == 1246910894353682482: #2-tai ảnh
+                    #Vì quá nhiều nên giới hạn lại, đủ 3 attachments mới đăng một thể
+                    list_2tai_images
+                    for saved_attachment in user_attachments: 
+                        list_2tai_images.append(saved_attachment)
+                    if len(list_2tai_images)>2:
+                        des_channel = true_heaven_server.get_channel(1259228154275434629)
+                        if des_channel:
+                            await des_channel.send(files=list_2tai_images)
+                        list_2tai_images.clear()
+                    else: return        
+                    
+                elif source_channel.id == 1246910996132401265: #2-tai video
+                    des_channel = true_heaven_server.get_channel(1259233868628885667)
+                    if des_channel:
+                        await des_channel.send(files=user_attachments)
+                elif source_channel.id == 1246911371535323197: #anime ảnh
+                    #Vì quá nhiều nên giới hạn lại, đủ 3 attachments mới đăng một thể
+                    list_anime_image
+                    for saved_attachment in user_attachments: 
+                        list_anime_image.append(saved_attachment)
+                    if len(list_anime_image)>2:
+                        des_channel = true_heaven_server.get_channel(1259234080810205315) #anime
+                        if des_channel:
+                            await des_channel.send(files=list_anime_image)
+                        list_anime_image.clear()
+                    else: return        
+                elif source_channel.id == 1246911391873372251: #anime video
+                    des_channel = true_heaven_server.get_channel(1259234158576664697)
+                    if des_channel:
+                        await des_channel.send(files=user_attachments)
+                #Không nằm trên danh sách trên thì khỏi cần
+                else:
+                    return
+                print(f"Found {len(message.attachments)} attachment(s) at channel {source_channel.name} and posted to channel {des_channel.name if des_channel else 'Unknow'}")
+            except Exception as e:
                 return
-            print(f"Found {len(message.attachments)} attachment(s) at channel {source_channel.name} and posted to channel {des_channel.name if des_channel else 'Unknow'}")                    
+            
+                    
     return
 
 client = discord.Client(intents=intents)
@@ -470,7 +496,7 @@ async def on_ready():
     print(f'We have logged in as {bot.user}')
     interaction_logger.info(f"Successfully logged in as {bot.user}")
     check_enable_server.start()
-    automatic_speak_randomly.start()
+    # automatic_speak_randomly.start()
     remove_old_conversation.start()
 
 @bot.event

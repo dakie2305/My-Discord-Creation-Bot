@@ -33,11 +33,3 @@ def get_logger(name, trace_dir="Traces"):
   logger.addHandler(handler)
   logger.setLevel(logging.DEBUG)  # Adjust the logging level as needed
   return logger
-
-# Example usage
-# my_logger = get_logger("my_app")
-# my_logger.info("This is an informational message.")
-# my_logger.error("This is an error message.")
-
-# my_logger.error("This is a new error message.")
-
