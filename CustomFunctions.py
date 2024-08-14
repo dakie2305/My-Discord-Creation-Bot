@@ -37,7 +37,7 @@ def get_random_response(filename):
 async def check_swear_content(message):
     swear_words= ["địt", "clmm", "clm", "đụ", "ỉa", "đái", "đĩ", "đm", "đmm","dm",
                   "lồn", "cặc", "con cu", "con mẹ mày", "đỉ", "l*n", "súc vật", "cặn bã", "c*c", 
-                  "nứng", "n*ng", "mọi đen", "mẹ mày", "mẹ m", "nigger", "niger", "da đen", "nigga", "n*gga", "ních gà", "dốt", "đần độn", "đần chó"]
+                  "nứng", "n*ng", "mọi đen", "mẹ mày", "mẹ m", "nigger", "niger", "da đen", "nigga", "n*gga", "ních gà", "dốt", "đần độn", "đần chó", "bú cu", "buscu", "bú liếm"]
     if contains_substring(message, swear_words):
             return True
     return False
@@ -329,6 +329,7 @@ async def get_attachment_file_from_url(url, content_type):
                     extension = 'png'
                     if content_type:
                         extension = content_type.split('/')[-1]
+                    if extension == None: return
                     if extension == 'quicktime': extension = 'mp4'
                     file = discord.File(io.BytesIO(data), filename=f"file.{extension}")
                     return file

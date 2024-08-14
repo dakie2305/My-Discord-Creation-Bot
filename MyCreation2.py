@@ -453,33 +453,35 @@ async def steal_content_from_2tai(message: discord.Message):
                         
                 elif source_channel.id == 1246910894353682482: #2-tai ảnh
                     #Vì quá nhiều nên giới hạn lại, đủ 3 attachments mới đăng một thể
-                    list_2tai_images
-                    for saved_attachment in user_attachments:
-                        if len(list_2tai_images)<=3:
-                            list_2tai_images.append(saved_attachment)
+                    if len(list_2tai_images)<=3:
+                        for saved_attachment in user_attachments:
+                                list_2tai_images.append(saved_attachment)
+                                
                     if len(list_2tai_images)>2:
                         des_channel = true_heaven_server.get_channel(1259228154275434629)
                         if des_channel:
                             await des_channel.send(files=list_2tai_images)
                         list_2tai_images.clear()
-                    else: return        
+                    else: return
                     
                 elif source_channel.id == 1246910996132401265: #2-tai video
                     des_channel = true_heaven_server.get_channel(1259233868628885667)
                     if des_channel:
                         await des_channel.send(files=user_attachments)
+                        
                 elif source_channel.id == 1246911371535323197: #anime ảnh
                     #Vì quá nhiều nên giới hạn lại, đủ 3 attachments mới đăng một thể
-                    list_anime_image
-                    for saved_attachment in user_attachments:
-                        if len(list_anime_image)<=3:
-                            list_anime_image.append(saved_attachment)
+                    if len(list_anime_image)<=3:
+                        for saved_attachment in user_attachments:
+                                list_anime_image.append(saved_attachment)
+                    
                     if len(list_anime_image)>2:
                         des_channel = true_heaven_server.get_channel(1259234080810205315) #anime
                         if des_channel:
                             await des_channel.send(files=list_anime_image)
                         list_anime_image.clear()
-                    else: return        
+                    else: return
+                      
                 elif source_channel.id == 1246911391873372251: #anime video
                     des_channel = true_heaven_server.get_channel(1259234158576664697)
                     if des_channel:
