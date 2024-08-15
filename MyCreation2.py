@@ -512,9 +512,9 @@ async def on_message_delete(message):
         embed.add_field(name="Nội dung tin nhắn bị xoá:", value=message.content, inline=False)
         embed.add_field(name=f"Tin nhắn chứa {len(message.attachments)} Attachments.", value="", inline=False)
         for index,attachment in enumerate(message.attachments):
+            embed.add_field(name="", value=f"{index+1}. {attachment.url}", inline=False)
             file = await CustomFunctions.get_attachment_file_from_url(url=attachment.url, content_type=attachment.content_type)
             if file != None: temp_files.append(file)
-        embed.set_footer(text=f"Message Id: {message.id}. User ID Invoke: {message.author.id}")  # Footer text
         await log_image_channel.send(embed=embed, files=temp_files)
     if message.guild:
         #Kiểm tra coi có attachments không

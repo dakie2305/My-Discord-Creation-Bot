@@ -79,7 +79,22 @@ async def reset_noi_tu_english(ctx):
             await ctx.send("Không đủ thẩm quyền để thực hiện lệnh.")
             return
         #Kiểm tra xem đã tồn tại WordMatchingClass cho channel này chưa
-        if db.find_word_matching_info_by_id(channel_id=message.channel.id, guild_id=message.guild.id, language='en'):
+        word_matching_channel = db.find_word_matching_info_by_id(channel_id=message.channel.id, guild_id=message.guild.id, language='en')
+        if word_matching_channel:
+            #Show lên bảng xếp hạng cuối cùng
+            embed = discord.Embed(title=f"Xếp hạng các player theo điểm.", description=f"Trò Chơi Nối Từ Tiếng Anh", color=0x03F8FC)
+            embed.add_field(name=f"", value="___________________", inline=False)
+            count = 0
+            if word_matching_channel.player_profiles:
+                word_matching_channel.player_profiles.sort(key=lambda x: x.points, reverse=True)
+                for index, profile in enumerate(word_matching_channel.player_profiles):
+                    user = message.guild.get_member(profile.user_id)
+                    if user != None and (profile.points!= 0 or len(profile.special_items)> 0):
+                        embed.add_field(name=f"", value=f"**Hạng {index+1}.** {user.mention}. Tổng điểm: **{profile.points}**. Số lượng kỹ năng đặc biệt: **{len(profile.special_items)}**.", inline=False)
+                        count+=1
+                    if count >= 25: break
+            
+            await message.channel.send(content=f"Chúc mừng các player top đầu! <@315835396305059840> sẽ trao role đặc biệt cho những Player thuộc top 3 nhé!", embed=embed)
             #Xoá đi tạo lại
             db.delete_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language='en')
             data = db.WordMatchingInfo(channel_id=message.channel.id, channel_name=message.channel.name, current_word="a", first_character="a",last_character="a",remaining_word=12300)
@@ -702,22 +717,23 @@ async def delete_message(interaction: discord.Interaction, reason : str, message
         if is_user_admin and interaction.user.id != 315835396305059840:        #Chỉ Darkie mới được quyền xoá tin nhắn của admin, moderator
             await interaction.followup.send("Không thể xoá tin nhắn của admin/moderator. Vui lòng liên hệ <@315835396305059840>.")
             return
-        image_urls = [attachment.url for attachment in mess_to_delete.attachments]
         # Create embed object
         embed = discord.Embed(title="Một tin nhắn đã bị xoá", description=f"User {interaction.user.mention} đã xoá một tin nhắn của {mess_to_delete.author.mention} đăng tại <#{mess_to_delete.channel.id}>!", color=0xFC0345)
         embed.add_field(name="Lý do xoá tin nhắn:", value=reason, inline=False)  # Single-line field
         embed.add_field(name="Nội dung tin nhắn bị xoá:", value=mess_to_delete.content, inline=False)
-        if image_urls != None and len(image_urls) == 1:
-            embed.set_image(url= image_urls[0])
-        elif image_urls != None and len(image_urls) > 1:
-            embed.add_field(name="Tin nhắn chứa nhiều hình ảnh. Dưới đây là những hình ảnh trong tin nhắn đó.", value="", inline=False)
-            for index,url in enumerate(image_urls):
-                embed.add_field(name="", value=f"{index+1}. {url}", inline=False)
+        temp_files = []
+        if mess_to_delete.attachments != None and len(mess_to_delete.attachments) > 0:
+            embed.add_field(name=f"Tin nhắn chứa {len(mess_to_delete.attachments)} attachments.", value="", inline=False)
+            for index,attachment in enumerate(mess_to_delete.attachments):
+                embed.add_field(name="", value=f"{index+1}. {attachment.url}", inline=False)
+                file = await CustomFunctions.get_attachment_file_from_url(url=attachment.url, content_type=attachment.content_type)
+                if file != None: temp_files.append(file)
+        
         embed.set_footer(text=f"Message Id: {message_id}. User ID Invoke: {interaction.user.id}")  # Footer text
         await mess_to_delete.delete()
         await interaction.followup.send(f"Đã xoá tin nhắn ID: {message_id}. Lý do xoá: {reason}", ephemeral=True)
         channel = bot.get_channel(1257150347017850990) #Log-text
-        await channel.send(embed=embed)
+        await channel.send(embed=embed, files=temp_files)
         print(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} delete message of {mess_to_delete.author.display_name}.")
         commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} delete message of {mess_to_delete.author.display_name}.")
     except discord.NotFound:
