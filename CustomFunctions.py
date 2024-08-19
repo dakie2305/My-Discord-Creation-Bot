@@ -330,8 +330,11 @@ async def get_attachment_file_from_url(url, content_type):
                     if content_type:
                         extension = content_type.split('/')[-1]
                     if extension == None: return
+                    #tạo random tên
+                    characters = string.ascii_letters
+                    unique_id = ''.join(random.choices(characters, k=10))
                     if extension == 'quicktime': extension = 'mp4'
-                    file = discord.File(io.BytesIO(data), filename=f"file.{extension}")
+                    file = discord.File(io.BytesIO(data), filename=f"{unique_id}.{extension}")
                     return file
                 return None
             except Exception as e:
