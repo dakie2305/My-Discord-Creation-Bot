@@ -340,6 +340,28 @@ async def get_attachment_file_from_url(url, content_type):
             except Exception as e:
                 return None
 
+async def download_image_file_from_url(url,content_type, filename):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as resp:
+            try:
+                if resp.status == 200:
+                    data = await resp.read()
+                    extension = 'png'
+                    if content_type:
+                        extension = content_type.split('/')[-1]
+                    if extension == None: return
+                    with open(os.path.join(os.path.dirname(__file__),"temp", filename), 'wb') as f:
+                        f.write(resp.content)
+                    return os.path.join(os.path.dirname(__file__),"temp", filename)
+                return None
+            except Exception as e:
+                return None
+
+def check_if_dev_mode():
+    #Nếu có file thì là đang trên dev
+    filepath = os.path.join(os.path.dirname(__file__), "dev.json")
+    return os.path.exists(filepath)
+
 def get_english_dict()->dict:
     filepath = os.path.join(os.path.dirname(__file__),"db", "english_dictionary.json")
     with open(filepath, 'r') as f:
