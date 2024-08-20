@@ -427,10 +427,10 @@ async def process_special_item_functions(word_matching_channel: db.WordMatchingI
         #Thêm cái random item kia cho user
         db.update_player_special_item_word_matching_info(user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= random_skill)
         #Skill này yêu cầu hy sinh điểm để đổi skill
-        db.update_player_point_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id= message.author.id, user_name=message.author.name,user_display_name=message.author.display_name, point=-random_skill.point)
+        db.update_player_point_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id= message.author.id, user_name=message.author.name,user_display_name=message.author.display_name, point=-special_item.point)
         #xoá skill đã dùng khỏi inven của player
         db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
-        await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`** để hy sinh {random_skill.point} điểm, và nhận được kỹ năng **`{random_skill.item_name}`**.\n")
+        await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`** để hy sinh {special_item.point} điểm, và nhận được kỹ năng **`{random_skill.item_name}`**.\n")
         return
     
     #Những kỹ năng có id tận cùng là _minus hoặc _add
