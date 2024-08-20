@@ -564,15 +564,10 @@ def find_player_profile_by_user_id(word_matching_channel: db.WordMatchingInfo, u
 #region Bot Slash Commands
 
 #region say command
-@bot.tree.command(name = "say", description="Nói gì đó ẩn danh thông qua bot, có thể gắn hình ảnh và nhắn vào Channel khác", guild=discord.Object(id=1256987900277690470))
+@bot.tree.command(name = "say", description="Nói gì đó ẩn danh thông qua bot, có thể gắn hình ảnh và nhắn vào Channel khác")
 @app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
 async def say(interaction: discord.Interaction, thing_to_say : str, image: Optional[discord.Attachment] = None, chosen_channel: Optional[discord.TextChannel]= None):
     await interaction.response.send_message(content="Đã gửi tin nhắn ẩn danh thành công", ephemeral=True)
-    req_roles = ['Cai Ngục', 'Supervisor', 'Server Master', 'Moderator', 'Thần Dân']
-    has_required_role = any(role.name in req_roles for role in interaction.user.roles)
-    if not has_required_role:
-        await interaction.followup.send("Không đủ thẩm quyền để thực hiện lệnh.")
-        return
     #Lấy channel mà người dùng gọi ra
     current_channel_id = interaction.channel_id
     current_channel = bot.get_channel(current_channel_id)
@@ -798,7 +793,7 @@ async def report(interaction: discord.Interaction, user : discord.Member, reason
 #endregion
 
 #region Truth Or Dare
-@bot.tree.command(name="truth_dare", description="Tạo mới trò chơi Truth Or Dare.", guild=discord.Object(id=1256987900277690470))
+@bot.tree.command(name="truth_dare", description="Tạo mới trò chơi Truth Or Dare.")
 async def report(interaction: discord.Interaction):
     await interaction.response.defer(ephemeral=True)
     req_roles = ['Thần Dân', 'Supervisor', 'Server Master', 'Moderator', 'Ultimate Admins']
@@ -833,7 +828,7 @@ async def report(interaction: discord.Interaction):
 #endregion
 
 #region Snipe command
-@bot.tree.command(name="snipe", description="Hiện lại message mới nhất vừa bị xoá trong channel này.", guild=discord.Object(id=1256987900277690470))
+@bot.tree.command(name="snipe", description="Hiện lại message mới nhất vừa bị xoá trong channel này.")
 async def snipe(interaction: discord.Interaction):
     await interaction.response.defer()
     req_roles = ['Supervisor', 'Server Master', 'Moderator', 'Ultimate Admins', 'Thần Dân', 'Đã_Mở_Khóa_Full_Kênh_Seg', 'Mod']
@@ -867,7 +862,7 @@ async def snipe(interaction: discord.Interaction):
 #endregion
 
 #region Bảng Xếp Hạng Nối Từ
-@bot.tree.command(name="bxh_noi_tu", description="Hiện bảng xếp hạng những người chơi nối từ trong channel này.", guild=discord.Object(id=1256987900277690470))
+@bot.tree.command(name="bxh_noi_tu", description="Hiện bảng xếp hạng những người chơi nối từ trong channel này.")
 @app_commands.describe(user="Chọn user cần muốn xem cụ thể xếp hạng")
 async def bxh_noi_tu(interaction: discord.Interaction, user: Optional[discord.Member] = None):
     await interaction.response.defer()

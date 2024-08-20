@@ -350,6 +350,8 @@ async def download_image_file_from_url(url,content_type, filename):
                     if content_type:
                         extension = content_type.split('/')[-1]
                     if extension == None: return
+                    if os.path.exists(os.path.join(os.path.dirname(__file__),"temp")) == False:
+                        os.makedirs(os.path.join(os.path.dirname(__file__),"temp"), exist_ok=True)
                     with open(os.path.join(os.path.dirname(__file__),"temp", filename), 'wb') as f:
                         f.write(await resp.read())
                     return os.path.join(os.path.dirname(__file__),"temp", filename)
