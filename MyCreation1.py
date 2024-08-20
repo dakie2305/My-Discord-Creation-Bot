@@ -1,3 +1,4 @@
+import PIL.Image
 import discord
 from datetime import datetime, timedelta
 import os
@@ -18,6 +19,7 @@ import CustomButton
 from typing import Optional
 from collections import deque
 import asyncio
+import PIL
 
 load_dotenv()
 intents = discord.Intents.all()
@@ -1020,7 +1022,19 @@ async def sub_function_ai_response(message: discord.Message):
                 model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
                 prompt = await CustomFunctions.get_proper_prompt(message,"Creation 1", referenced_message)
                 print(f"Prompt generated from {bot.user}: {prompt}")
-                response = model.generate_content(f"{prompt}")
+                file_image_path = None
+                if len(message.attachments)>0:
+                    #Lấy ảnh đầu tiên thôi
+                    for att in message.attachments:
+                        if 'image' in att.content_type:
+                            file_image_path = await CustomFunctions.download_image_file_from_url(url=att.url, content_type=att.content_type,filename= att.filename)
+                            break
+                if file_image_path!= None:
+                    response = model.generate_content([f"{prompt}", PIL.Image.open(file_image_path)])
+                    #Xoá file
+                    os.remove(file_image_path)
+                else:
+                    response = model.generate_content(f"{prompt}")
                 bot_response = (f"{response.text}")
                 #Kiểm tra xem bot reponse có nhiều emoji không, nếu nhiều quá thì remove emoji
                 if CustomFunctions.count_emojis_in_text(bot_response) > 4:
@@ -1045,7 +1059,19 @@ async def sub_function_ai_response(message: discord.Message):
                 model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
                 prompt = await CustomFunctions.get_proper_prompt(message,"Creation 1")
                 print(f"Prompt generated from {bot.user}: {prompt}")
-                response = model.generate_content(f"{prompt}")
+                file_image_path = None
+                if len(message.attachments)>0:
+                    #Lấy ảnh đầu tiên thôi
+                    for att in message.attachments:
+                        if 'image' in att.content_type:
+                            file_image_path = await CustomFunctions.download_image_file_from_url(url=att.url, content_type=att.content_type,filename= att.filename)
+                            break
+                if file_image_path!= None:
+                    response = model.generate_content([f"{prompt}", PIL.Image.open(file_image_path)])
+                    #Xoá file
+                    os.remove(file_image_path)
+                else:
+                    response = model.generate_content(f"{prompt}")
                 bot_response = (f"{response.text}")
                 #Kiểm tra xem bot reponse có nhiều emoji không, nếu nhiều quá thì remove emoji
                 if CustomFunctions.count_emojis_in_text(bot_response) > 4:

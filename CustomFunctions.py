@@ -351,7 +351,7 @@ async def download_image_file_from_url(url,content_type, filename):
                         extension = content_type.split('/')[-1]
                     if extension == None: return
                     with open(os.path.join(os.path.dirname(__file__),"temp", filename), 'wb') as f:
-                        f.write(resp.content)
+                        f.write(await resp.read())
                     return os.path.join(os.path.dirname(__file__),"temp", filename)
                 return None
             except Exception as e:
