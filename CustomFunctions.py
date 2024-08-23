@@ -35,7 +35,7 @@ def get_random_response(filename):
     return None
 
 async def check_swear_content(message):
-    swear_words= ["địt", "clmm", "clm", "đụ", "ỉa", "đái", "đĩ", "đm", "đmm","dm",
+    swear_words= ["địt", "clmm", "clm", "đụ", "ỉa", "đái", "đĩ", "đm", "đmm","dm", "chịch", "cu dài", "cu to", "chịt", "ch*ch", "hiếp dâm", "hấp diêm",
                   "lồn", "cặc", "con cu", "con mẹ mày", "đỉ", "l*n", "súc vật", "cặn bã", "c*c", 
                   "nứng", "n*ng", "mọi đen", "mẹ mày", "mẹ m", "nigger", "niger", "da đen", "nigga", "n*gga", "ních gà", "dốt", "đần độn", "đần chó", "bú cu", "buscu", "bú liếm"]
     if contains_substring(message, swear_words):
