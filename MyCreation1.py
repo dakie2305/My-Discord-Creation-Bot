@@ -735,50 +735,56 @@ async def unjail(interaction: discord.Interaction, user : discord.Member, reason
 #endregion
 
 #region delete_message command
-@bot.tree.command(name="delete_message", description="Xoá tin nhắn bất kỳ.", guild=discord.Object(id=1256987900277690470))
-@app_commands.describe(reason= "Lý do tại sao xoá tin nhắn này", message_id= "Chuột phải vào message muốn xoá, vào bấm Copy Id rồi dán vào đây")
-async def delete_message(interaction: discord.Interaction, reason : str, message_id: str):
+@bot.tree.command(name="delete_message", description="Xoá một hoặc nhiều tin nhắn bất kỳ.", guild=discord.Object(id=1256987900277690470))
+@app_commands.describe(reason= "Lý do tại sao xoá tin nhắn này", message_id= "Chuột phải vào message muốn xoá, vào bấm Copy Id rồi dán vào đây", chosen_channel = "Channel chứa message cần xoá. Tất cả message id phải chung một channel")
+async def delete_message(interaction: discord.Interaction, reason : str, message_id: str, chosen_channel: Optional[discord.TextChannel]= None):
     await interaction.response.defer(ephemeral=True)
     req_roles = ['Supervisor', 'Server Master', 'Moderator', 'Ultimate Admins']
     has_required_role = any(role.name in req_roles for role in interaction.user.roles)
     if not has_required_role:
         await interaction.followup.send("Không đủ thẩm quyền để thực hiện lệnh.")
         return
-    try:
-        mess_to_delete = await interaction.channel.fetch_message(int(message_id))
-        user_reported = mess_to_delete.author
-        is_user_admin = any(role.name in req_roles for role in user_reported.roles)
-        if is_user_admin and interaction.user.id != 315835396305059840:        #Chỉ Darkie mới được quyền xoá tin nhắn của admin, moderator
-            await interaction.followup.send("Không thể xoá tin nhắn của admin/moderator. Vui lòng liên hệ <@315835396305059840>.")
-            return
-        # Create embed object
-        embed = discord.Embed(title="Một tin nhắn đã bị xoá", description=f"User {interaction.user.mention} đã xoá một tin nhắn của {mess_to_delete.author.mention} đăng tại <#{mess_to_delete.channel.id}>!", color=0xFC0345)
-        embed.add_field(name="Lý do xoá tin nhắn:", value=reason, inline=False)  # Single-line field
-        embed.add_field(name="Nội dung tin nhắn bị xoá:", value=mess_to_delete.content, inline=False)
-        temp_files = []
-        if mess_to_delete.attachments != None and len(mess_to_delete.attachments) > 0:
-            embed.add_field(name=f"Tin nhắn chứa {len(mess_to_delete.attachments)} attachments.", value="", inline=False)
-            for index,attachment in enumerate(mess_to_delete.attachments):
-                embed.add_field(name="", value=f"{index+1}. {attachment.url}", inline=False)
-                file = await CustomFunctions.get_attachment_file_from_url(url=attachment.url, content_type=attachment.content_type)
-                if file != None: temp_files.append(file)
-        
-        embed.set_footer(text=f"Message Id: {message_id}. User ID Invoke: {interaction.user.id}")  # Footer text
-        await mess_to_delete.delete()
-        await interaction.followup.send(f"Đã xoá tin nhắn ID: {message_id}. Lý do xoá: {reason}", ephemeral=True)
-        channel = bot.get_channel(1257150347017850990) #Log-text
-        await channel.send(embed=embed, files=temp_files)
-        print(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} delete message of {mess_to_delete.author.display_name}.")
-        commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} delete message of {mess_to_delete.author.display_name}.")
-    except discord.NotFound:
-            await interaction.followup.send(f"Không tìm được tin nhắn với ID {message_id}. Vui lòng thử lại!", ephemeral=True)
-            commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} tried to delete message id{message_id} but not found.")
-    except discord.Forbidden:
-            await interaction.followup.send(f"Bot không có quyền xoá tin nhắn với ID {message_id}. Vui lòng cấp quyền Manage Message!", ephemeral=True)
-            commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} tried to delete message id{message_id} but bot has insufficient permissions.")
-    except Exception as e:
-            await interaction.followup.send(f"<@315835396305059840> Bot gặp exception trong lúc xoá message ID {message_id}. Exception: {str(e)}. Vui lòng liên hệ Darkie!")
-            commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} tried to delete message id{message_id} but got exception {str(e)}.")
+    list_mess_id = message_id.split(",")
+    for mess in list_mess_id:
+        try:
+            mess_to_delete: discord.Message = None
+            if chosen_channel:
+                mess_to_delete = await chosen_channel.fetch_message(int(mess))
+            else:
+                mess_to_delete = await interaction.channel.fetch_message(int(mess))
+            user_reported = mess_to_delete.author
+            is_user_admin = any(role.name in req_roles for role in user_reported.roles)
+            if is_user_admin and interaction.user.id != 315835396305059840:        #Chỉ Darkie mới được quyền xoá tin nhắn của admin, moderator
+                await interaction.followup.send("Không thể xoá tin nhắn của admin/moderator. Vui lòng liên hệ <@315835396305059840>.")
+                return
+            # Create embed object
+            embed = discord.Embed(title="Một tin nhắn đã bị xoá", description=f"User {interaction.user.mention} đã xoá một tin nhắn của {mess_to_delete.author.mention} đăng tại <#{mess_to_delete.channel.id}>!", color=0xFC0345)
+            embed.add_field(name="Lý do xoá tin nhắn:", value=reason, inline=False)  # Single-line field
+            embed.add_field(name="Nội dung tin nhắn bị xoá:", value=mess_to_delete.content, inline=False)
+            temp_files = []
+            if mess_to_delete.attachments != None and len(mess_to_delete.attachments) > 0:
+                embed.add_field(name=f"Tin nhắn chứa {len(mess_to_delete.attachments)} attachments.", value="", inline=False)
+                for index,attachment in enumerate(mess_to_delete.attachments):
+                    embed.add_field(name="", value=f"{index+1}. {attachment.url}", inline=False)
+                    file = await CustomFunctions.get_attachment_file_from_url(url=attachment.url, content_type=attachment.content_type)
+                    if file != None: temp_files.append(file)
+            
+            embed.set_footer(text=f"Message Id: {mess}. User ID Invoke: {interaction.user.id}")  # Footer text
+            await mess_to_delete.delete()
+            await interaction.followup.send(f"Đã xoá tin nhắn ID: {mess}. Lý do xoá: {reason}", ephemeral=True)
+            channel = bot.get_channel(1257150347017850990) #Log-text
+            await channel.send(embed=embed, files=temp_files)
+            print(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} delete message of {mess_to_delete.author.display_name}.")
+            commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} delete message of {mess_to_delete.author.display_name}.")
+        except discord.NotFound:
+                await interaction.followup.send(f"Không tìm được tin nhắn với ID {mess}. Vui lòng thử lại!", ephemeral=True)
+                commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} tried to delete message id{mess} but not found.")
+        except discord.Forbidden:
+                await interaction.followup.send(f"Bot không có quyền xoá tin nhắn với ID {mess}. Vui lòng cấp quyền Manage Message!", ephemeral=True)
+                commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} tried to delete message id{mess} but bot has insufficient permissions.")
+        except Exception as e:
+                await interaction.followup.send(f"<@315835396305059840> Bot gặp exception trong lúc xoá message ID {mess}. Exception: {str(e)}. Vui lòng liên hệ Darkie!")
+                commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} tried to delete message id{mess} but got exception {str(e)}.")
 #endregion
 
 #region report command
