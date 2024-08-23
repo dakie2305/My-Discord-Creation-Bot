@@ -907,6 +907,45 @@ async def bxh_noi_tu(interaction: discord.Interaction, user: Optional[discord.Me
         else:
             await interaction.followup.send(f"Đây không phải là channel dùng để chơi nối từ. Chỉ dùng lệnh này trong channel chơi nối từ thôi!")
 
+
+#region Verify
+@bot.tree.command(name="verify_user", description="Xác minh user.", guild=discord.Object(id=1256987900277690470))
+@app_commands.describe(user="Chọn user cần xác minh")
+async def verify(interaction: discord.Interaction, user: discord.Member):
+    await interaction.response.defer()
+    req_roles = ['Supervisor', 'Server Master', 'Moderator', 'Ultimate Admins']
+    has_required_role = any(role.name in req_roles for role in interaction.user.roles)
+    if not has_required_role:
+        await interaction.followup.send("Không đủ thẩm quyền để thực hiện lệnh.")
+        return
+    for role in user.roles:
+        if role.name == "Thần Dân":
+            await interaction.followup.send("User đã được xác minh rồi.")
+            return
+    #Add role Thần Dân
+    verify_role = discord.utils.get(user.guild.roles, name="Thần Dân")
+    await user.add_roles(verify_role)
+    await interaction.followup.send(f"Đã xác minh user {user.mention} thành công.")
+
+#region Unverify
+@bot.tree.command(name="unverify_user", description="Huỷ xác minh user.", guild=discord.Object(id=1256987900277690470))
+@app_commands.describe(user="Chọn user cần huỷ xác minh")
+async def verify(interaction: discord.Interaction, user: discord.Member):
+    await interaction.response.defer(ephemeral=True)
+    req_roles = ['Supervisor', 'Server Master', 'Moderator', 'Ultimate Admins']
+    has_required_role = any(role.name in req_roles for role in interaction.user.roles)
+    if not has_required_role:
+        await interaction.followup.send("Không đủ thẩm quyền để thực hiện lệnh.")
+        return
+    for role in user.roles:
+        if role.name == "Thần Dân":
+            await user.remove_roles(role)
+            await interaction.followup.send("Đã huỷ xác minh user.", ephemeral= True)
+            return
+    await interaction.followup.send(f"User {user.mention} vẫn chưa xác minh.", ephemeral= True)
+
+
+
 def get_bxh_noi_tu(interaction: discord.Interaction,lan: str, word_matching_channel: db.WordMatchingInfo, user_mention: Optional[discord.Member] = None):
     if lan == 'en' or 'eng':
         lan = "Tiếng Anh"
