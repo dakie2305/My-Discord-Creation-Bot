@@ -465,6 +465,33 @@ async def process_special_item_functions(word_matching_channel: db.WordMatchingI
         db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
         return
     
+    #Những kỹ năng có id tận cùng là steal_point
+    #Đây là những kỹ năng ăn cắp điểm của đối thủ
+    elif special_item.item_id.endswith("_steal_point"):
+        if user_target == None:
+            await message.reply(f"Kỹ năng **`{special_item.item_name}`** cần phải tag tên của đối phương mới có hiệu nghiệm.\n")
+            return
+        elif user_target.id == message.author.id:
+            await message.reply(f"Ôi bạn ơi, kỹ năng **`{special_item.item_name}`** chỉ dành cho người khác chứ không phải dành cho bạn.\n")
+            return
+        
+        if special_item.item_id == "ct_steal_point":
+            #50% thất bại
+            ran = random.randint(1, 2)
+            if ran == 2:
+                await message.reply(f"{message.author.mention} định dùng kỹ năng **`{special_item.item_name}`** để cướp điểm {user_target.mention} nhưng đã thất bại!\n")
+                #xoá khỏi inven của player
+                db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
+                return
+        #cộng điểm player
+        db.update_player_point_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id= message.author.id, user_name=message.author.name,user_display_name=message.author.display_name, point=special_item.point)
+        #trừ điểm đối thủ
+        db.update_player_point_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id= user_target.id, user_name=user_target.name,user_display_name=user_target.display_name, point=-special_item.point)
+        await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`** để cướp {special_item.point} điểm của {user_target.mention}.\n")
+        #xoá khỏi inven của player
+        db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
+        return
+    
     #Những kỹ năng có id tận cùng là minus_all
     #Đây là những kỹ năng trừ điểm toàn bộ đối thủ
     elif special_item.item_id.endswith("minus_all"):
