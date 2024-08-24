@@ -1074,7 +1074,7 @@ async def remove_old_conversation():
     print(f"Found {count} old conversation in collection 'user_conversation_info_{bot_name}' and deleted them.")
 
 async def sub_function_ai_response(message: discord.Message):
-    if message.channel.id == 1269029322950180977: return #Channel nối-từ-tiếng-anh, không cho bot nói chuyện ở đây
+    if message.channel.id == 1269029322950180977 or message.channel.id == 1259237810653626440 or message.channel.id == 1259242009290477618: return #Không cho bot nói chuyện ở những channel sau
     bots_creation1_name = ["creation 1", "creation số 1", "creation no 1", "creation no. 1"]
     if message.reference is not None and message.reference.resolved is not None:
         if message.reference.resolved.author == bot.user or CustomFunctions.contains_substring(message.content.lower(), bots_creation1_name):
