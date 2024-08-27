@@ -12,6 +12,7 @@ import re
 import aiohttp
 import io
 from gtts import gTTS
+import time
 
 def get_random_response(filename):
   """
@@ -36,13 +37,13 @@ def get_random_response(filename):
 
 async def check_swear_content(message):
     swear_words= ["địt", "clmm", "clm", "đụ", "ỉa", "đái", "đĩ", "đm", "đmm","dm", "chịch", "cu dài", "cu to", "chịt", "ch*ch", "hiếp dâm", "hấp diêm",
-                  "lồn", "cặc", "con cu", "con mẹ mày", "đỉ", "l*n", "súc vật", "cặn bã", "c*c", 
+                  "lồn", "cặc", "con cu", "con mẹ mày", "đỉ", "l*n", "súc vật", "cặn bã", "c*c", "khoả thân",
                   "nứng", "n*ng", "mọi đen", "mẹ mày", "mẹ m", "nigger", "niger", "da đen", "nigga", "n*gga", "ních gà", "dốt", "đần độn", "đần chó", "bú cu", "buscu", "bú liếm"]
     if contains_substring(message, swear_words):
             return True
     return False
 async def check_nswf_content(message):
-    swear_words= ["hentai","haiten","2ten", "nứng quá", "chat sech", "sech", "chat sex", "chat sếch", "nắc"]
+    swear_words= ["hentai","haiten","2ten", "nứng quá", "chat sech", "sech", "chat sex", "chat sếch", "nắc", "nude", "pussy", "naked"]
     if contains_substring(message, swear_words):
             return True
     return False 
@@ -370,6 +371,13 @@ def get_english_dict()->dict:
         data = json.load(f)
         return data
     return None
+
+def is_outside_working_time() -> bool:
+    # Không cho hoạt động khi nằm ngoài khung giờ này
+    start_time = time(0, 0)   # 00:00 AM
+    end_time = time(8, 0)     # 08:00 AM
+    current_time = datetime.now()
+    return start_time <= current_time.time() <= end_time
 
 english_dict = get_english_dict()
 
