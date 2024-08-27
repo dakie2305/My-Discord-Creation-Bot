@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 import db.DbMongoManager as db
 import db.UserList as DefaultUserList
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time as dt_time
 import discord
 import string
 from typing import List, Optional
@@ -374,10 +374,12 @@ def get_english_dict()->dict:
 
 def is_outside_working_time():
     # Không cho hoạt động khi nằm ngoài khung giờ này
-    current_time = datetime.now()
-    current_hour = current_time.hour
-    current_minute = current_time.minute
-    return 0 <= current_hour <= 8
+    start_time = dt_time(0, 0)   # 00:00 AM
+    end_time = dt_time(8, 0)     # 08:00 AM
+    current_datetime = datetime.now()
+    
+    return not (start_time <= current_datetime.time() <= end_time)
+    # return 0 <= current_hour <= 8
 
 english_dict = get_english_dict()
 
