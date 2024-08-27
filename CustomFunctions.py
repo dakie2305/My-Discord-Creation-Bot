@@ -372,12 +372,12 @@ def get_english_dict()->dict:
         return data
     return None
 
-def is_outside_working_time() -> bool:
+def is_outside_working_time():
     # Không cho hoạt động khi nằm ngoài khung giờ này
-    start_time = time(0, 0)   # 00:00 AM
-    end_time = time(8, 0)     # 08:00 AM
     current_time = datetime.now()
-    return start_time <= current_time.time() <= end_time
+    current_hour = current_time.hour
+    current_minute = current_time.minute
+    return 0 <= current_hour <= 8
 
 english_dict = get_english_dict()
 
