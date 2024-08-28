@@ -880,7 +880,7 @@ async def snipe(interaction: discord.Interaction):
         if list_snipe_message == None:
             await interaction.followup.send(f"Chưa thấy bất kỳ message nào bị xoá trong channel {interaction.channel.mention}. Vui lòng thử lại sau.")
             return
-        
+        list_snipe_message.reverse()
         temp_files = []
         first_message = list_snipe_message[0]
         if first_message != None and first_message.user_attachments!= None and len(first_message.user_attachments)>0:
