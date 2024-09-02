@@ -281,7 +281,7 @@ async def sub_function_ai_response(message: discord.Message):
     guild_info = db.find_guild_extra_info_by_id(message.guild.id)
     if message.reference is not None and message.reference.resolved is not None:
         if message.reference.resolved.author == bot.user or CustomFunctions.contains_substring(message.content.lower(), bots_creation_name):
-            if message.guild.id != 1256987900277690470: #Chỉ True Heaven mới không bị dính
+            if message.guild.id != 1256987900277690470 or message.guild.id != 1194106864582004849: #Chỉ True Heaven, Học Viện 2ten mới không bị dính
                 if CustomFunctions.is_outside_working_time() == False:
                     await message.channel.send(f"Tính năng AI của Bot chỉ hoạt động đến 12h đêm, vui lòng đợi đến 8h sáng hôm sau.")
                     return

@@ -93,30 +93,32 @@ async def reset_noi_tu_english(ctx):
         #Kiểm tra xem đã tồn tại WordMatchingClass cho channel này chưa
         word_matching_channel = db.find_word_matching_info_by_id(channel_id=message.channel.id, guild_id=message.guild.id, language='en')
         if word_matching_channel:
-            #Show lên bảng xếp hạng cuối cùng
-            embed = discord.Embed(title=f"Xếp hạng các player theo điểm.", description=f"Trò Chơi Nối Từ Tiếng Anh", color=0x03F8FC)
-            embed.add_field(name=f"", value="___________________", inline=False)
-            count = 0
-            if word_matching_channel.player_profiles:
-                word_matching_channel.player_profiles.sort(key=lambda x: x.points, reverse=True)
-                for index, profile in enumerate(word_matching_channel.player_profiles):
-                    user = message.guild.get_member(profile.user_id)
-                    if user != None and (profile.points!= 0 or len(profile.special_items)> 0):
-                        embed.add_field(name=f"", value=f"**Hạng {index+1}.** {user.mention}. Tổng điểm: **{profile.points}**. Số lượng kỹ năng đặc biệt: **{len(profile.special_items)}**.", inline=False)
-                        count+=1
-                    if count >= 25: break
-            
-            await message.channel.send(content=f"Chúc mừng các player top đầu! <@315835396305059840> sẽ trao role đặc biệt cho những Player thuộc top 3 nhé!", embed=embed)
-            #Xoá đi tạo lại
-            db.delete_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language='en')
-            data = db.WordMatchingInfo(channel_id=message.channel.id, channel_name=message.channel.name, current_word="a", first_character="a",last_character="a",remaining_word=12300)
-            result = db.create_word_matching_info(data=data, guild_id=message.guild.id, language='en')
-            message_tu_hien_tai = f"\nTừ hiện tại là: `'{data.current_word}'`, và có **{data.remaining_word if data.remaining_word else 0}** bắt đầu bằng chữ cái `{data.last_character if data.last_character else 0}`"
-            await ctx.send(f"Đã reset toàn bộ từ trong trò nối từ English. {message_tu_hien_tai}")
+            await process_reset_word_matching(message=message, word_matching_channel=word_matching_channel)
         else:
             await ctx.send(f"Chưa tồn tại thông tin Word Match Info cho channel này. Hãy dùng lệnh !bat_dau_noi_tu_english.")
         return
     return
+
+async def process_reset_word_matching(message: discord.Message, word_matching_channel: db.WordMatchingInfo):
+    embed = discord.Embed(title=f"Xếp hạng các player theo điểm.", description=f"Trò Chơi Nối Từ", color=0x03F8FC)
+    embed.add_field(name=f"", value="___________________", inline=False)
+    count = 0
+    if word_matching_channel.player_profiles:
+        word_matching_channel.player_profiles.sort(key=lambda x: x.points, reverse=True)
+        for index, profile in enumerate(word_matching_channel.player_profiles):
+            user = message.guild.get_member(profile.user_id)
+            if user != None and (profile.points!= 0 or len(profile.special_items)> 0):
+                embed.add_field(name=f"", value=f"**Hạng {index+1}.** {user.mention}. Tổng điểm: **{profile.points}**. Số lượng kỹ năng đặc biệt: **{len(profile.special_items)}**.", inline=False)
+                count+=1
+            if count >= 25: break
+    await message.channel.send(content=f"Chúc mừng các player top đầu! <@315835396305059840> sẽ trao role đặc biệt cho những Player thuộc top 3 nhé!", embed=embed)
+    #Xoá đi tạo lại
+    db.delete_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language='en')
+    data = db.WordMatchingInfo(channel_id=message.channel.id, channel_name=message.channel.name, current_word="a", first_character="a",last_character="a",remaining_word=12300)
+    result = db.create_word_matching_info(data=data, guild_id=message.guild.id, language='en')
+    message_tu_hien_tai = f"\nTừ hiện tại là: `'{data.current_word}'`, và có **{data.remaining_word if data.remaining_word else 0}** bắt đầu bằng chữ cái `{data.last_character if data.last_character else 0}`"
+    await message.channel.send(f"Đã reset toàn bộ từ trong trò nối từ trong channel này. {message_tu_hien_tai}")
+
 #region Give skill
 @bot.command()
 @app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
@@ -1208,7 +1210,7 @@ async def sub_function_ai_response(message: discord.Message):
     bots_creation1_name = ["creation 1", "creation số 1", "creation no 1", "creation no. 1"]
     if message.reference is not None and message.reference.resolved is not None:
         if message.reference.resolved.author == bot.user or CustomFunctions.contains_substring(message.content.lower(), bots_creation1_name):
-            if message.guild.id != 1256987900277690470: #Chỉ True Heaven mới không bị dính
+            if message.guild.id != 1256987900277690470 or message.guild.id != 1194106864582004849: #Chỉ True Heaven, học viện 2ten mới không bị dính
                 if CustomFunctions.is_outside_working_time() == False:
                     await message.channel.send(f"Tính năng AI của Bot chỉ hoạt động đến 12h đêm, vui lòng đợi đến 8h sáng hôm sau.")
                     return
@@ -1332,13 +1334,7 @@ async def english_word_matching(message: discord.Message):
             elif word_matching_channel.remaining_word==0:
                 #reset lại
                 await message.channel.send(f"Kinh nhờ, chơi hết từ khả dụng rồi. Cảm ơn mọi người đã chơi nhé. Đến lúc reset thông tin từ rồi. Mọi người bắt đầu lại nhé!")
-                temp = []
-                temp.append("aa")
-                db.update_special_point_word_matching_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_point= 0)
-                db.update_data_word_matching_info(language=lan,channel_id=message.channel.id, guild_id= message.guild.id, current_player_id=0, current_player_name="",current_word="aa", existed_words=temp)
-                word_matching_channel = db.find_word_matching_info_by_id(channel_id= message.channel.id, guild_id= message.guild.id, language=lan)
-                message_tu_hien_tai = f"\nTừ hiện tại là: `'{word_matching_channel.current_word}'`, và có **{word_matching_channel.remaining_word if word_matching_channel.remaining_word else 0}** từ bắt đầu bằng chữ cái `{word_matching_channel.last_character if word_matching_channel.last_character else 0}`"
-                await message.channel.send(f"{message_tu_hien_tai}")
+                await process_reset_word_matching(message=message, word_matching_channel=word_matching_channel)
         # #Xổ số nếu chưa có special point
         so_xo = random.randint(1, 10)
         #Nếu sổ xố rơi trúng số 5 thì coi như cộng point lên x2, x3, x4 ngẫu nhiên
