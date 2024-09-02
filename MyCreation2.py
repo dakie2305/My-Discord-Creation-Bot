@@ -296,7 +296,6 @@ async def sub_function_ai_response(message: discord.Message):
                 return
             async with message.channel.typing():
                 referenced_message = await message.channel.fetch_message(message.reference.message_id)
-                time.sleep(4)
                 model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
                 prompt = await CustomFunctions.get_proper_prompt(message,"Creation 2", referenced_message)
                 print(f"Prompt generated from {bot.user}: {prompt}")
@@ -334,7 +333,6 @@ async def sub_function_ai_response(message: discord.Message):
                 CustomFunctions.save_user_convo_data(message=message, bot_reponse= bot_response, bot_name= "Creation 2")
                 print(f"Username {message.author.name}, Display user name {message.author.display_name} replied {bot.user}")
                 interaction_logger.info(f"Username {message.author.name}, Display user name {message.author.display_name} replied {bot.user}")
-                time.sleep(4)
             
     elif CustomFunctions.contains_substring(message.content.lower(), bots_creation_name):
         if message.guild.id != 1256987900277690470 and CustomFunctions.is_outside_working_time() == False: #Chỉ True Heaven mới không bị dính
@@ -380,7 +378,6 @@ async def sub_function_ai_response(message: discord.Message):
                 CustomFunctions.save_user_convo_data(message=message, bot_reponse= bot_response, bot_name= "Creation 2")
                 print(f"Username {message.author.name}, Display user name {message.author.display_name} directly call {bot.user}")
                 interaction_logger.info(f"Username {message.author.name}, Display user name {message.author.display_name} directly call {bot.user}")
-                time.sleep(4)
     return
 
 async def save_message_attachments(message: discord.Message):
