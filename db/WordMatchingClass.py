@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 #region WordMatchingInfo
 class WordMatchingInfo:
-    def __init__(self, channel_id: int, channel_name: str, current_player_id: int = None, current_player_name: str = None, current_word: str = None, first_character: str = None, last_character: str = None, special_point: int = None, special_item: Optional['SpecialItem'] = None, remaining_word: int = None, used_words: List[str] = None, player_profiles: Optional[List['PlayerProfile']] = None):
+    def __init__(self, channel_id: int, channel_name: str, current_player_id: int = None, current_player_name: str = None, current_word: str = None, first_character: str = None, last_character: str = None, special_point: int = None, special_item: Optional['SpecialItem'] = None, remaining_word: int = None, used_words: List[str] = None, player_profiles: Optional[List['PlayerProfile']] = None, player_effects : Optional[List['PlayerEffect']] = None):
         self.channel_id = channel_id 
         self.channel_name = channel_name
         self.current_player_id = current_player_id
@@ -16,6 +16,7 @@ class WordMatchingInfo:
         self.used_words: List[str] = used_words if used_words else []
         self.special_item: SpecialItem = special_item if special_item else None
         self.player_profiles: List[PlayerProfile] = player_profiles if player_profiles else []
+        self.player_effects: List[PlayerEffect] = player_effects if player_effects else []
     def to_dict(self):
         return {
             "channel_id": self.channel_id,
@@ -30,6 +31,7 @@ class WordMatchingInfo:
             "used_words": [data for data in self.used_words],
             "special_item": self.special_item.to_dict() if self.special_item else None,
             "player_profiles": [data.to_dict() for data in self.player_profiles],
+            "player_effects": [data.to_dict() for data in self.player_effects],
         }
 
     @staticmethod
@@ -46,7 +48,8 @@ class WordMatchingInfo:
             special_point= data["special_point"],
             used_words = data["used_words"],
             special_item = SpecialItem.from_dict(data.get("special_item", None)) if data.get("special_item") else None,
-            player_profiles = [PlayerProfile.from_dict(item) for item in data.get("player_profiles", [])]
+            player_profiles = [PlayerProfile.from_dict(item) for item in data.get("player_profiles", [])],
+            player_effects = [PlayerEffect.from_dict(item) for item in data.get("player_effects", [])]
         )
 
 
@@ -108,6 +111,30 @@ class SpecialItem:
             point = data["point"],
             level = data["level"],
             required_target = data["required_target"]
+        )
+
+#Region Player Effect
+class PlayerEffect:
+    def __init__(self, user_id: int, username: str, effect_id: str, effect_name: str):
+        self.user_id = user_id 
+        self.username = username
+        self.effect_id = effect_id
+        self.effect_name = effect_name
+    def to_dict(self):
+        return {
+            "user_id": self.user_id,
+            "username": self.username,
+            "effect_id": self.effect_id,
+            "effect_name": self.effect_name,
+        }
+        
+    @staticmethod
+    def from_dict(data:dict):
+        return PlayerEffect(
+            user_id=data.get("user_id", None),
+            username=data.get("username", None),
+            effect_id = data.get("effect_id", None),
+            effect_name = data.get("effect_name", None),
         )
 
 list_special_items_cap_thap = [
@@ -201,6 +228,24 @@ list_special_items_cap_thap = [
         level="Cấp Thấp",
         required_target=True
     ),
+    SpecialItem(
+        item_id="ct_protect",
+        item_name="Bảo Hộ",
+        item_description="Kỹ năng này sẽ bảo vệ người chơi và vô hiệu hoá kỹ năng của player khác. Cách sử dụng rất đơn giản, chỉ việc nhập đúng lệnh như thế này:\n **!use_skill ct_protect**",
+        quantity = 1,
+        point=1,
+        level="Cấp Thấp",
+        required_target=False
+    ),
+    SpecialItem(
+        item_id="ct_protect_user",
+        item_name="Bảo Hộ Đối Phương",
+        item_description="Kỹ năng này sẽ bảo vệ đối phương và vô hiệu hoá kỹ năng của player khác. Cách sử dụng rất đơn giản, chỉ việc nhập đúng lệnh như thế này:\n **!use_skill ct_protect_user <@315835396305059840>**",
+        quantity = 1,
+        point=1,
+        level="Cấp Thấp",
+        required_target=True
+    ),
 ]
 
 list_special_items_cap_cao = [
@@ -285,6 +330,15 @@ list_special_items_cap_cao = [
         level="Cấp Cao",
         required_target=True
     ),
+    SpecialItem(
+        item_id="cc_protect",
+        item_name="Bảo Hộ Giáp Gai",
+        item_description="Kỹ năng này sẽ bảo hộ người chơi và phản lại kỹ năng của player khác. Cách sử dụng rất đơn giản, chỉ việc nhập đúng lệnh như thế này:\n **!use_skill cc_protect**",
+        quantity = 1,
+        point=1,
+        level="Cấp Cao",
+        required_target=False
+    ),
 ]
 list_special_items_dang_cap = [
     SpecialItem(
@@ -367,6 +421,15 @@ list_special_items_dang_cap = [
         point=9,
         level="Đẳng Cấp",
         required_target=True
+    ),
+    SpecialItem(
+        item_id="dc_protect",
+        item_name="Bảo Hộ Hoàn Giáp",
+        item_description="Kỹ năng này sẽ bảo hộ người chơi, phản lại kỹ năng của player khác và cướp luôn kỹ năng của đối thủ. Cách sử dụng rất đơn giản, chỉ việc nhập đúng lệnh như thế này:\n **!use_skill dc_protect**",
+        quantity = 1,
+        point=1,
+        level="Đẳng Cấp",
+        required_target=False
     ),
 ]
 list_special_items_toi_thuong = [

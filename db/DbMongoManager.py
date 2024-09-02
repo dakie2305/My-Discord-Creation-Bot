@@ -4,7 +4,7 @@ from typing import List
 from pymongo import MongoClient
 from datetime import datetime, timedelta
 from db.CustomClass import UserInfo, GuildExtraInfo, UserConversationInfo, ConversationInfo, SnipeChannelInfo, SnipeMessage, SnipeMessageAttachments, PreDeleteAttachmentsInfo
-from db.WordMatchingClass import WordMatchingInfo, PlayerProfile, SpecialItem
+from db.WordMatchingClass import WordMatchingInfo, PlayerProfile, SpecialItem, PlayerEffect
 import discord
 import CustomFunctions as MyFunc
 
@@ -479,6 +479,32 @@ def update_all_players_point_word_matching_info(channel_id: int, guild_id: int, 
             if player_profile.points < 0: player_profile.points = 0
             collection.update_one({"channel_id": channel_id, "player_profiles.user_id": player_profile.user_id}, {"$set": {"player_profiles.$.points": player_profile.points,
                                                                                                                                                                                         }})
+
+def update_player_effects_word_matching_info(channel_id: int, guild_id: int, language: str,user_id: int,user_name: str, effect_id: str, effect_name: str, remove_special_effect = False):
+    """
+    Cập nhật lại danh sách Player Effects của player cụ thể.
+    """
+    db_specific = client['word_matching_database']
+    collection = db_specific[f'{language}_word_matching_guild_{guild_id}']
+    existing_data = collection.find_one({"channel_id": channel_id})
+    existing_info = WordMatchingInfo.from_dict(existing_data)
+    list_player_effect = existing_info.player_effects
+    if remove_special_effect == False:
+        #Tạo mới danh sách Player Effect
+        data = PlayerEffect(user_id= user_id, username= user_name, effect_id= effect_id, effect_name= effect_name)
+        list_player_effect.append(data)
+    else:
+        #Xoá effect id của user id khỏi danh sách
+        for item in list_player_effect:
+            if item.effect_id == effect_id and item.user_id == user_id:
+                list_player_effect.remove(item)
+                break
+    #Cập nhật danh sách trong db
+    result = collection.update_one({"channel_id": channel_id}, {"$set": {"player_effects": [player_effects.to_dict() for player_effects in list_player_effect],
+                                                                         }})
+    return result
+
+
 #endregion
 
 #endregion

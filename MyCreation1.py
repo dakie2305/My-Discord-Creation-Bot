@@ -298,6 +298,8 @@ async def use_skill(ctx, item_id: str = None, user: Optional[discord.Member] = N
             if matched == False:
                 await message.reply(f"{message.author.mention} Bạn không có kỹ năng này.")
                 return
+        
+        
         #Sau khi bắt lỗi, bắt đầu thực hiện chức năng kỹ năng
         await process_special_item_functions(word_matching_channel=word_matching_channel, special_item=special_item, message=message, user_target=user, lan = 'en')
         return
@@ -314,6 +316,13 @@ async def use_skill(ctx, item_id: str = None, user: Optional[discord.Member] = N
 
 #region xử lý skill nối từ
 async def process_special_item_functions(word_matching_channel: db.WordMatchingInfo, special_item: WordMatchingClass.SpecialItem, message: discord.Message, lan:str,user_target: discord.User = None):
+    #Nếu có user_target thì lập tức kiểm tra xem user_target có effect đặc biệt không
+    target_player_effect: db.PlayerEffect = None
+    if user_target != None:
+        for effect in word_matching_channel.player_effects:
+            if effect.user_id == user_target.id:
+                target_player_effect = effect
+                break
     #Kỹ năng hint, gợi ý từ
     if special_item.item_id == "ct_hint":
         #Tìm từ hợp lệ, bắt đầu bằng chữ cái trong word_matching_channel
@@ -323,7 +332,7 @@ async def process_special_item_functions(word_matching_channel: db.WordMatchingI
                 suitable_word = word
         if suitable_word == None:
             await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`**.\nRất tiếc là không có từ hợp lệ... lạ ta. <@315835396305059840>")
-        half_length = (len(suitable_word) + 1) // 2
+        half_length = (len(suitable_word) + 2) // 2
         suitable_word = suitable_word[:half_length] + "..."
         #Gợi ý nửa từ
         await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`**.\nGợi ý từ hợp lệ: **`{suitable_word}**`")
@@ -341,8 +350,24 @@ async def process_special_item_functions(word_matching_channel: db.WordMatchingI
         await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`**.\nGợi ý từ hợp lệ: **`{suitable_word}**`")
         db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
         return
-    
     elif special_item.item_id =="ct_curr_player":
+        if target_player_effect!= None and target_player_effect.effect_id.endswith("protect"):
+            text_reply = f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`**, nhưng người chơi {user_target.mention} có hiệu ứng **`{target_player_effect.effect_name}`** nên không hề hấn gì! "
+            #Vô hiệu hoá
+            if target_player_effect.effect_id.startswith("cc") or target_player_effect.effect_id.startswith("dc"):
+                #Phản lại kỹ năng
+                db.update_current_player_id_word_matching_info(channel_id=message.channel.id,guild_id=message.guild.id, language=lan, user_id=message.author.id)
+                text_reply += f"{message.author.mention} mất quyền nối từ trong lượt chơi hiện tại"
+                if target_player_effect.effect_id.startswith("dc"):
+                    #Cướp luôn kỹ năng
+                    db.update_player_special_item_word_matching_info(user_id=user_target.id, user_name=user_target.name, user_display_name=user_target.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
+                    text_reply += f" và đã bị **{user_target.display_name}** cướp mất kỹ năng **`{special_item.item_name}`**!"
+            await message.reply(text_reply)
+            #xoá khỏi inven của player
+            db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
+            #Xoá hiệu ứng khỏi target user
+            db.update_player_effects_word_matching_info(remove_special_effect= True,channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id=user_target.id, user_name=user_target.name, effect_id= target_player_effect.effect_id, effect_name= target_player_effect.effect_name)
+            return
         #Chuyển current_player_id sang user_target là được
         await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`**. Người chơi {user_target.mention} sẽ mất quyền nối từ trong lượt chơi hiện tại.\n")
         db.update_current_player_id_word_matching_info(channel_id=message.channel.id,guild_id=message.guild.id, language=lan, user_id=user_target.id)
@@ -358,38 +383,48 @@ async def process_special_item_functions(word_matching_channel: db.WordMatchingI
         db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
         return
     
-    #Những kỹ năng có id tận cùng là minus_first
-    #Đây là những kỹ năng trừ điểm của top 1
-    elif special_item.item_id.endswith("minus_first"):
-        #Tìm top 1 player để trừ điểm
+    #Những kỹ năng có id tận cùng là minus_first hoặc minus_second
+    #Đây là những kỹ năng trừ điểm của top 1 hoặc top 2
+    elif special_item.item_id.endswith("minus_first") or special_item.item_id.endswith("minus_second"):
+        #Tìm top player để trừ điểm
         sort = sorted(word_matching_channel.player_profiles, key=lambda x: x.points, reverse=True)
-        top_1_profile = sort[0]
-        top_1_user = message.guild.get_member(top_1_profile.user_id)
-        if top_1_user == None:
-            await message.reply(f"Không tìm ra player top 1 để trừ điểm.\n")
-            return
-        db.update_player_point_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id= top_1_user.id, user_name=top_1_user.name,user_display_name=top_1_user.display_name, point=-special_item.point)
-        await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`** để trừ {special_item.point} điểm của {top_1_user.mention}.\n")
-        #xoá khỏi inven của player
-        db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
-        return
-    
-    #Những kỹ năng có id tận cùng là minus_second
-    #Đây là những kỹ năng trừ điểm của top 2
-    elif special_item.item_id.endswith("minus_second"):
-        #Tìm top 2 player để trừ điểm
-        sort = sorted(word_matching_channel.player_profiles, key=lambda x: x.points, reverse=True)
-        top_profile = sort[1]
+        top_number = "1"
+        if special_item.item_id.endswith("minus_first"):
+            top_profile = sort[0]
+        else:
+            top_number = "2"
+            top_profile = sort[1]
         top_user = message.guild.get_member(top_profile.user_id)
         if top_user == None:
-            await message.reply(f"Không tìm ra player top 2 để trừ điểm.\n")
+            await message.reply(f"Không tìm ra player top {top_number} để trừ điểm.\n")
+            return
+        for effect in word_matching_channel.player_effects:
+            if effect.user_id == top_user.id:
+                target_player_effect = effect
+                break
+        if target_player_effect!= None and target_player_effect.effect_id.endswith("protect"):
+            text_reply = f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`**, nhưng người chơi {top_user.mention} có hiệu ứng **`{target_player_effect.effect_name}`** nên không hề hấn gì! "
+            #Vô hiệu hoá
+            if target_player_effect.effect_id.startswith("cc") or target_player_effect.effect_id.startswith("dc"):
+                #Phản lại kỹ năng
+                db.update_player_point_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id= message.author.id, user_name=message.author.name,user_display_name=message.author.display_name, point=-special_item.point)
+                text_reply += f"{message.author.mention} bị trừ {special_item.point} "
+                if target_player_effect.effect_id.startswith("dc"):
+                    #Cướp luôn kỹ năng
+                    db.update_player_special_item_word_matching_info(user_id=top_user.id, user_name=top_user.name, user_display_name=top_user.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
+                    text_reply += f" và đã bị **{top_user.display_name}** cướp mất kỹ năng **`{special_item.item_name}`**!"
+            await message.reply(text_reply)
+            #xoá khỏi inven của player
+            db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
+            #Xoá hiệu ứng khỏi target user
+            db.update_player_effects_word_matching_info(remove_special_effect= True,channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id=top_user.id, user_name=top_user.name, effect_id= target_player_effect.effect_id, effect_name= target_player_effect.effect_name)
             return
         db.update_player_point_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id= top_user.id, user_name=top_user.name,user_display_name=top_user.display_name, point=-special_item.point)
         await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`** để trừ {special_item.point} điểm của {top_user.mention}.\n")
         #xoá khỏi inven của player
         db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
         return
-    
+
     elif special_item.item_id.endswith("steal_skill") or special_item.item_id.endswith("del_skill"):
         #Lấy ra ngẫu nhiên skill trong bộ skils của đối thủ
         selected_player = None
@@ -403,6 +438,20 @@ async def process_special_item_functions(word_matching_channel: db.WordMatchingI
         elif selected_player.special_items == None or len(selected_player.special_items) == 0:
             await message.reply(f"Đối phương không có bất kỳ kỹ năng đặc biệt nào cả.")
             return
+        if target_player_effect!= None and target_player_effect.effect_id.endswith("protect"):
+            text_reply = f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`**, nhưng người chơi {user_target.mention} có hiệu ứng **`{target_player_effect.effect_name}`** nên không hề hấn gì! "
+            #Vô hiệu hoá
+            if target_player_effect.effect_id.startswith("cc") or target_player_effect.effect_id.startswith("dc"):
+                #Chỉ cướp kỹ năng
+                db.update_player_special_item_word_matching_info(user_id=user_target.id, user_name=user_target.name, user_display_name=user_target.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
+                text_reply += f" **{user_target.display_name}** đã cướp mất kỹ năng **`{special_item.item_name}`**!"
+            await message.reply(text_reply)
+            #xoá khỏi inven của player
+            db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
+            #Xoá hiệu ứng khỏi target user
+            db.update_player_effects_word_matching_info(remove_special_effect= True,channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id=user_target.id, user_name=user_target.name, effect_id= target_player_effect.effect_id, effect_name= target_player_effect.effect_name)
+            return
+        
         random_item = random.choice(selected_player.special_items)
         action = "xoá"
         if special_item.item_id.endswith("steal_skill"): 
@@ -441,6 +490,23 @@ async def process_special_item_functions(word_matching_channel: db.WordMatchingI
             await message.reply(f"Kỹ năng **`{special_item.item_name}`** cần phải tag tên của đối phương mới có hiệu nghiệm.\n")
             return
         if is_minus:
+            if target_player_effect!= None and target_player_effect.effect_id.endswith("protect"):
+                text_reply = f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`**, nhưng người chơi {user_target.mention} có hiệu ứng **`{target_player_effect.effect_name}`** nên không hề hấn gì! "
+                #Vô hiệu hoá
+                if target_player_effect.effect_id.startswith("cc") or target_player_effect.effect_id.startswith("dc"):
+                    #Phản lại kỹ năng
+                    db.update_player_point_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id= message.author.id, user_name=message.author.name,user_display_name=message.author.display_name, point=-special_item.point)
+                    text_reply += f"{message.author.mention} bị trừ {special_item.point} "
+                    if target_player_effect.effect_id.startswith("dc"):
+                        #Cướp luôn kỹ năng
+                        db.update_player_special_item_word_matching_info(user_id=user_target.id, user_name=user_target.name, user_display_name=user_target.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
+                        text_reply += f" và đã bị **{user_target.display_name}** cướp mất kỹ năng **`{special_item.item_name}`**!"
+                await message.reply(text_reply)
+                #xoá khỏi inven của player
+                db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
+                #Xoá hiệu ứng khỏi target user
+                db.update_player_effects_word_matching_info(remove_special_effect= True,channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id=user_target.id, user_name=user_target.name, effect_id= target_player_effect.effect_id, effect_name= target_player_effect.effect_name)
+                return
             db.update_player_point_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id= user_target.id, user_name=user_target.name,user_display_name=user_target.display_name, point=-special_item.point)
             await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`** để trừ {special_item.point} điểm của {user_target.mention}.\n")
         else:
@@ -474,6 +540,25 @@ async def process_special_item_functions(word_matching_channel: db.WordMatchingI
         elif user_target.id == message.author.id:
             await message.reply(f"Ôi bạn ơi, kỹ năng **`{special_item.item_name}`** chỉ dành cho người khác chứ không phải dành cho bạn.\n")
             return
+        
+        if target_player_effect!= None and target_player_effect.effect_id.endswith("protect"):
+                text_reply = f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`**, nhưng người chơi {user_target.mention} có hiệu ứng **`{target_player_effect.effect_name}`** nên không hề hấn gì! "
+                #Vô hiệu hoá
+                if target_player_effect.effect_id.startswith("cc") or target_player_effect.effect_id.startswith("dc"):
+                    #Phản lại kỹ năng
+                    db.update_player_point_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id= message.author.id, user_name=message.author.name,user_display_name=message.author.display_name, point=-special_item.point)
+                    db.update_player_point_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id= user_target.id, user_name=user_target.name,user_display_name=user_target.display_name, point=special_item.point)
+                    text_reply += f"{message.author.mention} đã bị cướp mất {special_item.point} điểm "
+                    if target_player_effect.effect_id.startswith("dc"):
+                        #Cướp luôn kỹ năng
+                        db.update_player_special_item_word_matching_info(user_id=user_target.id, user_name=user_target.name, user_display_name=user_target.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
+                        text_reply += f" và đã bị **{user_target.display_name}** cướp mất kỹ năng **`{special_item.item_name}`**!"
+                await message.reply(text_reply)
+                #xoá khỏi inven của player
+                db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
+                #Xoá hiệu ứng khỏi target user
+                db.update_player_effects_word_matching_info(remove_special_effect= True,channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id=user_target.id, user_name=user_target.name, effect_id= target_player_effect.effect_id, effect_name= target_player_effect.effect_name)
+                return
         
         if special_item.item_id == "ct_steal_point":
             #50% thất bại
@@ -524,6 +609,29 @@ async def process_special_item_functions(word_matching_channel: db.WordMatchingI
         if top_user == None:
             await message.reply(f"Không tìm ra user để dùng kỹ năng.\n")
             return
+        for effect in word_matching_channel.player_effects:
+            if effect.user_id == top_user.id:
+                target_player_effect = effect
+                break
+            
+        if target_player_effect!= None and target_player_effect.effect_id.endswith("protect"):
+            text_reply = f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`**, nhưng người chơi {top_user.mention} có hiệu ứng **`{target_player_effect.effect_name}`** nên không hề hấn gì! "
+            #Vô hiệu hoá
+            if target_player_effect.effect_id.startswith("cc") or target_player_effect.effect_id.startswith("dc"):
+                #Phản lại kỹ năng
+                db.update_player_point_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id= message.author.id, user_name=message.author.name,user_display_name=message.author.display_name, point=-special_item.point)
+                text_reply += f"{message.author.mention} bị trừ {special_item.point} "
+                if target_player_effect.effect_id.startswith("dc"):
+                    #Cướp luôn kỹ năng
+                    db.update_player_special_item_word_matching_info(user_id=top_user.id, user_name=top_user.name, user_display_name=top_user.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
+                    text_reply += f" và đã bị **{top_user.display_name}** cướp mất kỹ năng **`{special_item.item_name}`**!"
+            await message.reply(text_reply)
+            #xoá khỏi inven của player
+            db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
+            #Xoá hiệu ứng khỏi target user
+            db.update_player_effects_word_matching_info(remove_special_effect= True,channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id=top_user.id, user_name=top_user.name, effect_id= target_player_effect.effect_id, effect_name= target_player_effect.effect_name)
+            return
+        
         #Lấy điểm của user_target ra và trừ điểm hiện tại của người chơi, đó sẽ là điểm cần cộng cho người chơi
         calc_point = top_profile.points -curr_player.points
         db.update_player_point_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id= message.author.id, user_name=message.author.name,user_display_name=message.author.display_name, point=calc_point)
@@ -534,9 +642,36 @@ async def process_special_item_functions(word_matching_channel: db.WordMatchingI
         db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
         return
     
+    #Những kỹ năng có id chứa chữ "_protect"
+    #Đây là những kỹ năng bảo hộ, thêm vào danh mục player effect
+    elif "_protect" in special_item.item_id:
+        #Thêm vào db player_effect
+        if special_item.item_id.endswith("protect_user"):
+            db.update_player_effects_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id=user_target.id, user_name=user_target.name, effect_id= "ct_protect", effect_name= "Bảo Hộ")
+            await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`** để bảo vệ player {user_target.mention}.\n")
+        else:    
+            db.update_player_effects_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id=message.author.id, user_name=message.author.name, effect_id= special_item.item_id, effect_name= special_item.item_name)
+            await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`** lên bản thân\n")
+        #xoá khỏi inven của player
+        db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
+        return
+    
     await message.reply(f"Darkie chưa hoàn thành kỹ năng **`{special_item.item_name}`** đâu nhé. Vui lòng đợi Darkie hoàn thiện bộ kỹ năng.")
     return
 
+async def process_players_effects_functions(word_matching_channel: db.WordMatchingInfo, special_item: WordMatchingClass.SpecialItem, message: discord.Message, lan:str,user_target: discord.User = None):
+    #Lấy ra player effect đầu tiên của target
+    flag = False
+    selected_player_effect: db.PlayerEffect = None
+    for effect in word_matching_channel.player_effects:
+        if effect.user_id == user_target.id:
+            selected_player_effect = effect
+            break
+    if selected_player_effect == None:
+        return flag
+    
+    
+    return flag
 def get_special_item_by_id(item_id: str):
     for data in WordMatchingClass.list_special_items_cap_thap:
         if data.item_id == item_id:
