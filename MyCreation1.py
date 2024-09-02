@@ -864,11 +864,6 @@ async def report(interaction: discord.Interaction):
 @bot.tree.command(name="snipe", description="Hiện lại message mới nhất vừa bị xoá trong channel này.")
 async def snipe(interaction: discord.Interaction):
     await interaction.response.defer()
-    req_roles = ['Supervisor', 'Server Master', 'Moderator', 'Ultimate Admins', 'Thần Dân', 'Đã_Mở_Khóa_Full_Kênh_Seg', 'Mod']
-    has_required_role = any(role.name in req_roles for role in interaction.user.roles)
-    if not has_required_role:
-        await interaction.followup.send("Không đủ thẩm quyền để thực hiện lệnh.")
-        return
     called_channel = interaction.channel
     
     snipe_channel_info = db.find_snipe_channel_info_by_id(called_channel.id, interaction.guild.id)

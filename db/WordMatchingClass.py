@@ -195,7 +195,7 @@ list_special_items_cap_thap = [
     SpecialItem(
         item_id="ct_steal_point",
         item_name="Ăn Cắp Điểm",
-        item_description="Kỹ năng này sẽ có 50/50 phần trăm ăn cắp 3 điểm của đối phương. Cách sử dụng rất đơn giản, chỉ việc nhập đúng lệnh như thế này:\n **!use_skill ct_steal_point**",
+        item_description="Kỹ năng này sẽ có 50/50 phần trăm ăn cắp 3 điểm của đối phương. Cách sử dụng rất đơn giản, chỉ việc nhập đúng lệnh như thế này:\n **!use_skill ct_steal_point <@315835396305059840>**",
         quantity = 1,
         point=3,
         level="Cấp Thấp",
@@ -279,7 +279,7 @@ list_special_items_cap_cao = [
     SpecialItem(
         item_id="cc_steal_point",
         item_name="Ăn Cắp Điểm",
-        item_description="Kỹ năng này sẽ ăn cắp 6 điểm của đối phương. Cách sử dụng rất đơn giản, chỉ việc nhập đúng lệnh như thế này:\n **!use_skill cc_steal_point**",
+        item_description="Kỹ năng này sẽ ăn cắp 6 điểm của đối phương. Cách sử dụng rất đơn giản, chỉ việc nhập đúng lệnh như thế này:\n **!use_skill cc_steal_point <@315835396305059840>**",
         quantity = 1,
         point=6,
         level="Cấp Cao",
@@ -362,7 +362,7 @@ list_special_items_dang_cap = [
     SpecialItem(
         item_id="dc_steal_point",
         item_name="Ăn Cắp Điểm",
-        item_description="Kỹ năng này sẽ ăn cắp 9 điểm của đối phương. Cách sử dụng rất đơn giản, chỉ việc nhập đúng lệnh như thế này:\n **!use_skill dc_steal_point**",
+        item_description="Kỹ năng này sẽ ăn cắp 9 điểm của đối phương. Cách sử dụng rất đơn giản, chỉ việc nhập đúng lệnh như thế này:\n **!use_skill dc_steal_point <@315835396305059840>**",
         quantity = 1,
         point=9,
         level="Đẳng Cấp",
