@@ -55,17 +55,14 @@ async def global_sync_creation_2(ctx):
         
 @bot.command()
 async def guild_extra_info(ctx):
-    if(ctx.author.id != CustomFunctions.user_darkie['user_id']):
-        await ctx.send(f"Có phải là Darkie đâu mà dùng lệnh này?")
     #Kiểm tra xem guild này đã có trong db extra info chưa
     check_exist = db.find_guild_extra_info_by_id(int(ctx.guild.id))
     if check_exist:
         await ctx.send(f"Đã tồn tại thông tin Guild Extra Info về server này.")
     else:
         data = GuildExtraInfo(guild_id=ctx.guild.id, guild_name= ctx.guild.name, allowed_ai_bot=False)
-        db.update_or_insert_conversation_info(data)
+        db.update_or_insert_guild_extra_info(data)
         await ctx.send(f"Lưu thành công thông tin Guild Extra Info về server này.", ephemeral=True)
-        
         
 #endregion
 
