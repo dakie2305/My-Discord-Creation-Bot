@@ -694,12 +694,20 @@ def danh_sach_ky_nang(word_matching_channel: db.WordMatchingInfo, user = discord
     if word_matching_channel.player_profiles:
         word_matching_channel.player_profiles.sort(key=lambda x: x.points, reverse=True)
         matched = False
+        list_effect = []
+        for player_effect in word_matching_channel.player_effects:
+            if player_effect.user_id == user.id:
+                list_effect.append(player_effect.effect_name)
+        
         for profile in word_matching_channel.player_profiles:
             if profile.user_id == user.id:
                 matched = True
+                if len(list_effect) > 0:
+                    comma_separated_string = ', '.join(list_effect)
+                    embed.add_field(name=f"", value= f"Hiệu ứng đặc biệt: **`{comma_separated_string}`**", inline=False)
+                    embed.add_field(name=f"________________", value= f"")
                 if profile.special_items:
                     for index_item, item in enumerate(profile.special_items):
-                        target_require = "Có" if item.required_target else "Không"
                         embed.add_field(name=f"Kỹ năng {index_item+1}", value= f"Tên kỹ năng: *{item.item_name}*\nRank: {item.level} \n\nMô tả kỹ năng: {item.item_description}", inline=False)  # Single-line field
                         embed.add_field(name=f"________________", value= f"")
                 else:

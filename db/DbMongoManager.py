@@ -499,6 +499,20 @@ def update_player_effects_word_matching_info(channel_id: int, guild_id: int, lan
             if item.effect_id == effect_id and item.user_id == user_id:
                 list_player_effect.remove(item)
                 break
+    list_temp_to_remove = []
+    for player_effect in list_player_effect:
+        if player_effect.user_id == user_id:
+            list_temp_to_remove.append(player_effect)
+            
+    if list_temp_to_remove != None and len(list_temp_to_remove)>2:
+        while len(list_temp_to_remove)>2:
+            first_skill_to_remove = list_temp_to_remove[0]
+            for item in list_player_effect:
+                if item.effect_id == first_skill_to_remove.effect_id and item.user_id == first_skill_to_remove.user_id:
+                    list_player_effect.remove(item)
+                    break
+            list_temp_to_remove.pop(0)
+        
     #Cập nhật danh sách trong db
     result = collection.update_one({"channel_id": channel_id}, {"$set": {"player_effects": [player_effects.to_dict() for player_effects in list_player_effect],
                                                                          }})
