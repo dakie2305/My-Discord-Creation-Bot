@@ -984,12 +984,10 @@ async def report(interaction: discord.Interaction):
         question_type = "Thách Thức"
         content = CustomFunctions.get_random_response("OnDareChallenge.txt")
     # Create embed object
-    embed = discord.Embed(title=f"Nhớ là đã tạo thì chơi cho tới cùng chứ đừng nhát quá bỏ qua nha :)", description=f"Tới lượt chơi của {interaction.user.mention}", color=0x03F8FC)
+    embed = discord.Embed(title=f"", description=f"Lượt chơi của: {interaction.user.mention}", color=0x03F8FC)
     embed.add_field(name=f"", value=f"*Loại trò chơi: {question_type}*", inline=False)
     embed.add_field(name=f"", value="___________________", inline=False)
     embed.add_field(name=f"{content}", value=f"", inline=False)
-    embed.add_field(name=f"", value="___________________", inline=False)
-    embed.set_footer(text=f"User ID Invoke: {interaction.user.id}")
     view = CustomButton.CustomTruthDareComboButtons()
     await interaction.followup.send(f"Đã tạo thành công trò sự thật hoặc thách thức.", ephemeral=True)
     await channel.send(embed=embed, view= view)
@@ -1336,7 +1334,7 @@ async def english_word_matching(message: discord.Message):
                 await message.channel.send(f"Kinh nhờ, chơi hết từ khả dụng rồi. Cảm ơn mọi người đã chơi nhé. Đến lúc reset thông tin từ rồi. Mọi người bắt đầu lại nhé!")
                 await process_reset_word_matching(message=message, word_matching_channel=word_matching_channel)
         # #Xổ số nếu chưa có special point
-        so_xo = random.randint(1, 10)
+        so_xo = random.randint(2, 10)
         #Nếu sổ xố rơi trúng số 5 thì coi như cộng point lên x2, x3, x4 ngẫu nhiên
         if so_xo == 10:
             x_value = random.randint(2, 5)
@@ -1346,7 +1344,7 @@ async def english_word_matching(message: discord.Message):
             await message.channel.send(f"{text_cong_point}")
         else:
             #Sổ xố xem trúng kỹ năng đặc biệt không
-            so_xo = random.randint(0, 10)
+            so_xo = random.randint(2, 10)
             if so_xo == 10:
                 text_cong_skill = f"\n**Cơ hội chỉ đến một lần duy nhất, nếu ai thắng nhận được kỹ năng đặc biệt bên dưới! Cơ hội duy nhất thôi!**\n"
                 percent = random.randint(0, 100)
