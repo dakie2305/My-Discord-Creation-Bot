@@ -13,6 +13,9 @@ import aiohttp
 import io
 from gtts import gTTS
 import time
+import librosa
+import soundfile as sf
+
 
 def get_random_response(filename):
   """
@@ -207,7 +210,12 @@ async def bot_sending_sound(bot_name: str, bot_reponse: str, message: discord.Me
     filepath = os.path.join(os.path.dirname(__file__),directory,filename)
     tts = gTTS(text=bot_reponse, lang='vi', slow=False)
     tts.save(filepath)
-    # Send the audio file to the channel
+    # Tăng tốc và thay đổi pitch âm lượng
+    y, sr = librosa.load(filepath)
+    y_faster = librosa.effects.time_stretch(y=y, rate=1.75)
+    y_higher_pitch = librosa.effects.pitch_shift(y=y_faster, sr= sr, n_steps=5.85)
+    sf.write(filepath, y_higher_pitch, sr)
+    # Gửi file lên
     with open(filepath, 'rb') as f:
         await message.reply(file=discord.File(f, filepath))
     os.remove(filepath)

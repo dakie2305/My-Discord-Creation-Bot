@@ -5,3 +5,5 @@ discord-py-slash-command
 gtts
 Pillow
 pymongo
+librosa
+soundfile
