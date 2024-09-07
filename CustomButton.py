@@ -27,12 +27,10 @@ class CustomTruthDareComboButtons(discord.ui.View):
         content = CustomFunctions.get_random_response("OnTruthChallenge.txt")
         channel = interaction.channel
         # Create embed object
-        embed = discord.Embed(title=f"Nhớ là đã tạo thì chơi cho tới cùng chứ đừng nhát quá bỏ qua nha :)", description=f"Tới lượt chơi của {interaction.user.mention}", color=0x03F8FC)
+        embed = discord.Embed(title=f"", description=f"Lượt chơi của: {interaction.user.mention}", color=0x03F8FC)
         embed.add_field(name=f"", value="*Loại trò chơi: Sự Thật*", inline=False)
         embed.add_field(name=f"", value="___________________", inline=False)
         embed.add_field(name=f"{content}", value=f"", inline=False)
-        embed.add_field(name=f"", value="___________________", inline=False)
-        embed.set_footer(text=f"User ID Invoke: {interaction.user.id}")
         view = CustomTruthDareComboButtons()
         await interaction.followup.send(f"Bạn đã chọn Sự Thật.", ephemeral=True)
         await channel.send(embed=embed, view= view)
@@ -43,11 +41,10 @@ class CustomTruthDareComboButtons(discord.ui.View):
         content = CustomFunctions.get_random_response("OnDareChallenge.txt")
         channel = interaction.channel
         # Create embed object
-        embed = discord.Embed(title=f"Nhớ là đã tạo thì chơi cho tới cùng chứ đừng nhát quá bỏ qua nha :)", description=f"Tới lượt chơi của {interaction.user.mention}", color=0x03F8FC)
+        embed = discord.Embed(title=f"", description=f"Lượt chơi của: {interaction.user.mention}", color=0x03F8FC)
         embed.add_field(name=f"", value="*Loại trò chơi: Thách Thức*", inline=False)
         embed.add_field(name=f"", value="___________________", inline=False)
         embed.add_field(name=f"{content}", value=f"", inline=False)
-        embed.add_field(name=f"", value="___________________", inline=False)
         view = CustomTruthDareComboButtons()
         await interaction.followup.send(f"Bạn đã chọn Thách Thức.", ephemeral=True)
         await channel.send(embed=embed, view= view)
@@ -55,7 +52,7 @@ class CustomTruthDareComboButtons(discord.ui.View):
 
 class PaginationView(discord.ui.View):
     def __init__(self, bot, interaction: discord.Interaction, items: List[SnipeMessage], per_page = 1):
-        super().__init__(timeout=600)
+        super().__init__(timeout=None)
         self.bot = bot
         self.interaction = interaction
         self.items = items
