@@ -361,12 +361,14 @@ async def sub_function_ai_response(message: discord.Message):
 attachment_counter = {}
 async def check_message_attachments(message: discord.Message):
     if message.guild and message.attachments != None and len(message.attachments) >= 1:
+        req_roles = ['Đẳng Cấp']
+        has_required_role = any(role.name in req_roles for role in message.author.roles)
         #Lưu lại link từng attachment theo từng channel
         user_attachments = []
         for att in message.attachments:
             if att.filename != "profile.png":
                 #Trong server True Heaven thì kiểm tra xem đăng đủ 10 attachments trong channel đặc biệt không
-                if message.guild.id == 1256987900277690470 and (message.channel.id == 1259237925590138880):
+                if message.guild.id == 1256987900277690470 and has_required_role == False and (message.channel.id == 1259237925590138880):
                     if message.channel.id not in attachment_counter:
                         attachment_counter[message.channel.id] = {}
                     if message.author.id not in attachment_counter[message.channel.id]:
@@ -375,7 +377,7 @@ async def check_message_attachments(message: discord.Message):
                 #cache lại link, tránh dead.
                 response = requests.get(url=att.url, stream=True)
         
-        if message.guild.id == 1256987900277690470 and message.channel.id == 1259237925590138880 and attachment_counter[message.channel.id].get(message.author.id, 0) >= 10:
+        if message.guild.id == 1256987900277690470 and message.channel.id == 1259237925590138880 and has_required_role == False and attachment_counter[message.channel.id].get(message.author.id, 0) >= 10:
         #thêm role Đẳng Cấp của server
             dc_role = discord.utils.get(message.author.guild.roles, name="Đẳng Cấp")
             if dc_role:
