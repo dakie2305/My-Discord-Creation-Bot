@@ -219,21 +219,6 @@ async def random_ai_talk(interaction: discord.Interaction):
 #endregion
 
 
-# Task: Kiểm tra enabled_ai_until của collection guild_extra_info
-@tasks.loop(hours=2)
-async def check_enable_server():
-    now = datetime.now()
-    list_guild_extra_info = db.find_all_guild_extra_info()
-    for guild_info in list_guild_extra_info:
-        enabled_until = guild_info.enabled_ai_until
-        if enabled_until!= None and guild_info.allowed_ai_bot == True:
-            if enabled_until > now:
-                return
-            data_updated = {"allowed_ai_bot": False}
-            db.update_guild_extra_info(guild_info.guild_id, data_updated)
-            print(f"Updating allowed_ai_bot = False for guid_id: {guild_info.guild_id}. enabled_until = {enabled_until}, now = {now}")
-            commands_logger.info(f"Updating allowed_ai_bot = False for guid_id: {guild_info.guild_id}. ")
-            
 # Task: Nói chuyện tự động
 @tasks.loop(hours=3, reconnect=True)
 async def automatic_speak_randomly():
@@ -372,14 +357,36 @@ async def sub_function_ai_response(message: discord.Message):
                 interaction_logger.info(f"Username {message.author.name}, Display user name {message.author.display_name} directly call {bot.user}")
     return
 
-async def save_message_attachments(message: discord.Message):
+
+attachment_counter = {}
+async def check_message_attachments(message: discord.Message):
     if message.guild and message.attachments != None and len(message.attachments) >= 1:
         #Lưu lại link từng attachment theo từng channel
         user_attachments = []
         for att in message.attachments:
             if att.filename != "profile.png":
+                #Trong server True Heaven thì kiểm tra xem đăng đủ 10 attachments trong channel đặc biệt không
+                if message.guild.id == 1256987900277690470 and (message.channel.id == 1259237925590138880):
+                    if message.channel.id not in attachment_counter:
+                        attachment_counter[message.channel.id] = {}
+                    if message.author.id not in attachment_counter[message.channel.id]:
+                        attachment_counter[message.channel.id][message.author.id] = 0
+                    attachment_counter[message.channel.id][message.author.id] += 1
                 #cache lại link, tránh dead.
                 response = requests.get(url=att.url, stream=True)
+        
+        if message.guild.id == 1256987900277690470 and message.channel.id == 1259237925590138880 and attachment_counter[message.channel.id].get(message.author.id, 0) >= 10:
+            #thêm role Đẳng Cấp của server
+            dc_role = discord.utils.get(message.author.guild.roles, name="Đẳng Cấp")
+            if dc_role:
+                await message.author.add_roles(dc_role)
+                mordern_date_time_format = datetime.now().strftime(f"%d/%m/%Y %H:%M")
+                embed = discord.Embed(title="Thêm Role Đẳng Cấp", description=f"{message.author.mention}, username: {message.author.name} đã đăng đủ mười attachment trong channel đặc biệt!", color=0x00FF00)  # Green color
+                embed.add_field(name="Thời gian thêm Role:", value=f"{mordern_date_time_format}", inline=True)
+                channel = bot.get_channel(1257016014156206115) #Log Command
+                await channel.send(embed= embed)
+                print(f"Username: {message.author.name} posted 10 attachments at special channel. {attachment_counter}")
+                del attachment_counter[message.channel.id][message.author.id]
     return
 
 
@@ -491,7 +498,6 @@ client = discord.Client(intents=intents)
 async def on_ready():
     print(f'We have logged in as {bot.user}')
     interaction_logger.info(f"Successfully logged in as {bot.user}")
-    check_enable_server.start()
     if CustomFunctions.check_if_dev_mode()==False:
         automatic_speak_randomly.start()
     remove_old_conversation.start()
@@ -501,7 +507,7 @@ async def on_message(message):
     if message.author == bot.user:
         return
     await sub_function_ai_response(message=message)
-    await save_message_attachments(message=message)
+    await check_message_attachments(message=message)
     await steal_content_from_2tai(message=message)
     await bot.process_commands(message)
 
