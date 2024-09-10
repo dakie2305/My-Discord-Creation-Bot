@@ -39,7 +39,7 @@ class GuildExtraInfo:
         self.guild_id = guild_id
         self.guild_name = guild_name
         self.allowed_ai_bot = allowed_ai_bot
-        self.list_channels_ai_talk = list_channels_ai_talk
+        self.list_channels_ai_talk: List[int] = list_channels_ai_talk if list_channels_ai_talk else []
         self.enabled_ai_until = enabled_ai_until
 
     def to_dict(self):

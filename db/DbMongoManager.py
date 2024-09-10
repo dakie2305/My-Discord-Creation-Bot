@@ -115,7 +115,7 @@ def find_all_guild_extra_info():
     data = list(collection.find())
     return [GuildExtraInfo.from_dict(guild) for guild in data]
     
-def update_or_insert_guild_extra_info(guild_info: GuildExtraInfo):
+def insert_guild_extra_info(guild_info: GuildExtraInfo):
     db_specific = client['guild_database']
     collection = db_specific['guild_extra_info']
     existing_data = collection.find_one({"guild_id": guild_info.guild_id})

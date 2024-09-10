@@ -61,47 +61,10 @@ async def guild_extra_info(ctx):
         await ctx.send(f"Đã tồn tại thông tin Guild Extra Info về server này.")
     else:
         data = GuildExtraInfo(guild_id=ctx.guild.id, guild_name= ctx.guild.name, allowed_ai_bot=False)
-        db.update_or_insert_guild_extra_info(data)
+        db.insert_guild_extra_info(data)
         await ctx.send(f"Lưu thành công thông tin Guild Extra Info về server này.", ephemeral=True)
-        
 #endregion
 
-#region enable / disable Creation 2 in 2ten server
-@bot.tree.command(name="enable_in_server", description="Bật Bot Creation 2 trong khoảng thời gian nhất định.", guild=discord.Object(id=1194106864582004849))
-@app_commands.describe(duration= "Thời gian bật (nhập số)", time_format = "Time Format để xác định chính xác (second, minute, hour, day, week, month)")
-async def enable_in_server(interaction: discord.Interaction, duration: int, time_format : str):
-    await interaction.response.defer()  # Defer the interaction early
-    #Chỉ Darkie được quyền bật
-    if(interaction.user.id != CustomFunctions.user_darkie['user_id']):
-        await interaction.followup.send("Vui lòng liên hệ <@315835396305059840> để bật bot nhé.")
-        return
-    if time_format not in ['second', 'minute', 'hour', 'day', 'month']:
-        await interaction.followup.send("Sai định dạng thời gian. Chỉ dùng những từ sau: second, minute, hour, day, month.", ephemeral=True)
-        return
-    # Calculate the end time
-    end_time = datetime.now() + CustomFunctions.get_timedelta(duration, time_format)
-    
-    #Set enabled_ai_until trong db
-    guild = db.find_guild_extra_info_by_id(interaction.guild_id) 
-    if guild == None:
-        await interaction.followup.send("Chưa tồn tại server này trong database, vui lòng thêm trước.", ephemeral=True)
-        return
-    data_updated = {"allowed_ai_bot": True,"enabled_ai_until": end_time.isoformat()}
-    db.update_guild_extra_info(interaction.guild_id, data_updated)
-    temp = end_time.strftime(f"%d/%m/%Y %H:%M")
-    await interaction.followup.send(f"Darkie đã cho phép Creation 2 chạy trong server này trong vòng {duration} {time_format}. Thời gian Bot hoạt động là đến {temp} nếu không có bất cập.\n Vào <#1264455905756446740> để tương tác nhé!")
-    
-@bot.tree.command(name="disable_in_server", description="Tắt Bot Creation 2 cho đến khi bật lại.", guild=discord.Object(id=1194106864582004849))
-async def enable_in_server(interaction: discord.Interaction):
-    await interaction.response.defer()  # Defer the interaction early
-    #Chỉ Darkie được quyền tắt
-    if(interaction.user.id != CustomFunctions.user_darkie['user_id']):
-        await interaction.followup.send("Vui lòng liên hệ <@315835396305059840> để tắt bot nhé.")
-        return
-    global Enabled_In_Server
-    Enabled_In_Server = False
-    await interaction.followup.send(f"Darkie đã vô hiệu hoá chức năng AI của Creation 2 trong server này.")
-#endregion
 
 #region say command
 @bot.tree.command(name = "say", description="Nói gì đó ẩn danh thông qua bot, có thể gắn hình ảnh và nhắn vào Channel khác", guild=discord.Object(id=1194106864582004849)) #Học viện 2ten
@@ -200,7 +163,6 @@ async def report(interaction: discord.Interaction):
 #endregion
 
 #region Snipe command
-
 @bot.tree.command(name="snipe", description="Hiện lại message mới nhất vừa bị xoá trong channel này.", guild=discord.Object(id=1194106864582004849)) #Học viện 2ten
 async def snipe(interaction: discord.Interaction):
     await interaction.response.defer()
@@ -222,6 +184,38 @@ async def snipe(interaction: discord.Interaction):
         await interaction.followup.send(embed=view.embed, view=view, files=temp_files)
     else:
         await interaction.followup.send(f"Chưa có dữ liệu snipe cho channel {interaction.channel.mention}. Vui lòng thử lại sau.")
+#endregion
+
+#region Random AI Talk command
+@bot.tree.command(name="random_ai_talk", description="Bật/tắt chế độ cho phép bot lâu lâu trò chuyện trong channel này.")
+async def random_ai_talk(interaction: discord.Interaction):
+    await interaction.response.defer(ephemeral= True)
+    if interaction.user.id != 315835396305059840 and interaction.user.id != interaction.guild.owner_id:
+        await interaction.followup.send(f"Chỉ chủ Server mới dùng lệnh này.", ephemeral= False)
+        return
+    called_channel = interaction.channel
+    list_channels_ai_talk = []
+    check_exist = db.find_guild_extra_info_by_id(interaction.guild.id)
+    if check_exist:
+        list_channels_ai_talk = check_exist.list_channels_ai_talk
+        add = True
+        if called_channel.id not in list_channels_ai_talk:
+            #thêm
+            list_channels_ai_talk.append(called_channel.id)
+        else:
+            add = False
+            list_channels_ai_talk.remove(called_channel.id)
+        data_updated = {"list_channels_ai_talk": list_channels_ai_talk}
+        db.update_guild_extra_info(guild_id=interaction.guild.id, update_data= data_updated)
+        if add:
+            await interaction.followup.send(f"Bot lâu lâu sẽ nói chuyện trong channel này.", ephemeral= True)
+        else:
+            await interaction.followup.send(f"Bot sẽ không còn nói chuyện trong channel này nữa.", ephemeral= True)
+    else:
+        list_channels_ai_talk.append(called_channel.id)
+        data = GuildExtraInfo(guild_id=interaction.guild.id, guild_name= interaction.guild.name, allowed_ai_bot=True, list_channels_ai_talk= list_channels_ai_talk)
+        db.insert_guild_extra_info(data)
+        await interaction.followup.send(f"Đã tạo Guild Extra Info. Bot lâu lâu sẽ nói chuyện trong channel này.", ephemeral= True)
 #endregion
 
 
