@@ -376,7 +376,7 @@ async def check_message_attachments(message: discord.Message):
                 response = requests.get(url=att.url, stream=True)
         
         if message.guild.id == 1256987900277690470 and message.channel.id == 1259237925590138880 and attachment_counter[message.channel.id].get(message.author.id, 0) >= 10:
-            #thêm role Đẳng Cấp của server
+        #thêm role Đẳng Cấp của server
             dc_role = discord.utils.get(message.author.guild.roles, name="Đẳng Cấp")
             if dc_role:
                 await message.author.add_roles(dc_role)
