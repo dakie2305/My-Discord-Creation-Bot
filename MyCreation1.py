@@ -1183,7 +1183,7 @@ async def automatic_speak_randomly():
     guilds = bot.guilds
     for guild in guilds:
         guild_extra_info = db.find_guild_extra_info_by_id(guild.id)
-        if guild_extra_info != None and guild_extra_info.list_channels_ai_talk != None:
+        if guild_extra_info != None and guild_extra_info.list_channels_ai_talk != None and len(guild_extra_info.list_channels_ai_talk)>0:
             random_channel_id = random.choice(guild_extra_info.list_channels_ai_talk)
             actual_channel = guild.get_channel(random_channel_id)
             if actual_channel:
