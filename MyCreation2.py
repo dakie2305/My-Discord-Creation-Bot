@@ -220,7 +220,7 @@ async def random_ai_talk(interaction: discord.Interaction):
 
 
 # Task: Nói chuyện tự động
-@tasks.loop(hours=3, reconnect=True)
+@tasks.loop(hours=3)
 async def automatic_speak_randomly():
     guilds = bot.guilds
     for guild in guilds:

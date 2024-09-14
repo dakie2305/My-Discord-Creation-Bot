@@ -410,7 +410,7 @@ async def process_special_item_functions(word_matching_channel: db.WordMatchingI
             if target_player_effect.effect_id.startswith("cc") or target_player_effect.effect_id.startswith("dc"):
                 #Phản lại kỹ năng
                 db.update_player_point_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id= message.author.id, user_name=message.author.name,user_display_name=message.author.display_name, point=-special_item.point)
-                text_reply += f"{message.author.mention} bị trừ {special_item.point} "
+                text_reply += f"{message.author.mention} bị trừ {special_item.point} điểm!"
                 if target_player_effect.effect_id.startswith("dc"):
                     #Cướp luôn kỹ năng
                     db.update_player_special_item_word_matching_info(user_id=top_user.id, user_name=top_user.name, user_display_name=top_user.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
@@ -498,7 +498,7 @@ async def process_special_item_functions(word_matching_channel: db.WordMatchingI
                 if target_player_effect.effect_id.startswith("cc") or target_player_effect.effect_id.startswith("dc"):
                     #Phản lại kỹ năng
                     db.update_player_point_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id= message.author.id, user_name=message.author.name,user_display_name=message.author.display_name, point=-special_item.point)
-                    text_reply += f"{message.author.mention} bị trừ {special_item.point} "
+                    text_reply += f"{message.author.mention} bị trừ {special_item.point} điểm."
                     if target_player_effect.effect_id.startswith("dc"):
                         #Cướp luôn kỹ năng
                         db.update_player_special_item_word_matching_info(user_id=user_target.id, user_name=user_target.name, user_display_name=user_target.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
@@ -550,7 +550,7 @@ async def process_special_item_functions(word_matching_channel: db.WordMatchingI
                     #Phản lại kỹ năng
                     db.update_player_point_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id= message.author.id, user_name=message.author.name,user_display_name=message.author.display_name, point=-special_item.point)
                     db.update_player_point_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id= user_target.id, user_name=user_target.name,user_display_name=user_target.display_name, point=special_item.point)
-                    text_reply += f"{message.author.mention} đã bị cướp mất {special_item.point} điểm "
+                    text_reply += f"{message.author.mention} đã bị cướp mất {special_item.point} điểm!"
                     if target_player_effect.effect_id.startswith("dc"):
                         #Cướp luôn kỹ năng
                         db.update_player_special_item_word_matching_info(user_id=user_target.id, user_name=user_target.name, user_display_name=user_target.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
@@ -622,7 +622,7 @@ async def process_special_item_functions(word_matching_channel: db.WordMatchingI
             if target_player_effect.effect_id.startswith("cc") or target_player_effect.effect_id.startswith("dc"):
                 #Phản lại kỹ năng
                 db.update_player_point_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id= message.author.id, user_name=message.author.name,user_display_name=message.author.display_name, point=-special_item.point)
-                text_reply += f"{message.author.mention} bị trừ {special_item.point} "
+                text_reply += f"{message.author.mention} bị trừ {special_item.point} điểm!"
                 if target_player_effect.effect_id.startswith("dc"):
                     #Cướp luôn kỹ năng
                     db.update_player_special_item_word_matching_info(user_id=top_user.id, user_name=top_user.name, user_display_name=top_user.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
