@@ -19,6 +19,7 @@ import soundfile as sf
 
 def get_random_response(filename):
   """
+  
   Đọc file .txt và trả về dòng ngẫu nhiên.
 
   Args:
