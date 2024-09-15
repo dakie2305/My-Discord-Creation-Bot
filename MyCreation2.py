@@ -447,7 +447,7 @@ async def steal_content_from_2tai(message: discord.Message):
                     if des_channel:
                         await des_channel.send(files=user_attachments)
                 elif source_channel.id == 1281163276008292352: #cosplay
-                    des_channel = true_heaven_server.get_channel(1259236555575263273)  #Châu á-ảnh
+                    des_channel = true_heaven_server.get_channel(1284834396419002469)  #Châu á-ảnh
                     if des_channel:
                         await des_channel.send(files=user_attachments)
                 elif source_channel.id == 1281163587011739710: #ai-gen
