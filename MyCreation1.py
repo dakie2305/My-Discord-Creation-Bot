@@ -749,6 +749,11 @@ async def say(interaction: discord.Interaction, thing_to_say : str, image: Optio
     #Lấy user-id lật ngược lại
     reversed_id = CustomFunctions.reverse_string_loop(str(interaction.user.id))
     
+    
+    
+    
+    
+    
     #tạo random id
     characters = string.ascii_letters
     unique_id = ''.join(random.choices(characters, k=5))
