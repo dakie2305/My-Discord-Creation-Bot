@@ -95,8 +95,6 @@ async def say(interaction: discord.Interaction, thing_to_say : str, image: Optio
     embed.add_field(name=f"'{thing_to_say}'", value= "", inline=False)
     if image != None:
         embed.set_image(url= image.url)
-    embed.add_field(name="______________", value= f"Anon: 0{reversed_id}", inline=False)  # Single-line field
-    embed.set_footer(text=f"❗Lưu ý không lạm dùng chức năng này. Nếu cảm thấy lời thú nhận này có vấn đề hãy thông báo ngay cho Server Master để giải quyết")  # Footer text
     # await interaction.followup.send(content= "Đã gửi tin nhắn ẩn danh thành công.", ephemeral= True)
     await current_channel.send(embed= embed)
     commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} used /say to say: {thing_to_say}")
