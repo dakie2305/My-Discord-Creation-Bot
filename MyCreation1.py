@@ -751,13 +751,15 @@ async def say(interaction: discord.Interaction, thing_to_say : str, image: Optio
     #tạo random id
     characters = string.ascii_letters
     unique_id = ''.join(random.choices(characters, k=5))
-    
+    first = random.randint(0, 9)
+    second = random.randint(0, 9)
     # Create embed object
-    embed = discord.Embed(title=f"Lời thú nhận ẩn danh ({unique_id})", color=0xC3A757)  # Yellowish color
+    embed = discord.Embed(title=f"Ẩn danh ({unique_id})", color=0xC3A757)  # Yellowish color
     embed.add_field(name="______________", value= "", inline=False)  # Single-line field
     embed.add_field(name=f"'{thing_to_say}'", value= "", inline=False)
     if image != None:
         embed.set_image(url= image.url)
+    embed.set_footer(text= f"Anon: {first}{reversed_id}{second}")  # Single-line field
     # await interaction.followup.send(content= "Đã gửi tin nhắn ẩn danh thành công.", ephemeral= True)
     await current_channel.send(embed= embed)
     commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} used /say to say: {thing_to_say}")
