@@ -29,6 +29,7 @@ interaction_logger = DailyLogger.get_logger("Creation2_Interaction")
 commands_logger = DailyLogger.get_logger("Creation2_Commands")
 
 bot = commands.Bot(command_prefix="!", intents=intents)
+bot.remove_command('help')
 #region Bot Prefix Commands
 @bot.command()
 async def ping(ctx):
@@ -63,6 +64,15 @@ async def guild_extra_info(ctx):
         data = GuildExtraInfo(guild_id=ctx.guild.id, guild_name= ctx.guild.name, allowed_ai_bot=False)
         db.insert_guild_extra_info(data)
         await ctx.send(f"Lưu thành công thông tin Guild Extra Info về server này.", ephemeral=True)
+
+@bot.command()
+@app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
+async def help(ctx):
+    message: discord.Message = ctx.message
+    if message:
+        await help_command(message= message)    
+
+
 #endregion
 
 
@@ -218,6 +228,26 @@ async def random_ai_talk(interaction: discord.Interaction):
         await interaction.followup.send(f"Đã tạo Guild Extra Info. Bot lâu lâu sẽ nói chuyện trong channel này.", ephemeral= True)
 #endregion
 
+#region Help Command
+@bot.tree.command(name="help", description="Hiện tất cả commands và hướng dẫn sử dụng bot.")
+async def help_command(interaction: discord.Interaction):
+    message = interaction.message
+    await help_command(message=message)
+    return
+
+
+async def help_command(message: discord.Message):
+    #Trả về text hướng dẫn command
+    text = """**-= Lệnh của Creations 2 =-**
+**Lệnh lặt vặt:**
+`/random_ai_talk`: Lệnh để bật / tắt khả năng lâu lâu bot nói chuyện xàm xí trong channel.
+`/say`: Lệnh dùng để gửi tin nhắn, hình ảnh ần danh.
+`/truth_dare`: Lệnh dùng để gửi tạo mới trò chơi Truth Or Dare.
+`/snipe`: Lệnh dùng để hiển thị lại 7 tin nhắn bị xoá gần nhất trong channel dùng lệnh.
+    """
+    await message.reply(content=text)
+    
+#endregion
 
 # Task: Nói chuyện tự động
 @tasks.loop(hours=3)

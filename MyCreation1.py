@@ -31,6 +31,7 @@ commands_logger = DailyLogger.get_logger("Creation1_Commands")
 
 
 bot = commands.Bot(command_prefix="!", intents=intents)
+bot.remove_command('help')
 #region Bot Prefix Commands
 @bot.command()
 async def ping(ctx):
@@ -46,6 +47,12 @@ async def global_sync_creation_1(ctx):
     else:
         await ctx.send(f"Có phải là Darkie đâu mà dùng lệnh này?")        
         
+@bot.command()
+@app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
+async def help(ctx):
+    message: discord.Message = ctx.message
+    if message:
+        await help_command(message= message)    
 
 @bot.command()
 @app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
@@ -71,7 +78,9 @@ async def bat_dau_noi_tu_english(ctx):
             return
         #Kiểm tra xem đã tồn tại WordMatchingClass cho channel này chưa
         if db.find_word_matching_info_by_id(channel_id=message.channel.id, guild_id=message.guild.id, language='en'):
-            await ctx.send(f"Đã tồn tại thông tin Word Match Info cho channel này. Hãy cứ bắt đầu chơi.")
+            #Xoá word matching info
+            db.delete_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language='en')
+            await ctx.send(f"Đã xoá thông tin Word Match Info cho channel này.")
         else:
             data = db.WordMatchingInfo(channel_id=message.channel.id, channel_name=message.channel.name, current_word="a", first_character="a",last_character="a",remaining_word=12300)
             result = db.create_word_matching_info(data=data, guild_id=message.guild.id, language='en')
@@ -1129,6 +1138,36 @@ def get_bxh_noi_tu(interaction: discord.Interaction,lan: str, word_matching_chan
     embed.add_field(name=f"", value="___________________", inline=False)
     return embed     
 #endregion
+
+#region Help
+@bot.tree.command(name="help", description="Hiện tất cả commands và hướng dẫn sử dụng bot.")
+async def help_command(interaction: discord.Interaction):
+    message = interaction.message
+    await help_command(message=message)
+    return
+
+
+async def help_command(message: discord.Message):
+    #Trả về text hướng dẫn command
+    text = """**-= Lệnh của Creations 1 =-**
+    
+**Lệnh trong trò chơi nối từ:**
+`!bat_dau_noi_tu_english:` bắt đầu một game nối từ tiếng anh trong channel hiện tại. Dùng thêm một lần nữa để xoá trò chơi nối từ khỏi channel đó.
+`!reset_noi_tu_english:`: reset channel nối từ tiếng anh để bắt đầu lại từ đầu.
+`!give_skill <id_skill> <@user>` : chỉ dành cho chủ Server. Lệnh dùng để đưa kỹ năng đặc biệt cho player trong channel nối từ.
+`!remove_skill <id_skill|all|random> <@user>`: chỉ dành cho chủ Server. Lệnh dùng để xoá kỹ năng đặc biệt cho user trong channel nối từ. (Có thể dùng all, random để xoá tất cả hoặc xoá ngẫu nhiên kỹ năng của player) 
+`!use_skill`: Lệnh dùng để hiển thị bảng kỹ năng đặc biệt của player trong channel nối từ và cách dùng kỹ năng đó.
+`/bxh_noi_tu`: Lệnh dùng để hiển thị bảng xếp hạng điểm của các player trong channel nối từ.
+
+
+**Lệnh lặt vặt:**
+`/say`: Lệnh dùng để gửi tin nhắn, hình ảnh ần danh.
+`/truth_dare`: Lệnh dùng để gửi tạo mới trò chơi Truth Or Dare.
+`/snipe`: Lệnh dùng để hiển thị lại 7 tin nhắn bị xoá gần nhất trong channel dùng lệnh.
+    """
+    await message.reply(content=text)
+    
+
 
 #endregion
 
