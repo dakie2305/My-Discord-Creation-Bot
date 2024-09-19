@@ -1035,7 +1035,9 @@ async def snipe(interaction: discord.Interaction):
                 if file != None: temp_files.append(file)
                 
         view = CustomButton.PaginationView(bot=bot, interaction=interaction, items= list_snipe_message)
-        await interaction.followup.send(embed=view.embed, view=view, files=temp_files)
+        message = await interaction.followup.send(embed=view.embed, view=view, files=temp_files)
+        view.discord_message = message
+        await view.countdown()
     else:
         await interaction.followup.send(f"Chưa có dữ liệu snipe cho channel {interaction.channel.mention}. Vui lòng thử lại sau.")
 #endregion

@@ -4,6 +4,7 @@ from discord import app_commands
 import CustomFunctions
 from typing import List, Optional
 from db.DbMongoManager import SnipeMessage, SnipeChannelInfo, PreDeleteAttachmentsInfo
+import asyncio
 
 
 class CustomReportButtonView(discord.ui.View):
@@ -51,21 +52,24 @@ class CustomTruthDareComboButtons(discord.ui.View):
 
 
 class PaginationView(discord.ui.View):
-    def __init__(self, bot, interaction: discord.Interaction, items: List[SnipeMessage], per_page = 1):
-        super().__init__(timeout=None)
+    def __init__(self, bot, interaction: discord.Interaction, items: List[SnipeMessage], per_page = 1, timeout: float = 5):
+        super().__init__(timeout=timeout)
         self.bot = bot
         self.interaction = interaction
         self.items = items
         self.per_page = per_page
         self.current_page = 1
         self.max_pages = len(items) // per_page + (len(items) % per_page > 0)
-        self.embed = discord.Embed(title="Snipe Messages", description=f"Message đã xoá trong channel {interaction.channel.mention}", color=0x03F8FC)
+        self.embed = discord.Embed(title="Snipe Messages", description=f"", color=0x03F8FC)
+        self.seconds_left = timeout
+        self.list_attachtment =[]
+        self.discord_message: discord.Message = None
         message = self.items[0]
         if message:
             modern_time = message.deleted_date.strftime(f"%d/%m/%Y %H:%M")
             user = interaction.guild.get_member(message.author_id)
             self.embed.set_thumbnail(url=user.avatar.url)
-            self.embed.add_field(name=f"", value=f"**Tin nhắn của user: {user.mention}, username: {user.name}**", inline=False)
+            self.embed.add_field(name=f"", value=f"**Channel {interaction.channel.mention}. Tin nhắn của user: {user.mention}, username: {user.name}**", inline=False)
             if message.user_message_content != "" and message.user_message_content != None:
                 self.embed.add_field(name=f"", value=f"{message.user_message_content}", inline=False)
             if message.user_attachments != None and len(message.user_attachments)>0:
@@ -84,9 +88,9 @@ class PaginationView(discord.ui.View):
         if message:
             modern_time = message.deleted_date.strftime(f"%d/%m/%Y %H:%M")
             user = interaction.guild.get_member(message.author_id)
-            new_embed = discord.Embed(title="Snipe Messages", description=f"Message đã xoá trong channel {interaction.channel.mention}", color=0x03F8FC)
+            new_embed = discord.Embed(title="Snipe Messages", description=f"", color=0x03F8FC)
             new_embed.set_thumbnail(url=user.avatar.url)
-            new_embed.add_field(name=f"", value=f"**Tin nhắn của user: {user.mention}, username: {user.name}**", inline=False)
+            new_embed.add_field(name=f"", value=f"**Channel {interaction.channel.mention}. Tin nhắn của user: {user.mention}, username: {user.name}**", inline=False)
             file = None
             temp_files = []
             if message.user_message_content != "" and message.user_message_content != None:
@@ -104,8 +108,31 @@ class PaginationView(discord.ui.View):
             new_embed.add_field(name=f"", value=f"User Invoke: {interaction.user.id}", inline=True)
             new_embed.set_footer(text=f"Trang thứ {self.current_page}/{self.max_pages}")
             self.embed = new_embed
+            self.list_attachtment = temp_files
         await interaction.response.edit_message(embed=self.embed, view=self, attachments=temp_files)
 
+    async def countdown(self):
+        while self.seconds_left > 0:
+            self.seconds_left -= 1
+            self.embed.description = f"Thời gian còn lại: {self.seconds_left} giây"
+            await self.discord_message.edit(embed=self.embed, view=self, attachments = self.list_attachtment)
+            await asyncio.sleep(1)
+        await self.disable_buttons()
+
+    async def disable_buttons(self):
+        for item in self.children:
+            if isinstance(item, discord.ui.Button):
+                item.disabled = True 
+        self.embed.description = "Đã hết hạn snipe. Vui lòng /snipe lại nếu cần."
+        await self.discord_message.edit(embed=self.embed, view=self, attachments = self.list_attachtment)
+
+    async def on_timeout(self):
+        for child in self.children:
+            child.disabled = True
+        if self.discord_message:
+            await self.discord_message.edit(embed=self.embed, view=self, attachments = self.list_attachtment)
+
+    
     @discord.ui.button(label="Trước", style=discord.ButtonStyle.secondary, disabled=True, custom_id="prev")
     async def previous_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         if self.current_page > 1:
