@@ -52,7 +52,7 @@ class CustomTruthDareComboButtons(discord.ui.View):
 
 
 class PaginationView(discord.ui.View):
-    def __init__(self, bot, interaction: discord.Interaction, items: List[SnipeMessage], per_page = 1, timeout: float = 5):
+    def __init__(self, bot, interaction: discord.Interaction, items: List[SnipeMessage], per_page = 1, timeout: float = 60):
         super().__init__(timeout=timeout)
         self.bot = bot
         self.interaction = interaction
