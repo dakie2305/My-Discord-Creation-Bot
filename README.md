@@ -41,6 +41,7 @@ Bot Creation có sẵn một số mini-game nổi bật và độc lạ, khác b
 - Sự Thật Hay Thách Thức
 - Tung đồng xu
 
+![noi-tu-english](https://i.imgur.com/WXoia3n.gif)
 
 ## Sử dụng Source Code
 
