@@ -1193,7 +1193,7 @@ async def verify(interaction: discord.Interaction, user: discord.Member):
 
 
 def get_bxh_noi_tu(interaction: discord.Interaction,lan: str, word_matching_channel: db.WordMatchingInfo, user_mention: Optional[discord.Member] = None):
-    if lan == 'en' or 'eng':
+    if lan == 'en' or lan == 'eng':
         lan = "Tiếng Anh"
     elif lan == 'vn':
         lan = "Tiếng Việt"
@@ -1247,6 +1247,7 @@ async def help_command(message: discord.Message):
     
 **Lệnh trong trò chơi nối từ:**
 `!bat_dau_noi_tu_english:` bắt đầu một game nối từ tiếng anh trong channel hiện tại. Dùng thêm một lần nữa để xoá trò chơi nối từ khỏi channel đó.
+`!bat_dau_noi_tu_vn:` bắt đầu một game nối từ tiếng anh trong channel hiện tại. Dùng thêm một lần nữa để xoá trò chơi nối từ khỏi channel đó.
 `!reset_noi_tu:`: reset channel nối từ để bắt đầu lại từ đầu.
 `!give_skill <id_skill> <@user>` : chỉ dành cho chủ Server. Lệnh dùng để đưa kỹ năng đặc biệt cho player trong channel nối từ.
 `!remove_skill <id_skill|all|random> <@user>`: chỉ dành cho chủ Server. Lệnh dùng để xoá kỹ năng đặc biệt cho user trong channel nối từ. (Có thể dùng all, random để xoá tất cả hoặc xoá ngẫu nhiên kỹ năng của player) 
