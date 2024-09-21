@@ -397,7 +397,7 @@ def get_english_dict()->dict:
 
 def get_vietnamese_dict()->dict:
     filepath = os.path.join(os.path.dirname(__file__),"db", "vietnamese_dictionary.json")
-    with open(filepath, 'r') as f:
+    with open(filepath, 'r', encoding='utf-8') as f:
         data = json.load(f)
         return data
     return None
