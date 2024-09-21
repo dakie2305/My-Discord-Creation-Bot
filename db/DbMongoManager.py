@@ -173,7 +173,7 @@ def update_or_insert_conversation_info(user_id: int, conversation: ConversationI
     list_convo.append(conversation)
     #Chỉnh lại last time interaction là hiện tại
     last_time_interaction = datetime.now()
-    #Chỉ cho phép tối đa ba conversation tồn tại
+    #Chỉ cho phép tối đa 2 conversation tồn tại
     if len(list_convo) > 2:
         list_convo.pop(0)
     result = collection.update_one({"user_id": user_id}, {"$set": {"last_time_interaction":last_time_interaction,
