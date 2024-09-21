@@ -329,6 +329,8 @@ def update_data_word_matching_info(channel_id: int, guild_id: int, current_playe
     #Tuỳ vào language sẽ get remaining word khác nhau
     if language == 'en' or language == 'eng':
         existing_info.remaining_word = get_remaining_words_english(data=current_word[-1], used_words= used_words)
+    elif language == 'vn' or language == 'vietnam':
+        existing_info.remaining_word = get_remaining_words_vietnamese(data=current_word[-1], used_words= used_words)
     used_words.append(current_word)
     result = collection.update_one({"channel_id": channel_id}, {"$set": {"current_player_id": current_player_id,
                                                                          "current_player_name": current_player_name,
@@ -456,6 +458,17 @@ def get_remaining_words_english(data: str, used_words: List[str]):
             count+= 1
     return count
 
+def get_remaining_words_vietnamese(data: str, used_words: List[str]):
+    """
+    Kiểm tra với danh sách những từ đã tồn tại, đối chiếu vói dictionary để xem còn bao nhiêu từ khả dụng.
+    """
+    if data == None: return 0
+    count = 0
+    for word in vietnamese_words_dictionary.keys():
+        if word.startswith(data) and word not in used_words:
+            count+= 1
+    return count
+
 #region Các functions về kỹ năng của nối từ
 def update_current_player_id_word_matching_info(channel_id: int, guild_id: int, language: str,user_id: int):
     db_specific = client['word_matching_database']
@@ -532,20 +545,15 @@ def create_and_update_player_bans_word_matching_info(channel_id: int, guild_id: 
     for player in list_player_ban:
         if player.user_id == user_id:
             selected_player = player
+            player.ban_remaining = ban_remaining
             break
     if selected_player == None:
         #Tạo mới player ban và thêm vào world matching
         new_player = PlayerBan(user_id=user_id, username=user_name, ban_remaining=ban_remaining)
         list_player_ban.append(new_player)
-        result = collection.update_one({"channel_id": channel_id}, {"$set": {"player_bans": [player.to_dict() for player in list_player_ban],
+    result = collection.update_one({"channel_id": channel_id}, {"$set": {"player_bans": [player.to_dict() for player in list_player_ban],
                                                                          }})
-        return result
-    else:
-        selected_player.ban_remaining += ban_remaining
-        if selected_player.ban_remaining < 0: selected_player.ban_remaining = 0
-        result = collection.update_one({"channel_id": channel_id, "player_bans.user_id": user_id}, {"$set": {"player_bans.$.ban_remaining": selected_player.ban_remaining,
-                                                                                                                }})
-        return result
+    return result
     
 def reduce_player_bans_word_matching_info_after_round(channel_id: int, guild_id: int, language: str):
     """
@@ -585,6 +593,13 @@ def get_english_dict()->dict:
         return data
     return None
 
-english_words_dictionary = get_english_dict()
+def get_vietnamese_dict()->dict:
+    filepath = os.path.join(os.path.dirname(__file__), "vietnamese_dictionary.json")
+    with open(filepath, 'r') as f:
+        data = json.load(f)
+        return data
+    return None
 
+english_words_dictionary = get_english_dict()
+vietnamese_words_dictionary = get_vietnamese_dict()
 

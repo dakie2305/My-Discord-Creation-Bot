@@ -395,6 +395,13 @@ def get_english_dict()->dict:
         return data
     return None
 
+def get_vietnamese_dict()->dict:
+    filepath = os.path.join(os.path.dirname(__file__),"db", "vietnamese_dictionary.json")
+    with open(filepath, 'r') as f:
+        data = json.load(f)
+        return data
+    return None
+
 def is_outside_working_time():
     # Không cho hoạt động khi nằm ngoài khung giờ này
     start_time = dt_time(0, 0)   # 00:00 AM
@@ -405,6 +412,7 @@ def is_outside_working_time():
     # return 0 <= current_hour <= 8
 
 english_dict = get_english_dict()
+vietnamese_dict = get_vietnamese_dict()
 
 safety_settings = [
     {
@@ -454,7 +462,7 @@ emoji_pattern = re.compile(
 
 #region MessagePlayerTracker
 class MessageTracker:
-    def __init__(self, message_count_threshold=5, time_window_minutes=5):
+    def __init__(self, message_count_threshold=5, time_window_minutes=2):
         self.message_count_threshold = message_count_threshold
         self.time_window = timedelta(minutes=time_window_minutes)
         self.user_messages = defaultdict(list)
@@ -467,10 +475,20 @@ class MessageTracker:
                 (msg, timestamp) for msg, timestamp in self.user_messages[(user_id, channel_id)]
                 if now - timestamp <= self.time_window
             ]
-        
         # Thêm message mới vào để check
         self.user_messages[(user_id, channel_id)].append((content, now))
         # Kiểm xem message hiện tại có phải là spam không
         message_count = sum(1 for msg, _ in self.user_messages[(user_id, channel_id)] if msg == content)
-        print(self.user_messages)
         return message_count >= self.message_count_threshold
+    
+    def clear_user_messages(self, user_id, channel_id):
+        """Xoá hết messages đã lưu của user_id nhất định trong channel nhất định."""
+        try:
+            if (user_id, channel_id) in self.user_messages:
+                del self.user_messages[(user_id, channel_id)]
+                return True
+            return False
+        except Exception as e:
+            print(f"Error while clearing messages for user {user_id} in channel {channel_id}: {str(e)}")
+            return False
+
