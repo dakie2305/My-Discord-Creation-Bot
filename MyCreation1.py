@@ -1424,6 +1424,11 @@ async def english_word_matching(message: discord.Message):
             return
         elif word_matching_channel.current_player_id == message.author.id:
             await message.reply(f"Bạn đã nối từ rồi, vui lòng né qua để cho người khác chơi đi. {message_tu_hien_tai}")
+            if message_tracker.add_message(user_id= message.author.id, channel_id= message.channel.id, content= "spam nối từ"): #Đánh dấu những đối tượng thích spam
+                #Ban 5 vòng
+                db.create_and_update_player_bans_word_matching_info(channel_id= message.channel.id, guild_id= message.guild.id, language= lan, user_id= message.author.id, user_name=message.author.name, ban_remaining=5)
+                await message.reply(f"{message.author.mention} đã spam quá nhiều và bị khoá mõm trong vòng **5** lượt chơi tiếp theo!")
+                print(f"Player {message.author.name} is banned 5 round from world matching game for spamming")
             return
         #Kiểm tra xem content có chứa first character là last character của current word không
         elif message.content.lower()[0] != word_matching_channel.last_character:
@@ -1501,6 +1506,12 @@ async def matching_words_fail(message: discord.Message, err: str, word_matching_
         db.update_special_point_word_matching_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_point= 0)
     if word_matching_channel.special_item:
         db.update_special_item_word_matching_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_item= None)
+    if message_tracker.add_message(user_id= message.author.id, channel_id= message.channel.id, content= "spam nối từ"): #Đánh dấu những đối tượng thích spam
+        #Ban 5 vòng
+        db.create_and_update_player_bans_word_matching_info(channel_id= message.channel.id, guild_id= message.guild.id, language= lan, user_id= message.author.id, user_name=message.author.name, ban_remaining=5)
+        await message.reply(f"{message.author.mention} đã spam quá nhiều và bị khoá mõm trong vòng **5** lượt chơi tiếp theo!")
+        print(f"Player {message.author.name} is banned 5 round from world matching game for spamming")
+        return
     await message.add_reaction('❌')
     await message.reply(f"{err} {message_tu_hien_tai}")
 
@@ -1525,4 +1536,6 @@ async def on_message(message):
 bot_token = os.getenv("BOT_TOKENN")
 # client.run(bot_token)
 english_words_dictionary = CustomFunctions.english_dict
+message_tracker = CustomFunctions.MessageTracker()
+
 bot.run(bot_token)

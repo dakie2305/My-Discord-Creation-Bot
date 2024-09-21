@@ -7,13 +7,12 @@ from datetime import datetime, timedelta, time as dt_time
 import discord
 import string
 from typing import List, Optional
+from collections import defaultdict
 import json
 import re
 import aiohttp
 import io
 from gtts import gTTS
-import time
-import librosa
 import soundfile as sf
 
 
@@ -452,3 +451,26 @@ emoji_pattern = re.compile(
         "\ufe0f"
         "]+",
         flags=re.UNICODE,)
+
+#region MessagePlayerTracker
+class MessageTracker:
+    def __init__(self, message_count_threshold=5, time_window_minutes=5):
+        self.message_count_threshold = message_count_threshold
+        self.time_window = timedelta(minutes=time_window_minutes)
+        self.user_messages = defaultdict(list)
+    
+    def add_message(self, user_id: int, channel_id: int, content: str):
+        now = datetime.now()
+        # Xoá message cũ
+        if (user_id, channel_id) in self.user_messages:
+            self.user_messages[(user_id, channel_id)] = [
+                (msg, timestamp) for msg, timestamp in self.user_messages[(user_id, channel_id)]
+                if now - timestamp <= self.time_window
+            ]
+        
+        # Thêm message mới vào để check
+        self.user_messages[(user_id, channel_id)].append((content, now))
+        # Kiểm xem message hiện tại có phải là spam không
+        message_count = sum(1 for msg, _ in self.user_messages[(user_id, channel_id)] if msg == content)
+        print(self.user_messages)
+        return message_count >= self.message_count_threshold
