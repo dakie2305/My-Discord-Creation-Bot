@@ -71,11 +71,6 @@ async def sync(ctx):
 async def bat_dau_noi_tu_english(ctx):
     message: discord.Message = ctx.message
     if message:
-        req_roles = ['Supervisor', 'Server Master', 'Moderator', 'Ultimate Admins']
-        has_required_role = any(role.name in req_roles for role in message.author.roles)
-        if not has_required_role:
-            await ctx.send("Không đủ thẩm quyền để thực hiện lệnh.")
-            return
         #Kiểm tra xem đã tồn tại WordMatchingClass cho channel này chưa
         if db.find_word_matching_info_by_id(channel_id=message.channel.id, guild_id=message.guild.id, language='en'):
             #Xoá word matching info
@@ -88,10 +83,30 @@ async def bat_dau_noi_tu_english(ctx):
             await ctx.send(f"Đã tạo thông tin Word Match Info cho channel này. Hãy bắt đầu nối từ đi. {message_tu_hien_tai}")
         return
     return
-#region Reset nối từ english
+
 @bot.command()
 @app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
-async def reset_noi_tu_english(ctx):
+async def bat_dau_noi_tu_vn(ctx):
+    message: discord.Message = ctx.message
+    if message:
+        #Kiểm tra xem đã tồn tại WordMatchingClass cho channel này chưa
+        if db.find_word_matching_info_by_id(channel_id=message.channel.id, guild_id=message.guild.id, language='vn'):
+            #Xoá word matching info
+            db.delete_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language='vn')
+            await ctx.send(f"Đã xoá thông tin Word Match Info cho channel này.")
+        else:
+            data = db.WordMatchingInfo(channel_id=message.channel.id, channel_name=message.channel.name, current_word="a", first_character="a",last_character="a",remaining_word=12300)
+            result = db.create_word_matching_info(data=data, guild_id=message.guild.id, language='vn')
+            message_tu_hien_tai = f"\nTừ hiện tại là: `'{data.current_word}'`, và có **{data.remaining_word if data.remaining_word else 0}** bắt đầu bằng chữ cái `{data.last_character if data.last_character else 0}`"
+            await ctx.send(f"Đã tạo thông tin Word Match Info cho channel này. Hãy bắt đầu nối từ đi. {message_tu_hien_tai}")
+        return
+    return
+
+
+#region Reset nối từ
+@bot.command()
+@app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
+async def reset_noi_tu(ctx):
     message: discord.Message = ctx.message
     if message:
         req_roles = ['Supervisor', 'Server Master', 'Moderator', 'Ultimate Admins']
@@ -104,7 +119,11 @@ async def reset_noi_tu_english(ctx):
         if word_matching_channel:
             await process_reset_word_matching(message=message, word_matching_channel=word_matching_channel)
         else:
-            await ctx.send(f"Chưa tồn tại thông tin Word Match Info cho channel này. Hãy dùng lệnh !bat_dau_noi_tu_english.")
+            word_matching_channel = db.find_word_matching_info_by_id(channel_id=message.channel.id, guild_id=message.guild.id, language='vn')
+            if word_matching_channel:
+                await process_reset_word_matching(message=message, word_matching_channel=word_matching_channel)
+            else:
+                await ctx.send(f"Chưa tồn tại thông tin Word Match Info cho channel này. Hãy dùng lệnh !bat_dau_noi_tu_english.")
         return
     return
 
@@ -314,50 +333,45 @@ async def use_skill(ctx, item_id: str = None, user: Optional[discord.Member] = N
     called_channel = message.channel
     #Kiểm tra xem ở đây là bảng channel nối từ hay không
     word_matching_channel = db.find_word_matching_info_by_id(channel_id= called_channel.id, guild_id= called_channel.guild.id, language= 'en')
-    if word_matching_channel:
-        if item_id is None and user is None:
-            embed = danh_sach_ky_nang(word_matching_channel= word_matching_channel, user=message.author)
-            await message.reply(embed=embed)
+    lan = 'en'
+    if word_matching_channel == None:
+        word_matching_channel = db.find_word_matching_info_by_id(channel_id= called_channel.id, guild_id= called_channel.guild.id, language= 'vn')
+        if word_matching_channel == None:
+            await ctx.send(f"Đây không phải là channel dùng để chơi nối từ. Chỉ dùng lệnh này trong channel chơi nối từ thôi!")
             return
-        #Lấy item theo item_id
-        special_item = get_special_item_by_id(item_id=item_id)
-        if special_item==None:
-            await message.reply(f"{message.author.mention} Kỹ năng **`{message.content}`** không hợp lệ")
-            return
+        lan = 'vn'
+    if item_id is None and user is None:
+        embed = danh_sach_ky_nang(word_matching_channel= word_matching_channel, user=message.author)
+        await message.reply(embed=embed)
+        return
+    #Lấy item theo item_id
+    special_item = get_special_item_by_id(item_id=item_id)
+    if special_item==None:
+        await message.reply(f"{message.author.mention} Kỹ năng **`{message.content}`** không hợp lệ")
+        return
         #Kiểm xem kỹ năng có cần mục tiêu không
-        elif special_item.required_target==True and user is None:
-            await message.reply(f"{message.author.mention} Kỹ năng **`{special_item.item_name}`** yêu cầu phải có mục tiêu mới dùng được.")
-            return
+    elif special_item.required_target==True and user is None:
+        await message.reply(f"{message.author.mention} Kỹ năng **`{special_item.item_name}`** yêu cầu phải có mục tiêu mới dùng được.")
+        return
         #Kiểm xem user có kỹ năng đó không
-        player = find_player_profile_by_user_id(user_id=message.author.id, word_matching_channel=word_matching_channel)
-        if player == None:
-            await message.reply(f"{message.author.mention} Bạn không nằm trong danh sách người chơi.")
-            return
-        elif player.special_items == None:
-            await message.reply(f"{message.author.mention} Bạn không có bất kỳ kỹ năng nào để dùng.")
-            return
-        else:
-            matched = False
-            for user_item in player.special_items:
-                if user_item.item_id == item_id:
-                    matched = True
-                    break
-            if matched == False:
-                await message.reply(f"{message.author.mention} Bạn không có kỹ năng này.")
-                return
-        
-        
-        #Sau khi bắt lỗi, bắt đầu thực hiện chức năng kỹ năng
-        await process_special_item_functions(word_matching_channel=word_matching_channel, special_item=special_item, message=message, user_target=user, lan = 'en')
+    player = find_player_profile_by_user_id(user_id=message.author.id, word_matching_channel=word_matching_channel)
+    if player == None:
+        await message.reply(f"{message.author.mention} Bạn không nằm trong danh sách người chơi.")
+        return
+    elif player.special_items == None:
+        await message.reply(f"{message.author.mention} Bạn không có bất kỳ kỹ năng nào để dùng.")
         return
     else:
-        word_matching_channel= db.find_word_matching_info_by_id(channel_id= called_channel.id, guild_id= called_channel.guild.id, language= 'vn')
-        if word_matching_channel:
-            #to-do
-            await ctx.send(f"Hệ thống kỹ năng đang phát triển, chưa dùng được đâu!")
+        matched = False
+        for user_item in player.special_items:
+            if user_item.item_id == item_id:
+                matched = True
+                break
+        if matched == False:
+            await message.reply(f"{message.author.mention} Bạn không có kỹ năng này.")
             return
-        else:
-            await ctx.send(f"Đây không phải là channel dùng để chơi nối từ. Chỉ dùng lệnh này trong channel chơi nối từ thôi!")
+        #Sau khi bắt lỗi, bắt đầu thực hiện chức năng kỹ năng
+    await process_special_item_functions(word_matching_channel=word_matching_channel, special_item=special_item, message=message, user_target=user, lan = lan)
     return
 
 
@@ -374,9 +388,14 @@ async def process_special_item_functions(word_matching_channel: db.WordMatchingI
     if special_item.item_id == "ct_hint":
         #Tìm từ hợp lệ, bắt đầu bằng chữ cái trong word_matching_channel
         suitable_word = None
-        for word in english_words_dictionary.keys():
-            if len(word) > 1 and word.startswith(word_matching_channel.last_character) and word not in word_matching_channel.used_words:
-                suitable_word = word
+        if lan == 'eng' or lan == 'en':
+            for word in english_words_dictionary.keys():
+                if len(word) > 1 and word.startswith(word_matching_channel.last_character) and word not in word_matching_channel.used_words:
+                    suitable_word = word
+        elif lan == 'vn':
+            for word in vietnamese_dict.keys():
+                if len(word) > 1 and word.startswith(word_matching_channel.last_character) and word not in word_matching_channel.used_words:
+                    suitable_word = word
         if suitable_word == None:
             await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`**.\nRất tiếc là không có từ hợp lệ... lạ ta. <@315835396305059840>")
         half_length = (len(suitable_word) + 2) // 2
@@ -389,9 +408,14 @@ async def process_special_item_functions(word_matching_channel: db.WordMatchingI
     elif special_item.item_id == "cc_hint":
         #Tìm từ hợp lệ, bắt đầu bằng chữ cái trong word_matching_channel
         suitable_word = None
-        for word in english_words_dictionary.keys():
-            if word.startswith(word_matching_channel.last_character) and word not in word_matching_channel.used_words:
-                suitable_word = word
+        if lan == 'eng' or lan == 'en':
+            for word in english_words_dictionary.keys():
+                if word.startswith(word_matching_channel.last_character) and word not in word_matching_channel.used_words:
+                    suitable_word = word
+        elif lan == 'vn':
+            for word in vietnamese_dict.keys():
+                if word.startswith(word_matching_channel.last_character) and word not in word_matching_channel.used_words:
+                    suitable_word = word
         if suitable_word == None:
             await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`**.\nRất tiếc là không có từ hợp lệ... lạ ta. <@315835396305059840>")
         await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`**.\nGợi ý từ hợp lệ: **`{suitable_word}**`")
@@ -1223,7 +1247,7 @@ async def help_command(message: discord.Message):
     
 **Lệnh trong trò chơi nối từ:**
 `!bat_dau_noi_tu_english:` bắt đầu một game nối từ tiếng anh trong channel hiện tại. Dùng thêm một lần nữa để xoá trò chơi nối từ khỏi channel đó.
-`!reset_noi_tu_english:`: reset channel nối từ tiếng anh để bắt đầu lại từ đầu.
+`!reset_noi_tu:`: reset channel nối từ để bắt đầu lại từ đầu.
 `!give_skill <id_skill> <@user>` : chỉ dành cho chủ Server. Lệnh dùng để đưa kỹ năng đặc biệt cho player trong channel nối từ.
 `!remove_skill <id_skill|all|random> <@user>`: chỉ dành cho chủ Server. Lệnh dùng để xoá kỹ năng đặc biệt cho user trong channel nối từ. (Có thể dùng all, random để xoá tất cả hoặc xoá ngẫu nhiên kỹ năng của player) 
 `!use_skill`: Lệnh dùng để hiển thị bảng kỹ năng đặc biệt của player trong channel nối từ và cách dùng kỹ năng đó.
@@ -1403,15 +1427,20 @@ async def sub_function_ai_response(message: discord.Message):
                 interaction_logger.info(f"Username {message.author.name}, Display user name {message.author.display_name} directly call {bot.user}")
     return
 
-async def english_word_matching(message: discord.Message):
-    if len(message.content.split()) == 1 and message.content[0] not in string.punctuation and message.content[0] != ":":
+async def word_matching(message: discord.Message):
+    word_matching_channel = db.find_word_matching_info_by_id(channel_id= message.channel.id, guild_id= message.guild.id, language= 'en')
+    lan = 'en'
+    if word_matching_channel == None:
+        word_matching_channel = db.find_word_matching_info_by_id(channel_id= message.channel.id, guild_id= message.guild.id, language= 'vn')
+        if word_matching_channel == None:
+            return
+        lan = 'vn'
+    if lan == 'en' and len(message.content.split()) > 1: return
+    if message.content[0] not in string.punctuation and message.content[0] != ":":
         #Kiểm xem nằm đúng channel không
-        word_matching_channel = db.find_word_matching_info_by_id(channel_id= message.channel.id, guild_id= message.guild.id, language= 'en')
-        if word_matching_channel == None: return
         point = 1
         if word_matching_channel.special_point != None and word_matching_channel.special_point > 0:
             point = word_matching_channel.special_point
-        lan = 'en'
         selected_ban = None
         for player_ban in word_matching_channel.player_bans:
                 if player_ban.user_id == message.author.id and player_ban.ban_remaining>0:
@@ -1437,7 +1466,9 @@ async def english_word_matching(message: discord.Message):
         elif message.content.lower() in word_matching_channel.used_words:
             await matching_words_fail(err= f"Từ `{message.content}` đã có người nối rồi bạn ơi.", message=message, word_matching_channel=word_matching_channel,lan=lan,point=point)
         #Kiểm tra xem từ này có tồn tại không
-        elif message.content.lower() not in english_words_dictionary.keys():
+        if lan == 'en' and message.content.lower() not in english_words_dictionary.keys():
+            await matching_words_fail(err= f"Từ `{message.content}` không nằm trong từ điển.", message=message, word_matching_channel=word_matching_channel,lan=lan,point=point)
+        elif lan == 'vn' and message.content.lower() not in vietnamese_dict.keys():
             await matching_words_fail(err= f"Từ `{message.content}` không nằm trong từ điển.", message=message, word_matching_channel=word_matching_channel,lan=lan,point=point)
         else:
             #Coi như pass hết
@@ -1462,6 +1493,7 @@ async def english_word_matching(message: discord.Message):
                 #reset lại
                 await message.channel.send(f"Kinh nhờ, chơi hết từ khả dụng rồi. Cảm ơn mọi người đã chơi nhé. Đến lúc reset thông tin từ rồi. Mọi người bắt đầu lại nhé!")
                 await process_reset_word_matching(message=message, word_matching_channel=word_matching_channel)
+            message_tracker.clear_user_messages(user_id=message.author.id, channel_id=message.channel.id)
         # #Xổ số nếu chưa có special point
         so_xo = random.randint(4, 10)
         #Nếu sổ xố rơi trúng số 5 thì coi như cộng point lên x2, x3, x4 ngẫu nhiên
@@ -1531,11 +1563,12 @@ async def on_message(message):
     if message.author == bot.user:
         return
     await sub_function_ai_response(message=message)
-    asyncio.create_task(english_word_matching(message=message))
+    asyncio.create_task(word_matching(message=message))
     await bot.process_commands(message)
 bot_token = os.getenv("BOT_TOKENN")
 # client.run(bot_token)
 english_words_dictionary = CustomFunctions.english_dict
+vietnamese_dict = CustomFunctions.vietnamese_dict
 message_tracker = CustomFunctions.MessageTracker()
 
 bot.run(bot_token)
