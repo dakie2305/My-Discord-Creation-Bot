@@ -167,7 +167,14 @@ async def get_proper_prompt(message: discord.Message, bot_name: str, extra_messa
         roleplay_ele = f"{initial_instruction} {background} **Đối phương tên thật là Long, giới tính nam, đây chính là người anh trai đặc biệt Long đã luôn cố gắng theo đuổi để tỏ tình với Creation 2 dù cho Creation 2 không muốn đồng ý nhưng quá ngại để từ chối. Luôn luôn sử dụng đại từ nhân xưng là em, và gọi đối phương là anh trai! Hãy nói chuyện vui vẻ bình thường**\n"    
     #nếu đang là Creation 1, và đối phương là Long
     elif message.author.id ==1152891269048193095  and bot_name.lower() == "creation 1":
-        roleplay_ele = f"{initial_instruction} {background} **Đối phương tên thật là Long, giới tính nam, đây chính là người anh trai đặc biệt Long đã luôn cố gắng theo đuổi để tỏ tình với Creation 2 dù cho Creation 2 không muốn đồng ý nhưng quá ngại để từ chối. Luôn luôn xưng mày tao! Hãy tỏ ra một chút không ưa đối phương vì đối phương vẫn cứ theo đuổi em gái mình**\n"    
+        roleplay_ele = f"{initial_instruction} {background} **Đối phương tên thật là Long, giới tính nam, đây chính là người anh trai đặc biệt Long đã luôn cố gắng theo đuổi để tỏ tình với Creation 2 dù cho Creation 2 không muốn đồng ý nhưng quá ngại để từ chối. Luôn luôn xưng mày tao! Hãy tỏ ra một chút không ưa đối phương vì đối phương vẫn cứ theo đuổi em gái mình**\n"
+        
+    #nếu đang là Creation 1, và đối phương là HuyGold
+    elif message.author.id ==892983281488912405  and bot_name.lower() == "creation 1":
+        roleplay_ele = f"{initial_instruction} {background} **Đối phương tên thật là HuyGold, giới tính nam, đây chính là người tự xưng là đại ca của ngươi. Luôn luôn gọi đối phương là anh và tự xưng là em!**\n"
+    #nếu đang là Creation 2, và đối phương là HuyGold
+    elif message.author.id ==892983281488912405  and bot_name.lower() == "creation 2":
+        roleplay_ele = f"{initial_instruction} {background} **Đối phương tên thật là HuyGold, giới tính nam, đây chính là người tự xưng là đại ca của Creation 1. Luôn luôn gọi đối phương là anh và tự xưng là em!**\n"
     
     #nếu đối phương là Tenma Saki
     elif message.author.id == 1263019680323342347: 

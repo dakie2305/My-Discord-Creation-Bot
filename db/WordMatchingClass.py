@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 #region WordMatchingInfo
 class WordMatchingInfo:
-    def __init__(self, channel_id: int, channel_name: str, current_player_id: int = None, current_player_name: str = None, current_word: str = None, first_character: str = None, last_character: str = None, special_point: int = None, special_item: Optional['SpecialItem'] = None, remaining_word: int = None, used_words: List[str] = None, player_profiles: Optional[List['PlayerProfile']] = None, player_effects : Optional[List['PlayerEffect']] = None):
+    def __init__(self, channel_id: int, channel_name: str, current_player_id: int = None, current_player_name: str = None, current_word: str = None, first_character: str = None, last_character: str = None, special_point: int = None, special_item: Optional['SpecialItem'] = None, remaining_word: int = None, used_words: List[str] = None, player_profiles: Optional[List['PlayerProfile']] = None, player_effects : Optional[List['PlayerEffect']] = None, player_bans : Optional[List['PlayerBan']] = None):
         self.channel_id = channel_id 
         self.channel_name = channel_name
         self.current_player_id = current_player_id
@@ -17,6 +17,7 @@ class WordMatchingInfo:
         self.special_item: SpecialItem = special_item if special_item else None
         self.player_profiles: List[PlayerProfile] = player_profiles if player_profiles else []
         self.player_effects: List[PlayerEffect] = player_effects if player_effects else []
+        self.player_bans: List[PlayerBan] = player_bans if player_bans else []
     def to_dict(self):
         return {
             "channel_id": self.channel_id,
@@ -32,6 +33,7 @@ class WordMatchingInfo:
             "special_item": self.special_item.to_dict() if self.special_item else None,
             "player_profiles": [data.to_dict() for data in self.player_profiles],
             "player_effects": [data.to_dict() for data in self.player_effects],
+            "player_bans": [data.to_dict() for data in self.player_bans],
         }
 
     @staticmethod
@@ -49,7 +51,8 @@ class WordMatchingInfo:
             used_words = data["used_words"],
             special_item = SpecialItem.from_dict(data.get("special_item", None)) if data.get("special_item") else None,
             player_profiles = [PlayerProfile.from_dict(item) for item in data.get("player_profiles", [])],
-            player_effects = [PlayerEffect.from_dict(item) for item in data.get("player_effects", [])]
+            player_effects = [PlayerEffect.from_dict(item) for item in data.get("player_effects", [])],
+            player_bans = [PlayerBan.from_dict(item) for item in data.get("player_bans", [])]
         )
 
 
@@ -113,7 +116,7 @@ class SpecialItem:
             required_target = data["required_target"]
         )
 
-#Region Player Effect
+#region Player Effect
 class PlayerEffect:
     def __init__(self, user_id: int, username: str, effect_id: str, effect_name: str):
         self.user_id = user_id 
@@ -135,6 +138,27 @@ class PlayerEffect:
             username=data.get("username", None),
             effect_id = data.get("effect_id", None),
             effect_name = data.get("effect_name", None),
+        )
+
+#region Player Ban
+class PlayerBan:
+    def __init__(self, user_id: int, username: str, ban_remaining: int):
+        self.user_id = user_id 
+        self.username = username
+        self.ban_remaining = ban_remaining
+    def to_dict(self):
+        return {
+            "user_id": self.user_id,
+            "username": self.username,
+            "ban_remaining": self.ban_remaining,
+        }
+        
+    @staticmethod
+    def from_dict(data:dict):
+        return PlayerBan(
+            user_id=data.get("user_id", None),
+            username=data.get("username", None),
+            ban_remaining = data.get("ban_remaining", None),
         )
 
 list_special_items_cap_thap = [
@@ -246,6 +270,15 @@ list_special_items_cap_thap = [
         level="Cấp Thấp",
         required_target=True
     ),
+    SpecialItem(
+        item_id="ct_ban",
+        item_name="Câm Lặng",
+        item_description="Kỹ năng này sẽ khoá miệng đối phương, ban đối phương khỏi trò chơi nối từ trong 2 vòng nhất định. Cách sử dụng rất đơn giản, chỉ việc nhập đúng lệnh như thế này:\n **!use_skill ct_ban <@315835396305059840>**",
+        quantity = 1,
+        point=2,
+        level="Cấp Thấp",
+        required_target=True
+    ),
 ]
 
 list_special_items_cap_cao = [
@@ -338,6 +371,15 @@ list_special_items_cap_cao = [
         point=1,
         level="Cấp Cao",
         required_target=False
+    ),
+    SpecialItem(
+        item_id="cc_ban",
+        item_name="Câm Lặng",
+        item_description="Kỹ năng này sẽ khoá miệng đối phương, ban đối phương khỏi trò chơi nối từ trong 4 vòng nhất định. Cách sử dụng rất đơn giản, chỉ việc nhập đúng lệnh như thế này:\n **!use_skill cc_ban <@315835396305059840>**",
+        quantity = 1,
+        point=4,
+        level="Cấp Cao",
+        required_target=True
     ),
 ]
 list_special_items_dang_cap = [

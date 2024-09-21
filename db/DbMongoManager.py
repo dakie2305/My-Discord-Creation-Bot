@@ -4,7 +4,7 @@ from typing import List
 from pymongo import MongoClient
 from datetime import datetime, timedelta
 from db.CustomClass import UserInfo, GuildExtraInfo, UserConversationInfo, ConversationInfo, SnipeChannelInfo, SnipeMessage, SnipeMessageAttachments, PreDeleteAttachmentsInfo
-from db.WordMatchingClass import WordMatchingInfo, PlayerProfile, SpecialItem, PlayerEffect
+from db.WordMatchingClass import WordMatchingInfo, PlayerProfile, SpecialItem, PlayerEffect, PlayerBan
 import discord
 import CustomFunctions as MyFunc
 
@@ -517,6 +517,52 @@ def update_player_effects_word_matching_info(channel_id: int, guild_id: int, lan
     result = collection.update_one({"channel_id": channel_id}, {"$set": {"player_effects": [player_effects.to_dict() for player_effects in list_player_effect],
                                                                          }})
     return result
+
+def create_and_update_player_bans_word_matching_info(channel_id: int, guild_id: int, language: str,user_id: int,user_name: str, ban_remaining: int):
+    """
+    Cập nhật lại danh sách Player Bans của world matching info cụ thể.
+    """
+    db_specific = client['word_matching_database']
+    collection = db_specific[f'{language}_word_matching_guild_{guild_id}']
+    existing_data = collection.find_one({"channel_id": channel_id})
+    existing_info = WordMatchingInfo.from_dict(existing_data)
+    list_player_ban = existing_info.player_bans
+    #Tìm xem có user_id trong list player_ban chưa
+    selected_player: PlayerBan = None
+    for player in list_player_ban:
+        if player.user_id == user_id:
+            selected_player = player
+            break
+    if selected_player == None:
+        #Tạo mới player ban và thêm vào world matching
+        new_player = PlayerBan(user_id=user_id, username=user_name, ban_remaining=ban_remaining)
+        list_player_ban.append(new_player)
+        result = collection.update_one({"channel_id": channel_id}, {"$set": {"player_bans": [player.to_dict() for player in list_player_ban],
+                                                                         }})
+        return result
+    else:
+        selected_player.ban_remaining += ban_remaining
+        if selected_player.ban_remaining < 0: selected_player.ban_remaining = 0
+        result = collection.update_one({"channel_id": channel_id, "player_bans.user_id": user_id}, {"$set": {"player_bans.$.ban_remaining": selected_player.ban_remaining,
+                                                                                                                }})
+        return result
+    
+def reduce_player_bans_word_matching_info_after_round(channel_id: int, guild_id: int, language: str):
+    """
+    Trừ 1 điểm ban_remaining của tất cả dữ liệu trong danh sách Player Ban của world matching info cụ thể sau mỗi lượt chơi thành công.
+    """
+    db_specific = client['word_matching_database']
+    collection = db_specific[f'{language}_word_matching_guild_{guild_id}']
+    existing_data = collection.find_one({"channel_id": channel_id})
+    existing_info = WordMatchingInfo.from_dict(existing_data)
+    list_player_ban = existing_info.player_bans
+    if list_player_ban != None and len(list_player_ban) > 0:
+        for player in list_player_ban:
+            player.ban_remaining += -1
+        new_list_remove_0 = [item for item in list_player_ban if item.ban_remaining > 0]    
+        result = collection.update_one({"channel_id": channel_id}, {"$set": {"player_bans": [player.to_dict() for player in new_list_remove_0],
+                                                                            }})
+        return result
 
 
 #endregion

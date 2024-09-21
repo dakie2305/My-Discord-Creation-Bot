@@ -332,3 +332,4 @@ ASALocalRun/
 *.DS_Store
 .env
 dev.json
+test.py

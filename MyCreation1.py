@@ -136,7 +136,7 @@ async def give_skill(ctx, item_id: str = None, user: Optional[discord.Member] = 
     called_channel = message.channel
     req_roles = ['Cai Ngục', 'Server Master']
     has_required_role = any(role.name in req_roles for role in message.author.roles)
-    if not has_required_role:
+    if not has_required_role and message.author.id != 315835396305059840:
         await ctx.send("Không đủ thẩm quyền để dùng lệnh.")
         return
     #Kiểm tra xem ở đây là bảng channel nối từ hay không
@@ -168,6 +168,42 @@ async def give_skill(ctx, item_id: str = None, user: Optional[discord.Member] = 
             #Add item vào inven của player
             db.update_player_special_item_word_matching_info(user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language='vn', special_item= special_item)
             await ctx.send(f"Đã thêm kỹ năng **`{special_item.item_name}`** cho player {message.author.mention}!")
+            return
+        else:
+            await ctx.send(f"Đây không phải là channel dùng để chơi nối từ. Chỉ dùng lệnh này trong channel chơi nối từ thôi!")
+    return
+
+#region Give ban skill
+@bot.command()
+@app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
+async def give_ban(ctx, user: discord.Member, ban_amount: int):
+    message: discord.Message = ctx.message
+    called_channel = message.channel
+    req_roles = ['Cai Ngục', 'Server Master']
+    has_required_role = any(role.name in req_roles for role in message.author.roles)
+    if not has_required_role and message.author.id != 315835396305059840:
+        await ctx.send("Không đủ thẩm quyền để dùng lệnh.")
+        return
+    if ban_amount is None or user is None:
+            await ctx.send(f"Dùng sai câu lệnh. Vui lòng dùng câu lệnh đúng format sau.\n!give_ban @User 1")
+            return
+    #Kiểm tra xem ở đây là bảng channel nối từ hay không
+    word_matching_channel = db.find_word_matching_info_by_id(channel_id= called_channel.id, guild_id= called_channel.guild.id, language= 'en')
+    if word_matching_channel:
+        db.create_and_update_player_bans_word_matching_info(channel_id= called_channel.id, guild_id= called_channel.guild.id, language= 'en', user_id= user.id, user_name=user.name, ban_remaining=ban_amount)
+        if ban_amount==0:
+            await message.reply(content=f"Đã dỡ bỏ khoá mõm {user.name}.")
+        else:
+            await message.reply(content=f"Đã khoá mõm {user.name} trong vòng **{ban_amount}** lượt chơi tiếp theo!")
+        return
+    else:
+        word_matching_channel= db.find_word_matching_info_by_id(channel_id= called_channel.id, guild_id= called_channel.guild.id, language= 'vn')
+        if word_matching_channel:
+            db.create_and_update_player_bans_word_matching_info(channel_id= called_channel.id, guild_id= called_channel.guild.id, language= 'en', user_id= user.id, user_name=user.name, ban_remaining=ban_amount)
+            if ban_amount==0:
+                await message.reply(content=f"Đã dỡ bỏ khoá mõm {user.name}.")
+            else:
+                await message.reply(content=f"Đã khoá mõm {user.name} trong vòng **{ban_amount}** lượt chơi tiếp theo!")
             return
         else:
             await ctx.send(f"Đây không phải là channel dùng để chơi nối từ. Chỉ dùng lệnh này trong channel chơi nối từ thôi!")
@@ -667,6 +703,38 @@ async def process_special_item_functions(word_matching_channel: db.WordMatchingI
         db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
         return
     
+    #Những kỹ năng có id chứa chữ "_ban"
+    #Đây là những kỹ năng khoá mõm player
+    elif "_ban" in special_item.item_id:
+        if user_target == None:
+            await message.reply(f"Kỹ năng **`{special_item.item_name}`** cần phải tag tên của đối phương mới có hiệu nghiệm.\n")
+            return
+        elif user_target.id == message.author.id:
+            await message.reply(f"Ôi bạn ơi, kỹ năng **`{special_item.item_name}`** chỉ dành cho người khác chứ không phải dành cho bạn. Muốn tự khoá mõm mình à?\n")
+            return
+        if target_player_effect!= None and target_player_effect.effect_id.endswith("protect"):
+                text_reply = f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`**, nhưng người chơi {user_target.mention} có hiệu ứng **`{target_player_effect.effect_name}`** nên không hề hấn gì! "
+                #Vô hiệu hoá
+                if target_player_effect.effect_id.startswith("cc") or target_player_effect.effect_id.startswith("dc"):
+                    #Phản lại kỹ năng
+                    db.create_and_update_player_bans_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id= message.author.id, user_name=message.author.name, ban_remaining=special_item.point)
+                    text_reply += f"{message.author.mention} đã bị khoá mõm trong {special_item.point} vòng chơi tiếp theo!"
+                    if target_player_effect.effect_id.startswith("dc"):
+                        #Cướp luôn kỹ năng
+                        db.update_player_special_item_word_matching_info(user_id=user_target.id, user_name=user_target.name, user_display_name=user_target.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
+                        text_reply += f" và đã bị **{user_target.display_name}** cướp mất kỹ năng **`{special_item.item_name}`**!"
+                await message.reply(text_reply)
+                #xoá khỏi inven của player
+                db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
+                #Xoá hiệu ứng khỏi target user
+                db.update_player_effects_word_matching_info(remove_special_effect= True,channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id=user_target.id, user_name=user_target.name, effect_id= target_player_effect.effect_id, effect_name= target_player_effect.effect_name)
+                return
+        #khoá mõm đối thủ
+        db.create_and_update_player_bans_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id= user_target.id, user_name=user_target.name, ban_remaining=special_item.point)
+        await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`** để khoá mõm {user_target.mention} trong {special_item.point} lượt chơi tiếp theo.\n")
+        #xoá khỏi inven của player
+        db.update_player_special_item_word_matching_info(remove_special_item=True,user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= 0, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= special_item)
+        return
     await message.reply(f"Darkie chưa hoàn thành kỹ năng **`{special_item.item_name}`** đâu nhé. Vui lòng đợi Darkie hoàn thiện bộ kỹ năng.")
     return
 
@@ -1114,7 +1182,7 @@ def get_bxh_noi_tu(interaction: discord.Interaction,lan: str, word_matching_chan
         if user_mention == None:
             for index, profile in enumerate(word_matching_channel.player_profiles):
                 user = interaction.guild.get_member(profile.user_id)
-                if user != None and (profile.points!= 0 or len(profile.special_items)> 0):
+                if user != None and (profile.points!= 0):
                     embed.add_field(name=f"", value=f"**Hạng {index+1}.** {user.mention}. Tổng điểm: **{profile.points}**. Số lượng kỹ năng đặc biệt: **{len(profile.special_items)}**.", inline=False)
                     count+=1
                 if count >= 25: break
@@ -1344,11 +1412,19 @@ async def english_word_matching(message: discord.Message):
         if word_matching_channel.special_point != None and word_matching_channel.special_point > 0:
             point = word_matching_channel.special_point
         lan = 'en'
+        selected_ban = None
+        for player_ban in word_matching_channel.player_bans:
+                if player_ban.user_id == message.author.id and player_ban.ban_remaining>0:
+                    selected_ban = player_ban
+                    break
         #Bắt đầu chơi
         message_tu_hien_tai = f"\nTừ hiện tại là: `'{word_matching_channel.current_word}'`, và có **{word_matching_channel.remaining_word if word_matching_channel.remaining_word else 0}** bắt đầu bằng chữ cái `{word_matching_channel.last_character if word_matching_channel.last_character else 0}`"
-        if word_matching_channel.current_player_id == message.author.id:
-            await message.add_reaction('❌')
+        if selected_ban:
+            await message.reply(f"Bạn đã bị khoá mõm trong vòng **{selected_ban.ban_remaining}** lượt chơi tới. Vui lòng chờ đi.")
+            return
+        elif word_matching_channel.current_player_id == message.author.id:
             await message.reply(f"Bạn đã nối từ rồi, vui lòng né qua để cho người khác chơi đi. {message_tu_hien_tai}")
+            return
         #Kiểm tra xem content có chứa first character là last character của current word không
         elif message.content.lower()[0] != word_matching_channel.last_character:
             await matching_words_fail(err= f"Từ mới phải bắt đầu bằng chữ cái `'{word_matching_channel.last_character}'` mới được nha.", message=message, word_matching_channel=word_matching_channel,lan=lan,point=point)
@@ -1372,11 +1448,11 @@ async def english_word_matching(message: discord.Message):
                 if word_matching_channel.special_item:
                     db.update_player_special_item_word_matching_info(user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= point, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= word_matching_channel.special_item)
                     chuc_mung_item = f" và nhận được kỹ năng **{word_matching_channel.special_item.item_name}**. Nhớ đừng quên sử dụng nó nhé"
-                #Trả lời đúng thì reset special_points và special_item lại từ đầu
+                #Trả lời đúng thì reset special_points và special_item lại từ đầu, cập nhật lại list player ban
                 await message.channel.send(f"Hay lắm {message.author.mention}, bạn đã được cộng {point} điểm{chuc_mung_item}. Để kiểm tra điểm số của mình thì hãy dùng lệnh /bxh_noi_tu nhé. {message_tu_hien_tai}")
                 db.update_special_point_word_matching_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_point= 0)
                 db.update_special_item_word_matching_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_item= None)
-                
+                db.reduce_player_bans_word_matching_info_after_round(channel_id= message.channel.id, guild_id= message.guild.id, language=lan)
             elif word_matching_channel.remaining_word==0:
                 #reset lại
                 await message.channel.send(f"Kinh nhờ, chơi hết từ khả dụng rồi. Cảm ơn mọi người đã chơi nhé. Đến lúc reset thông tin từ rồi. Mọi người bắt đầu lại nhé!")
