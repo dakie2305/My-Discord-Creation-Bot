@@ -1452,7 +1452,7 @@ async def word_matching(message: discord.Message):
         if selected_ban:
             await message.reply(f"Bạn đã bị khoá mõm trong vòng **{selected_ban.ban_remaining}** lượt chơi tới. Vui lòng chờ đi.")
             return
-        elif word_matching_channel.current_player_id == message.author.id:
+        if word_matching_channel.current_player_id == message.author.id:
             await message.reply(f"Bạn đã nối từ rồi, vui lòng né qua để cho người khác chơi đi. {message_tu_hien_tai}")
             if message_tracker.add_message(user_id= message.author.id, channel_id= message.channel.id, content= "spam nối từ"): #Đánh dấu những đối tượng thích spam
                 #Ban 5 vòng
@@ -1467,7 +1467,7 @@ async def word_matching(message: discord.Message):
         elif message.content.lower() in word_matching_channel.used_words:
             await matching_words_fail(err= f"Từ `{message.content}` đã có người nối rồi bạn ơi.", message=message, word_matching_channel=word_matching_channel,lan=lan,point=point)
         #Kiểm tra xem từ này có tồn tại không
-        if lan == 'en' and message.content.lower() not in english_words_dictionary.keys():
+        elif lan == 'en' and message.content.lower() not in english_words_dictionary.keys():
             await matching_words_fail(err= f"Từ `{message.content}` không nằm trong từ điển.", message=message, word_matching_channel=word_matching_channel,lan=lan,point=point)
         elif lan == 'vn' and message.content.lower() not in vietnamese_dict.keys():
             await matching_words_fail(err= f"Từ `{message.content}` không nằm trong từ điển.", message=message, word_matching_channel=word_matching_channel,lan=lan,point=point)
