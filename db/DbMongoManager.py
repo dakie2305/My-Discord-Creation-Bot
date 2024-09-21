@@ -551,6 +551,8 @@ def create_and_update_player_bans_word_matching_info(channel_id: int, guild_id: 
         #Tạo mới player ban và thêm vào world matching
         new_player = PlayerBan(user_id=user_id, username=user_name, ban_remaining=ban_remaining)
         list_player_ban.append(new_player)
+    elif selected_player.ban_remaining <= 0:
+        list_player_ban.remove(selected_player)
     result = collection.update_one({"channel_id": channel_id}, {"$set": {"player_bans": [player.to_dict() for player in list_player_ban],
                                                                          }})
     return result

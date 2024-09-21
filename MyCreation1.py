@@ -207,25 +207,19 @@ async def give_ban(ctx, user: discord.Member, ban_amount: int):
             await ctx.send(f"Dùng sai câu lệnh. Vui lòng dùng câu lệnh đúng format sau.\n!give_ban @User 1")
             return
     #Kiểm tra xem ở đây là bảng channel nối từ hay không
+    lan = 'en'
     word_matching_channel = db.find_word_matching_info_by_id(channel_id= called_channel.id, guild_id= called_channel.guild.id, language= 'en')
-    if word_matching_channel:
-        db.create_and_update_player_bans_word_matching_info(channel_id= called_channel.id, guild_id= called_channel.guild.id, language= 'en', user_id= user.id, user_name=user.name, ban_remaining=ban_amount)
-        if ban_amount==0:
-            await message.reply(content=f"Đã dỡ bỏ khoá mõm {user.name}.")
-        else:
-            await message.reply(content=f"Đã khoá mõm {user.name} trong vòng **{ban_amount}** lượt chơi tiếp theo!")
-        return
-    else:
-        word_matching_channel= db.find_word_matching_info_by_id(channel_id= called_channel.id, guild_id= called_channel.guild.id, language= 'vn')
-        if word_matching_channel:
-            db.create_and_update_player_bans_word_matching_info(channel_id= called_channel.id, guild_id= called_channel.guild.id, language= 'en', user_id= user.id, user_name=user.name, ban_remaining=ban_amount)
-            if ban_amount==0:
-                await message.reply(content=f"Đã dỡ bỏ khoá mõm {user.name}.")
-            else:
-                await message.reply(content=f"Đã khoá mõm {user.name} trong vòng **{ban_amount}** lượt chơi tiếp theo!")
-            return
-        else:
+    if word_matching_channel == None:
+        word_matching_channel = db.find_word_matching_info_by_id(channel_id= called_channel.id, guild_id= called_channel.guild.id, language= 'vn')
+        if word_matching_channel == None:
             await ctx.send(f"Đây không phải là channel dùng để chơi nối từ. Chỉ dùng lệnh này trong channel chơi nối từ thôi!")
+            return
+        lan = 'vn'
+    db.create_and_update_player_bans_word_matching_info(channel_id= called_channel.id, guild_id= called_channel.guild.id, language= lan, user_id= user.id, user_name=user.name, ban_remaining=ban_amount)
+    if ban_amount==0:
+        await message.reply(content=f"Đã bỏ khoá mõm {user.name}.")
+    else:
+        await message.reply(content=f"Đã khoá mõm {user.name} trong vòng **{ban_amount}** lượt chơi tiếp theo!")
     return
 
 #region remove skill
