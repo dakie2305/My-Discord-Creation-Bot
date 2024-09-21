@@ -462,7 +462,7 @@ emoji_pattern = re.compile(
 
 #region MessagePlayerTracker
 class MessageTracker:
-    def __init__(self, message_count_threshold=5, time_window_minutes=2):
+    def __init__(self, message_count_threshold=7, time_window_minutes=2):
         self.message_count_threshold = message_count_threshold
         self.time_window = timedelta(minutes=time_window_minutes)
         self.user_messages = defaultdict(list)
