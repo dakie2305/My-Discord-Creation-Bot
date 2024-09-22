@@ -114,8 +114,8 @@ class PaginationView(discord.ui.View):
     async def countdown(self):
         while self.seconds_left > 0:
             self.seconds_left -= 1
-            self.embed.description = f"Thời gian còn lại: {self.seconds_left} giây"
-            await self.discord_message.edit(embed=self.embed, view=self, attachments = self.list_attachtment)
+            # self.embed.description = f"Thời gian còn lại: {self.seconds_left} giây"
+            # await self.discord_message.edit(embed=self.embed, view=self, attachments = self.list_attachtment)
             await asyncio.sleep(1)
         await self.disable_buttons()
 
