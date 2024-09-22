@@ -271,6 +271,7 @@ async def help_command(message: discord.Message):
 `/say`: Lệnh dùng để gửi tin nhắn, hình ảnh ần danh.
 `/truth_dare`: Lệnh dùng để gửi tạo mới trò chơi Truth Or Dare.
 `/snipe`: Lệnh dùng để hiển thị lại 7 tin nhắn bị xoá gần nhất trong channel dùng lệnh.
+`/cf`: Lệnh dùng để tạo một tin nhắn tung đồng xu sấp/ngửa.
     """
     await message.reply(content=text)
     
@@ -313,16 +314,16 @@ async def remove_old_conversation():
 async def sub_function_ai_response(message: discord.Message):
     bots_creation_name = ["creation 2", "creation số 2", "creation no 2", "creatiom 2", "creation no. 2"]
     coin_flip = ["tung đồng xu", "sấp ngửa", "sấp hay ngửa", "ngửa hay sấp", "ngửa sấp", "tung xu"]
-    guild_info = db.find_guild_extra_info_by_id(message.guild.id)
-    if message.reference is not None and message.reference.resolved is not None:
-        if message.reference.resolved.author == bot.user or CustomFunctions.contains_substring(message.content.lower(), bots_creation_name):
-            if CustomFunctions.contains_substring(message.content.lower(),coin_flip):
+    if CustomFunctions.contains_substring(message.content.lower(),coin_flip):
                 #Tung đồng xu
                 embed = discord.Embed(title=f"", description=f"{message.author.mention} đã tung đồng xu. Đồng xu đang quay <a:doge_coin:1287452452827697276> ...", color=0x03F8FC)
                 mess_coin = await message.reply(embed=embed)
                 if mess_coin:
                     await edit_embed_coin_flip(message=mess_coin, user=message.author)
                 return
+    guild_info = db.find_guild_extra_info_by_id(message.guild.id)
+    if message.reference is not None and message.reference.resolved is not None:
+        if message.reference.resolved.author == bot.user or CustomFunctions.contains_substring(message.content.lower(), bots_creation_name):
             if message.guild.id != 1256987900277690470 and message.guild.id != 1194106864582004849: #Chỉ True Heaven, Học Viện 2ten mới không bị dính
                 if CustomFunctions.is_outside_working_time() == False:
                     await message.channel.send(f"Tính năng AI của Bot chỉ hoạt động đến 12h đêm, vui lòng đợi đến 8h sáng hôm sau.")
@@ -377,13 +378,6 @@ async def sub_function_ai_response(message: discord.Message):
                 interaction_logger.info(f"Username {message.author.name}, Display user name {message.author.display_name} replied {bot.user}")
             
     elif CustomFunctions.contains_substring(message.content.lower(), bots_creation_name):
-        if CustomFunctions.contains_substring(message.content.lower(),coin_flip):
-                #Tung đồng xu
-                embed = discord.Embed(title=f"", description=f"{message.author.mention} đã tung đồng xu. Đồng xu đang quay <a:doge_coin:1287452452827697276> ...", color=0x03F8FC)
-                mess_coin = await message.reply(embed=embed)
-                if mess_coin:
-                    await edit_embed_coin_flip(message=mess_coin, user=message.author)
-                return
         if message.guild.id != 1256987900277690470 and message.guild.id != 1194106864582004849 and CustomFunctions.is_outside_working_time() == False: #Chỉ True Heaven, học viện 2ten mới không bị dính
             await message.channel.send(f"Tính năng AI của Bot chỉ hoạt động đến 12h đêm, vui lòng đợi đến 8h sáng hôm sau.")
             return
