@@ -19,6 +19,7 @@ from typing import Optional
 from collections import deque
 import requests
 import PIL
+import asyncio
 
 load_dotenv()
 intents = discord.Intents.all()
@@ -230,6 +231,30 @@ async def random_ai_talk(interaction: discord.Interaction):
         await interaction.followup.send(f"Đã tạo Guild Extra Info. Bot lâu lâu sẽ nói chuyện trong channel này.", ephemeral= True)
 #endregion
 
+#region Coin flip command
+@bot.tree.command(name="cf", description="Tung đồng xu sấp/ngửa cho vui.")
+async def cf(interaction: discord.Interaction):
+    embed = discord.Embed(title=f"", description=f"{interaction.user.mention} đã tung đồng xu. Đồng xu đang quay <a:doge_coin:1287452452827697276> ...", color=0x03F8FC)
+    await interaction.response.send_message(embed=embed)
+    mess = await interaction.original_response()
+    if mess:
+        await edit_embed_coin_flip(message=mess, user=interaction.user)
+    return
+
+
+async def edit_embed_coin_flip(message: discord.Message, user: discord.Member):
+    choice = random.randint(0,1)
+    emoji_state = '<:coin_ngua:1287452465733570684>'
+    state = 'ngửa'
+    if choice == 1:
+        state = 'sấp'
+        emoji_state = '<:coin_sap:1287452474952777750>'
+    await asyncio.sleep(3)
+    embed_updated = discord.Embed(title=f"", description=f"{user.mention} đã tung đồng xu. Đồng xu đã quay ra **`{state}`** {emoji_state}!", color=0x03F8FC)
+    await message.edit(embed=embed_updated)
+    return
+#endregion
+
 #region Help Command
 @bot.tree.command(name="help", description="Hiện tất cả commands và hướng dẫn sử dụng bot.")
 async def help_command(interaction: discord.Interaction):
@@ -287,9 +312,17 @@ async def remove_old_conversation():
 
 async def sub_function_ai_response(message: discord.Message):
     bots_creation_name = ["creation 2", "creation số 2", "creation no 2", "creatiom 2", "creation no. 2"]
+    coin_flip = ["tung đồng xu", "sấp ngửa", "sấp hay ngửa", "ngửa hay sấp", "ngửa sấp", "tung xu"]
     guild_info = db.find_guild_extra_info_by_id(message.guild.id)
     if message.reference is not None and message.reference.resolved is not None:
         if message.reference.resolved.author == bot.user or CustomFunctions.contains_substring(message.content.lower(), bots_creation_name):
+            if CustomFunctions.contains_substring(message.content.lower(),coin_flip):
+                #Tung đồng xu
+                embed = discord.Embed(title=f"", description=f"{message.author.mention} đã tung đồng xu. Đồng xu đang quay <a:doge_coin:1287452452827697276> ...", color=0x03F8FC)
+                mess_coin = await message.reply(embed=embed)
+                if mess_coin:
+                    await edit_embed_coin_flip(message=mess_coin, user=message.author)
+                return
             if message.guild.id != 1256987900277690470 and message.guild.id != 1194106864582004849: #Chỉ True Heaven, Học Viện 2ten mới không bị dính
                 if CustomFunctions.is_outside_working_time() == False:
                     await message.channel.send(f"Tính năng AI của Bot chỉ hoạt động đến 12h đêm, vui lòng đợi đến 8h sáng hôm sau.")
@@ -344,6 +377,13 @@ async def sub_function_ai_response(message: discord.Message):
                 interaction_logger.info(f"Username {message.author.name}, Display user name {message.author.display_name} replied {bot.user}")
             
     elif CustomFunctions.contains_substring(message.content.lower(), bots_creation_name):
+        if CustomFunctions.contains_substring(message.content.lower(),coin_flip):
+                #Tung đồng xu
+                embed = discord.Embed(title=f"", description=f"{message.author.mention} đã tung đồng xu. Đồng xu đang quay <a:doge_coin:1287452452827697276> ...", color=0x03F8FC)
+                mess_coin = await message.reply(embed=embed)
+                if mess_coin:
+                    await edit_embed_coin_flip(message=mess_coin, user=message.author)
+                return
         if message.guild.id != 1256987900277690470 and message.guild.id != 1194106864582004849 and CustomFunctions.is_outside_working_time() == False: #Chỉ True Heaven, học viện 2ten mới không bị dính
             await message.channel.send(f"Tính năng AI của Bot chỉ hoạt động đến 12h đêm, vui lòng đợi đến 8h sáng hôm sau.")
             return
