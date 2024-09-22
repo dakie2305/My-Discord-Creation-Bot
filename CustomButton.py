@@ -92,7 +92,7 @@ class PaginationView(discord.ui.View):
             new_embed.set_thumbnail(url=user.avatar.url)
             new_embed.add_field(name=f"", value=f"**Channel {interaction.channel.mention}. Tin nhắn của user: {user.mention}, username: {user.name}**", inline=False)
             file = None
-            temp_files = []
+            self.list_attachtment = []
             if message.user_message_content != "" and message.user_message_content != None:
                 new_embed.add_field(name=f"", value=f"{message.user_message_content}", inline=False)
             if message.user_attachments!= None and len(message.user_attachments)>0:
@@ -102,14 +102,13 @@ class PaginationView(discord.ui.View):
                     new_embed.add_field(name="", value=f"{index+1}. {attachments.url}", inline=False)
                     file = await CustomFunctions.get_attachment_file_from_url(url= attachments.url, content_type= attachments.content_type)
                     if file != None:
-                        temp_files.append(file)
+                        self.list_attachtment.append(file)
             new_embed.add_field(name=f"", value=f"*________________*", inline=False)
             new_embed.add_field(name=f"", value=f"Thời gian xoá: {modern_time}", inline=True)
             new_embed.add_field(name=f"", value=f"User Invoke: {interaction.user.id}", inline=True)
             new_embed.set_footer(text=f"Trang thứ {self.current_page}/{self.max_pages}")
             self.embed = new_embed
-            self.list_attachtment = temp_files
-        await interaction.response.edit_message(embed=self.embed, view=self, attachments=temp_files)
+        await interaction.response.edit_message(embed=self.embed, view=self, attachments=self.list_attachtment)
 
     async def countdown(self):
         while self.seconds_left > 0:
@@ -125,13 +124,6 @@ class PaginationView(discord.ui.View):
                 item.disabled = True 
         self.embed.description = "Đã hết hạn snipe. Vui lòng /snipe lại nếu cần."
         await self.discord_message.edit(embed=self.embed, view=self, attachments = self.list_attachtment)
-
-    async def on_timeout(self):
-        for child in self.children:
-            child.disabled = True
-        if self.discord_message:
-            await self.discord_message.edit(embed=self.embed, view=self, attachments = self.list_attachtment)
-
     
     @discord.ui.button(label="Trước", style=discord.ButtonStyle.secondary, disabled=True, custom_id="prev")
     async def previous_button(self, interaction: discord.Interaction, button: discord.ui.Button):
