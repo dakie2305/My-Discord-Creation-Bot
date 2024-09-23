@@ -243,15 +243,42 @@ async def cf(interaction: discord.Interaction):
 
 
 async def edit_embed_coin_flip(message: discord.Message, user: discord.Member):
-    choice = random.randint(0,1)
+    await asyncio.sleep(3)
+    choice = random.randint(0,10)
     emoji_state = '<:coin_ngua:1287452465733570684>'
     state = 'ngửa'
-    if choice == 1:
+    if choice > 0 and choice <=5:
         state = 'sấp'
         emoji_state = '<:coin_sap:1287452474952777750>'
-    await asyncio.sleep(3)
+    elif choice == 10:
+        #Troll player
+        response = CustomFunctions.get_random_response("OnCoinFlip.txt")
+        embed_updated = discord.Embed(title=f"", description=f"{user.mention} đã tung đồng xu. {response}", color=0x03F8FC)
+        await message.edit(embed=embed_updated)
+        return
     embed_updated = discord.Embed(title=f"", description=f"{user.mention} đã tung đồng xu. Đồng xu đã quay ra **`{state}`** {emoji_state}!", color=0x03F8FC)
     await message.edit(embed=embed_updated)
+    if choice == 0:
+        await asyncio.sleep(2)
+        #Troll tập 2
+        if state == 'ngửa':
+            state = 'sấp'
+            emoji_state = '<:coin_sap:1287452474952777750>'
+        else:
+            state = 'ngửa'
+            emoji_state = '<:coin_ngua:1287452465733570684>'
+        embed_updated = discord.Embed(title=f"", description=f"Đùa thôi. Đồng xu đã quay ra **`{state}`** {emoji_state}!", color=0x03F8FC)
+        await message.edit(embed=embed_updated)
+        await asyncio.sleep(2)
+        #Troll tập 3
+        if state == 'ngửa':
+            state = 'sấp'
+            emoji_state = '<:coin_sap:1287452474952777750>'
+        else:
+            state = 'ngửa'
+            emoji_state = '<:coin_ngua:1287452465733570684>'
+        embed_updated = discord.Embed(title=f"", description=f"Đùa cái nữa thôi á mà. Đồng xu đã quay ra **`{state}`** {emoji_state}!", color=0x03F8FC)
+        await message.edit(embed=embed_updated)
     return
 #endregion
 
