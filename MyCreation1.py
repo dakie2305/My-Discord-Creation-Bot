@@ -75,12 +75,12 @@ async def bat_dau_noi_tu_english(ctx):
         if db.find_word_matching_info_by_id(channel_id=message.channel.id, guild_id=message.guild.id, language='en'):
             #Xoá word matching info
             db.delete_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language='en')
-            await ctx.send(f"Đã xoá thông tin Word Match Info cho channel này.")
+            await ctx.send(f"Đã xoá trò chơi nối từ trong channel này.")
         else:
             data = db.WordMatchingInfo(channel_id=message.channel.id, channel_name=message.channel.name, current_word="a", first_character="a",last_character="a",remaining_word=12300)
             result = db.create_word_matching_info(data=data, guild_id=message.guild.id, language='en')
             message_tu_hien_tai = f"\nTừ hiện tại là: `'{data.current_word}'`, và có **{data.remaining_word if data.remaining_word else 0}** bắt đầu bằng chữ cái `{data.last_character if data.last_character else 0}`"
-            await ctx.send(f"Đã tạo thông tin Word Match Info cho channel này. Hãy bắt đầu nối từ đi. {message_tu_hien_tai}")
+            await ctx.send(f"Đã tạo trò chơi nối từ tiếng Anh cho channel này. Hãy bắt đầu nối từ đi. {message_tu_hien_tai}")
         return
     return
 
@@ -93,12 +93,12 @@ async def bat_dau_noi_tu_vn(ctx):
         if db.find_word_matching_info_by_id(channel_id=message.channel.id, guild_id=message.guild.id, language='vn'):
             #Xoá word matching info
             db.delete_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language='vn')
-            await ctx.send(f"Đã xoá thông tin Word Match Info cho channel này.")
+            await ctx.send(f"Đã xoá trò chơi nối từ trong channel này.")
         else:
             data = db.WordMatchingInfo(channel_id=message.channel.id, channel_name=message.channel.name, current_word="a", first_character="a",last_character="a",remaining_word=12300)
             result = db.create_word_matching_info(data=data, guild_id=message.guild.id, language='vn')
             message_tu_hien_tai = f"\nTừ hiện tại là: `'{data.current_word}'`, và có **{data.remaining_word if data.remaining_word else 0}** bắt đầu bằng chữ cái `{data.last_character if data.last_character else 0}`"
-            await ctx.send(f"Đã tạo thông tin Word Match Info cho channel này. Hãy bắt đầu nối từ đi. {message_tu_hien_tai}")
+            await ctx.send(f"Đã tạo trò chơi nối từ tiếng Việt cho channel này. Hãy bắt đầu nối từ đi. {message_tu_hien_tai}")
         return
     return
 
@@ -117,17 +117,17 @@ async def reset_noi_tu(ctx):
         #Kiểm tra xem đã tồn tại WordMatchingClass cho channel này chưa
         word_matching_channel = db.find_word_matching_info_by_id(channel_id=message.channel.id, guild_id=message.guild.id, language='en')
         if word_matching_channel:
-            await process_reset_word_matching(message=message, word_matching_channel=word_matching_channel)
+            await process_reset_word_matching(message=message, word_matching_channel=word_matching_channel, language='en')
         else:
             word_matching_channel = db.find_word_matching_info_by_id(channel_id=message.channel.id, guild_id=message.guild.id, language='vn')
             if word_matching_channel:
-                await process_reset_word_matching(message=message, word_matching_channel=word_matching_channel)
+                await process_reset_word_matching(message=message, word_matching_channel=word_matching_channel, language='vn')
             else:
                 await ctx.send(f"Chưa tồn tại thông tin Word Match Info cho channel này. Hãy dùng lệnh !bat_dau_noi_tu_english.")
         return
     return
 
-async def process_reset_word_matching(message: discord.Message, word_matching_channel: db.WordMatchingInfo):
+async def process_reset_word_matching(message: discord.Message, word_matching_channel: db.WordMatchingInfo, language):
     embed = discord.Embed(title=f"Xếp hạng các player theo điểm.", description=f"Trò Chơi Nối Từ", color=0x03F8FC)
     embed.add_field(name=f"", value="___________________", inline=False)
     count = 0
@@ -141,9 +141,9 @@ async def process_reset_word_matching(message: discord.Message, word_matching_ch
             if count >= 25: break
     await message.channel.send(content=f"Chúc mừng các player top đầu! <@315835396305059840> sẽ trao role đặc biệt cho những Player thuộc top 3 nhé!", embed=embed)
     #Xoá đi tạo lại
-    db.delete_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language='en')
+    db.delete_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=language)
     data = db.WordMatchingInfo(channel_id=message.channel.id, channel_name=message.channel.name, current_word="a", first_character="a",last_character="a",remaining_word=12300)
-    result = db.create_word_matching_info(data=data, guild_id=message.guild.id, language='en')
+    result = db.create_word_matching_info(data=data, guild_id=message.guild.id, language=language)
     message_tu_hien_tai = f"\nTừ hiện tại là: `'{data.current_word}'`, và có **{data.remaining_word if data.remaining_word else 0}** bắt đầu bằng chữ cái `{data.last_character if data.last_character else 0}`"
     await message.channel.send(f"Đã reset toàn bộ từ trong trò nối từ trong channel này. {message_tu_hien_tai}")
 
@@ -1339,7 +1339,7 @@ async def remove_old_conversation():
     print(f"Found {count} old conversation in collection 'user_conversation_info_{bot_name}' and deleted them.")
 
 async def sub_function_ai_response(message: discord.Message):
-    if message.channel.id == 1269029322950180977 or message.channel.id == 1259237810653626440 or message.channel.id == 1259242009290477618: return #Không cho bot nói chuyện ở những channel sau
+    if message.channel.id == 1269029322950180977 or message.channel.id == 1259237810653626440 or message.channel.id == 1259242009290477618 or message.channel.id == 1287118424874684530: return #Không cho bot nói chuyện ở những channel sau
     bots_creation1_name = ["creation 1", "creation số 1", "creation no 1", "creation no. 1"]
     if message.reference is not None and message.reference.resolved is not None:
         if message.reference.resolved.author == bot.user or CustomFunctions.contains_substring(message.content.lower(), bots_creation1_name):
@@ -1487,7 +1487,7 @@ async def word_matching(message: discord.Message):
             elif word_matching_channel.remaining_word==0:
                 #reset lại
                 await message.channel.send(f"Kinh nhờ, chơi hết từ khả dụng rồi. Cảm ơn mọi người đã chơi nhé. Đến lúc reset thông tin từ rồi. Mọi người bắt đầu lại nhé!")
-                await process_reset_word_matching(message=message, word_matching_channel=word_matching_channel)
+                await process_reset_word_matching(message=message, word_matching_channel=word_matching_channel, language=lan)
             message_tracker.clear_user_messages(user_id=message.author.id, channel_id=message.channel.id)
         # #Xổ số nếu chưa có special point
         so_xo = random.randint(4, 10)
