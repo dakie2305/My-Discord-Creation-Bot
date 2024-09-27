@@ -51,8 +51,48 @@ def create_update_consecutive_point_rps_info(guild_id: int,guild_name: str, user
     result = collection.update_one({"id": "rps_info"}, {"$set": {"con_player_profile": [data.to_dict() for data in con_player_profile],
                                                                          }})
     
-    
     return result
+
+#region Player Profile
+def find_player_profile_by_id(guild_id: int, user_id: int):
+    collection = db_specific[f'rps_{guild_id}']
+    data = collection.find_one({"id": "player_profile", "user_id": user_id}) #Lấy ra Player Profile
+    if data:
+        return RpsPlayerProfile.from_dict(data)
+    return None
+
+
+def player_profile_on_draw(guild_id: int, player_1_id: int, player_1_display_name: str, player_1_user_name: str, player_2_id:int, player_2_display_name: str, player_2_user_name: str):
+    create_update_player_profile(guild_id=guild_id, user_id=player_1_id, user_display_name=player_1_display_name, user_name= player_1_user_name, draw_point=1)
+    create_update_player_profile(guild_id=guild_id, user_id=player_2_id, user_display_name=player_2_display_name, user_name= player_2_user_name, draw_point=1)
+
+def create_update_player_profile(guild_id: int, user_id: int, user_name: str, user_display_name: str, win_point: int = 0, lose_point: int = 0, draw_point: int = 0, legendary_point: int = 0, humiliated_point: int = 0, game_consecutive_round_win: int = 0, game_consecutive_round_lose: int = 0):
+    #Mỗi server là một collection, chia theo server id
+    collection = db_specific[f'rps_{guild_id}']
+    existing_player_info = collection.find_one({"id": "player_profile", "user_id": user_id}) #Lấy ra Player Profile
+    if existing_player_info == None:
+        data = RpsPlayerProfile(user_id=user_id, user_name=user_name, user_display_name=user_display_name, win_point=win_point, lose_point=lose_point, draw_point=draw_point, legendary_point=0, humiliated_point=0, game_consecutive_round_win=game_consecutive_round_win, game_consecutive_round_lose=game_consecutive_round_lose)
+        result = collection.insert_one(data.to_dict())
+    else:
+        data = RpsPlayerProfile.from_dict(existing_player_info)
+        data.win_point += win_point
+        data.lose_point += lose_point
+        data.draw_point += draw_point
+        data.legendary_point += legendary_point
+        data.humiliated_point += humiliated_point
+        data.game_consecutive_round_win += game_consecutive_round_win
+        data.game_consecutive_round_lose += game_consecutive_round_lose
+        if data.game_consecutive_round_win >= 5:
+            #Cộng 1 điểm vào legend point và reset
+            data.legendary_point+= 1
+            data.game_consecutive_round_win = 0
+        if data.game_consecutive_round_lose >= 5:
+            #Cộng 1 điểm vào humi point và reset
+            data.humiliated_point+= 1
+            data.game_consecutive_round_lose = 0
+        result = collection.update_one({"id": "player_profile", "user_id": user_id}, {"$set": data.to_dict()})
+    return result
+
 
 def create_update_ban_list(guild_id: int,guild_name: str, user_id: int, user_name: str, ban_remaining: int):
     #Mỗi server là một collection, chia theo server id

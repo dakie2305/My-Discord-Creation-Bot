@@ -2,8 +2,9 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 from typing import List, Optional
-import asyncio
 import random
+import mini_game.RockPaperScissor.RpsMongoManager as RpsMongoManager
+import os
 
 class RPSView(discord.ui.View):
     def __init__(self, player_1: discord.Member, player_2: discord.Member, embed: discord.Embed):
@@ -44,22 +45,53 @@ class RPSView(discord.ui.View):
             self.choices[self.player_2.id] = bot_choice
         
         if len(self.choices) == 2:
-            await self.determine_winner()
+            await self.determine_winner(interaction)
             self.stop()
 
-    async def determine_winner(self):
+    async def determine_winner(self, interaction: discord.Interaction):
         player1_choice = self.choices[self.player_1.id]
         player2_choice = self.choices[self.player_2.id]
-        
-
+        win_player :discord.Member = None
+        lose_player :discord.Member = None
+        #Hoà
         if player1_choice == player2_choice:
             result = f"Cả hai player đều chọn **`{self.translate_choice(player1_choice)}`** nên trận này coi như hoà!"
+            RpsMongoManager.player_profile_on_draw(guild_id=interaction.guild.id, player_1_id= self.player_1.id, player_1_display_name=self.player_1.display_name, player_1_user_name= self.player_1.name, player_2_id=self.player_2.id, player_2_display_name=self.player_2.display_name, player_2_user_name= self.player_2.name)
+        #Player 1 thắng
         elif (player1_choice == "rock" and player2_choice == "scissors") or \
              (player1_choice == "paper" and player2_choice == "rock") or \
              (player1_choice == "scissors" and player2_choice == "paper"):
             result = f"{self.player_1.mention} chọn **`{self.translate_choice(player1_choice)}`**, còn {self.player_2.mention} đã chọn **`{self.translate_choice(player2_choice)}`**. {self.player_1.mention} đã thắng trận này!"
+            win_player = self.player_1
+            lose_player = self.player_2
+        #PLayer 2 thắng
         else:
             result = f"{self.player_1.mention} chọn **`{self.translate_choice(player1_choice)}`**, còn {self.player_2.mention} đã chọn **`{self.translate_choice(player2_choice)}`**. {self.player_2.mention} đã thắng trận này!"
+            win_player = self.player_2
+            lose_player = self.player_1
+        
+        if win_player != None and lose_player != None:
+            #Kiểm tra humi point và len point trước
+            flagLegend = False
+            flagHumi = False
+            player_profile_win_player = RpsMongoManager.find_player_profile_by_id(guild_id=interaction.guild.id, user_id=win_player.id)
+            player_profile_lose_player = RpsMongoManager.find_player_profile_by_id(guild_id=interaction.guild.id, user_id=lose_player.id)
+            if player_profile_win_player!= None and player_profile_win_player.game_consecutive_round_win == 4: #Chuẩn bị được điêm legend
+                flagLegend = True
+            if player_profile_lose_player!= None and player_profile_lose_player.game_consecutive_round_lose == 4: #Chuẩn bị được điểm humi
+                flagHumi = True
+            #win point +1, cons_win + 1
+            RpsMongoManager.create_update_player_profile(guild_id=interaction.guild.id, user_id= win_player.id, user_name=win_player.name,user_display_name=win_player.display_name, win_point=1, game_consecutive_round_win=1)
+            #lose point +1, cons_lose +1
+            RpsMongoManager.create_update_player_profile(guild_id=interaction.guild.id, user_id= lose_player.id, user_name=lose_player.name,user_display_name=lose_player.display_name, lose_point=1, game_consecutive_round_lose=1)
+            
+            if flagLegend:
+                file = self.get_congrat_humilate_gif(True)
+                await interaction.message.reply(content=f"{win_player.mention} đã thắng 5 ván liên tiếp và được cộng **`1`** điểm Huyền Thoại!", file= file)
+            if flagHumi:
+                file = self.get_congrat_humilate_gif(False)
+                await interaction.message.reply(content=f"Quá nhục nhã! {lose_player.mention} đã thua tận tới 5 ván liên tiếp và được cộng **`1`** điểm Sỉ Nhục!", file= file)
+        
         embed = discord.Embed(title=f"", description= f"{self.player_1.mention} đã mời {self.player_2.mention} chơi Kéo Búa Bao!", color=0xC3A757)  # Yellowish color
         embed.add_field(name="______________", value= f"{result}", inline=False)
         await self.message.edit(embed=embed, view=None, content="")
@@ -88,21 +120,32 @@ class RPSView(discord.ui.View):
         bot_choice = 'paper'
         #If else đến chết
         #bot thua
-        if chance >= 0 and chance <= 5:
+        if chance >= 0 and chance <= 20:
             if choice == 'rock': bot_choice = 'scissors'
             elif choice == 'paper': bot_choice = 'rock'
             else: bot_choice = 'paper'
         #bot hoà
-        elif chance >5 and chance <= 15:
+        elif chance >20 and chance <= 40:
             bot_choice = choice
         else:
             if choice == 'rock': bot_choice = 'paper'
             elif choice == 'paper': bot_choice = 'scissors'
             else: bot_choice = 'rock'
-        print(f"Dice is:{chance}. Player choice: {choice}, bot choice: {bot_choice}")
         return bot_choice
     
     def translate_choice(self, choice: str) -> str:
         if choice == 'paper': return 'Giấy'
         elif choice == 'rock': return 'Búa'
         else: return 'Kéo'
+        
+    def get_congrat_humilate_gif(self, is_congrat: bool):
+        if is_congrat:
+            folder_path = "Responses/RockPaperScissor/congrat"
+        else:
+            folder_path = "Responses/RockPaperScissor/humiliate"
+        files = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
+        random_file = random.choice(files)
+        file_path = os.path.join(folder_path, random_file)
+        file = discord.File(file_path, filename=random_file)
+        return file
+        
