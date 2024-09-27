@@ -269,16 +269,6 @@ async def edit_embed_coin_flip(message: discord.Message, user: discord.Member):
             emoji_state = '<:coin_ngua:1287452465733570684>'
         embed_updated = discord.Embed(title=f"", description=f"Đùa thôi. Đồng xu đã quay ra **`{state}`** {emoji_state}!", color=0x03F8FC)
         await message.edit(embed=embed_updated)
-        await asyncio.sleep(2)
-        #Troll tập 3
-        if state == 'ngửa':
-            state = 'sấp'
-            emoji_state = '<:coin_sap:1287452474952777750>'
-        else:
-            state = 'ngửa'
-            emoji_state = '<:coin_ngua:1287452465733570684>'
-        embed_updated = discord.Embed(title=f"", description=f"Đùa cái nữa thôi á mà. Đồng xu đã quay ra **`{state}`** {emoji_state}!", color=0x03F8FC)
-        await message.edit(embed=embed_updated)
     return
 #endregion
 
@@ -470,17 +460,17 @@ async def check_message_attachments(message: discord.Message):
                 #cache lại link, tránh dead.
                 response = requests.get(url=att.url, stream=True)
         
-        if message.guild.id == 1256987900277690470 and message.channel.id == 1259237925590138880 and has_required_role == False and attachment_counter[message.channel.id].get(message.author.id, 0) >= 10:
+        if message.guild.id == 1256987900277690470 and message.channel.id == 1259237925590138880 and has_required_role == False and attachment_counter[message.channel.id].get(message.author.id, 0) >= 20:
         #thêm role Đẳng Cấp của server
             dc_role = discord.utils.get(message.author.guild.roles, name="Đẳng Cấp")
             if dc_role:
                 await message.author.add_roles(dc_role)
                 mordern_date_time_format = datetime.now().strftime(f"%d/%m/%Y %H:%M")
-                embed = discord.Embed(title="Thêm Role Đẳng Cấp", description=f"{message.author.mention}, username: {message.author.name} đã đăng đủ mười attachment trong channel đặc biệt!", color=0x00FF00)  # Green color
+                embed = discord.Embed(title="Thêm Role Đẳng Cấp", description=f"{message.author.mention}, username: {message.author.name} đã đăng đủ 20 attachment trong channel đặc biệt!", color=0x00FF00)  # Green color
                 embed.add_field(name="Thời gian thêm Role:", value=f"{mordern_date_time_format}", inline=True)
                 channel = bot.get_channel(1257016014156206115) #Log Command
                 await channel.send(embed= embed)
-                print(f"Username: {message.author.name} posted 10 attachments at special channel. {attachment_counter}")
+                print(f"Username: {message.author.name} posted 20 attachments at special channel. {attachment_counter}")
                 del attachment_counter[message.channel.id][message.author.id]
     return
 
@@ -596,6 +586,10 @@ async def on_ready():
     if CustomFunctions.check_if_dev_mode()==False:
         automatic_speak_randomly.start()
     remove_old_conversation.start()
+    
+    #Load extension
+    for ext in init_extension:
+        await bot.load_extension(ext)
 
 @bot.event
 async def on_message(message):
@@ -648,7 +642,8 @@ async def on_message_delete(message):
     else:
         print("Message deleted in a private message.")
     return
-    
-    
+
+init_extension = ["cogs.games.RockPaperScissor"]
+
 bot_token = os.getenv("BOT_TOKEN_NO2")
 bot.run(bot_token)
