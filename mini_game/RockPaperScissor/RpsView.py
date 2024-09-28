@@ -5,6 +5,7 @@ from typing import List, Optional
 import random
 import mini_game.RockPaperScissor.RpsMongoManager as RpsMongoManager
 import os
+import CustomFunctions
 
 class RPSView(discord.ui.View):
     def __init__(self, player_1: discord.Member, player_2: discord.Member, embed: discord.Embed):
@@ -86,14 +87,13 @@ class RPSView(discord.ui.View):
             RpsMongoManager.create_update_player_profile(guild_id=interaction.guild.id, user_id= lose_player.id, user_name=lose_player.name,user_display_name=lose_player.display_name, lose_point=1, game_consecutive_round_lose=1)
             
             if flagLegend:
-                file = self.get_congrat_humilate_gif(True)
+                file = CustomFunctions.get_congrat_humilate_gif(is_congrat=True)
                 await interaction.message.reply(content=f"{win_player.mention} đã thắng 5 ván liên tiếp và được cộng **`1`** điểm Huyền Thoại!", file= file)
             if flagHumi:
-                file = self.get_congrat_humilate_gif(False)
+                file = CustomFunctions.get_congrat_humilate_gif(is_congrat=False)
                 await interaction.message.reply(content=f"Quá nhục nhã! {lose_player.mention} đã thua tận tới 5 ván liên tiếp và được cộng **`1`** điểm Sỉ Nhục!", file= file)
         
-        embed = discord.Embed(title=f"", description= f"{self.player_1.mention} đã mời {self.player_2.mention} chơi Kéo Búa Bao!", color=0xC3A757)  # Yellowish color
-        embed.add_field(name="______________", value= f"{result}", inline=False)
+        embed = discord.Embed(title=f"", description= f"{result}", color=0xC3A757)  # Yellowish color
         await self.message.edit(embed=embed, view=None, content="")
     
     async def on_timeout(self):
@@ -102,7 +102,7 @@ class RPSView(discord.ui.View):
         if(len(self.choices)) != 2:
             if self.message:
                 try:
-                    await self.message.edit(content=f"{self.player_1.mention} rất đáng tiếc là {self.player_2.display_name} không muốn chơi cùng bạn.")
+                    await self.message.edit(content=f"{self.player_1.mention} rất đáng tiếc là {self.player_2.display_name} không muốn chơi cùng bạn.", embed=None, view=None)
                     return
                 except discord.NotFound:
                     pass
@@ -134,18 +134,7 @@ class RPSView(discord.ui.View):
         return bot_choice
     
     def translate_choice(self, choice: str) -> str:
-        if choice == 'paper': return 'Giấy'
-        elif choice == 'rock': return 'Búa'
-        else: return 'Kéo'
-        
-    def get_congrat_humilate_gif(self, is_congrat: bool):
-        if is_congrat:
-            folder_path = "Responses/RockPaperScissor/congrat"
-        else:
-            folder_path = "Responses/RockPaperScissor/humiliate"
-        files = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
-        random_file = random.choice(files)
-        file_path = os.path.join(folder_path, random_file)
-        file = discord.File(file_path, filename=random_file)
-        return file
+        if choice == 'paper': return '🗞️ Bao'
+        elif choice == 'rock': return '🔨 Búa'
+        else: return '✂️ Kéo'
         

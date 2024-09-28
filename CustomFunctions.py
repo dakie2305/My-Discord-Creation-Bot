@@ -411,6 +411,18 @@ def is_outside_working_time():
     return not (start_time <= current_datetime.time() <= end_time)
     # return 0 <= current_hour <= 8
 
+def get_congrat_humilate_gif(is_congrat: bool):
+        if is_congrat:
+            type = "congrat"
+        else:
+            type = "humiliate"
+        filepath = os.path.join(os.path.dirname(__file__),"Responses", "RockPaperScissor",type)
+        files = [f for f in os.listdir(filepath) if os.path.isfile(os.path.join(filepath, f))]
+        random_file = random.choice(files)
+        file_path = os.path.join(filepath, random_file)
+        file = discord.File(file_path, filename=random_file)
+        return file
+    
 english_dict = get_english_dict()
 vietnamese_dict = get_vietnamese_dict()
 
