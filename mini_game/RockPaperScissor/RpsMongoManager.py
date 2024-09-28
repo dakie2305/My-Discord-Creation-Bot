@@ -99,10 +99,12 @@ def create_update_player_profile(guild_id: int, user_id: int, user_name: str, us
             #Cộng 1 điểm vào legend point và reset
             data.legendary_point+= 1
             data.game_consecutive_round_win = 0
+            data.game_consecutive_round_lose = 0
         if data.game_consecutive_round_lose >= 5:
             #Cộng 1 điểm vào humi point và reset
             data.humiliated_point+= 1
             data.game_consecutive_round_lose = 0
+            data.game_consecutive_round_win = 0
         result = collection.update_one({"id": "player_profile", "user_id": user_id}, {"$set": data.to_dict()})
     return result
 
