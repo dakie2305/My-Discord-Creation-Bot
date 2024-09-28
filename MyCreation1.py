@@ -878,7 +878,8 @@ async def first_command(interaction: discord.Interaction, user : discord.Member,
     end_time = datetime.now() + CustomFunctions.get_timedelta(duration, time_format)
     mordern_date_time_format = end_time.strftime(f"%d/%m/%Y %H:%M")
     # Save user's roles
-    original_roles = user.roles[1:]  # Exclude @everyone role
+    # original_roles = user.roles[1:]  # Exclude @everyone role
+    original_roles = [role for role in user.roles if not role.is_default() and not role.is_premium_subscriber()]
     stored_original_roles = []
     for role in original_roles:
         old_role = {
@@ -1470,8 +1471,13 @@ async def word_matching(message: discord.Message):
         else:
             #Coi như pass hết
             await message.add_reaction('👍')
+            #Nếu trong game việt nam, gặp những từ có đuôi như sau thì đánh special case để xử lý tiếp
+            special_words = ["ữ","ã", "ẵ", "ẫ"]
+            special_case = False
+            if lan == 'vn' and message.content[-1].lower() in special_words:
+                special_case = True
             #Cập nhật lại thông tin
-            db.update_data_word_matching_info(language=lan,channel_id=message.channel.id, guild_id= message.guild.id, current_player_id=message.author.id, current_player_name=message.author.name,current_word=message.content.lower())
+            db.update_data_word_matching_info(language=lan,channel_id=message.channel.id, guild_id= message.guild.id, current_player_id=message.author.id, current_player_name=message.author.name,current_word=message.content.lower(), special_case_vn=special_case)
             db.update_player_point_word_matching_info(user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= point, guild_id=message.guild.id, channel_id=message.channel.id,language=lan)
             word_matching_channel = db.find_word_matching_info_by_id(channel_id= message.channel.id, guild_id= message.guild.id, language=lan)
             if word_matching_channel.remaining_word>0:

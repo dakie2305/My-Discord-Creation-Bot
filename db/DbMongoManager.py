@@ -311,7 +311,7 @@ def create_word_matching_info(data: WordMatchingInfo, guild_id: int, language: s
     result = collection.insert_one(data.to_dict())
     return result
 
-def update_data_word_matching_info(channel_id: int, guild_id: int, current_player_id: int, current_player_name: str, current_word: str, language: str, existed_words: List[str] = None):
+def update_data_word_matching_info(channel_id: int, guild_id: int, current_player_id: int, current_player_name: str, current_word: str, language: str, existed_words: List[str] = None, special_case_vn: bool = False):
     db_specific = client['word_matching_database']
     collection = db_specific[f'{language}_word_matching_guild_{guild_id}']
     existing_data = collection.find_one({"channel_id": channel_id})
@@ -332,15 +332,20 @@ def update_data_word_matching_info(channel_id: int, guild_id: int, current_playe
     elif language == 'vn' or language == 'vietnam':
         existing_info.remaining_word = get_remaining_words_vietnamese(data=current_word[-1], used_words= used_words)
     used_words.append(current_word)
+    first_character = current_word[0]
+    last_character = current_word[-1]
+    if special_case_vn:
+        splitted = get_first_and_last_word_special_case_vn(current_word)
+        if splitted != None:
+            first_character = splitted[0]
+            last_character = splitted[1]
     result = collection.update_one({"channel_id": channel_id}, {"$set": {"current_player_id": current_player_id,
                                                                          "current_player_name": current_player_name,
                                                                          "current_word": current_word,
-                                                                         "first_character": current_word[0],
-                                                                         "last_character": current_word[-1],
+                                                                         "first_character": first_character,
+                                                                         "last_character": last_character,
                                                                          "remaining_word": existing_info.remaining_word,
                                                                          "used_words": [word for word in used_words], #chỉ dùng used_words
-                                                                         
-                                                                         
                                                                          }})
     return result
 
@@ -574,6 +579,20 @@ def reduce_player_bans_word_matching_info_after_round(channel_id: int, guild_id:
                                                                             }})
         return result
 
+def get_first_and_last_word_special_case_vn(input_string: str):
+    words = input_string.split()
+    if len(words) == 0:
+        return None
+    elif len(words) == 1:
+        # Nếu chữ chỉ có một thì trả về chữ cái đầu và chữ cái cuối
+        first_char = words[0][0]
+        last_char = words[0][-1]
+        return [first_char, last_char]
+    else:
+        # Trả về nguyên từ đầu và từ cuối
+        first_word = words[0]
+        last_word = words[-1]
+        return [first_word, last_word]
 
 #endregion
 
