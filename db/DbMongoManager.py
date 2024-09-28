@@ -345,6 +345,7 @@ def update_data_word_matching_info(channel_id: int, guild_id: int, current_playe
                                                                          "first_character": first_character,
                                                                          "last_character": last_character,
                                                                          "remaining_word": existing_info.remaining_word,
+                                                                         "special_case": special_case_vn,
                                                                          "used_words": [word for word in used_words], #chỉ dùng used_words
                                                                          }})
     return result

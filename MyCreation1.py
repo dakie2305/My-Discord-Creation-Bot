@@ -1307,7 +1307,7 @@ async def check_jail_expiry():
                     embed.set_footer(text=f"Đã được ân xoá bởi: {bot.user}")  # Footer text
                     channel = bot.get_channel(1257012036718563380)
                     if channel:
-                        await channel.send(embed=embed)
+                            await channel.send(embed=embed)
                     commands_logger.info(f"Bot {bot.user} automatically unjailed {user.display_name} for time is up")
                     print(f"Bot {bot.user} automatically unjailed {user.display_name} for time is up.")
 
@@ -1463,7 +1463,10 @@ async def word_matching(message: discord.Message):
                 print(f"Player {message.author.name} is banned 5 round from world matching game for spamming")
             return
         #Kiểm tra xem content có chứa first character là last character của current word không
-        elif message.content.lower()[0] != word_matching_channel.last_character:
+        elif word_matching_channel.special_case == False and message.content.lower()[0] != word_matching_channel.last_character:
+            await matching_words_fail(err= f"Từ mới phải bắt đầu bằng chữ cái `'{word_matching_channel.last_character}'` mới được nha.", message=message, word_matching_channel=word_matching_channel,lan=lan,point=point)
+        #Kiểm tra xem content có chứa nguyên từ đầu là last character của current word không
+        elif word_matching_channel.special_case == True and message.content.lower().split()[0] != word_matching_channel.last_character:
             await matching_words_fail(err= f"Từ mới phải bắt đầu bằng chữ cái `'{word_matching_channel.last_character}'` mới được nha.", message=message, word_matching_channel=word_matching_channel,lan=lan,point=point)
         #Kiểm xem content có nằm trong list từ đã nối rồi chưa
         elif message.content.lower() in word_matching_channel.used_words:

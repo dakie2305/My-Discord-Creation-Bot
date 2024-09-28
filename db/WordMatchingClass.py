@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 #region WordMatchingInfo
 class WordMatchingInfo:
-    def __init__(self, channel_id: int, channel_name: str, current_player_id: int = None, current_player_name: str = None, current_word: str = None, first_character: str = None, last_character: str = None, special_point: int = None, special_item: Optional['SpecialItem'] = None, remaining_word: int = None, used_words: List[str] = None, player_profiles: Optional[List['PlayerProfile']] = None, player_effects : Optional[List['PlayerEffect']] = None, player_bans : Optional[List['PlayerBan']] = None):
+    def __init__(self, channel_id: int, channel_name: str, current_player_id: int = None, current_player_name: str = None, current_word: str = None, first_character: str = None, last_character: str = None, special_point: int = None, special_item: Optional['SpecialItem'] = None, remaining_word: int = None, used_words: List[str] = None, player_profiles: Optional[List['PlayerProfile']] = None, player_effects : Optional[List['PlayerEffect']] = None, player_bans : Optional[List['PlayerBan']] = None, special_case: bool = False):
         self.channel_id = channel_id 
         self.channel_name = channel_name
         self.current_player_id = current_player_id
@@ -13,6 +13,7 @@ class WordMatchingInfo:
         self.last_character = last_character
         self.remaining_word = remaining_word
         self.special_point = special_point
+        self.special_case = special_case
         self.used_words: List[str] = used_words if used_words else []
         self.special_item: SpecialItem = special_item if special_item else None
         self.player_profiles: List[PlayerProfile] = player_profiles if player_profiles else []
@@ -29,6 +30,7 @@ class WordMatchingInfo:
             "last_character": self.last_character,
             "remaining_word": self.remaining_word,
             "special_point": self.special_point,
+            "special_case": self.special_case,
             "used_words": [data for data in self.used_words],
             "special_item": self.special_item.to_dict() if self.special_item else None,
             "player_profiles": [data.to_dict() for data in self.player_profiles],
@@ -49,6 +51,7 @@ class WordMatchingInfo:
             remaining_word = data["remaining_word"],
             special_point= data["special_point"],
             used_words = data["used_words"],
+            special_case = data.get("special_case", False),
             special_item = SpecialItem.from_dict(data.get("special_item", None)) if data.get("special_item") else None,
             player_profiles = [PlayerProfile.from_dict(item) for item in data.get("player_profiles", [])],
             player_effects = [PlayerEffect.from_dict(item) for item in data.get("player_effects", [])],
