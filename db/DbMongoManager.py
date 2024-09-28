@@ -325,7 +325,6 @@ def update_data_word_matching_info(channel_id: int, guild_id: int, current_playe
     used_words = existing_info.used_words
     if existed_words != None:
         used_words = existed_words
-    
     first_character = current_word[0]
     last_character = current_word[-1]
     if special_case_vn:

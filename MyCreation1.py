@@ -959,17 +959,20 @@ async def unjail(interaction: discord.Interaction, user : discord.Member, reason
                 await user.add_roles(get_role_from_server)
         #Xoá row khỏi database
         db.delete_user_by_id(user_id= user.id, chosen_collection= jail_db)
-    # Create embed object
-    embed = discord.Embed(title="Ân Xá Khỏi Đại Lao", description=f"Kẻ tội đồ {user.mention} đã được {interaction.user.mention} ân xoá khỏi đại lao!", color=0x00FF00)  # Green color
-    embed.add_field(name="Lý do được ân xá:", value=reason, inline=False)  # Single-line field
-    embed.add_field(name="Thời gian ra đại lao:", value=f"{datetime.now().isoformat()}", inline=True)
-    embed.add_field(name="Ghi chú", value="Nhớ đừng vi phạm để bị tống vài đại lao nữa nhé!", inline=False) 
-    embed.set_footer(text=f"Đã được ân xoá bởi: {interaction.user.name}")  # Footer text
+        # Create embed object
+        mordern_date_time_format = datetime.now().strftime(f"%d/%m/%Y %H:%M")
+        embed = discord.Embed(title="Ân Xá Khỏi Đại Lao", description=f"Kẻ tội đồ {user.mention} đã được {interaction.user.mention} ân xoá khỏi đại lao!", color=0x00FF00)  # Green color
+        embed.add_field(name="Lý do được ân xá:", value=reason, inline=False)  # Single-line field
+        embed.add_field(name="Thời gian ra đại lao:", value=f"{mordern_date_time_format}", inline=True)
+        embed.add_field(name="Ghi chú", value="Nhớ đừng vi phạm để bị tống vài đại lao nữa nhé!", inline=False) 
+        embed.set_footer(text=f"Đã được ân xoá bởi: {interaction.user.name}")  # Footer text
 
-    await interaction.followup.send(f"Kẻ tội độ {user.mention} đã được {interaction.user.mention} ân xá đại lao. Mong thần dân đừng vi phạm để thành kẻ tội đồ nữa. Lý do ân xá: {reason}")
-    channel = bot.get_channel(1257012036718563380)
-    if channel:
-        await channel.send(embed=embed)
+        await interaction.followup.send(f"Kẻ tội độ {user.mention} đã được {interaction.user.mention} ân xá đại lao. Mong thần dân đừng vi phạm để thành kẻ tội đồ nữa. Lý do ân xá: {reason}")
+        channel = bot.get_channel(1257012036718563380)
+        if channel:
+            await channel.send(embed=embed)
+    else:
+        await interaction.followup.send(f"Người này không ở trong tù.", ephemeral=True)
     print(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} unjailed {user.display_name}. Reason: {reason}")
     commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} unjailed {user.display_name}. Reason: {reason}")
 #endregion
@@ -1296,9 +1299,10 @@ async def check_jail_expiry():
                         #Xoá row khỏi database
                         db.delete_user_by_id(jail_user.user_id, chosen_collection= jail_db)
                         # Create embed object
+                    mordern_date_time_format = datetime.now().strftime(f"%d/%m/%Y %H:%M")
                     embed = discord.Embed(title="Ân Xá Khỏi Đại Lao", description=f"Kẻ tội đồ {user.mention} đã hoàn thành hạn tù và ân xoá khỏi đại lao!", color=0x00FF00)  # Green color
                     embed.add_field(name="Lý do được ân xá:", value="Hoàn thành hạn tù", inline=False)  # Single-line field
-                    embed.add_field(name="Thời gian ra đại lao:", value=f"{datetime.now().isoformat()}", inline=True)
+                    embed.add_field(name="Thời gian ra đại lao:", value=f"{mordern_date_time_format}", inline=True)
                     embed.add_field(name="Ghi chú", value="Nhớ đừng vi phạm để bị tống vài đại lao nữa nhé!", inline=False) 
                     embed.set_footer(text=f"Đã được ân xoá bởi: {bot.user}")  # Footer text
                     channel = bot.get_channel(1257012036718563380)
