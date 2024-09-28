@@ -30,7 +30,7 @@ class RockPaperScissors(commands.Cog):
             return
         # Get the current epoch time (in seconds)
         start_time = datetime.now()
-        end_time = start_time + timedelta(seconds=30)  # 30 seconds from now
+        end_time = start_time + timedelta(seconds=32)  # 30 seconds from now
         unix_time = int(end_time.timestamp())
         # Tạo embed thông báo
         embed = discord.Embed(title=f"", description= f"{interaction.user.mention} đã mời {user.mention} chơi Kéo Búa Bao!", color=0xC3A757)  # Yellowish color

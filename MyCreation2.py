@@ -283,6 +283,11 @@ async def help_command(interaction: discord.Interaction):
 async def help_command(message: discord.Message):
     #Trả về text hướng dẫn command
     text = """**-= Lệnh của Creations 2 =-**
+
+**Lệnh trong trò chơi Kéo - Búa - Bao:**
+`/keo_bua_bao [@user]`: Lệnh dùng để chơi kéo búa bao với người chơi khác. Nếu không chọn người chơi thì sẽ chơi với bot. 
+`/bxh_rps [@user] [legendary|humiliate|lose|draw]`: Lệnh dùng để xem xếp hạng Kéo - Búa - Bao. Có thể xem thứ hạng của player khác và xếp hạng theo nhiều mục khác nhau.    
+
 **Lệnh lặt vặt:**
 `/random_ai_talk`: Lệnh để bật / tắt khả năng lâu lâu bot nói chuyện xàm xí trong channel.
 `/say`: Lệnh dùng để gửi tin nhắn, hình ảnh ần danh.

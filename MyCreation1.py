@@ -1247,6 +1247,9 @@ async def help_command(message: discord.Message):
 `!use_skill`: Lệnh dùng để hiển thị bảng kỹ năng đặc biệt của player trong channel nối từ và cách dùng kỹ năng đó.
 `/bxh_noi_tu`: Lệnh dùng để hiển thị bảng xếp hạng điểm của các player trong channel nối từ.
 
+**Lệnh trong trò chơi Kéo - Búa - Bao:**
+`/keo_bua_bao [@user]`: Lệnh dùng để chơi kéo búa bao với người chơi khác. Nếu không chọn người chơi thì sẽ chơi với bot. 
+`/bxh_rps [@user] [legendary|humiliate|lose|draw]`: Lệnh dùng để xem xếp hạng Kéo - Búa - Bao. Có thể xem thứ hạng của player khác và xếp hạng theo nhiều mục khác nhau.
 
 **Lệnh lặt vặt:**
 `/say`: Lệnh dùng để gửi tin nhắn, hình ảnh ần danh.
