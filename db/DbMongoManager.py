@@ -584,9 +584,9 @@ def get_first_and_last_word_special_case_vn(input_string: str):
     if len(words) == 0:
         return None
     elif len(words) == 1:
-        # Nếu chữ chỉ có một thì trả về chữ cái đầu và chữ cái cuối
-        first_char = words[0][0]
-        last_char = words[0][-1]
+        # Nếu chữ chỉ có một thì trả về nguyên chữ cái
+        first_char = words[0]
+        last_char = words[0]
         return [first_char, last_char]
     else:
         # Trả về nguyên từ đầu và từ cuối
