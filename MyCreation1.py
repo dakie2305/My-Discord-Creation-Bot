@@ -1193,7 +1193,6 @@ def get_bxh_noi_tu(interaction: discord.Interaction,lan: str, word_matching_chan
         lan = "Tiếng Việt"
     embed = discord.Embed(title=f"Xếp hạng các player theo điểm.", description=f"Trò Chơi Nối Từ {lan}", color=0x03F8FC)
     embed.add_field(name=f"", value="___________________", inline=False)
-    embed.set_footer(text=f"User ID Invoke: {interaction.user.id}")
     count = 0
     if word_matching_channel.player_profiles:
         word_matching_channel.player_profiles.sort(key=lambda x: x.points, reverse=True)
@@ -1552,6 +1551,10 @@ async def on_ready():
     if CustomFunctions.check_if_dev_mode()==False:
         automatic_speak_randomly.start()
     remove_old_conversation.start()
+    #Load extension
+    for ext in init_extension:
+        await bot.load_extension(ext)
+        
 @bot.event
 async def on_message(message):
     # print(message)
@@ -1565,5 +1568,7 @@ bot_token = os.getenv("BOT_TOKENN")
 english_words_dictionary = CustomFunctions.english_dict
 vietnamese_dict = CustomFunctions.vietnamese_dict
 message_tracker = CustomFunctions.MessageTracker()
+#Cog command
+init_extension = ["cogs.games.RockPaperScissor"]
 
 bot.run(bot_token)

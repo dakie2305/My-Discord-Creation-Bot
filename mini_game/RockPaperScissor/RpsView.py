@@ -61,12 +61,12 @@ class RPSView(discord.ui.View):
         elif (player1_choice == "rock" and player2_choice == "scissors") or \
              (player1_choice == "paper" and player2_choice == "rock") or \
              (player1_choice == "scissors" and player2_choice == "paper"):
-            result = f"{self.player_1.mention} chọn **`{self.translate_choice(player1_choice)}`**, còn {self.player_2.mention} đã chọn **`{self.translate_choice(player2_choice)}`**. {self.player_1.mention} đã thắng trận này!"
+            result = f"{self.player_1.mention} chọn **`{self.translate_choice(player1_choice)}`**, còn {self.player_2.mention} đã chọn **`{self.translate_choice(player2_choice)}`**. {self.player_1.mention} đã thắng trận này!\nĐừng quên dùng lệnh **`/bxh_rps`** để xem bảng xếp hạng nhé!"
             win_player = self.player_1
             lose_player = self.player_2
         #PLayer 2 thắng
         else:
-            result = f"{self.player_1.mention} chọn **`{self.translate_choice(player1_choice)}`**, còn {self.player_2.mention} đã chọn **`{self.translate_choice(player2_choice)}`**. {self.player_2.mention} đã thắng trận này!"
+            result = f"{self.player_1.mention} chọn **`{self.translate_choice(player1_choice)}`**, còn {self.player_2.mention} đã chọn **`{self.translate_choice(player2_choice)}`**. {self.player_2.mention} đã thắng trận này!\nĐừng quên dùng lệnh **`/bxh_rps`** để xem bảng xếp hạng nhé!"
             win_player = self.player_2
             lose_player = self.player_1
         

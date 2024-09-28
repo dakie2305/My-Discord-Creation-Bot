@@ -643,6 +643,7 @@ async def on_message_delete(message):
         print("Message deleted in a private message.")
     return
 
+#Cog command
 init_extension = ["cogs.games.RockPaperScissor"]
 
 bot_token = os.getenv("BOT_TOKEN_NO2")

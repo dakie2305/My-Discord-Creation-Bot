@@ -62,6 +62,19 @@ def find_player_profile_by_id(guild_id: int, user_id: int):
     return None
 
 
+def find_all_player_profile(guild_id: int):
+    collection = db_specific[f'rps_{guild_id}']
+    data = collection.find({"id": "player_profile"}) #Lấy ra tất cả Player Profile
+    player_profiles = []
+    if data:
+        player_profiles = [RpsPlayerProfile.from_dict(player_data) for player_data in data]
+    if len(player_profiles) > 0:
+        return player_profiles
+    return None
+
+
+
+
 def player_profile_on_draw(guild_id: int, player_1_id: int, player_1_display_name: str, player_1_user_name: str, player_2_id:int, player_2_display_name: str, player_2_user_name: str):
     create_update_player_profile(guild_id=guild_id, user_id=player_1_id, user_display_name=player_1_display_name, user_name= player_1_user_name, draw_point=1)
     create_update_player_profile(guild_id=guild_id, user_id=player_2_id, user_display_name=player_2_display_name, user_name= player_2_user_name, draw_point=1)
