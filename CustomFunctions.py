@@ -198,7 +198,7 @@ async def get_proper_prompt(message: discord.Message, bot_name: str, extra_messa
         if list_convo and len(list_convo)>0:
             past_convo = f"**Ngươi và đối phương đã từng nói chuyện rất nhiều trước đây, {message.author.display_name} đã từng nói như dưới đây:**\n"
             for convo in list_convo:
-                past_convo += f"*{message.author.display_name}: {convo.message_content}*\n*Ngươi: {convo.bot_message_content}*"
+                past_convo += f"*{message.author.display_name}: {convo.message_content}*\n*{bot_name}: {convo.bot_message_content}*"
             roleplay_ele += past_convo
             last_convo = list_convo[len(list_convo)-1].bot_message_content
     
