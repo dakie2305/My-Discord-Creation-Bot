@@ -1276,14 +1276,14 @@ async def check_jail_expiry():
     jail_db = "jailed_user"
     #Lấy tất cả dữ liệu db jail user ra
     list_all_jailed_users = db.find_all_users(chosen_collection=jail_db)
+    guild = bot.get_guild(1256987900277690470)
     if list_all_jailed_users:
-        for guid in bot.guilds:
-            for jail_user in list_all_jailed_users:
+        for jail_user in list_all_jailed_users:
                 #Lấy thời hạn tù đày
                 jailed_time = (jail_user.jail_until)
                 if jailed_time > now:
                     return
-                user = guid.get_member(jail_user.user_id)
+                user = guild.get_member(jail_user.user_id)
                 if user:
                     #Xoá role Đáy Xã Hội
                     jail_role = discord.utils.get(user.guild.roles, name="Đáy Xã Hội")
@@ -1306,7 +1306,7 @@ async def check_jail_expiry():
                     embed.add_field(name="Thời gian ra đại lao:", value=f"{mordern_date_time_format}", inline=True)
                     embed.add_field(name="Ghi chú", value="Nhớ đừng vi phạm để bị tống vài đại lao nữa nhé!", inline=False) 
                     embed.set_footer(text=f"Đã được ân xoá bởi: {bot.user}")  # Footer text
-                    channel = bot.get_channel(1257012036718563380)
+                    channel = guild.get_channel(1257012036718563380)
                     if channel:
                             await channel.send(embed=embed)
                     commands_logger.info(f"Bot {bot.user} automatically unjailed {user.display_name} for time is up")
