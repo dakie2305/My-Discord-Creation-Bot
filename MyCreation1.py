@@ -1482,7 +1482,7 @@ async def word_matching(message: discord.Message):
             db.update_player_point_word_matching_info(user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= point, guild_id=message.guild.id, channel_id=message.channel.id,language=lan)
             word_matching_channel = db.find_word_matching_info_by_id(channel_id= message.channel.id, guild_id= message.guild.id, language=lan)
             if word_matching_channel.remaining_word>0:
-                message_tu_hien_tai = f"\nTừ hiện tại là: `'{word_matching_channel.current_word}'`, và có **{word_matching_channel.remaining_word if word_matching_channel.remaining_word else 0}** bắt đầu bằng chữ cái `{word_matching_channel.last_character if word_matching_channel.last_character else 0}`"
+                message_tu_hien_tai = f"\nTừ hiện tại là: `'{word_matching_channel.current_word}'`, và có **{word_matching_channel.remaining_word if word_matching_channel.remaining_word else 0}** từ bắt đầu bằng chữ cái `{word_matching_channel.last_character if word_matching_channel.last_character else 0}`"
                 #Kiểm tra xem có special_item không, nếu có thì cộng cho player
                 chuc_mung_item = ""
                 if word_matching_channel.special_item:

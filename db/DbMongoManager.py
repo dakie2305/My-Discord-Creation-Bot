@@ -325,13 +325,7 @@ def update_data_word_matching_info(channel_id: int, guild_id: int, current_playe
     used_words = existing_info.used_words
     if existed_words != None:
         used_words = existed_words
-    #Để biết được còn bao nhiêu remaining words, ta sẽ đếm số lượng từ trong dictionary bắt đầu bằng first_character, và trừ đi số lượng từ bắt đầu bằng first_character trong used_words
-    #Tuỳ vào language sẽ get remaining word khác nhau
-    if language == 'en' or language == 'eng':
-        existing_info.remaining_word = get_remaining_words_english(data=current_word[-1], used_words= used_words)
-    elif language == 'vn' or language == 'vietnam':
-        existing_info.remaining_word = get_remaining_words_vietnamese(data=current_word[-1], used_words= used_words)
-    used_words.append(current_word)
+    
     first_character = current_word[0]
     last_character = current_word[-1]
     if special_case_vn:
@@ -339,6 +333,13 @@ def update_data_word_matching_info(channel_id: int, guild_id: int, current_playe
         if splitted != None:
             first_character = splitted[0]
             last_character = splitted[1]
+    #Để biết được còn bao nhiêu remaining words, ta sẽ đếm số lượng từ trong dictionary bắt đầu bằng first_character, và trừ đi số lượng từ bắt đầu bằng first_character trong used_words
+    #Tuỳ vào language sẽ get remaining word khác nhau
+    if language == 'en' or language == 'eng':
+        existing_info.remaining_word = get_remaining_words_english(data=last_character, used_words= used_words)
+    elif language == 'vn' or language == 'vietnam':
+        existing_info.remaining_word = get_remaining_words_vietnamese(data=last_character, used_words= used_words)
+    used_words.append(current_word)
     result = collection.update_one({"channel_id": channel_id}, {"$set": {"current_player_id": current_player_id,
                                                                          "current_player_name": current_player_name,
                                                                          "current_word": current_word,
