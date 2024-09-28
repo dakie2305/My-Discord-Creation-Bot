@@ -22,9 +22,6 @@ class RockPaperScissors(commands.Cog):
     @discord.app_commands.describe(user="Chọn user để chơi cùng. Không chọn tức là sẽ chơi với bot")
     async def create_rps(self, interaction: discord.Interaction, user: Optional[discord.Member] = None):
         await interaction.response.defer()
-        if interaction.user.id != 315835396305059840:
-            await interaction.followup.send("Game đang hoàn thiện sau!")
-            return
         if user is None:
             user = self.bot.user
         
