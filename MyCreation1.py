@@ -1287,7 +1287,8 @@ async def check_jail_expiry():
                 if user:
                     #Xoá role Đáy Xã Hội
                     jail_role = discord.utils.get(user.guild.roles, name="Đáy Xã Hội")
-                    await user.remove_roles(jail_role)
+                    if jail_role:
+                        await user.remove_roles(jail_role)
                     #Tìm xem user này đã có chưa, có thì xoá khỏi db jail_user
                     search_user = db.find_user_by_id(jail_user.user_id, jail_db)
                     if search_user:
