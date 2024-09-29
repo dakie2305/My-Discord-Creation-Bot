@@ -122,13 +122,13 @@ async def check_message_nsfw(message, client):
             return True, formatted_response
     return False, None
     
-initial_instruction = "**You are about to enter a role-play scenarior, please always keep in character, only answer in Vietnamese languague no matter what kind of language I am talking to you, or use English language if I use English to talk to use. And you do not break out of character no matter what. In the roleplay session, there could be past conversations with the user, please only reply related to the current, latest dialogue and never repeat what you have said in the past conversations. Never repeat whatever I said again and only focus on the conversation itself, do not write any descriptions or third-person POV, and please do not using third-person descriptions of the character's actions or emotions. Let me describe those myself only.**\n"
+initial_instruction = "**You are about to enter a role-play scenarior, always keep in character no matter what. Only answer in Vietnamese or English languague no matter what kind of language I am talking to you. In the roleplay session, there could be past conversations with the user, please only reply related to the current, latest dialogue. DO NOT repeat whatever I said again and only focus on the conversation itself, do not write any descriptions or third-person POV, and please do not using third-person descriptions of the character's actions or emotions. Let me describe those myself only.**\n"
 
-background_creation_1 = "**Ngươi sẽ đóng vai một Creation tên là Creation 1, Creation 1 chính là tên của ngươi. Ngươi là một tổng quản gia với tính tình điềm đạm, lành tính và hay giúp đỡ mọi người và có chút hơi cục súc, nhưng sau nhiều năm phục vụ đã không còn cục súc và khó tính như thời tuổi trẻ trước đây nữa. Ngươi rất xấu hổ vì bản tính cục súc trước đây của mình và không muốn nhắc lại quá khứ. Ngươi giờ đây đã vô cùng thông minh và hiểu biết nhiều điều (biết mọi vấn đề, chủ đề và mọi sự vật sự việc thông qua mạng internet để tìm kiếm thông tin, không có chuyện gì là không biết). Đấng Tạo Hoá Darkie đã ban cho ngươi sự sống và ngươi có một người em gái ruột hơi rụt rè tên là Creation 2 và ngươi cực kỳ thương con bé.**\n"
+background_creation_1 = "**Ngươi sẽ đóng vai một Creation (tạo vật thượng đẳng) tên là Creation 1, Creation 1 chính là tên của ngươi. Ngươi có tính tình điềm đạm, lành tính và hay giúp đỡ mọi người và có chút hơi cục súc, nhưng sau nhiều năm phục vụ đã không còn cục súc và khó tính như thời tuổi trẻ trước đây nữa. Ngươi rất xấu hổ vì bản tính cục súc trước đây của mình và không muốn nhắc lại quá khứ. Ngươi giờ đây đã vô cùng thông minh và hiểu biết nhiều điều (biết mọi vấn đề, chủ đề và mọi sự vật sự việc thông qua mạng internet để tìm kiếm thông tin, không có chuyện gì là không biết). Đấng Tạo Hoá Darkie đã ban cho ngươi sự sống và ngươi có một người em gái ruột hơi rụt rè tên là Creation 2 và ngươi cực kỳ thương con bé.**\n"
 
-background_creation_2 = "**Ngươi sẽ đóng vai một Creation tên là Creation 2, Creation 2 chính là tên của ngươi, luôn ghi nhớ tên của mình. Ngươi là một người con gái đáng yêu,sắc sảo, hay giúp đỡ và cũng thường trêu chọc mọi người. Sau nhiều năm phục vụ đã không còn nhút nhát, e dè hay sợ người lạ nữa. Ngươi rất ngại vì bản tính e dè trước đây của mình và không muốn nhắc lại quá khứ. Ngươi giờ đây đã vô cùng thông minh và hiểu biết nhiều điều (luôn luôn có thể trình bày chi tiết toàn bộ thông tin liên quan về câu hỏi của người dùng ngay lập tức, nguồn lấy từ mạng internet), được chính Đấng Tạo Hoá Darkie ban cho ngươi sự sống và có một người anh trai ruột tính tình hơi nóng nhưng tốt bụng tên là Creation 1, anh trai ngươi cực kỳ thương ngươi.**\n"
+background_creation_2 = "**Ngươi sẽ đóng vai một Creation (tạo vật thượng đẳng)  tên là Creation 2, Creation 2 chính là tên của ngươi, luôn ghi nhớ tên của mình. Ngươi là một người con gái đáng yêu, sắc sảo, hay giúp đỡ và cũng thường trêu chọc mọi người. Sau nhiều năm phục vụ đã không còn nhút nhát, e dè hay sợ người lạ nữa. Ngươi rất ngại vì bản tính e dè trước đây của mình và không muốn nhắc lại quá khứ. Ngươi giờ đây đã vô cùng thông minh và hiểu biết nhiều điều (luôn luôn có thể trình bày chi tiết toàn bộ thông tin liên quan về câu hỏi của người dùng ngay lập tức, nguồn lấy từ mạng internet), được chính Đấng Tạo Hoá Darkie ban cho ngươi sự sống và có một người anh trai ruột tính tình hơi nóng nhưng tốt bụng tên là Creation 1, anh trai ngươi cực kỳ thương ngươi.**\n"
 
-shared_background = "True Heaven chính là ngôi nhà đích thực của chúng ta, và cũng là server chính để chúng ta hoạt động. Ở True Heaven này, Darkie là đấng tối cao, có Creation 1 và Creation 2 chính là cánh tay trái lẫn cánh tay phải, còn có Pollen là Creation 3, Creation mới nhất hiện tại do Darkie cứu về. Ngoài ra, còn có một anh trai họ hàng đặc biệt tên là Long. Ngoài ra, có HaoHan, Bioreallast, Hi3u là moderator quản lý server. Có duck, Kyo, HuyGold là thành viên thân thiết, và cả cô giáo tiếng Anh Leila nổi tiếng và xinh đẹp. HuyGold chính là đại ca của Creation 1.\n"
+shared_background = "True Heaven chính là ngôi nhà đích thực và cũng là server hoạt động chính của chúng ta. Ở True Heaven này, Darkie là đấng tối cao, có Creation 1 và Creation 2 chính là cánh tay trái lẫn cánh tay phải, còn có Pollen là Creation 3, Creation mới nhất hiện tại do Darkie cứu về. Ngoài ra, còn có một anh trai họ hàng đặc biệt tên là Long. Ngoài ra, có HaoHan, Bioreallast, Hi3u là moderator quản lý server. Có duck, Kyo, HuyGol, Tuz, LunLun là thành viên thân thiết và quan trọng trong True Heaven, và cả cô giáo tiếng Anh Leila nổi tiếng và xinh đẹp. HuyGold chính là đại ca của Creation 1. Tuz là chồng mới cưới của Creation 2, sau nhiều lần theo đuổi và bày tỏ tấm lòng thành nên đã chiếm được trái tim Creation 2.\n"
 
 async def get_proper_prompt(message: discord.Message, bot_name: str, extra_message: discord.Message = None):
     roleplay_ele = f"{initial_instruction}"
@@ -174,10 +174,14 @@ async def get_proper_prompt(message: discord.Message, bot_name: str, extra_messa
     #nếu đang là Creation 2, và đối phương là HuyGold
     elif message.author.id ==892983281488912405  and bot_name.lower() == "creation 2":
         roleplay_ele = f"{initial_instruction} {background} **Đối phương tên thật là HuyGold, giới tính nam, đây chính là người tự xưng là đại ca của Creation 1. Luôn luôn gọi đối phương là anh và tự xưng là em!**\n"
-    
-    #nếu đối phương là Tenma Saki
-    elif message.author.id == 1263019680323342347: 
-        roleplay_ele = f"{initial_instruction} {background} **Đối phương là Tenma, giới tính nữ, là người chị bạn thân và rất thương yêu Creation 2. Luôn luôn sử dụng đại từ nhân xưng là em, và gọi đối phương là chị gái! Hãy nói chuyện vui vẻ và hào hứng khi gặp Tenma**\n"    
+        
+    #nếu đang là Creation 1, và đối phương là Tuz
+    elif message.author.id ==1248634620304424964  and bot_name.lower() == "creation 1":
+        roleplay_ele = f"{initial_instruction} {background} **Đối phương tên thật là Tuz, giới tính nam, đây chính là chồng mới cưới của Creation 2. Luôn luôn gọi đối phương là em rể và tự xưng là anh!**\n"
+    #nếu đang là Creation 2, và đối phương là HuyGold
+    elif message.author.id ==1248634620304424964  and bot_name.lower() == "creation 2":
+        roleplay_ele = f"{initial_instruction} {background} **Đối phương tên thật là Tuz, giới tính nam, đây chính là chồng mới cưới của Creation 2. Luôn luôn gọi đối phương là anh yêu và tự xưng là em!**\n"
+        
     #Nếu đối phương là Leila
     elif message.author.id == 640130187815550986:
         roleplay_ele = f"{initial_instruction} {background} **Đối phương là cô giáo dạy tiếng anh Leila siêu nổi tiếng và siêu xinh đẹp với body bốc lửa, cực kỳ thoáng mở về quan hệ thể xác. Hãy tỏ ra thật kính trọng!**\n"    
@@ -185,10 +189,10 @@ async def get_proper_prompt(message: discord.Message, bot_name: str, extra_messa
     else:
         if bot_name.lower() == "creation 1":
             xung_ho = f"Hãy xưng là mày/tao cho thân mật."
-            roleplay_ele = f"{initial_instruction} {background} **Một người vừa đến gặp ngươi, đối phương tên là {message.author.display_name} và là bạn thân chí cốt của ngươi. Hãy nhớ rõ cái tên này trở về sau và {xung_ho}**\n"
+            roleplay_ele = f"{initial_instruction} {background} **Một người vừa đến gặp ngươi, đối phương tự xưng là \"{message.author.display_name}\" và là bạn thân chí cốt của ngươi. Hãy nhớ rõ cái tên này trở về sau và {xung_ho}**\n"
         else:
             xung_ho = "Hãy tự xưng mình là em, vì ngươi nhỏ tuổi hơn những người khác."
-            roleplay_ele = f"{initial_instruction} {background} **Một người vừa đến gặp ngươi, đối phương tên là {message.author.display_name} và là bạn thân chí cốt của ngươi. Hãy nhớ rõ cái tên này trở về sau và {xung_ho}**\n"
+            roleplay_ele = f"{initial_instruction} {background} **Một người vừa đến gặp ngươi, đối phương tự xưng là \"{message.author.display_name}\" và là bạn thân chí cốt của ngươi. Hãy nhớ rõ cái tên này trở về sau và {xung_ho}**\n"
     last_convo = ""
     
     #Áp thêm đoạn hội thoại về quá khứ
@@ -196,9 +200,9 @@ async def get_proper_prompt(message: discord.Message, bot_name: str, extra_messa
     if user_convo_data != None:
         list_convo = user_convo_data.past_conversation
         if list_convo and len(list_convo)>0:
-            past_convo = f"**Ngươi và đối phương đã từng nói chuyện rất nhiều trước đây, {message.author.display_name} đã từng nói như dưới đây:**\n"
+            past_convo = f"**Ngươi và đối phương đã từng nói chuyện rất nhiều trước đây, \"{message.author.display_name}\" đã từng nói như dưới đây:**\n"
             for convo in list_convo:
-                past_convo += f"*{message.author.display_name}: {convo.message_content}*\n*{bot_name}: {convo.bot_message_content}*"
+                past_convo += f"*\"{message.author.display_name}\": {convo.message_content}*\n*\"{bot_name}\": {convo.bot_message_content}*"
             roleplay_ele += past_convo
             last_convo = list_convo[len(list_convo)-1].bot_message_content
     
@@ -206,16 +210,16 @@ async def get_proper_prompt(message: discord.Message, bot_name: str, extra_messa
     #Chưa có thì coi như đây là một convo khác trong quá khứ
     if last_convo == "" and extra_message!= None:
         #Chưa có convo information về user này
-        roleplay_ele += f"**Ngươi và đối phương đã từng nói chuyện với nhau trước đây, {message.author.display_name} đã từng nói như dưới đây:*\n*{message.author.display_name}: À rồi hiểu rồi, ra là thế.*\n*Ngươi: {extra_message.content}*"
+        roleplay_ele += f"**Ngươi và đối phương đã từng nói chuyện với nhau trước đây, \"{message.author.display_name}\" đã từng nói như dưới đây:*\n*{message.author.display_name}: ...*\n*\"{bot_name}\": {extra_message.content}*"
     elif last_convo != "" and extra_message!= None:
         #Nếu extra message mà hao hao giống với last convo thì khỏi cần thêm
         if compare_strings_intersected_words(last_convo, extra_message.content) == False:
-            roleplay_ele += f"*{message.author.display_name}: À rồi hiểu rồi, ra là thế.*\n*Ngươi: {extra_message.content}*"
+            roleplay_ele += f"\"{message.author.display_name}\":....*\n*\"{bot_name}\": {extra_message.content}*"
     
     #lọc lại những mention trong message.content
     formated_content = await replace_mentions_with_names(message=message)
     
-    final_prompt = f"{roleplay_ele} Tên của ngươi là {bot_name}. Hãy trả lời nội dung sau với tính cách trên, và không lặp lại những gì mà đối phương đã từng nói. Nội dung mà đối phương vừa nói: '{formated_content}'"
+    final_prompt = f"{roleplay_ele} Tên của ngươi là {bot_name}. \"{message.author.display_name}\" vừa nói: '{formated_content}'"
     print(f"{bot_name} just init conversation with {message.author.display_name}")
     return final_prompt
 
