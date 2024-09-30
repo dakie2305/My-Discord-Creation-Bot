@@ -85,13 +85,13 @@ user_cr_1 = DefaultUserList.user_data_list[1]
 user_cr_2 = DefaultUserList.user_data_list[2]
 user_cr_3 = DefaultUserList.user_data_list[3]
 
-blacklist_userid = [969835661978898474]
+blacklist_userid = [969835661978898474, 1288778980635185153]
 
 async def check_message_nsfw(message, client):
     #Kiểm tra xem user id có nằm trong blacklist hay không
     m = discord.Message
     if message.author.id in blacklist_userid:
-        response = get_random_response("OnSwearWords.txt")
+        response = get_random_response("OnUserIdBlacklist.txt")
         formatted_response = response.replace("{message.author.mention}", message.author.mention)
         print(f"Username {message.author.name}, Display user name {message.author.display_name}, just use swear word at {client.user}")
         return True, formatted_response
