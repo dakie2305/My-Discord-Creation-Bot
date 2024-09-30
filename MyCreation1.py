@@ -1322,7 +1322,6 @@ async def automatic_speak_randomly():
             random_channel_id = random.choice(guild_extra_info.list_channels_ai_talk)
             actual_channel = guild.get_channel(random_channel_id)
             if actual_channel:
-                
                 model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
                 prompt = CustomFunctions.get_automatically_talk_prompt("Creation 1", guild, actual_channel)
                 response = model.generate_content(f"{prompt}")
