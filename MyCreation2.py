@@ -82,11 +82,6 @@ async def help(ctx):
 @app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
 async def say(interaction: discord.Interaction, thing_to_say : str, image: Optional[discord.Attachment] = None, chosen_channel: Optional[discord.TextChannel]= None):
     await interaction.response.send_message(content="Đã gửi tin nhắn ẩn danh thành công", ephemeral=True)
-    req_roles = ['Đã_Mở_Khoá_Full_Kênh_Seg', 'Mod', 'Nâng_cấp_máy_chủ']
-    has_required_role = any(role.name in req_roles for role in interaction.user.roles)
-    if not has_required_role:
-        await interaction.followup.send("Không đủ thẩm quyền để thực hiện lệnh.")
-        return
     #Lấy channel mà người dùng gọi ra
     current_channel_id = interaction.channel_id
     current_channel = bot.get_channel(current_channel_id)

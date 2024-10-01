@@ -337,7 +337,7 @@ def update_data_word_matching_info(channel_id: int, guild_id: int, current_playe
     if language == 'en' or language == 'eng':
         existing_info.remaining_word = get_remaining_words_english(data=last_character, used_words= used_words)
     elif language == 'vn' or language == 'vietnam':
-        existing_info.remaining_word = get_remaining_words_vietnamese(data=last_character, used_words= used_words)
+        existing_info.remaining_word = get_remaining_words_vietnamese(data=last_character, used_words= used_words, special_case=special_case_vn)
     used_words.append(current_word)
     result = collection.update_one({"channel_id": channel_id}, {"$set": {"current_player_id": current_player_id,
                                                                          "current_player_name": current_player_name,
@@ -460,19 +460,23 @@ def get_remaining_words_english(data: str, used_words: List[str]):
     if data == None: return 0
     count = 0
     for word in english_words_dictionary.keys():
+        if word == data: continue
         if word.startswith(data) and word not in used_words:
             count+= 1
     return count
 
-def get_remaining_words_vietnamese(data: str, used_words: List[str]):
+def get_remaining_words_vietnamese(data: str, used_words: List[str], special_case: bool = False):
     """
     Kiểm tra với danh sách những từ đã tồn tại, đối chiếu vói dictionary để xem còn bao nhiêu từ khả dụng.
     """
     if data == None: return 0
     count = 0
-    for word in vietnamese_words_dictionary.keys():
-        if word.startswith(data) and word not in used_words:
-            count+= 1
+    for phrase in vietnamese_words_dictionary.keys():
+        if phrase == data: continue
+        if special_case == True and phrase.split()[0] == data and phrase not in used_words:
+            count += 1
+        elif special_case == False and phrase.startswith(data) and phrase not in used_words:
+            count += 1
     return count
 
 #region Các functions về kỹ năng của nối từ
