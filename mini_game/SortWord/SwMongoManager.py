@@ -57,8 +57,8 @@ def update_data_info(channel_id: int, guild_id: int, current_player_id: int, cur
                                                                          }})
     return result
 
-def delete_data_info(channel_id: int, guild_id: int, language: str):
-    collection = db_specific[f'{language}_sw_guild_{guild_id}']
+def delete_data_info(channel_id: int, guild_id: int, lang: str):
+    collection = db_specific[f'{lang}_sw_guild_{guild_id}']
     existing_data = collection.find_one({"channel_id": channel_id})
     existing_info = SortWordInfo.from_dict(existing_data)
     if existing_info:
@@ -73,7 +73,7 @@ def update_special_point_data_info(channel_id: int, guild_id: int, language: str
                                                                          }})
     return result
 
-def update_special_item_word_matching_info(channel_id: int, guild_id: int, language: str, special_item: SwSpecialItem = None):
+def update_special_item_data_info(channel_id: int, guild_id: int, language: str, special_item: SwSpecialItem = None):
     collection = db_specific[f'{language}_sw_guild_{guild_id}']
     #Cập nhật special item của channel lại
     if special_item:
