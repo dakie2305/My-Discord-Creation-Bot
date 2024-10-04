@@ -712,6 +712,12 @@ async def process_special_item_functions(word_matching_channel: db.WordMatchingI
     elif "_protect" in special_item.item_id:
         #Thêm vào db player_effect
         if special_item.item_id.endswith("protect_user"):
+            if user_target == None:
+                await message.reply(f"Kỹ năng **`{special_item.item_name}`** cần phải tag tên của đối phương mới có hiệu nghiệm.\n")
+                return
+            if user_target.id == message.author.id:
+                await message.reply(f"Ôi bạn ơi, kỹ năng **`{special_item.item_name}`** chỉ dành cho người khác chứ không phải dành cho bạn.\n")
+                return
             db.update_player_effects_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=lan, user_id=user_target.id, user_name=user_target.name, effect_id= "ct_protect", effect_name= "Bảo Hộ")
             await message.reply(f"{message.author.mention} đã dùng kỹ năng **`{special_item.item_name}`** để bảo vệ player {user_target.mention}.\n")
         else:    
@@ -1480,7 +1486,7 @@ async def word_matching(message: discord.Message):
             #Coi như pass hết
             await message.add_reaction('👍')
             #Nếu trong game việt nam, gặp những từ có đuôi như sau thì đánh special case để xử lý tiếp
-            special_words = ["ữ","ã", "ẵ", "ẫ", "õ", "ẽ", "ó", "ọ", "ỡ", "ỗ", "ĩ", "ũ", "ỹ", "ỳ", "ỵ", "ử", "ự", "ộ","ẻ","è", "ể", "ễ", "ệ", "ẹ", "ạ", "ợ"]
+            special_words = ["ữ","ã", "ẵ", "ẫ", "õ", "ẽ", "ó", "ọ", "ờ","ớ", "ỡ", "ỗ", "ĩ", "ũ", "ỹ", "ỳ", "ỵ", "ử", "ự", "ộ","ẻ","è", "ể", "ễ", "ệ", "ẹ", "ạ", "ợ"]
             special_case = False
             if lan == 'vn' and message.content[-1].lower() in special_words:
                 special_case = True
