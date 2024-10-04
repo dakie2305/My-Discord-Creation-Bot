@@ -20,6 +20,7 @@ from typing import Optional
 from collections import deque
 import asyncio
 import PIL
+from mini_game.SortWord import SwHandling as SwHandling
 
 load_dotenv()
 intents = discord.Intents.all()
@@ -1580,9 +1581,15 @@ async def on_ready():
         
 @bot.event
 async def on_message(message):
-    # print(message)
     if message.author == bot.user:
         return
+    sort_word_game = SwHandling.handling_function(message= message, message_tracker=message_tracker)
+    sw_info, lan = await sort_word_game.check_if_message_inside_game(source=message)
+    if sw_info != None:
+        #Xử lý nối từ
+        asyncio.create_task(sort_word_game.handling_game(message=message))
+        return
+    
     await sub_function_ai_response(message=message)
     asyncio.create_task(word_matching(message=message))
     await bot.process_commands(message)
@@ -1592,6 +1599,8 @@ english_words_dictionary = CustomFunctions.english_dict
 vietnamese_dict = CustomFunctions.vietnamese_dict
 message_tracker = CustomFunctions.MessageTracker()
 #Cog command
-init_extension = ["cogs.games.RockPaperScissor"]
+init_extension = ["cogs.games.RockPaperScissor",
+                  "cogs.games.SortWord",
+                  ]
 
 bot.run(bot_token)

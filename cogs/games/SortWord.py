@@ -15,9 +15,9 @@ class SortWords(commands.Cog):
     
     
     #region sort word Commands
-    @discord.bot.command()
+    @commands.command()
     @discord.app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
-    async def start_sw_en(ctx):
+    async def start_sw_en(self, ctx):
         message: discord.Message = ctx.message
         if message:
             #Kiểm tra xem đã tồn tại game trong channel này chưa
@@ -29,10 +29,9 @@ class SortWords(commands.Cog):
             elif SwMongoManager.find_sort_word_info_by_id(channel_id=message.channel.id, guild_id=message.guild.id, lang='vn'):
                 await ctx.send(f"Channel này đã dành cho game đoán từ Tiếng Việt rồi!")
             else:
-                
                 #Tạo mới
                 data = SwClass.SortWordInfo(channel_id=message.channel.id, channel_name=message.channel.name, current_word="hi", unsorted_word="ih")
-                result = SwMongoManager.create_info(data=data, guild_id=message.guild.id, language='en')
+                result = SwMongoManager.create_info(data=data, guild_id=message.guild.id, lang='en')
                 message_tu_hien_tai = f"\nTừ hiện tại: `'{data.unsorted_word}'`."
                 await ctx.send(f"Đã tạo trò chơi đoán chữ tiếng Anh cho channel này. Hãy bắt đầu đoán đi. {message_tu_hien_tai}")
             return

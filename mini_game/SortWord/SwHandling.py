@@ -7,21 +7,21 @@ import os
 import CustomFunctions
 import string
 
-class SwHandling():
-    def __init__ (self, message = discord.Message):
+class handling_function():
+    def __init__ (self, message: discord.Message, message_tracker):
         self.message = message
-        self.message_tracker = CustomFunctions.MessageTracker()
+        self.message_tracker = message_tracker
         self.english_words_dictionary = CustomFunctions.english_dict
         self.vietnamese_dict = CustomFunctions.vietnamese_dict
         
     async def check_if_message_inside_game(self, source: discord.Message):
-        if source == None: return False
+        if source == None: return None, None
         langs = ['en', 'vn']
         for lan in langs:
             check = SwMongoManager.find_sort_word_info_by_id(lang=lan, guild_id=source.guild.id, channel_id= source.channel.id)
             if check!=None:
                 return check, lan
-        return False
+        return None, None
     
     def get_random_current_word(self, lang: str):
         if lang == 'en' or lang == 'eng':
@@ -80,6 +80,8 @@ class SwHandling():
             await self.fail_attempt(err= f"Suýt thì được rồi, nhưng chỉ đúng từ đầu thôi à.", message=message, sw_info= sw_info,lan=lan,point=point)
         elif message.content.lower()[-1] == sw_info.current_word[-1] and message.content.lower() != sw_info.current_word:
             await self.fail_attempt(err= f"Suýt thì được rồi, nhưng chỉ đúng từ cuối thôi à.", message=message, sw_info= sw_info,lan=lan,point=point)
+        elif message.content.lower() != sw_info.current_word:
+            await self.fail_attempt(message=message, sw_info= sw_info,lan=lan,point=point)
         else:
             #Coi như pass hết
             await message.add_reaction('👍')
