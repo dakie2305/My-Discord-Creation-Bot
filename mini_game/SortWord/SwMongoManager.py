@@ -154,10 +154,17 @@ def update_player_special_item(channel_id: int, guild_id: int, language: str,use
         return result
     
 def randomize_word(input_string: str) -> str:
-    char_list = list(input_string)
-    random.shuffle(char_list)
-    unsorted_word = ''.join(char_list)
-    return unsorted_word
+    if len(input_string) > 3:
+        # Để từ đầu tiên và từ cuối yên, random ở giữa thôi
+        middle_chars = list(input_string[1:-1])
+        random.shuffle(middle_chars)
+        return input_string[0] + ''.join(middle_chars) + input_string[-1]
+    else:
+        char_list = list(input_string)
+        random.shuffle(char_list)
+        unsorted_word = ''.join(char_list)
+        return unsorted_word
+      
       
 
 def get_unsorted_string(input_string: str) -> str:

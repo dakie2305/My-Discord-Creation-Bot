@@ -4,7 +4,6 @@ import random
 import mini_game.SortWord.SwMongoManager as SwMongoManager
 import mini_game.SortWord.SwClass
 from mini_game.SortWord.SwClass import SortWordInfo
-import os
 import CustomFunctions
 import string
 
@@ -37,16 +36,16 @@ class handling_function():
         embed.add_field(name=f"", value="___________________", inline=False)
         count = 0
         if sw_info.player_profiles:
-            sw_info.player_profiles.sort(key=lambda x: x.points, reverse=True)
+            sw_info.player_profiles.sort(key=lambda x: x.point, reverse=True)
             for index, profile in enumerate(sw_info.player_profiles):
                 user = message.guild.get_member(profile.user_id)
                 if user != None and (profile.point!= 0 or len(profile.special_items)> 0):
-                    embed.add_field(name=f"", value=f"**Hạng {index+1}.** {user.mention}. Tổng điểm: **{profile.points}**. Số lượng kỹ năng đặc biệt: **{len(profile.special_items)}**.", inline=False)
+                    embed.add_field(name=f"", value=f"**Hạng {index+1}.** {user.mention}. Tổng điểm: **{profile.point}**. Số lượng kỹ năng đặc biệt: **{len(profile.special_items)}**.", inline=False)
                     count+=1
                 if count >= 25: break
         await message.channel.send(content=f"Chúc mừng các player top đầu! <@315835396305059840> sẽ trao role đặc biệt cho những Player thuộc top 3 nhé!", embed=embed)
         #Xoá đi tạo lại
-        SwMongoManager.delete_data_info(channel_id=message.channel.id, guild_id=message.guild.id, language=language)
+        SwMongoManager.delete_data_info(channel_id=message.channel.id, guild_id=message.guild.id, lang=language)
         
         #Tạo lại
         data = SortWordInfo(channel_id=message.channel.id, channel_name=message.channel.name, current_word="hi", unsorted_word="ih")
@@ -62,10 +61,10 @@ class handling_function():
         if sw_info.special_item:
             SwMongoManager.update_special_item_data_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_item= None)
         if self.message_tracker.add_message(user_id= message.author.id, channel_id= message.channel.id, content= "spam đoán từ"): #Đánh dấu những đối tượng thích spam
-            #Ban 5 vòng
-            SwMongoManager.create_and_update_player_bans(channel_id= message.channel.id, guild_id= message.guild.id, language= lan, user_id= message.author.id, user_name=message.author.name, ban_remaining=5)
-            await message.reply(f"{message.author.mention} đã spam quá nhiều và bị khoá mõm trong vòng **5** lượt chơi tiếp theo!")
-            print(f"Player {message.author.name} is banned 5 round from sort word game for spamming")
+            #Trừ 2 điểm
+            SwMongoManager.update_player_point_data_info(user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= -2, guild_id=message.guild.id, channel_id=message.channel.id,language=lan)
+            await message.reply(f"{message.author.mention} đã spam quá nhiều và bị trừ 2 điểm!")
+            print(f"Player {message.author.name} got two point reduction from sort word game for spamming")
             return
         await message.add_reaction('❌')
         if err != None:
@@ -91,10 +90,10 @@ class handling_function():
         elif sw_info.current_player_id == message.author.id:
             await message.reply(f"Bạn đã chơi rồi, vui lòng né qua để cho người khác chơi đi. {message_tu_hien_tai}")
             if self.message_tracker.add_message(user_id= message.author.id, channel_id= message.channel.id, content= "spam đoán từ"): #Đánh dấu những đối tượng thích spam
-                #Ban 5 vòng
-                SwMongoManager.create_and_update_player_bans(channel_id= message.channel.id, guild_id= message.guild.id, language= lan, user_id= message.author.id, user_name=message.author.name, ban_remaining=5)
-                await message.reply(f"{message.author.mention} đã spam quá nhiều và bị khoá mõm trong vòng **5** lượt chơi tiếp theo!")
-                print(f"Player {message.author.name} is banned 5 round from sort word game for spamming")
+                #Trừ 5 điểm
+                SwMongoManager.update_player_point_data_info(user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= -5, guild_id=message.guild.id, channel_id=message.channel.id,language=lan)
+                await message.reply(f"{message.author.mention} không biết đọc nên bị trừ 5 điểm!")
+                print(f"Player {message.author.name} got five point reduction from sort word game for spamming")
             return
         point = 1
         if sw_info.special_point != None and sw_info.special_point > 0:

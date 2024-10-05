@@ -1352,7 +1352,8 @@ async def remove_old_conversation():
                 count+=1
     print(f"Found {count} old conversation in collection 'user_conversation_info_{bot_name}' and deleted them.")
 
-async def sub_function_ai_response(message: discord.Message):
+async def sub_function_ai_response(message: discord.Message, speakFlag = True):
+    if speakFlag == False: return
     if message.channel.id == 1269029322950180977 or message.channel.id == 1259237810653626440 or message.channel.id == 1259242009290477618 or message.channel.id == 1287118424874684530: return #Không cho bot nói chuyện ở những channel sau
     bots_creation1_name = ["creation 1", "creation số 1", "creation no 1", "creation no. 1"]
     if message.reference is not None and message.reference.resolved is not None:
@@ -1583,14 +1584,15 @@ async def on_ready():
 async def on_message(message):
     if message.author == bot.user:
         return
+    speakFlag= True
     sort_word_game = SwHandling.handling_function(message= message, message_tracker=message_tracker)
     sw_info, lan = await sort_word_game.check_if_message_inside_game(source=message)
     if sw_info != None:
         #Xử lý nối từ
         asyncio.create_task(sort_word_game.handling_game(message=message))
-        return
+        speakFlag = False
     
-    await sub_function_ai_response(message=message)
+    await sub_function_ai_response(message=message, speakFlag=speakFlag)
     asyncio.create_task(word_matching(message=message))
     await bot.process_commands(message)
 bot_token = os.getenv("BOT_TOKENN")
