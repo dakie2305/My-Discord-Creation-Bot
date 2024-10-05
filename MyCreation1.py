@@ -1512,7 +1512,7 @@ async def word_matching(message: discord.Message):
                 await message.channel.send(f"Kinh nhờ, chơi hết từ khả dụng rồi. Cảm ơn mọi người đã chơi nhé. Đến lúc reset thông tin từ rồi. Mọi người bắt đầu lại nhé!")
                 await process_reset_word_matching(message=message, word_matching_channel=word_matching_channel, language=lan)
             message_tracker.clear_user_messages(user_id=message.author.id, channel_id=message.channel.id)
-        # #Xổ số nếu chưa có special point
+        #Xổ số nếu chưa có special point
         so_xo = random.randint(4, 10)
         #Nếu sổ xố rơi trúng số 5 thì coi như cộng point lên x2, x3, x4 ngẫu nhiên
         if so_xo == 10:

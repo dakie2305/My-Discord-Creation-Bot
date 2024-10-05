@@ -4,6 +4,7 @@ from pymongo import MongoClient
 from datetime import datetime, timedelta
 from mini_game.SortWord.SwClass import SortWordInfo, SwPlayerProfile, SwSpecialItem, SwPlayerBan, SwPlayerEffect
 import random
+import string
 
 # Connect to the MongoDB server
 client = MongoClient("mongodb://localhost:27017/")
@@ -43,16 +44,16 @@ def update_data_info(channel_id: int, guild_id: int, current_player_id: int, cur
     used_words.append(current_word)
     
     #Đảo lại current_word
-    char_list = list(current_word)
-    unsorted_word = ''.join(char_list)
-    while unsorted_word == current_word:
-        random.shuffle(char_list)
-        unsorted_word = ''.join(char_list)
+    unsorted_word = get_unsorted_string(input_string= current_word)
+        
+    #Cộng current round lên 1
+    current_round = existing_info.current_round+ 1
     result = collection.update_one({"channel_id": channel_id}, {"$set": {"current_player_id": current_player_id,
                                                                          "current_player_name": current_player_name,
                                                                          "current_word": current_word,
                                                                          "unsorted_word": unsorted_word,
                                                                          "special_case": special_case,
+                                                                         "current_round": current_round,
                                                                          "used_words": [word for word in used_words], #chỉ dùng used_words
                                                                          }})
     return result
@@ -98,7 +99,7 @@ def update_player_point_data_info(channel_id: int, guild_id: int, language: str,
             break
     if selected_player == None:
         #Tạo mới player và thêm vào
-        new_player = SwPlayerProfile(user_id=user_id, username=user_name, user_display_name=user_display_name, point=point)
+        new_player = SwPlayerProfile(user_id=user_id, user_name=user_name, user_display_name=user_display_name, point=point)
         list_player_profiles.append(new_player)
         result = collection.update_one({"channel_id": channel_id}, {"$set": {"player_profiles": [player.to_dict() for player in list_player_profiles],
                                                                          }})
@@ -111,7 +112,7 @@ def update_player_point_data_info(channel_id: int, guild_id: int, language: str,
         return result
 
 
-def update_player_special_item_word_matching_info(channel_id: int, guild_id: int, language: str,user_id: int,user_name: str, user_display_name: str, point:int, special_item: SwSpecialItem, remove_special_item = False):
+def update_player_special_item(channel_id: int, guild_id: int, language: str,user_id: int,user_name: str, user_display_name: str, point:int, special_item: SwSpecialItem, remove_special_item = False):
     """
     Cập nhật lại danh sách các Special Items của player cụ thể.
     """
@@ -129,7 +130,7 @@ def update_player_special_item_word_matching_info(channel_id: int, guild_id: int
         #Tạo mới player và thêm vào
         temp = []
         temp.append(special_item)
-        new_player = SwPlayerProfile(user_id=user_id, username=user_name, user_display_name=user_display_name, point=point, special_items=temp)
+        new_player = SwPlayerProfile(user_id=user_id, user_name=user_name, user_display_name=user_display_name, point=point, special_items=temp)
         list_player_profiles.append(new_player)
         result = collection.update_one({"channel_id": channel_id}, {"$set": {"player_profiles": [player.to_dict() for player in list_player_profiles],
                                                                          }})
@@ -152,6 +153,27 @@ def update_player_special_item_word_matching_info(channel_id: int, guild_id: int
                                                                                                                 }})
         return result
     
+def randomize_word(input_string: str) -> str:
+    char_list = list(input_string)
+    random.shuffle(char_list)
+    unsorted_word = ''.join(char_list)
+    return unsorted_word
+      
+
+def get_unsorted_string(input_string: str) -> str:
+    # Xoá dấu khỏi string
+    translator = str.maketrans('', '', string.punctuation)
+    cleaned_string = input_string.translate(translator)
+    
+    phrase = cleaned_string.split()
+    if len(phrase) == 1:
+      #Một từ
+      return randomize_word(input_string)
+    else:
+      #Cụm từ
+      randomized_words = [randomize_word(word) for word in phrase]
+      return ' '.join(randomized_words)
+
 #region Các functions về kỹ năng
 def update_current_player_id(channel_id: int, guild_id: int, language: str,user_id: int):
     collection = db_specific[f'{language}_sw_guild_{guild_id}']
@@ -186,7 +208,7 @@ def update_player_effects(channel_id: int, guild_id: int, language: str,user_id:
     list_player_effect = existing_info.player_effects
     if remove_special_effect == False:
         #Tạo mới danh sách Player Effect
-        data = SwPlayerEffect(user_id= user_id, username= user_name, effect_id= effect_id, effect_name= effect_name)
+        data = SwPlayerEffect(user_id= user_id, user_name= user_name, effect_id= effect_id, effect_name= effect_name)
         list_player_effect.append(data)
     else:
         #Xoá effect id của user id khỏi danh sách
@@ -230,7 +252,7 @@ def create_and_update_player_bans(channel_id: int, guild_id: int, language: str,
             break
     if selected_player == None:
         #Tạo mới player ban và thêm vào world matching
-        new_player = SwPlayerBan(user_id=user_id, username=user_name, ban_remaining=ban_remaining)
+        new_player = SwPlayerBan(user_id=user_id, user_name=user_name, ban_remaining=ban_remaining)
         list_player_ban.append(new_player)
     elif selected_player.ban_remaining <= 0:
         list_player_ban.remove(selected_player)
@@ -238,12 +260,11 @@ def create_and_update_player_bans(channel_id: int, guild_id: int, language: str,
                                                                          }})
     return result
     
-def reduce_player_bans_word_matching_info_after_round(channel_id: int, guild_id: int, language: str):
+def reduce_player_bans_after_round(channel_id: int, guild_id: int, language: str):
     """
     Trừ 1 điểm ban_remaining của tất cả dữ liệu trong danh sách Player Ban cụ thể sau mỗi lượt chơi thành công.
     """
-    db_specific = client['word_matching_database']
-    collection = db_specific[f'{language}_word_matching_guild_{guild_id}']
+    collection = db_specific[f'{language}_sw_guild_{guild_id}']
     existing_data = collection.find_one({"channel_id": channel_id})
     existing_info = SortWordInfo.from_dict(existing_data)
     list_player_ban = existing_info.player_bans
