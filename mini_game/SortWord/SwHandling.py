@@ -31,6 +31,18 @@ class handling_function():
         random_word = random.choice(list(dictionary.keys()))
         return random_word
     
+    def count_matching_start(self, correct_word: str, input_str: str):
+        # Tìm xem input_str có bao nhiêu chữ gần giống với correct_word
+        min_length = min(len(correct_word), len(input_str))
+        start_count = 0
+        for i in range(min_length):
+            if correct_word[i] == input_str[i]:
+                start_count += 1
+            else:
+                break
+        if start_count == len(correct_word): start_count = 0
+        return start_count
+    
     async def process_reset(self, message: discord.Message, sw_info: SortWordInfo, language: str):
         embed = discord.Embed(title=f"Xếp hạng các player theo điểm.", description=f"Game Sắp Xếp Từ", color=0x03F8FC)
         embed.add_field(name=f"", value="___________________", inline=False)
@@ -98,13 +110,11 @@ class handling_function():
         point = 1
         if sw_info.special_point != None and sw_info.special_point > 0:
             point = sw_info.special_point
-        #Kiểm tra xem, nếu trùng từ đầu, hoặc trùng từ cuối thì vẫn đánh là fail, nhưng vẫn hint rằng đúng
-        if message.content.lower()[0] == sw_info.current_word[0] and message.content.lower() != sw_info.current_word:
-            await self.fail_attempt(err= f"Suýt thì được rồi, nhưng chỉ đúng từ đầu thôi à.", message=message, sw_info= sw_info,lan=lan,point=point)
-        elif message.content.lower()[-1] == sw_info.current_word[-1] and message.content.lower() != sw_info.current_word:
-            await self.fail_attempt(err= f"Suýt thì được rồi, nhưng chỉ đúng từ cuối thôi à.", message=message, sw_info= sw_info,lan=lan,point=point)
+        count_matching_initial = self.count_matching_start(correct_word=sw_info.current_word, input_str= message.content.lower())
+        if count_matching_initial != 0:
+            await self.fail_attempt(err= f"Suýt thì được rồi, nhưng chỉ mới đúng được **{count_matching_initial}** từ đầu thôi à.", message=message, sw_info= sw_info,lan=lan,point=point)
         elif message.content.lower() != sw_info.current_word:
-            await self.fail_attempt(message=message, sw_info= sw_info,lan=lan,point=point)
+            await self.fail_attempt(message=message, sw_info= sw_info,lan=lan,point=point, err= "Đoán sai rồi!")
         else:
             #Coi như pass hết
             await message.add_reaction('👍')

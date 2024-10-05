@@ -116,7 +116,6 @@ class SwSpecialItem:
             point = data.get("point", None),
             level = data.get("level", None),
             required_target = data.get("required_target", None),
-            item_command = data.get("item_command", None),
         )
 
 

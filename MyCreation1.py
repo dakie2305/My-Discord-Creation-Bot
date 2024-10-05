@@ -279,7 +279,7 @@ async def remove_skill(ctx, item_id: str = None, user: Optional[discord.Member] 
         word_matching_channel= db.find_word_matching_info_by_id(channel_id= called_channel.id, guild_id= called_channel.guild.id, language= 'vn')
         if word_matching_channel:
             if item_id is None or user is None:
-                await ctx.send(f"Dùng sai câu lệnh. Vui lòng dùng câu lệnh đúng format sau.\n!give_skill skill_id @User")
+                await ctx.send(f"Dùng sai câu lệnh. Vui lòng dùng câu lệnh đúng format sau.\n!remove_skill skill_id @User")
                 return
             selected_player = None
             for player in word_matching_channel.player_profiles:
