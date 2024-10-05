@@ -1601,8 +1601,8 @@ english_words_dictionary = CustomFunctions.english_dict
 vietnamese_dict = CustomFunctions.vietnamese_dict
 message_tracker = CustomFunctions.MessageTracker()
 #Cog command
-init_extension = ["cogs.games.RockPaperScissor",
-                  "cogs.games.SortWord",
+init_extension = ["cogs.games.RockPaperScissorCog",
+                  "cogs.games.SortWordCog",
                   ]
 
 bot.run(bot_token)
