@@ -1258,9 +1258,16 @@ async def help_command(message: discord.Message):
 `!use_skill`: Lệnh dùng để hiển thị bảng kỹ năng đặc biệt của player trong channel nối từ và cách dùng kỹ năng đó.
 `/bxh_noi_tu`: Lệnh dùng để hiển thị bảng xếp hạng điểm của các player trong channel nối từ.
 
+**Lệnh trong trò chơi đoán từ (Sort Word):**
+`!start_sw_en:` bắt đầu một game đoán từ tiếng anh trong channel hiện tại. Dùng thêm một lần nữa để xoá trò chơi khỏi channel đó.
+`!reset_sw:`: reset channel game đoán từ hiện tại để bắt đầu lại từ đầu.
+`!sws_give_skill <id_skill> <@user>` : chỉ dành cho chủ Server. Lệnh dùng để đưa kỹ năng đặc biệt cho player trong channel đoán từ.
+`!sws`: Lệnh dùng để hiển thị bảng kỹ năng đặc biệt của player trong channel đoán từ và cách dùng kỹ năng đó.
+`/bxh_sw`: Lệnh dùng để hiển thị bảng xếp hạng điểm của các player trong channel game đoán từ.
+
 **Lệnh trong trò chơi Kéo - Búa - Bao:**
 `/keo_bua_bao [@user]`: Lệnh dùng để chơi kéo búa bao với người chơi khác. Nếu không chọn người chơi thì sẽ chơi với bot. 
-`/bxh_rps [@user] [legendary|humiliate|lose|draw]`: Lệnh dùng để xem xếp hạng Kéo - Búa - Bao. Có thể xem thứ hạng của player khác và xếp hạng theo nhiều mục khác nhau.
+`/bxh_rps [@user]`: Lệnh dùng để xem xếp hạng Kéo - Búa - Bao. Có thể xem thứ hạng của player khác và xếp hạng theo nhiều mục khác nhau.
 
 **Lệnh lặt vặt:**
 `/say`: Lệnh dùng để gửi tin nhắn, hình ảnh ần danh.

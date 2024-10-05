@@ -62,7 +62,7 @@ class handling_function():
         #Tạo lại
         data = SortWordInfo(channel_id=message.channel.id, channel_name=message.channel.name, current_word="hi", unsorted_word="ih")
         result = SwMongoManager.create_info(data=data, guild_id=message.guild.id, lang='en')
-        message_tu_hien_tai = f"\nTừ hiện tại: `'{data.unsorted_word}'`."
+        message_tu_hien_tai = f"\nTừ hiện tại: `'{data.unsorted_word}'`. Chữ này có **{len(data.current_word)}** chữ cái."
         await message.channel.send(f"Đã reset trò chơi trong channel này. {message_tu_hien_tai}")
 
             
@@ -80,7 +80,7 @@ class handling_function():
             return
         await message.add_reaction('❌')
         if err != None:
-            message_tu_hien_tai = f"\nTừ hiện tại: `'{sw_info.unsorted_word}'`."
+            message_tu_hien_tai = f"\nTừ hiện tại: `'{sw_info.unsorted_word}'`. Chữ này có **{len(sw_info.current_word)}** chữ cái"
             await message.reply(f"{err} {message_tu_hien_tai}")
 
     
@@ -95,7 +95,7 @@ class handling_function():
                 if player_ban.user_id == message.author.id and player_ban.ban_remaining>0:
                     selected_ban = player_ban
                     break
-        message_tu_hien_tai = f"\nTừ hiện tại: `'{sw_info.unsorted_word}'`."
+        message_tu_hien_tai = f"\nTừ hiện tại: `'{sw_info.unsorted_word}'`. Chữ này có **{len(sw_info.current_word)}** chữ cái."
         if selected_ban:
             await message.reply(f"Bạn đã bị khoá mõm trong vòng **{selected_ban.ban_remaining}** lượt chơi tới. Vui lòng chờ đi.")
             return
@@ -132,7 +132,7 @@ class handling_function():
                 return
             else:
                 #Thông báo
-                message_tu_hien_tai = f"\nTừ hiện tại: `'{sw_info.unsorted_word}'`."
+                message_tu_hien_tai = f"\nTừ hiện tại: `'{sw_info.unsorted_word}'`. Chữ này có **{len(sw_info.current_word)}** chữ cái"
                 #Kiểm tra xem có special_item không, nếu có thì cộng cho player
                 chuc_mung_item = ""
                 if sw_info.special_item:
