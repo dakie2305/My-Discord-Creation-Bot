@@ -99,14 +99,14 @@ class handling_function():
         if selected_ban:
             await message.reply(f"Bạn đã bị khoá mõm trong vòng **{selected_ban.ban_remaining}** lượt chơi tới. Vui lòng chờ đi.")
             return
-        elif sw_info.current_player_id == message.author.id:
-            await message.reply(f"Bạn đã chơi rồi, vui lòng né qua để cho người khác chơi đi. {message_tu_hien_tai}")
-            if self.message_tracker.add_message(user_id= message.author.id, channel_id= message.channel.id, content= "spam đoán từ"): #Đánh dấu những đối tượng thích spam
-                #Trừ 5 điểm
-                SwMongoManager.update_player_point_data_info(user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= -5, guild_id=message.guild.id, channel_id=message.channel.id,language=lan)
-                await message.reply(f"{message.author.mention} không biết đọc nên bị trừ 5 điểm!")
-                print(f"Player {message.author.name} got five point reduction from sort word game for spamming")
-            return
+        # elif sw_info.current_player_id == message.author.id:
+        #     await message.reply(f"Bạn đã chơi rồi, vui lòng né qua để cho người khác chơi đi. {message_tu_hien_tai}")
+        #     if self.message_tracker.add_message(user_id= message.author.id, channel_id= message.channel.id, content= "spam đoán từ"): #Đánh dấu những đối tượng thích spam
+        #         #Trừ 5 điểm
+        #         SwMongoManager.update_player_point_data_info(user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= -5, guild_id=message.guild.id, channel_id=message.channel.id,language=lan)
+        #         await message.reply(f"{message.author.mention} không biết đọc nên bị trừ 5 điểm!")
+        #         print(f"Player {message.author.name} got five point reduction from sort word game for spamming")
+        #     return
         point = 1
         if sw_info.special_point != None and sw_info.special_point > 0:
             point = sw_info.special_point
