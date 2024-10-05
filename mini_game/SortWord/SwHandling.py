@@ -112,7 +112,7 @@ class handling_function():
             point = sw_info.special_point
         count_matching_initial = self.count_matching_start(correct_word=sw_info.current_word, input_str= message.content.lower())
         if count_matching_initial != 0:
-            await self.fail_attempt(err= f"Suýt thì được rồi, nhưng chỉ mới đúng được **{count_matching_initial}** từ đầu thôi à.", message=message, sw_info= sw_info,lan=lan,point=point)
+            await self.fail_attempt(err= f"Suýt thì được rồi, nhưng chỉ mới đúng được **{count_matching_initial}** từ đầu: {sw_info.current_word[:count_matching_initial]}.", message=message, sw_info= sw_info,lan=lan,point=point)
         elif message.content.lower() != sw_info.current_word:
             await self.fail_attempt(message=message, sw_info= sw_info,lan=lan,point=point, err= "Đoán sai rồi!")
         else:
