@@ -1259,7 +1259,8 @@ async def help_command(message: discord.Message):
 `/bxh_noi_tu`: Lệnh dùng để hiển thị bảng xếp hạng điểm của các player trong channel nối từ.
 
 **Lệnh trong trò chơi đoán từ (Sort Word):**
-`!start_sw_en:` bắt đầu một game đoán từ tiếng anh trong channel hiện tại. Dùng thêm một lần nữa để xoá trò chơi khỏi channel đó.
+`!start_sw_en:` bắt đầu một game đoán từ tiếng Anh trong channel hiện tại. Dùng thêm một lần nữa để xoá trò chơi khỏi channel đó.
+`!start_sw_vn:` bắt đầu một game đoán từ tiếng Việt trong channel hiện tại. Dùng thêm một lần nữa để xoá trò chơi khỏi channel đó.
 `!reset_sw:`: reset channel game đoán từ hiện tại để bắt đầu lại từ đầu.
 `!sws_give_skill <id_skill> <@user>` : chỉ dành cho chủ Server. Lệnh dùng để đưa kỹ năng đặc biệt cho player trong channel đoán từ.
 `!sws`: Lệnh dùng để hiển thị bảng kỹ năng đặc biệt của player trong channel đoán từ và cách dùng kỹ năng đó.

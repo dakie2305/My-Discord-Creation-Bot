@@ -29,7 +29,10 @@ class handling_function():
         else:
             dictionary = self.vietnamese_dict
         random_word = random.choice(list(dictionary.keys()))
-        return random_word
+        # Xoá dấu khỏi string
+        translator = str.maketrans('', '', string.punctuation)
+        cleaned_string = random_word.translate(translator)
+        return cleaned_string
     
     def count_matching_start(self, correct_word: str, input_str: str):
         # Tìm xem input_str có bao nhiêu chữ gần giống với correct_word
@@ -89,6 +92,7 @@ class handling_function():
         sw_info, lan = await self.check_if_message_inside_game(source=message)
         if sw_info == None: return
         if message.content[0] in string.punctuation or message.content[0] == ":": return
+        if lan == 'en' and len(message.content.split()) > 1: return
         #Kiểm tra xem có nằm trong danh sách ban không
         selected_ban = None
         for player_ban in sw_info.player_bans:
