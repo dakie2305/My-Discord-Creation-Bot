@@ -89,7 +89,7 @@ class handling_function():
     
     async def handling_game(self, message: discord.Message):
         if message.author.bot: return
-        if message == None or message.content == None or message.content == "": return
+        if str.isspace(message.content): return
         sw_info, lan = await self.check_if_message_inside_game(source=message)
         if sw_info == None: return
         if message.content[0] in string.punctuation or message.content[0] == ":": return
