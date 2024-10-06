@@ -88,6 +88,7 @@ class handling_function():
 
     
     async def handling_game(self, message: discord.Message):
+        if message.author.bot: return
         if message == None or message.content == None or message.content == "": return
         sw_info, lan = await self.check_if_message_inside_game(source=message)
         if sw_info == None: return
@@ -129,7 +130,7 @@ class handling_function():
             SwMongoManager.update_player_point_data_info(user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= point, guild_id=message.guild.id, channel_id=message.channel.id,language=lan)
             #Mỗi game 1000 round là kết thúc
             sw_info, lan = await self.check_if_message_inside_game(source=message)
-            if sw_info.current_round>=1000:
+            if sw_info.current_round>=1200:
                 #Reset
                 await message.channel.send(f"Đã chơi được 1000 round rồi. Cảm ơn mọi người đã chơi nhé. Đến lúc reset lại rồi, nên mọi người bắt đầu lại nhé!")
                 await self.process_reset(message=message, sw_info=sw_info, language=lan)

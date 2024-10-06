@@ -1447,6 +1447,7 @@ async def sub_function_ai_response(message: discord.Message, speakFlag = True):
 
 async def word_matching(message: discord.Message):
     if str.isspace(message.content): return
+    if message.author.bot: return
     word_matching_channel = db.find_word_matching_info_by_id(channel_id= message.channel.id, guild_id= message.guild.id, language= 'en')
     lan = 'en'
     if word_matching_channel == None:
