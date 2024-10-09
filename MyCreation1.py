@@ -881,6 +881,13 @@ async def first_command(interaction: discord.Interaction, user : discord.Member,
     if time_format not in ['second', 'minute', 'hour', 'day', 'month']:
         await interaction.followup.send("Sai định dạng thời gian. Chỉ dùng những từ sau: second, minute, hour, day, month.", ephemeral=True)
         return
+    
+    #Nếu là Bot thì lật ngược vị thế:
+    temp_author = interaction.user 
+    if user.bot:
+        interaction.user = user
+        user = temp_author
+    
     # Calculate the end time
     end_time = datetime.now() + CustomFunctions.get_timedelta(duration, time_format)
     mordern_date_time_format = end_time.strftime(f"%d/%m/%Y %H:%M")
@@ -921,10 +928,17 @@ async def first_command(interaction: discord.Interaction, user : discord.Member,
         updated_data = {"jail_until": end_time.isoformat(), "reason" :user_info.reason }
         db.update_guild_extra_info(guild_id=user_info.user_id, update_data= updated_data)
     
-    await user.remove_roles(*original_roles)
-    await user.add_roles(jail_role)
+    try:
+        for ori_role in original_roles:
+            try:
+                await user.remove_roles(ori_role)
+            except Exception:
+                continue
+        await user.add_roles(jail_role)
+    except Exception as e:
+        print(e)
     # Create embed object
-    embed = discord.Embed(title="Đại Lao Thẳng Tiến", description=f"Kẻ tội đồ {user.mention} đã bị  {interaction.user.mention}bắt giữ và tống vào đại lao!", color=0x00FF00)  # Green color
+    embed = discord.Embed(title="Đại Lao Thẳng Tiến", description=f"Kẻ tội đồ {user.mention} đã bị {interaction.user.mention} bắt giữ và tống vào đại lao!", color=0x00FF00)  # Green color
     embed.add_field(name="Lý do bị tù đày:", value=reason, inline=False)  # Single-line field
     embed.add_field(name="Sẽ được ân xoá sau khoảng thời gian:", value=f"{duration} {time_format}", inline=False)
     embed.add_field(name="Thời gian ra đại lao:", value=f"{mordern_date_time_format}", inline=True)
@@ -1302,19 +1316,22 @@ async def check_jail_expiry():
                 if user:
                     #Xoá role Đáy Xã Hội
                     jail_role = discord.utils.get(user.guild.roles, name="Đáy Xã Hội")
-                    if jail_role:
-                        await user.remove_roles(jail_role)
+                    if jail_role == None: return
+                    await user.remove_roles(jail_role)
                     #Tìm xem user này đã có chưa, có thì xoá khỏi db jail_user
                     search_user = db.find_user_by_id(jail_user.user_id, jail_db)
-                    if search_user:
+                    if search_user == None: return
                         #Restore lại roles cũ của user
-                        for role in search_user.roles:
+                    for role in search_user.roles:
                             get_role_from_server = discord.utils.get(user.guild.roles, id = role["role_id"])
                             if get_role_from_server:
-                                await user.add_roles(get_role_from_server)
-                        #Xoá row khỏi database
-                        db.delete_user_by_id(jail_user.user_id, chosen_collection= jail_db)
-                        # Create embed object
+                                try:
+                                    await user.add_roles(get_role_from_server)
+                                except Exception as e:
+                                    print(e)
+                    #Xoá row khỏi database
+                    db.delete_user_by_id(jail_user.user_id, chosen_collection= jail_db)
+                    # Create embed object
                     mordern_date_time_format = datetime.now().strftime(f"%d/%m/%Y %H:%M")
                     embed = discord.Embed(title="Ân Xá Khỏi Đại Lao", description=f"Kẻ tội đồ {user.mention} đã hoàn thành hạn tù và ân xoá khỏi đại lao!", color=0x00FF00)  # Green color
                     embed.add_field(name="Lý do được ân xá:", value="Hoàn thành hạn tù", inline=False)  # Single-line field
@@ -1497,7 +1514,7 @@ async def word_matching(message: discord.Message):
             #Coi như pass hết
             await message.add_reaction('👍')
             #Nếu trong game việt nam, gặp những từ có đuôi như sau thì đánh special case để xử lý tiếp
-            special_words = ["ữ","ã", "ẵ", "ẫ", "õ", "ẽ", "ó", "ọ", "ờ","ớ", "ỡ", "ỗ", "ĩ", "ũ", "ỹ", "ỳ", "ỵ", "ử", "ự", "ộ","ẻ","è", "ể", "ễ", "ệ", "ẹ", "ạ", "ợ"]
+            special_words = ["ữ","ã", "ẵ", "ẫ", "õ", "ẽ", "ó", "ọ", "ờ","ớ", "ỡ", "ỗ", "ĩ", "ỉ","í", "ũ", "ỹ", "ỳ", "ỵ", "ử", "ự", "ộ","ẻ","è", "ể", "ễ", "ệ", "ẹ", "ạ", "ợ"]
             special_case = False
             if lan == 'vn' and message.content[-1].lower() in special_words:
                 special_case = True
