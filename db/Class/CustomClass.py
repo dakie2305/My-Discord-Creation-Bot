@@ -202,3 +202,4 @@ class PreDeleteAttachmentsInfo:
             channel_name=data["channel_name"],
             user_attachments=[SnipeMessageAttachments.from_dict(att) for att in data.get("user_attachments", [])]
         )
+

@@ -3,10 +3,11 @@ import os
 from typing import List
 from pymongo import MongoClient
 from datetime import datetime, timedelta
-from db.CustomClass import UserInfo, GuildExtraInfo, UserConversationInfo, ConversationInfo, SnipeChannelInfo, SnipeMessage, SnipeMessageAttachments, PreDeleteAttachmentsInfo
-from db.WordMatchingClass import WordMatchingInfo, PlayerProfile, SpecialItem, PlayerEffect, PlayerBan
+from db.Class.CustomClass import UserInfo, GuildExtraInfo, UserConversationInfo, ConversationInfo, SnipeChannelInfo, SnipeMessage, SnipeMessageAttachments, PreDeleteAttachmentsInfo
+from db.Class.WordMatchingClass import WordMatchingInfo, PlayerProfile, SpecialItem, PlayerEffect, PlayerBan
+from db.Class.UserCountClass import UserCount
 import discord
-import CustomFunctions as MyFunc
+import CustomFunctions
 
 #region User Info Database
 
@@ -599,6 +600,60 @@ def get_first_and_last_word_special_case_vn(input_string: str):
         last_word = words[-1]
         return [first_word, last_word]
 
+def find_user_count_by_id(guild_id: int, user_id: int):
+    db_specific = client['misc_database']
+    collection = db_specific[f'{guild_id}_user_count']
+    existing_data = collection.find_one({"guild_id": guild_id, "user_id": user_id})
+    if existing_data:
+        return UserCount.from_dict(existing_data)
+    return None
+
+def create_user_count(guild_id: int, data: UserCount):
+    """
+    Thêm mới lại thông tin count của user.
+    """
+    db_specific = client['misc_database']
+    collection = db_specific[f'{guild_id}_user_count']
+    existing_data = collection.find_one({"user_id": data.user_id})
+    if existing_data:
+        return f"Data user count for user {data.user_id} at {guild_id} already exists."
+    result = collection.insert_one(data.to_dict())
+    return result
+
+def update_or_insert_user_count(guild_id: int, user_id: int, user_name: str, user_display_name: str, truth_game_count: int = 0, dare_game_count: int = 0, therapy_count: int = 0):
+    """
+    Cập nhật hoặc tạo mới thông tin count của user.
+    """
+    db_specific = client['misc_database']
+    collection = db_specific[f'{guild_id}_user_count']
+    existing_data = collection.find_one({"user_id": user_id})
+    last_interaction = datetime.now()
+    if existing_data == None:
+        #Không có thì tạo mới
+        new_data = UserCount(user_id = user_id, user_display_name=user_display_name, user_name=user_name, last_interaction=last_interaction)
+        create_user_count(data=new_data, guild_id=guild_id)
+        existing_info = new_data
+    else:
+        existing_info = UserCount.from_dict(existing_data)
+    existing_info.dare_game_count += dare_game_count
+    if existing_info.dare_game_count > CustomFunctions.dare_count:
+        existing_info.dare_game_count = 0
+    existing_info.truth_game_count += truth_game_count
+    if existing_info.truth_game_count > CustomFunctions.truth_count:
+        existing_info.truth_game_count = 0
+    existing_info.therapy_count += therapy_count
+    if existing_info.therapy_count>5:
+        existing_info.therapy_count = 0
+    
+    result = collection.update_one({"user_id": user_id}, 
+                                   {"$set": 
+                                       {"dare_game_count": existing_info.dare_game_count,
+                                        "truth_game_count": existing_info.truth_game_count,
+                                        "therapy_count": existing_info.therapy_count,
+                                        "last_interaction": last_interaction,
+                                                                                }})
+    return result
+
 #endregion
 
 #endregion
@@ -613,14 +668,14 @@ db = client["user_database"]
 db_specific = client[set_database]
 
 def get_english_dict()->dict:
-    filepath = os.path.join(os.path.dirname(__file__), "english_dictionary.json")
+    filepath = os.path.join(os.path.dirname(__file__), "json", "english_dictionary.json")
     with open(filepath, 'r') as f:
         data = json.load(f)
         return data
     return None
 
 def get_vietnamese_dict()->dict:
-    filepath = os.path.join(os.path.dirname(__file__), "vietnamese_dictionary.json")
+    filepath = os.path.join(os.path.dirname(__file__),"json", "vietnamese_dictionary.json")
     with open(filepath, 'r', encoding= 'utf-8') as f:
         data = json.load(f)
         return data
@@ -628,4 +683,3 @@ def get_vietnamese_dict()->dict:
 
 english_words_dictionary = get_english_dict()
 vietnamese_words_dictionary = get_vietnamese_dict()
-

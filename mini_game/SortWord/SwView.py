@@ -1,12 +1,6 @@
 import discord
-from discord.ext import commands
-from discord import app_commands
-from typing import List, Optional
-import random
 from mini_game.SortWord.SwClass import SortWordInfo, SwPlayerBan, SwPlayerEffect, SwPlayerProfile, SwSpecialItem
 from mini_game.SortWord import SwMongoManager as SwMongoManager
-import os
-import CustomFunctions
 
 class SwView(discord.ui.View):
     def __init__(self, embed: discord.Embed, user: discord.Member, sw_info: SortWordInfo, lan: str):

@@ -2,7 +2,7 @@ import random
 import os
 from dotenv import load_dotenv
 import db.DbMongoManager as db
-import db.UserList as DefaultUserList
+import db.Class.UserList as DefaultUserList
 from datetime import datetime, timedelta, time as dt_time
 import discord
 import string
@@ -16,10 +16,10 @@ from gtts import gTTS
 import soundfile as sf
 
 
-def get_random_response(filename):
+def get_random_response(filename, exclude_line_index: int = None):
   """
   
-  Đọc file .txt và trả về dòng ngẫu nhiên.
+  Đọc file .txt và trả về dòng ngẫu nhiên, trừ dòng nhất định
 
   Args:
       filename (str): Path to the text file.
@@ -30,7 +30,10 @@ def get_random_response(filename):
   try:
     filepath = os.path.join(os.path.dirname(__file__),"Responses", filename)
     with open(filepath, 'r', encoding='utf-8') as f:
-        lines = f.readlines()
+        if exclude_line_index!= None:
+            lines = [line for idx, line in enumerate(lines) if idx != exclude_line_index]
+        else:
+            lines = f.readlines()
         if lines:  # Check if there are any lines in the file
             return random.choice(lines).strip()  # lấy dòng ngẫu nhiên và strip string
         else:
@@ -391,14 +394,14 @@ def check_if_dev_mode():
     return os.path.exists(filepath)
 
 def get_english_dict()->dict:
-    filepath = os.path.join(os.path.dirname(__file__),"db", "english_dictionary.json")
+    filepath = os.path.join(os.path.dirname(__file__),"db","json", "english_dictionary.json")
     with open(filepath, 'r') as f:
         data = json.load(f)
         return data
     return None
 
 def get_vietnamese_dict()->dict:
-    filepath = os.path.join(os.path.dirname(__file__),"db", "vietnamese_dictionary.json")
+    filepath = os.path.join(os.path.dirname(__file__),"db", "json", "vietnamese_dictionary.json")
     with open(filepath, 'r', encoding='utf-8') as f:
         data = json.load(f)
         return data
@@ -506,3 +509,15 @@ class MessageTracker:
             print(f"Error while clearing messages for user {user_id} in channel {channel_id}: {str(e)}")
             return False
 
+def count_lines_truth_dare(is_truth: bool = False):
+    file_path = os.path.join(os.path.dirname(__file__),"Responses", "OnDareChallenge.txt")
+    if is_truth:
+        file_path = os.path.join(os.path.dirname(__file__),"Responses", "OnTruthChallenge.txt")
+    with open(file_path, 'r', encoding='utf-8') as f:
+        line_count = 0
+        for line in f:
+            line_count += 1
+    return line_count
+
+truth_count = count_lines_truth_dare(True)
+dare_count = count_lines_truth_dare(False)

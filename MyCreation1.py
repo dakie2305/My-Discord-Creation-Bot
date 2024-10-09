@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
 import CustomFunctions
-import db.UserList as DefaultUserList
+import db.Class.UserList as DefaultUserList
 import google.generativeai as genai
 import time
 import DailyLogger
@@ -12,7 +12,7 @@ from discord.ext import commands, tasks
 from discord import app_commands
 import db.DbMongoManager as db
 from db.DbMongoManager import UserInfo, GuildExtraInfo
-import db.WordMatchingClass as WordMatchingClass
+import db.Class.WordMatchingClass as WordMatchingClass
 import random
 import string
 import CustomButton
@@ -1089,38 +1089,6 @@ async def report(interaction: discord.Interaction, user : discord.Member, reason
         commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} tried report user id {user.id} but got exception {str(e)}.")
 #endregion
 
-#region Truth Or Dare
-@bot.tree.command(name="truth_dare", description="Tạo mới trò chơi Truth Or Dare.")
-async def report(interaction: discord.Interaction):
-    await interaction.response.defer(ephemeral=True)
-    req_roles = ['Thần Dân', 'Supervisor', 'Server Master', 'Moderator', 'Ultimate Admins']
-    has_required_role = any(role.name in req_roles for role in interaction.user.roles)
-    if not has_required_role:
-        await interaction.followup.send("Không đủ thẩm quyền để thực hiện lệnh.")
-        return
-    channel = interaction.channel
-    #Random true false, true là Truth, false là Dare
-    ran = random.choice([True, False])
-    content = ""
-    question_type = "Sự Thật"
-    if ran == True:
-        #Truth
-        content = CustomFunctions.get_random_response("OnTruthChallenge.txt")
-        question_type = "Sự Thật"
-    else:
-        question_type = "Thách Thức"
-        content = CustomFunctions.get_random_response("OnDareChallenge.txt")
-    # Create embed object
-    embed = discord.Embed(title=f"", description=f"Lượt chơi của: {interaction.user.mention}", color=0x03F8FC)
-    embed.add_field(name=f"", value=f"*Loại trò chơi: {question_type}*", inline=False)
-    embed.add_field(name=f"", value="___________________", inline=False)
-    embed.add_field(name=f"{content}", value=f"", inline=False)
-    view = CustomButton.CustomTruthDareComboButtons()
-    await interaction.followup.send(f"Đã tạo thành công trò sự thật hoặc thách thức.", ephemeral=True)
-    await channel.send(embed=embed, view= view)
-    print(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} create Truth Or Dare in channel id {channel.id}.")
-    commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} create Truth Or Dare in channel id {channel.id}.")
-#endregion
 
 #region Snipe command
 @bot.tree.command(name="snipe", description="Hiện lại message mới nhất vừa bị xoá trong channel này.")
@@ -1629,6 +1597,7 @@ message_tracker = CustomFunctions.MessageTracker()
 #Cog command
 init_extension = ["cogs.games.RockPaperScissorCog",
                   "cogs.games.SortWordCog",
+                  "cogs.games.TruthDareCog",
                   ]
 
 bot.run(bot_token)
