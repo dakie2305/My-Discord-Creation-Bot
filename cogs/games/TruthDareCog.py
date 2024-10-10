@@ -29,15 +29,15 @@ class TruthDare(commands.Cog):
         question_type = "Sự Thật"
         if ran == True:
             #Truth
-            index_excluded = user_count.truth_game_count if user_count else None
-            content = CustomFunctions.get_random_response("OnTruthChallenge.txt", index_excluded)
+            index_excluded = user_count.truth_game_count if user_count and len(user_count.truth_game_count) > 0 else None
+            index, content = CustomFunctions.get_random_truth_dare(True, index_excluded)
             question_type = "Sự Thật"
-            DbMongoManager.update_or_insert_user_count(guild_id=interaction.guild_id, user_id= interaction.user.id, user_name= interaction.user.name, user_display_name=interaction.user.display_name, truth_game_count=1)
+            DbMongoManager.update_or_insert_user_count(guild_id=interaction.guild_id, user_id= interaction.user.id, user_name= interaction.user.name, user_display_name=interaction.user.display_name, truth_game_index=index)
         else:
-            index_excluded = user_count.dare_game_count if user_count else None
+            index_excluded = user_count.dare_game_count if user_count and len(user_count.dare_game_count) > 0 else None
             question_type = "Thách Thức"
-            content = CustomFunctions.get_random_response("OnDareChallenge.txt", index_excluded)
-            DbMongoManager.update_or_insert_user_count(guild_id=interaction.guild_id, user_id= interaction.user.id, user_name= interaction.user.name, user_display_name=interaction.user.display_name, dare_game_count=1)
+            index, content = CustomFunctions.get_random_truth_dare(False, index_excluded)
+            DbMongoManager.update_or_insert_user_count(guild_id=interaction.guild_id, user_id= interaction.user.id, user_name= interaction.user.name, user_display_name=interaction.user.display_name, dare_game_index=index)
         # Create embed object
         embed = discord.Embed(title=f"", description=f"*Loại trò chơi: {question_type}*", color=0x03F8FC)
         embed.add_field(name=f"", value="___________________", inline=False)

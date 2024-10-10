@@ -603,7 +603,7 @@ def get_first_and_last_word_special_case_vn(input_string: str):
 def find_user_count_by_id(guild_id: int, user_id: int):
     db_specific = client['misc_database']
     collection = db_specific[f'{guild_id}_user_count']
-    existing_data = collection.find_one({"guild_id": guild_id, "user_id": user_id})
+    existing_data = collection.find_one({"user_id": user_id})
     if existing_data:
         return UserCount.from_dict(existing_data)
     return None
@@ -620,7 +620,7 @@ def create_user_count(guild_id: int, data: UserCount):
     result = collection.insert_one(data.to_dict())
     return result
 
-def update_or_insert_user_count(guild_id: int, user_id: int, user_name: str, user_display_name: str, truth_game_count: int = 0, dare_game_count: int = 0, therapy_count: int = 0):
+def update_or_insert_user_count(guild_id: int, user_id: int, user_name: str, user_display_name: str, truth_game_index: int = None, dare_game_index: int = None, therapy_count: int = 0):
     """
     Cập nhật hoặc tạo mới thông tin count của user.
     """
@@ -635,20 +635,25 @@ def update_or_insert_user_count(guild_id: int, user_id: int, user_name: str, use
         existing_info = new_data
     else:
         existing_info = UserCount.from_dict(existing_data)
-    existing_info.dare_game_count += dare_game_count
-    if existing_info.dare_game_count > CustomFunctions.dare_count:
-        existing_info.dare_game_count = 0
-    existing_info.truth_game_count += truth_game_count
-    if existing_info.truth_game_count > CustomFunctions.truth_count:
-        existing_info.truth_game_count = 0
+    
+    if dare_game_index != None:
+        existing_info.dare_game_count.append(dare_game_index)
+        if len(existing_info.dare_game_count) >= CustomFunctions.dare_count:
+            existing_info.dare_game_count = []
+            
+    if truth_game_index != None:
+        existing_info.truth_game_count.append(truth_game_index)
+        if len(existing_info.truth_game_count) >= CustomFunctions.truth_count:
+            existing_info.truth_game_count = []
+            
     existing_info.therapy_count += therapy_count
     if existing_info.therapy_count>5:
         existing_info.therapy_count = 0
     
     result = collection.update_one({"user_id": user_id}, 
                                    {"$set": 
-                                       {"dare_game_count": existing_info.dare_game_count,
-                                        "truth_game_count": existing_info.truth_game_count,
+                                       {"dare_game_count": [index for index in existing_info.dare_game_count],
+                                        "truth_game_count": [index for index in existing_info.truth_game_count],
                                         "therapy_count": existing_info.therapy_count,
                                         "last_interaction": last_interaction,
                                                                                 }})

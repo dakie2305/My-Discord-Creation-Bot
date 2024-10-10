@@ -20,8 +20,8 @@ class TruthDareView(discord.ui.View):
     async def buttonTruth_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.defer(ephemeral=True)
         user_count = DbMongoManager.find_user_count_by_id(guild_id=interaction.guild_id, user_id= interaction.user.id)
-        index_excluded = user_count.dare_game_count if user_count else None
-        content = CustomFunctions.get_random_response("OnTruthChallenge.txt", index_excluded)
+        index_excluded = user_count.truth_game_count if user_count and len(user_count.truth_game_count) > 0 else None
+        index, content = CustomFunctions.get_random_truth_dare(True, index_excluded)
         channel = interaction.channel
         # Create embed object
         embed = discord.Embed(title=f"", description=f"*Loại trò chơi: Sự Thật*", color=0x03F8FC)
@@ -32,14 +32,14 @@ class TruthDareView(discord.ui.View):
         await interaction.followup.send(f"Bạn đã chọn Sự Thật.", ephemeral=True)
         message = await channel.send(embed=embed, view= view)
         view.message = message
-        DbMongoManager.update_or_insert_user_count(guild_id=interaction.guild_id, user_id= interaction.user.id, user_name= interaction.user.name, user_display_name=interaction.user.display_name, truth_game_count=1)
+        DbMongoManager.update_or_insert_user_count(guild_id=interaction.guild_id, user_id= interaction.user.id, user_name= interaction.user.name, user_display_name=interaction.user.display_name, truth_game_index=index)
         
     @discord.ui.button(label="Thách thức", style=discord.ButtonStyle.secondary, custom_id="dare_button")
     async def buttonDare_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.defer(ephemeral=True)
         user_count = DbMongoManager.find_user_count_by_id(guild_id=interaction.guild_id, user_id= interaction.user.id)
-        index_excluded = user_count.dare_game_count if user_count else None
-        content = CustomFunctions.get_random_response("OnDareChallenge.txt", index_excluded)
+        index_excluded = user_count.dare_game_count if user_count and len(user_count.dare_game_count) > 0 else None
+        index, content = CustomFunctions.get_random_truth_dare(False, index_excluded)
         channel = interaction.channel
         # Create embed object
         embed = discord.Embed(title=f"", description=f"*Loại trò chơi: Thử Thách*", color=0x03F8FC)
@@ -50,4 +50,4 @@ class TruthDareView(discord.ui.View):
         await interaction.followup.send(f"Bạn đã chọn Thách Thức.", ephemeral=True)
         message= await channel.send(embed=embed, view= view)
         view.message = message
-        DbMongoManager.update_or_insert_user_count(guild_id=interaction.guild_id, user_id= interaction.user.id, user_name= interaction.user.name, user_display_name=interaction.user.display_name, dare_game_count=1)
+        DbMongoManager.update_or_insert_user_count(guild_id=interaction.guild_id, user_id= interaction.user.id, user_name= interaction.user.name, user_display_name=interaction.user.display_name, dare_game_index=index)

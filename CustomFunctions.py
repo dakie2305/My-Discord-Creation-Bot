@@ -16,7 +16,7 @@ from gtts import gTTS
 import soundfile as sf
 
 
-def get_random_response(filename, exclude_line_index: int = None):
+def get_random_response(filename):
   """
   
   Đọc file .txt và trả về dòng ngẫu nhiên, trừ dòng nhất định
@@ -30,10 +30,7 @@ def get_random_response(filename, exclude_line_index: int = None):
   try:
     filepath = os.path.join(os.path.dirname(__file__),"Responses", filename)
     with open(filepath, 'r', encoding='utf-8') as f:
-        if exclude_line_index!= None:
-            lines = [line for idx, line in enumerate(lines) if idx != exclude_line_index]
-        else:
-            lines = f.readlines()
+        lines = f.readlines()
         if lines:  # Check if there are any lines in the file
             return random.choice(lines).strip()  # lấy dòng ngẫu nhiên và strip string
         else:
@@ -518,6 +515,25 @@ def count_lines_truth_dare(is_truth: bool = False):
         for line in f:
             line_count += 1
     return line_count
+
+def get_random_truth_dare(is_truth: bool = False, excluded_index: Optional[List['int']] = None):
+    file_path = os.path.join(os.path.dirname(__file__),"Responses", "OnDareChallenge.txt")
+    if is_truth:
+        file_path = os.path.join(os.path.dirname(__file__),"Responses", "OnTruthChallenge.txt")
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+            if excluded_index is not None:
+                available_lines = [(idx, line) for idx, line in enumerate(lines) if idx not in excluded_index]
+            else:
+                available_lines = [(idx, line) for idx, line in enumerate(lines)]
+            if available_lines:
+                selected_idx, selected_line = random.choice(available_lines)
+                return selected_idx, selected_line.strip()
+            return None, None
+    except FileNotFoundError:
+        return None, None
+
 
 truth_count = count_lines_truth_dare(True)
 dare_count = count_lines_truth_dare(False)
