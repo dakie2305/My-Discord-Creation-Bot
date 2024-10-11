@@ -456,7 +456,7 @@ async def steal_content_from_2tai(message: discord.Message):
         random_chance =random.randint(1, 3)
         # if random_chance == 3: return
         #Tuỳ channel sẽ lấy attachment khác nhau
-        true_heaven_server = bot.get_guild(1256987900277690470) 
+        true_heaven_server = bot.get_guild(1256987900277690470)
         user_attachments = []
         for att in message.attachments:
             if att.filename != "profile.png":
@@ -464,7 +464,7 @@ async def steal_content_from_2tai(message: discord.Message):
                 if att.size > 24 * 1024 * 1024: continue
                 file = await CustomFunctions.get_attachment_file_from_url(url=att.url, content_type=att.content_type)
                 if file != None: user_attachments.append(file)
-        if user_attachments != None and len(user_attachments):
+        if user_attachments != None and len(user_attachments)>0:
             try:
                 #Lấy theo channel 2ten, post vào channel true heavens
                 source_channel = message.channel
@@ -472,6 +472,7 @@ async def steal_content_from_2tai(message: discord.Message):
                 source_id, des_id = CustomFunctions.find_in_channels(input= source_channel.id)
                 if source_id != None and des_id != None:
                     des_channel = true_heaven_server.get_channel(des_id)
+                    print(des_channel)
                     if des_channel:
                         await des_channel.send(files=user_attachments)
                 #Không nằm trên danh sách trên thì khỏi cần
