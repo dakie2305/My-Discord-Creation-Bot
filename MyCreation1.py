@@ -1611,6 +1611,7 @@ init_extension = ["cogs.games.RockPaperScissorCog",
                   "cogs.games.SortWordCog",
                   "cogs.games.TruthDareCog",
                   "cogs.misc.TherapyAICog",
+                  "cogs.misc.TrueHeavenRuleCog",
                   ]
 
 bot.run(bot_token)

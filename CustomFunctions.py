@@ -519,7 +519,6 @@ def get_random_truth_dare(is_truth: bool = False, excluded_index: Optional[List[
 
 def find_in_channels(input: int):
     value = hai10_server_channels_steal.get(input)
-    print(f"input, value = {input, value}")
     if value:
         return input, value
     return None, None
