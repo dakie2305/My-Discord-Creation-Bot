@@ -1257,6 +1257,7 @@ async def help_command(message: discord.Message):
 `/say`: Lệnh dùng để gửi tin nhắn, hình ảnh ần danh.
 `/truth_dare`: Lệnh dùng để gửi tạo mới trò chơi Truth Or Dare.
 `/snipe`: Lệnh dùng để hiển thị lại 7 tin nhắn bị xoá gần nhất trong channel dùng lệnh.
+`/therapy`: Lệnh dùng để thiết lập channel dùng để tâm sự cùng bot.
     """
     await message.reply(content=text)
     
@@ -1381,10 +1382,10 @@ async def sub_function_ai_response(message: discord.Message, speakFlag = True):
                     os.remove(file_image_path)
                 else:
                     response = model.generate_content(f"{prompt}")
-                bot_response = (f"{response.text}")
+                bot_response = CustomFunctions.remove_creation_name_prefix(f"{response.text}")
                 #Kiểm tra xem bot reponse có nhiều emoji không, nếu nhiều quá thì remove emoji
                 if CustomFunctions.count_emojis_in_text(bot_response) > 4:
-                    bot_response = CustomFunctions.remove_emojis_and_creation_name_prefix(bot_response)
+                    bot_response = CustomFunctions.remove_emojis_from_text(bot_response)
                 #Nếu là bot thì đương nhiên không reply, chỉ nhắn bình thường thôi
                 if(message.author.id == CustomFunctions.user_cr_1["user_id"] or message.author.id == CustomFunctions.user_cr_2["user_id"] or message.author.id == CustomFunctions.user_cr_3["user_id"]):
                     await message.channel.send(f"{message.author.mention} {bot_response}")
@@ -1422,10 +1423,10 @@ async def sub_function_ai_response(message: discord.Message, speakFlag = True):
                     os.remove(file_image_path)
                 else:
                     response = model.generate_content(f"{prompt}")
-                bot_response = (f"{response.text}")
+                bot_response = CustomFunctions.remove_creation_name_prefix(f"{response.text}")
                 #Kiểm tra xem bot reponse có nhiều emoji không, nếu nhiều quá thì remove emoji
                 if CustomFunctions.count_emojis_in_text(bot_response) > 4:
-                    bot_response = CustomFunctions.remove_emojis_and_creation_name_prefix(bot_response)     
+                    bot_response = CustomFunctions.remove_emojis_from_text(bot_response)     
                 await message.channel.send(f"{message.author.mention} {bot_response}")
                 CustomFunctions.save_user_convo_data(message=message, bot_reponse= bot_response, bot_name= "Creation 1")
                 print(f"Username {message.author.name}, Display user name {message.author.display_name} directly call {bot.user}")

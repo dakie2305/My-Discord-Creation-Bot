@@ -3,7 +3,6 @@ from discord.ext import commands
 from discord.app_commands import Choice
 from typing import Optional
 from collections import deque
-import asyncio
 from datetime import datetime, timedelta
 from mini_game.RockPaperScissor import RpsClass, RpsMongoManager, RpsView
 

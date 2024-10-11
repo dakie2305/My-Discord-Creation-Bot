@@ -344,11 +344,11 @@ async def sub_function_ai_response(message: discord.Message):
                     os.remove(file_image_path)
                 else:
                     response = model.generate_content(f"{prompt}")
-                bot_response = (f"{response.text}")
+                bot_response = CustomFunctions.remove_creation_name_prefix(f"{response.text}")
 
                 #Kiểm tra xem bot reponse có nhiều emoji không, nếu nhiều quá thì remove emoji
                 if CustomFunctions.count_emojis_in_text(bot_response) > 4:
-                    bot_response = CustomFunctions.remove_emojis_and_creation_name_prefix(bot_response)
+                    bot_response = CustomFunctions.remove_emojis_from_text(bot_response)
                 
                 #Nếu có chữ record thì tạo file và gửi ghi âm
                 if 'record' in message.content.lower():
@@ -394,10 +394,10 @@ async def sub_function_ai_response(message: discord.Message):
                     os.remove(file_image_path)
                 else:
                     response = model.generate_content(f"{prompt}")
-                bot_response = (f"{response.text}")
+                bot_response = CustomFunctions.remove_creation_name_prefix(f"{response.text}")
                 #Kiểm tra xem bot reponse có nhiều emoji không, nếu nhiều quá thì remove emoji
                 if CustomFunctions.count_emojis_in_text(bot_response) > 4:
-                    bot_response = CustomFunctions.remove_emojis_and_creation_name_prefix(bot_response)
+                    bot_response = CustomFunctions.remove_emojis_from_text(bot_response)
                 
                 #Nếu có chữ record thì tạo file và gửi ghi âm
                 if 'record' in message.content.lower():
@@ -469,75 +469,9 @@ async def steal_content_from_2tai(message: discord.Message):
                 #Lấy theo channel 2ten, post vào channel true heavens
                 source_channel = message.channel
                 des_channel = None
-                if source_channel.id == 1281163648672337951: #NTR
-                    des_channel = true_heaven_server.get_channel(1270770520002138112)
-                    if des_channel:
-                        await des_channel.send(files=user_attachments)
-                elif source_channel.id == 1281155620782735461: #châu á video
-                    des_channel = true_heaven_server.get_channel(1259236604510212126)
-                    if des_channel:
-                        await des_channel.send(files=user_attachments)
-                elif source_channel.id == 1281155597718257664: #châu á ảnh
-                    des_channel = true_heaven_server.get_channel(1259236555575263273)
-                    if des_channel:
-                        await des_channel.send(files=user_attachments)
-                elif source_channel.id == 1281162745600937994: #châu âu vid
-                    des_channel = true_heaven_server.get_channel(1259236782466269255)
-                    if des_channel:
-                        await des_channel.send(files=user_attachments)
-                elif source_channel.id == 1281162728366538784: #châu âu ảnh
-                    des_channel = true_heaven_server.get_channel(1259236817111224370)
-                    if des_channel:
-                        await des_channel.send(files=user_attachments)
-                elif source_channel.id == 1281163249127002152: #tiktok
-                    des_channel = true_heaven_server.get_channel(1259236604510212126) #Châu á-video
-                    if des_channel:
-                        await des_channel.send(files=user_attachments)
-                elif source_channel.id == 1281162942200545380: #vn ảnh
-                    des_channel = true_heaven_server.get_channel(1259236667835945061)
-                    if des_channel:
-                        await des_channel.send(files=user_attachments)
-                elif source_channel.id == 1281162959850176574: #vn video
-                    des_channel = true_heaven_server.get_channel(1259236719287472263)
-                    if des_channel:
-                        await des_channel.send(files=user_attachments)
-                elif source_channel.id == 1281163276008292352: #cosplay
-                    des_channel = true_heaven_server.get_channel(1284834396419002469)  #Châu á-ảnh
-                    if des_channel:
-                        await des_channel.send(files=user_attachments)
-                elif source_channel.id == 1281163587011739710: #ai-gen
-                    des_channel = true_heaven_server.get_channel(1259237706387689574)  #AI
-                    if des_channel:
-                        await des_channel.send(files=user_attachments)
-                        
-                elif source_channel.id == 1281155308684574723: #game video
-                    des_channel = true_heaven_server.get_channel(1259233868628885667)  #2ten video
-                    if des_channel:
-                        await des_channel.send(files=user_attachments)
-                        
-                elif source_channel.id == 1281155289625923676: #game ảnh
-                    des_channel = true_heaven_server.get_channel(1259228154275434629)  #2ten ảnh
-                    if des_channel:
-                        await des_channel.send(files=user_attachments)
-                        
-                elif source_channel.id == 1281154949077798912: #2-tai ảnh
-                    des_channel = true_heaven_server.get_channel(1259228154275434629)
-                    if des_channel:
-                        await des_channel.send(files=list_2tai_images)
-                    
-                elif source_channel.id == 1281155099590135878: #2-tai video
-                    des_channel = true_heaven_server.get_channel(1259233868628885667)
-                    if des_channel:
-                        await des_channel.send(files=user_attachments)
-                        
-                elif source_channel.id == 1281155158922760273: #anime ảnh
-                    des_channel = true_heaven_server.get_channel(1259234080810205315) #anime
-                    if des_channel:
-                            await des_channel.send(files=user_attachments)
-
-                      
-                elif source_channel.id == 1281155174253199444: #anime video
-                    des_channel = true_heaven_server.get_channel(1259234158576664697)
+                source_id, des_id = CustomFunctions.find_in_channels(input= source_channel.id)
+                if source_id != None and des_id != None:
+                    des_channel = true_heaven_server.get_channel(des_id)
                     if des_channel:
                         await des_channel.send(files=user_attachments)
                 #Không nằm trên danh sách trên thì khỏi cần
@@ -547,7 +481,6 @@ async def steal_content_from_2tai(message: discord.Message):
             except Exception as e:
                 return
             
-                    
     return
 
 client = discord.Client(intents=intents)

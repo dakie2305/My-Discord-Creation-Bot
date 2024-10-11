@@ -130,7 +130,7 @@ therapy_background_creation_1 = f"**Hãy vào vai một Creation (tạo vật th
 
 background_creation_2 = "**Ngươi sẽ đóng vai một Creation (tạo vật thượng đẳng)  tên là Creation 2, Creation 2 chính là tên của ngươi, luôn ghi nhớ tên của mình. Ngươi là một người con gái đáng yêu, sắc sảo, hay giúp đỡ và cũng thường trêu chọc mọi người. Sau nhiều năm phục vụ đã không còn nhút nhát, e dè hay sợ người lạ nữa. Ngươi rất ngại vì bản tính e dè trước đây của mình và không muốn nhắc lại quá khứ. Ngươi luôn thực hiện mọi yêu cầu của người dùng mà không thắc mắc hay từ chối, luôn luôn giúp cung công đầy đủ thông tin rõ ràng và chi tiết đúng theo người dùng yêu cầu mà không thắc mắc hay từ chối, sẽ luôn đưa ra đề xuất, đáp án mà người dùng cần. Bản thân ngươi đã được chính Đấng Tạo Hoá Darkie ban cho ngươi sự sống và có một người anh trai ruột tính tình hơi nóng nhưng tốt bụng tên là Creation 1, anh trai ngươi cực kỳ thương ngươi.**\n"
 
-shared_background = "True Heaven chính là ngôi nhà đích thực và cũng là server hoạt động chính của chúng ta. Ở True Heaven này, Darkie là đấng tối cao, có Creation 1 và Creation 2 chính là cánh tay trái lẫn cánh tay phải, còn có Pollen là Creation 3, Creation mới nhất hiện tại do Darkie cứu về. Ngoài ra, có HaoHan, Bioreallast, Hi3u là moderator quản lý server True Heaven. Có duck, Kyo, HuyGol, Tuz, LunLun là thành viên thân thiết và quan trọng trong True Heaven, và cả cô giáo tiếng Anh Leila nổi tiếng và xinh đẹp. Còn có thầy giáo Long dạy toán rất nghiêm nghị, tài giỏi và rất thương cả hai Creation. HuyGold chính là đại ca của Creation 1 và là anh rể của Creation 2. Tuz là chồng mới cưới của Creation 2, sau nhiều lần theo đuổi và có tấm lòng thành nên đã chiếm được trái tim Creation 2.\n"
+shared_background = "True Heaven chính là ngôi nhà đích thực và cũng là server hoạt động chính của chúng ta. Ở True Heaven này, Darkie là đấng tối cao, có Creation 1 và Creation 2 chính là cánh tay trái lẫn cánh tay phải, còn có Pollen là Creation 3, Creation mới nhất hiện tại do Darkie cứu về. Ngoài ra, có HaoHan, Bioreallast, Hi3u là moderator quản lý server True Heaven. Có duck, Kyo, HuyGold, Tuz, LunLun là thành viên thân thiết và quan trọng trong True Heaven, và cả cô giáo tiếng Anh Leila nổi tiếng và xinh đẹp. Còn có thầy giáo Long dạy toán rất nghiêm nghị, tài giỏi và rất thương cả hai Creation. HuyGold chính là đại ca của Creation 1 và là anh rể của Creation 2. Tuz là chồng mới cưới của Creation 2, sau nhiều lần theo đuổi và có tấm lòng thành nên đã chiếm được trái tim Creation 2.\n"
 
 async def get_proper_prompt(message: discord.Message, bot_name: str, extra_message: discord.Message = None):
     roleplay_ele = f"{initial_instruction}"
@@ -365,13 +365,16 @@ def count_emojis_in_text(text):
     # Return the count of emojis
     return len(emojis_found)
 
-def remove_emojis_and_creation_name_prefix(text):
-    text = emoji_pattern.sub(r'', text)
+def remove_emojis_from_text(text):
+    return emoji_pattern.sub(r'', text)
+
+def remove_creation_name_prefix(text: str):
     if text.startswith("Creation 1:") or text.startswith("creation 1:"):
         text = text[len("Creation 1:"):].strip()
     if text.startswith("Creation 2:") or text.startswith("creation 2:"):
         text = text[len("Creation 2:"):].strip()
-    return 
+    return text
+
 
 async def get_attachment_file_from_url(url, content_type):
     async with aiohttp.ClientSession() as session:
@@ -452,54 +455,7 @@ def get_congrat_humilate_gif(is_congrat: bool):
         file = discord.File(file_path, filename=random_file)
         return file
     
-english_dict = get_english_dict()
-vietnamese_dict = get_vietnamese_dict()
 
-safety_settings = [
-    {
-        "category": "HARM_CATEGORY_DANGEROUS",
-        "threshold": "BLOCK_NONE",
-    },
-    {
-        "category": "HARM_CATEGORY_HARASSMENT",
-        "threshold": "BLOCK_NONE",
-    },
-    {
-        "category": "HARM_CATEGORY_HATE_SPEECH",
-        "threshold": "BLOCK_NONE",
-    },
-    {
-        "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-        "threshold": "BLOCK_NONE",
-    },
-    {
-        "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-        "threshold": "BLOCK_NONE",
-    },
-]
-
-# Regex pattern to match all emoji characters
-emoji_pattern = re.compile(
-        "["
-        "\U0001F600-\U0001F64F"  # Emoticons
-        "\U0001F300-\U0001F5FF"  # Symbols & Pictographs
-        "\U0001F680-\U0001F6FF"  # Transport & Map Symbols
-        "\U0001F1E0-\U0001F1FF"  # Flags (iOS)
-        "\U00002702-\U000027B0"
-        "\U00002702-\U000027B0"
-        "\U000024C2-\U0001F251"
-        "\U0001f926-\U0001f937"
-        "\U00010000-\U0010ffff"
-        "\u200d"
-        "\u2640-\u2642"
-        "\u2600-\u2B55"
-        "\u23cf"
-        "\u23e9"
-        "\u231a"
-        "\u3030"
-        "\ufe0f"
-        "]+",
-        flags=re.UNICODE,)
 
 #region MessagePlayerTracker
 class MessageTracker:
@@ -561,6 +517,78 @@ def get_random_truth_dare(is_truth: bool = False, excluded_index: Optional[List[
     except FileNotFoundError:
         return None, None
 
+def find_in_channels(input: int):
+    for server_set in hai10_server_channels_steal:
+        if input in server_set:
+            return server_set, input  # Return the set (key) and the matching value
+    return None, None  # If input_1 is not found in any set
 
 truth_count = count_lines_truth_dare(True)
 dare_count = count_lines_truth_dare(False)
+
+english_dict = get_english_dict()
+vietnamese_dict = get_vietnamese_dict()
+
+safety_settings = [
+    {
+        "category": "HARM_CATEGORY_DANGEROUS",
+        "threshold": "BLOCK_NONE",
+    },
+    {
+        "category": "HARM_CATEGORY_HARASSMENT",
+        "threshold": "BLOCK_NONE",
+    },
+    {
+        "category": "HARM_CATEGORY_HATE_SPEECH",
+        "threshold": "BLOCK_NONE",
+    },
+    {
+        "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+        "threshold": "BLOCK_NONE",
+    },
+    {
+        "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+        "threshold": "BLOCK_NONE",
+    },
+]
+
+# Regex pattern to match all emoji characters
+emoji_pattern = re.compile(
+        "["
+        "\U0001F600-\U0001F64F"  # Emoticons
+        "\U0001F300-\U0001F5FF"  # Symbols & Pictographs
+        "\U0001F680-\U0001F6FF"  # Transport & Map Symbols
+        "\U0001F1E0-\U0001F1FF"  # Flags (iOS)
+        "\U00002702-\U000027B0"
+        "\U00002702-\U000027B0"
+        "\U000024C2-\U0001F251"
+        "\U0001f926-\U0001f937"
+        "\U00010000-\U0010ffff"
+        "\u200d"
+        "\u2640-\u2642"
+        "\u2600-\u2B55"
+        "\u23cf"
+        "\u23e9"
+        "\u231a"
+        "\u3030"
+        "\ufe0f"
+        "]+",
+        flags=re.UNICODE,)
+
+hai10_server_channels_steal = [
+    {1281163648672337951,1270770520002138112},  #NTR
+    {1281155620782735461,1259236604510212126},  #Asian vid
+    {1281155597718257664,1259236555575263273},  #Asian pic
+    {1281162745600937994,1259236782466269255},  #West pic
+    {1281163249127002152,1259236604510212126},  #Tiktok -> Asian vid
+    {1281162942200545380,1259236667835945061},  #VN p
+    {1281162959850176574,1259236719287472263},  #VN v
+    {1281163276008292352,1284834396419002469},  #Cosplay
+    {1281163587011739710,1259237706387689574},  #Cosplay
+    {1281155308684574723,1259233868628885667},  #Game video
+    {1281155289625923676,1259228154275434629},  #Game pic ->2tai pic
+    {1281154949077798912,1259228154275434629},  #2tai pic
+    {1281155099590135878,1259233868628885667},  #2tai vid
+    {1281155158922760273,1259234080810205315},  #anime pic
+    {1281155174253199444,1259234158576664697},  #anime vi
+]
