@@ -21,6 +21,7 @@ from collections import deque
 import asyncio
 import PIL
 from mini_game.SortWord import SwHandling as SwHandling
+from Handling.Therapy import TherapyHandling
 
 load_dotenv()
 intents = discord.Intents.all()
@@ -1345,6 +1346,7 @@ async def remove_old_conversation():
                 count+=1
     print(f"Found {count} old conversation in collection 'user_conversation_info_{bot_name}' and deleted them.")
 
+#region Response AI
 async def sub_function_ai_response(message: discord.Message, speakFlag = True):
     if speakFlag == False: return
     if message.channel.id == 1269029322950180977 or message.channel.id == 1259237810653626440 or message.channel.id == 1259242009290477618 or message.channel.id == 1287118424874684530: return #Không cho bot nói chuyện ở những channel sau
@@ -1382,7 +1384,7 @@ async def sub_function_ai_response(message: discord.Message, speakFlag = True):
                 bot_response = (f"{response.text}")
                 #Kiểm tra xem bot reponse có nhiều emoji không, nếu nhiều quá thì remove emoji
                 if CustomFunctions.count_emojis_in_text(bot_response) > 4:
-                    bot_response = CustomFunctions.remove_emojis(bot_response)
+                    bot_response = CustomFunctions.remove_emojis_and_creation_name_prefix(bot_response)
                 #Nếu là bot thì đương nhiên không reply, chỉ nhắn bình thường thôi
                 if(message.author.id == CustomFunctions.user_cr_1["user_id"] or message.author.id == CustomFunctions.user_cr_2["user_id"] or message.author.id == CustomFunctions.user_cr_3["user_id"]):
                     await message.channel.send(f"{message.author.mention} {bot_response}")
@@ -1423,13 +1425,14 @@ async def sub_function_ai_response(message: discord.Message, speakFlag = True):
                 bot_response = (f"{response.text}")
                 #Kiểm tra xem bot reponse có nhiều emoji không, nếu nhiều quá thì remove emoji
                 if CustomFunctions.count_emojis_in_text(bot_response) > 4:
-                    bot_response = CustomFunctions.remove_emojis(bot_response)     
+                    bot_response = CustomFunctions.remove_emojis_and_creation_name_prefix(bot_response)     
                 await message.channel.send(f"{message.author.mention} {bot_response}")
                 CustomFunctions.save_user_convo_data(message=message, bot_reponse= bot_response, bot_name= "Creation 1")
                 print(f"Username {message.author.name}, Display user name {message.author.display_name} directly call {bot.user}")
                 interaction_logger.info(f"Username {message.author.name}, Display user name {message.author.display_name} directly call {bot.user}")
     return
 
+#region Word Matching
 async def word_matching(message: discord.Message):
     if str.isspace(message.content): return
     if message.author.bot: return
@@ -1579,18 +1582,26 @@ async def on_message(message):
     if message.author == bot.user:
         return
     speakFlag= True
-    sort_word_game = SwHandling.handling_function(message= message, message_tracker=message_tracker)
+    sort_word_game = SwHandling.SwHandlingFunction(message= message, message_tracker=message_tracker)
     sw_info, lan = await sort_word_game.check_if_message_inside_game(source=message)
     if sw_info != None:
         #Xử lý nối từ
         asyncio.create_task(sort_word_game.handling_game(message=message))
         speakFlag = False
     
+    guild_extra_info = db.find_guild_extra_info_by_id(guild_id=message.guild.id)
+    if guild_extra_info != None and message.channel.id == guild_extra_info.therapy_channel:
+        #Xử lý therapy
+        model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
+        asyncio.create_task(TherapyHandling(bot=bot, model=model).handling_therapy_ai(message=message))
+        speakFlag = False
+
     await sub_function_ai_response(message=message, speakFlag=speakFlag)
     asyncio.create_task(word_matching(message=message))
     await bot.process_commands(message)
+
+
 bot_token = os.getenv("BOT_TOKENN")
-# client.run(bot_token)
 english_words_dictionary = CustomFunctions.english_dict
 vietnamese_dict = CustomFunctions.vietnamese_dict
 message_tracker = CustomFunctions.MessageTracker()
@@ -1598,6 +1609,7 @@ message_tracker = CustomFunctions.MessageTracker()
 init_extension = ["cogs.games.RockPaperScissorCog",
                   "cogs.games.SortWordCog",
                   "cogs.games.TruthDareCog",
+                  "cogs.misc.TherapyAICog",
                   ]
 
 bot.run(bot_token)

@@ -7,7 +7,7 @@ from mini_game.SortWord.SwClass import SortWordInfo
 import CustomFunctions
 import string
 
-class handling_function():
+class SwHandlingFunction():
     def __init__ (self, message: discord.Message, message_tracker):
         self.message = message
         self.message_tracker = message_tracker

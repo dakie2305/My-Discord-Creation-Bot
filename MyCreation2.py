@@ -348,7 +348,7 @@ async def sub_function_ai_response(message: discord.Message):
 
                 #Kiểm tra xem bot reponse có nhiều emoji không, nếu nhiều quá thì remove emoji
                 if CustomFunctions.count_emojis_in_text(bot_response) > 4:
-                    bot_response = CustomFunctions.remove_emojis(bot_response)
+                    bot_response = CustomFunctions.remove_emojis_and_creation_name_prefix(bot_response)
                 
                 #Nếu có chữ record thì tạo file và gửi ghi âm
                 if 'record' in message.content.lower():
@@ -397,7 +397,7 @@ async def sub_function_ai_response(message: discord.Message):
                 bot_response = (f"{response.text}")
                 #Kiểm tra xem bot reponse có nhiều emoji không, nếu nhiều quá thì remove emoji
                 if CustomFunctions.count_emojis_in_text(bot_response) > 4:
-                    bot_response = CustomFunctions.remove_emojis(bot_response)
+                    bot_response = CustomFunctions.remove_emojis_and_creation_name_prefix(bot_response)
                 
                 #Nếu có chữ record thì tạo file và gửi ghi âm
                 if 'record' in message.content.lower():
