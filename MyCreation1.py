@@ -1590,7 +1590,7 @@ async def on_message(message):
         speakFlag = False
     
     guild_extra_info = db.find_guild_extra_info_by_id(guild_id=message.guild.id)
-    if guild_extra_info != None and message.channel.id == guild_extra_info.therapy_channel:
+    if guild_extra_info != None and message.channel.id == guild_extra_info.therapy_channel and message.author.bot == False:
         #Xử lý therapy
         model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
         asyncio.create_task(TherapyHandling(bot=bot, model=model).handling_therapy_ai(message=message))
