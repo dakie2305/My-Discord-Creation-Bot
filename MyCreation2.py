@@ -20,6 +20,7 @@ from collections import deque
 import requests
 import PIL
 import asyncio
+from Handling.Misc.AutoresponderCreation2 import AutoresponderHandling
 
 load_dotenv()
 intents = discord.Intents.all()
@@ -300,16 +301,9 @@ async def remove_old_conversation():
     print(f"Found {count} old conversation in collection 'user_conversation_info_{bot_name}' and deleted them.")
         
 
-async def sub_function_ai_response(message: discord.Message):
+async def sub_function_ai_response(message: discord.Message, speakFlag: bool = True):
+    if speakFlag == False: return
     bots_creation_name = ["creation 2", "creation số 2", "creation no 2", "creatiom 2", "creation no. 2"]
-    coin_flip = ["tung đồng xu", "sấp ngửa", "sấp hay ngửa", "ngửa hay sấp", "ngửa sấp", "tung xu"]
-    if CustomFunctions.contains_substring(message.content.lower(),coin_flip):
-                #Tung đồng xu
-                embed = discord.Embed(title=f"", description=f"{message.author.mention} đã tung đồng xu. Đồng xu đang quay <a:doge_coin:1287452452827697276> ...", color=0x03F8FC)
-                mess_coin = await message.reply(embed=embed)
-                if mess_coin:
-                    await edit_embed_coin_flip(message=mess_coin, user=message.author)
-                return
     guild_info = db.find_guild_extra_info_by_id(message.guild.id)
     if message.reference is not None and message.reference.resolved is not None:
         if message.reference.resolved.author == bot.user or CustomFunctions.contains_substring(message.content.lower(), bots_creation_name):
@@ -502,9 +496,13 @@ async def on_ready():
 async def on_message(message):
     if message.author == bot.user:
         return
-    await sub_function_ai_response(message=message)
     await check_message_attachments(message=message)
     await steal_content_from_2tai(message=message)
+    speakFlag = True
+    auto_rep = AutoresponderHandling(bot=bot)
+    if await auto_rep.handling_auto_responder(message=message):
+        speakFlag = False
+    await sub_function_ai_response(message=message, speakFlag=speakFlag)
     await bot.process_commands(message)
 
 @bot.event

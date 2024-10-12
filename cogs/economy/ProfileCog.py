@@ -64,7 +64,7 @@ class Profile(commands.Cog):
         show_darkium = f"<a:darkium:1294615481701105734>: **{self.shortened_currency(data.darkium)}**\n"
         if data.darkium == 0:
             show_darkium = ""
-        embed.add_field(name=f"", value=f"{show_darkium}<a:gold:1294615502588608563>: **{self.shortened_currency(data.gold)}**\n<a:silver:1294615512919048224>: **{self.shortened_currency(data.silver)}**\n<a:copper:1294615524918956052>: **{self.shortened_currency(data.copper)}**", inline=False)
+        embed.add_field(name=f"", value=f">>> {show_darkium}<a:gold:1294615502588608563>: **{self.shortened_currency(data.gold)}**\n<a:silver:1294615512919048224>: **{self.shortened_currency(data.silver)}**\n<a:copper:1294615524918956052>: **{self.shortened_currency(data.copper)}**", inline=False)
         #Quote
         embed.add_field(name=f"", value="\n", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬▬▬ι═════════════>", inline=False)
