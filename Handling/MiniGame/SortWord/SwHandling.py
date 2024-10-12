@@ -1,9 +1,9 @@
 import discord
 from typing import List, Optional
 import random
-import mini_game.SortWord.SwMongoManager as SwMongoManager
-import mini_game.SortWord.SwClass
-from mini_game.SortWord.SwClass import SortWordInfo
+import Handling.MiniGame.SortWord.SwMongoManager as SwMongoManager
+import Handling.MiniGame.SortWord.SwClass
+from Handling.MiniGame.SortWord.SwClass import SortWordInfo
 import CustomFunctions
 import string
 
@@ -167,16 +167,16 @@ class SwHandlingFunction():
                 item = None
                 if percent >= 0 and percent < 55:
                     #Cấp thấp
-                    item = random.choice(mini_game.SortWord.SwClass.list_special_items_cap_thap)
+                    item = random.choice(Handling.MiniGame.SortWord.SwClass.list_special_items_cap_thap)
                 elif percent >= 55 and percent < 80:
                     #Cấp cao
-                    item = random.choice(mini_game.SortWord.SwClass.list_special_items_cap_cao)
+                    item = random.choice(Handling.MiniGame.SortWord.SwClass.list_special_items_cap_cao)
                 elif percent >= 80 and percent < 95:
                     #Đẳng cấp
-                    item = random.choice(mini_game.SortWord.SwClass.list_special_items_dang_cap)
+                    item = random.choice(Handling.MiniGame.SortWord.SwClass.list_special_items_dang_cap)
                 else:
                     #tối thượng
-                    item = random.choice(mini_game.SortWord.SwClass.list_special_items_toi_thuong)
+                    item = random.choice(Handling.MiniGame.SortWord.SwClass.list_special_items_toi_thuong)
                 
                 instruction = f"!sws {item.item_id}"
                 if item.required_target:

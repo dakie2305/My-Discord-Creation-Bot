@@ -5,7 +5,7 @@ from typing import Optional
 import db.DbMongoManager as DbMongoManager
 import CustomFunctions
 import random
-from mini_game.TruthDare.TruthDareView import TruthDareView
+from Handling.MiniGame.TruthDare.TruthDareView import TruthDareView
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(TruthDare(bot=bot))

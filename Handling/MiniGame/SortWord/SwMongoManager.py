@@ -2,7 +2,7 @@ import os
 from typing import List
 from pymongo import MongoClient
 from datetime import datetime, timedelta
-from mini_game.SortWord.SwClass import SortWordInfo, SwPlayerProfile, SwSpecialItem, SwPlayerBan, SwPlayerEffect
+from Handling.MiniGame.SortWord.SwClass import SortWordInfo, SwPlayerProfile, SwSpecialItem, SwPlayerBan, SwPlayerEffect
 import random
 import string
 

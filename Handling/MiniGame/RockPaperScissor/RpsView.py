@@ -3,8 +3,7 @@ from discord.ext import commands
 from discord import app_commands
 from typing import List, Optional
 import random
-import mini_game.RockPaperScissor.RpsMongoManager as RpsMongoManager
-import os
+import Handling.MiniGame.RockPaperScissor.RpsMongoManager as RpsMongoManager
 import CustomFunctions
 
 class RPSView(discord.ui.View):

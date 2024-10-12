@@ -3,7 +3,7 @@ from discord.ext import commands
 from discord.app_commands import Choice
 from typing import Optional
 from datetime import datetime, timedelta
-from mini_game.SortWord import SwClass, SwHandling, SwMongoManager, SwView
+from Handling.MiniGame.SortWord import SwClass, SwHandling, SwMongoManager, SwView
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(SortWords(bot=bot))

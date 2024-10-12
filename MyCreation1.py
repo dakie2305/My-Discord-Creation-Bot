@@ -11,7 +11,7 @@ import DailyLogger
 from discord.ext import commands, tasks
 from discord import app_commands
 import db.DbMongoManager as db
-from db.DbMongoManager import UserInfo, GuildExtraInfo
+from db.DbMongoManager import UserInfo
 import db.Class.WordMatchingClass as WordMatchingClass
 import random
 import string
@@ -20,8 +20,8 @@ from typing import Optional
 from collections import deque
 import asyncio
 import PIL
-from mini_game.SortWord import SwHandling as SwHandling
-from Handling.Therapy import TherapyHandling
+from Handling.MiniGame.SortWord import SwHandling as SwHandling
+from Handling.Misc.Therapy import TherapyHandling
 
 load_dotenv()
 intents = discord.Intents.all()
@@ -1355,7 +1355,7 @@ async def sub_function_ai_response(message: discord.Message, speakFlag = True):
     if message.reference is not None and message.reference.resolved is not None:
         if message.reference.resolved.author == bot.user or CustomFunctions.contains_substring(message.content.lower(), bots_creation1_name):
             if message.guild.id != 1256987900277690470 and message.guild.id != 1194106864582004849: #Chỉ True Heaven, học viện 2ten mới không bị dính
-                if CustomFunctions.is_outside_working_time() == False:
+                if CustomFunctions.is_inside_working_time() == False:
                     await message.channel.send(f"Tính năng AI của Bot chỉ hoạt động đến 12h đêm, vui lòng đợi đến 8h sáng hôm sau.")
                     return
             flag, mess = await CustomFunctions.check_message_nsfw(message, bot)
@@ -1398,7 +1398,7 @@ async def sub_function_ai_response(message: discord.Message, speakFlag = True):
     elif CustomFunctions.contains_substring(message.content.lower(), bots_creation1_name):
         async with message.channel.typing():
             if message.guild.id != 1256987900277690470 and message.guild.id != 1194106864582004849: #Chỉ True Heaven, học viện 2ten mới không bị dính
-                if CustomFunctions.is_outside_working_time() == False:
+                if CustomFunctions.is_inside_working_time() == False:
                     await message.channel.send(f"Tính năng AI của Bot chỉ hoạt động đến 12h đêm, vui lòng đợi đến 8h sáng hôm sau.")
                     return
             flag, mess = await CustomFunctions.check_message_nsfw(message, bot)
