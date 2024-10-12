@@ -1,6 +1,6 @@
 import discord
-from mini_game.SortWord.SwClass import SortWordInfo, SwPlayerBan, SwPlayerEffect, SwPlayerProfile, SwSpecialItem
-from mini_game.SortWord import SwMongoManager as SwMongoManager
+from Handling.MiniGame.SortWord.SwClass import SortWordInfo, SwPlayerBan, SwPlayerEffect, SwPlayerProfile, SwSpecialItem
+from Handling.MiniGame.SortWord import SwMongoManager as SwMongoManager
 
 class SwView(discord.ui.View):
     def __init__(self, embed: discord.Embed, user: discord.Member, sw_info: SortWordInfo, lan: str):

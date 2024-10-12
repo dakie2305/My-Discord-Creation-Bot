@@ -2,7 +2,7 @@ import os
 from typing import List
 from pymongo import MongoClient
 from datetime import datetime, timedelta
-from mini_game.RockPaperScissor.RpsClass import RpsInfo, RpsPlayerProfile, RpsBanInfo, ConsecutiveRpsPlayerProfile, RpsGameSession
+from Handling.MiniGame.RockPaperScissor.RpsClass import RpsInfo, RpsPlayerProfile, RpsBanInfo, ConsecutiveRpsPlayerProfile, RpsGameSession
 
 # Connect to the MongoDB server
 client = MongoClient("mongodb://localhost:27017/")

@@ -1,5 +1,4 @@
-from mini_game.SortWord.SwClass import SortWordInfo, SwPlayerBan, SwPlayerEffect, SwPlayerProfile, SwSpecialItem
-from mini_game.SortWord import SwMongoManager as SwMongoManager
+from Handling.MiniGame.SortWord import SwMongoManager as SwMongoManager
 import CustomFunctions
 import db.DbMongoManager as DbMongoManager
 import discord
