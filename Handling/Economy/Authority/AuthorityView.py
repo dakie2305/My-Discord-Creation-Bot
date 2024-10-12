@@ -4,7 +4,7 @@ from Handling.Economy.Profile import ProfileMongoManager
 
 class AuthorityView(discord.ui.View):
     def __init__(self, user: discord.Member):
-        super().__init__(timeout=5)
+        super().__init__(timeout=60)
         self.message: discord.Message = None
         self.embed: discord.Embed = None
         self.target_user = user
@@ -14,6 +14,9 @@ class AuthorityView(discord.ui.View):
 
     @discord.ui.button(label="👍 Có", style=discord.ButtonStyle.success)
     async def yes_button(self, interaction: discord.Interaction, button: Button):
+        if interaction.user.id == self.target_user.id:
+            #Nếu tự bầu thì phải tự counter bản thân
+            self.no_votes.add(1)
         user = interaction.user
         # Nếu user đã bầu Không thì xoá khỏi list No votes
         if user.id in self.no_votes:
