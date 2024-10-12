@@ -434,7 +434,7 @@ def get_vietnamese_dict()->dict:
         return data
     return None
 
-def is_outside_working_time():
+def is_inside_working_time():
     # Không cho hoạt động khi nằm ngoài khung giờ này
     start_time = dt_time(0, 0)   # 00:00 AM
     end_time = dt_time(8, 0)     # 08:00 AM
