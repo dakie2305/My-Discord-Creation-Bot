@@ -552,6 +552,7 @@ async def on_message_delete(message):
 #Cog command
 init_extension = ["cogs.games.RockPaperScissorCog", 
                   "cogs.games.TruthDareCog",
+                  "cogs.economy.ProfileCog",
                   ]
 
 bot_token = os.getenv("BOT_TOKEN_NO2")
