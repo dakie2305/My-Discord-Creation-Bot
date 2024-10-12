@@ -4,7 +4,7 @@ from discord.app_commands import Choice
 from typing import Optional
 from collections import deque
 from datetime import datetime, timedelta
-from mini_game.RockPaperScissor import RpsClass, RpsMongoManager, RpsView
+from Handling.MiniGame.RockPaperScissor import RpsClass, RpsMongoManager, RpsView
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(RockPaperScissors(bot=bot))

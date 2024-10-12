@@ -11,7 +11,7 @@ import DailyLogger
 from discord.ext import commands, tasks
 from discord import app_commands
 import db.DbMongoManager as db
-from db.DbMongoManager import UserInfo, GuildExtraInfo
+from db.DbMongoManager import UserInfo
 import db.Class.WordMatchingClass as WordMatchingClass
 import random
 import string
@@ -20,8 +20,8 @@ from typing import Optional
 from collections import deque
 import asyncio
 import PIL
-from mini_game.SortWord import SwHandling as SwHandling
-from Handling.Therapy import TherapyHandling
+from Handling.MiniGame.SortWord import SwHandling as SwHandling
+from Handling.Misc.Therapy import TherapyHandling
 
 load_dotenv()
 intents = discord.Intents.all()
