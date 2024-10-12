@@ -13,7 +13,10 @@ class AutoresponderHandling():
     async def handling_auto_responder(self, message: discord.Message):
         coin_flip = ["tung đồng xu", "sấp ngửa", "sấp hay ngửa", "ngửa hay sấp", "ngửa sấp", "tung xu"]
         conversion_rate = ["quy đổi coin", "quy đổi gold", "quy đổi silver", "quy đổi copper", "darkium"]
+        quote = ["quote"]
         flag = False
+        if message.author.bot: return flag
+        
         if CustomFunctions.contains_substring(message.content.lower(), coin_flip):
             #Tung đồng xu
             embed = discord.Embed(title=f"", description=f"{message.author.mention} đã tung đồng xu. Đồng xu đang quay <a:doge_coin:1287452452827697276> ...", color=0x03F8FC)
@@ -31,6 +34,13 @@ class AutoresponderHandling():
             _mess = await message.channel.send(embed=embed, view=view)
             view.message= _mess
             flag = True
+        elif CustomFunctions.contains_substring(message.content.lower(), quote):
+            flag = True
+            embed = discord.Embed(title=f"", description=f"Để thay đổi **Quote** trong lệnh </profile:1294699979058970656> thì hãy dùng lệnh:\n!quote \"Ghi quote vào đây\"", color=0xc379e0)
+            view = SelfDestructView(timeout=20)
+            _mess = await message.channel.send(embed=embed, view=view)
+            view.message= _mess
+            
         return flag
     
     async def edit_embed_coin_flip(self, message: discord.Message, user: discord.Member):

@@ -407,41 +407,6 @@ async def sub_function_ai_response(message: discord.Message, speakFlag: bool = T
     return
 
 
-attachment_counter = {}
-async def check_message_attachments(message: discord.Message):
-    if message.guild and message.attachments != None and len(message.attachments) >= 1:
-        req_roles = ['Đẳng Cấp']
-        has_required_role = any(role.name in req_roles for role in message.author.roles)
-        #Lưu lại link từng attachment theo từng channel
-        user_attachments = []
-        for att in message.attachments:
-            if att.filename != "profile.png":
-                #Trong server True Heaven thì kiểm tra xem đăng đủ 10 attachments trong channel đặc biệt không
-                if message.guild.id == 1256987900277690470 and has_required_role == False and (message.channel.id == 1259237925590138880):
-                    if message.channel.id not in attachment_counter:
-                        attachment_counter[message.channel.id] = {}
-                    if message.author.id not in attachment_counter[message.channel.id]:
-                        attachment_counter[message.channel.id][message.author.id] = 0
-                    attachment_counter[message.channel.id][message.author.id] += 1
-                #cache lại link, tránh dead.
-                response = requests.get(url=att.url, stream=True)
-        
-        if message.guild.id == 1256987900277690470 and message.channel.id == 1259237925590138880 and has_required_role == False and attachment_counter[message.channel.id].get(message.author.id, 0) >= 20:
-        #thêm role Đẳng Cấp của server
-            dc_role = discord.utils.get(message.author.guild.roles, name="Đẳng Cấp")
-            if dc_role:
-                await message.author.add_roles(dc_role)
-                mordern_date_time_format = datetime.now().strftime(f"%d/%m/%Y %H:%M")
-                embed = discord.Embed(title="Thêm Role Đẳng Cấp", description=f"{message.author.mention}, username: {message.author.name} đã đăng đủ 20 attachment trong channel đặc biệt!", color=0x00FF00)  # Green color
-                embed.add_field(name="Thời gian thêm Role:", value=f"{mordern_date_time_format}", inline=True)
-                channel = bot.get_channel(1257016014156206115) #Log Command
-                await channel.send(embed= embed)
-                print(f"Username: {message.author.name} posted 20 attachments at special channel. {attachment_counter}")
-                del attachment_counter[message.channel.id][message.author.id]
-    return
-
-
-
 list_2tai_images = [] 
 list_anime_image = []
 
@@ -496,7 +461,6 @@ async def on_ready():
 async def on_message(message):
     if message.author == bot.user:
         return
-    await check_message_attachments(message=message)
     await steal_content_from_2tai(message=message)
     speakFlag = True
     auto_rep = AutoresponderHandling(bot=bot)
@@ -552,6 +516,7 @@ async def on_message_delete(message):
 init_extension = ["cogs.games.RockPaperScissorCog", 
                   "cogs.games.TruthDareCog",
                   "cogs.economy.ProfileCog",
+                  
                   ]
 
 bot_token = os.getenv("BOT_TOKEN_NO2")

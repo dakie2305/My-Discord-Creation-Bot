@@ -5,15 +5,23 @@ from typing import Optional
 from Handling.Economy.Profile.ProfileClass import Profile
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 from Handling.Misc.SelfDestructView import SelfDestructView
+from Handling.Economy.Authority.AuthorityView import AuthorityView
+from enum import Enum
 
 async def setup(bot: commands.Bot):
-    await bot.add_cog(Profile(bot=bot))
+    await bot.add_cog(ProfileEconomy(bot=bot))
     print("Profile Economy is ready!")
 
-class Profile(commands.Cog):
+class ProfileEconomy(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
+    class CurrencyEmoji(Enum):
+        DARKIUM = "<a:darkium:1294615481701105734>"
+        GOLD = "<a:gold:1294615502588608563>"
+        SILVER = "<a:silver:1294615512919048224>"
+        COPPER = "<a:copper:1294615524918956052>"
+    
     #region profile
     @discord.app_commands.command(name="profile", description="Hiển thị profile của user trong server")
     @discord.app_commands.describe(user="Chọn user để xem profile của người đó.")
@@ -49,9 +57,45 @@ class Profile(commands.Cog):
             message_sent = await message.reply(embed=embed, view=view)
             view.message = message_sent
     
+    #region Authority
+    @discord.app_commands.command(name="vote_authority", description="Bầu chọn bản thân làm Chính Quyền, sẽ tốn 500C mỗi lần làm")
+    async def vote(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=False)
+        #Kiểm tra xem đây có phải là chính quyền không
+        if ProfileMongoManager.is_authority(guild_id=interaction.guild_id, user_id=interaction.user.id) != None:
+            await interaction.followup.send(content=f"Bạn đã là Chính Quyền rồi. Vì gây lãng phí tài nguyên, bạn đã bị trừ 500 {self.CurrencyEmoji.COPPER.value}!")
+            ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, copper=-500, guild_name= interaction.guild.name)
+            return
+        #Kiểm tra xem server đã tồn tại ai là chính quyền chưa
+        existed_authority = ProfileMongoManager.is_authority_existed(guild_id=interaction.guild_id)
+        if existed_authority!= None:
+            #Get thử xem còn tồn tại trong server không
+            member = interaction.guild.get_member(existed_authority.user_id)
+            if member:
+                await interaction.followup.send(content=f"Server này đã có Chính Quyền là {member.mention} rồi! Vui lòng lật đổ hoặc ép Chính Quyền từ bỏ địa vị để tranh chức Chính Quyền!")
+                return
+        data = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
+        if data == None:
+            embed = discord.Embed(title=f"", description=f"Vui lòng dùng lệnh </profile:1294699979058970656> trước đã! Vì gây lãng phí tài nguyên, bạn đã bị trừ 500 {self.CurrencyEmoji.COPPER.value}!", color=0xc379e0)
+            await interaction.followup.send(embed=embed)
+            ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, copper=-500, guild_name= interaction.guild.name)
+            return
+        embed = discord.Embed(title=f"Chính Quyền Đương Cử",description=f"Bầu chọn cho **{interaction.user.mention}** làm Chính Quyền của server {interaction.guild.name}.",color=discord.Color.blue())
+        embed.set_thumbnail(url=interaction.user.avatar.url)
+        embed.add_field(name=f"", value="\n", inline=False)
+        embed.add_field(name=f"", value=f"> Rank: **{data.level}**", inline=False)
+        embed.add_field(name=f"", value=f"> Nhân phẩm: **{self.get_nhan_pham(data.dignity_point)}** ({data.dignity_point})", inline=False)
+        view = AuthorityView(user=interaction.user)
+        me = await interaction.followup.send(embed=embed, view=view)
+        view.message = me
+        view.embed = embed
+        return
+
+    
+    
+    
     async def procress_profile_embed(self, user: discord.Member):
         data = ProfileMongoManager.find_profile_by_id(guild_id=user.guild.id, user_id=user.id)
-        print(f"data: {data}")
         if data == None:
             data = ProfileMongoManager.create_profile(guild_id=user.guild.id, user_id=user.id, guild_name=user.guild.name, user_name=user.name, user_display_name=user.display_name)
         
@@ -61,10 +105,10 @@ class Profile(commands.Cog):
         embed.add_field(name=f"", value=f"Nhân phẩm: **{self.get_nhan_pham(data.dignity_point)}** ({data.dignity_point})", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬▬▬ι═════════════>", inline=False)
         embed.add_field(name=f"", value=f"**Tổng tài sản**:", inline=False)
-        show_darkium = f"<a:darkium:1294615481701105734>: **{self.shortened_currency(data.darkium)}**\n"
+        show_darkium = f"{self.CurrencyEmoji.DARKIUM.value}: **{self.shortened_currency(data.darkium)}**\n"
         if data.darkium == 0:
             show_darkium = ""
-        embed.add_field(name=f"", value=f">>> {show_darkium}<a:gold:1294615502588608563>: **{self.shortened_currency(data.gold)}**\n<a:silver:1294615512919048224>: **{self.shortened_currency(data.silver)}**\n<a:copper:1294615524918956052>: **{self.shortened_currency(data.copper)}**", inline=False)
+        embed.add_field(name=f"", value=f">>> {show_darkium}{self.CurrencyEmoji.GOLD.value}: **{self.shortened_currency(data.gold)}**\n{self.CurrencyEmoji.SILVER.value}: **{self.shortened_currency(data.silver)}**\n{self.CurrencyEmoji.COPPER.value}: **{self.shortened_currency(data.copper)}**", inline=False)
         #Quote
         embed.add_field(name=f"", value="\n", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬▬▬ι═════════════>", inline=False)
