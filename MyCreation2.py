@@ -72,7 +72,8 @@ async def guild_extra_info(ctx):
 async def help(ctx):
     message: discord.Message = ctx.message
     if message:
-        await help_command(message= message)    
+        text= help_command()
+        await message.reply(text)    
 
 
 #endregion
@@ -242,19 +243,24 @@ async def edit_embed_coin_flip(message: discord.Message, user: discord.Member):
 
 #region Help Command
 @bot.tree.command(name="help", description="Hiện tất cả commands và hướng dẫn sử dụng bot.")
-async def help_command(interaction: discord.Interaction):
-    message = interaction.message
-    await help_command(message=message)
-    return
+async def help_s_command(interaction: discord.Interaction):
+    await interaction.response.defer(ephemeral=False)
+    text = help_command()
+    await interaction.followup.send(content=f"{text}")
 
 
-async def help_command(message: discord.Message):
+def help_command():
     #Trả về text hướng dẫn command
     text = """**-= Lệnh của Creations 2 =-**
 
 **Lệnh trong trò chơi Kéo - Búa - Bao:**
 `/keo_bua_bao [@user]`: Lệnh dùng để chơi kéo búa bao với người chơi khác. Nếu không chọn người chơi thì sẽ chơi với bot. 
 `/bxh_rps [@user] [legendary|humiliate|lose|draw]`: Lệnh dùng để xem xếp hạng Kéo - Búa - Bao. Có thể xem thứ hạng của player khác và xếp hạng theo nhiều mục khác nhau.    
+
+**Lệnh liên quan đến hệ thống tiền tệ:**
+`/profile [@user]`: Lệnh dùng để hiển thị profile của user trong server.
+`/bank `: Lệnh dùng để Gọi ngân hàng chính quyền để đổi tiền trong server.
+`/vote_authority `: Bầu chọn bản thân làm Chính Quyền, sẽ tốn 500C mỗi lần làm.
 
 **Lệnh lặt vặt:**
 `/random_ai_talk`: Lệnh để bật / tắt khả năng lâu lâu bot nói chuyện xàm xí trong channel.
@@ -263,7 +269,7 @@ async def help_command(message: discord.Message):
 `/snipe`: Lệnh dùng để hiển thị lại 7 tin nhắn bị xoá gần nhất trong channel dùng lệnh.
 `/cf`: Lệnh dùng để tạo một tin nhắn tung đồng xu sấp/ngửa.
     """
-    await message.reply(content=text)
+    return text
     
 #endregion
 
@@ -516,7 +522,8 @@ async def on_message_delete(message):
 init_extension = ["cogs.games.RockPaperScissorCog", 
                   "cogs.games.TruthDareCog",
                   "cogs.economy.ProfileCog",
-                  
+                  "cogs.economy.BankCog",
+                  "cogs.economy.TransferCog",
                   ]
 
 bot_token = os.getenv("BOT_TOKEN_NO2")

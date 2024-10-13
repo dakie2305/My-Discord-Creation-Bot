@@ -2,7 +2,7 @@ from typing import List, Optional
 from datetime import datetime
 
 class Profile:
-    def __init__(self, user_id: int, user_name: str, user_display_name: str, guild_name: str, copper: int = 500, silver: int = 0, gold: int = 0, darkium: int = 0, is_authority: bool = False, last_attendance: datetime= None, last_work: datetime = None, level: int = 1, dignity_point: int = 50, quest_finished: int = 0, quote: str = None):
+    def __init__(self, user_id: int, user_name: str, user_display_name: str, guild_name: str, copper: int = 500, silver: int = 0, gold: int = 0, darkium: int = 0, is_authority: bool = False, last_attendance: datetime= None, last_work: datetime = None, level: int = 1, dignity_point: int = 50, quest_finished: int = 0, quote: str = None, level_progressing: int = 0):
         self.id = "profile"
         self.user_id = user_id
         self.user_name = user_name
@@ -19,6 +19,7 @@ class Profile:
         self.dignity_point = dignity_point
         self.quest_finished = quest_finished
         self.quote = quote
+        self.level_progressing = level_progressing
     
     def to_dict(self):
         return {
@@ -38,6 +39,7 @@ class Profile:
             "dignity_point": self.dignity_point,
             "quest_finished": self.quest_finished,
             "quote": self.quote,
+            "level_progressing": self.level_progressing,
         }
 
     @staticmethod
@@ -57,6 +59,7 @@ class Profile:
                 level=data.get("level", 1),
                 dignity_point=data.get("dignity_point", 50),
                 quest_finished=data.get("quest_finished", 0),
+                level_progressing=data.get("level_progressing", 0),
                 quote=data.get("quote", None),
             )
         
