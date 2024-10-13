@@ -2,7 +2,7 @@ from typing import List, Optional
 from datetime import datetime
 
 class ConversionRate:
-    def __init__(self, rate:int = 1, last_reset: datetime = None):
+    def __init__(self, rate:float = 1.0, last_reset: datetime = None):
         self.id = "conversion_rate"
         self.rate = rate
         self.last_reset = last_reset
@@ -16,6 +16,6 @@ class ConversionRate:
     @staticmethod
     def from_dict(data:dict):
         return ConversionRate(
-            rate= data.get("rate", None),
+            rate= data.get("rate", 1.0),
             last_reset= data.get("last_reset", None),
         )

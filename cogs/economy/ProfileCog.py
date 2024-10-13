@@ -22,6 +22,10 @@ class ProfileEconomy(commands.Cog):
         SILVER = "<a:silver:1294615512919048224>"
         COPPER = "<a:copper:1294615524918956052>"
     
+    class CurrencySlashCommand(Enum):
+        PROFILE = "</profile:1294699979058970656>"
+        VOTE_AUTHORITY = "</vote_authority:1294754901988999240>"
+    
     #region profile
     @discord.app_commands.command(name="profile", description="Hiển thị profile của user trong server")
     @discord.app_commands.describe(user="Chọn user để xem profile của người đó.")
@@ -51,7 +55,7 @@ class ProfileEconomy(commands.Cog):
         if message:
             if quote == None:
                 quote = "None"
-            embed = discord.Embed(title=f"", description=f"Đã cập nhật quote thành công. Vui lòng dùng lệnh </profile:1294699979058970656> để xem profile.", color=0xddede7)
+            embed = discord.Embed(title=f"", description=f"Đã cập nhật quote thành công. Vui lòng dùng lệnh {self.CurrencySlashCommand.PROFILE.value} để xem profile.", color=0xddede7)
             ProfileMongoManager.update_profile_quote(guild_name=message.guild.name,guild_id=message.guild.id, user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, quote=quote)
             view = SelfDestructView(timeout=30)
             message_sent = await message.reply(embed=embed, view=view)
@@ -76,7 +80,7 @@ class ProfileEconomy(commands.Cog):
                 return
         data = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
         if data == None:
-            embed = discord.Embed(title=f"", description=f"Vui lòng dùng lệnh </profile:1294699979058970656> trước đã! Vì gây lãng phí tài nguyên, bạn đã bị trừ 500 {self.CurrencyEmoji.COPPER.value}!", color=0xc379e0)
+            embed = discord.Embed(title=f"", description=f"Vui lòng dùng lệnh {self.CurrencySlashCommand.PROFILE.value} trước đã! Vì gây lãng phí tài nguyên, bạn đã bị trừ 500 {self.CurrencyEmoji.COPPER.value}!", color=0xc379e0)
             await interaction.followup.send(embed=embed)
             ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, copper=-500, guild_name= interaction.guild.name)
             return
@@ -101,9 +105,10 @@ class ProfileEconomy(commands.Cog):
         
         embed = discord.Embed(title=f"", description=f"Rank: **{data.level}**", color=0xddede7)
         embed.set_thumbnail(url=user.avatar.url)
-        embed.add_field(name=f"", value="\n", inline=False)
+        if data.is_authority:
+            embed.add_field(name=f"", value="**Chính Quyền Tối Cao**", inline=False)
         embed.add_field(name=f"", value=f"Nhân phẩm: **{self.get_nhan_pham(data.dignity_point)}** ({data.dignity_point})", inline=False)
-        embed.add_field(name=f"", value="▬▬▬▬▬▬ι═════════════>", inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬▬ι═══════════>", inline=False)
         embed.add_field(name=f"", value=f"**Tổng tài sản**:", inline=False)
         show_darkium = f"{self.CurrencyEmoji.DARKIUM.value}: **{self.shortened_currency(data.darkium)}**\n"
         if data.darkium == 0:
@@ -111,7 +116,7 @@ class ProfileEconomy(commands.Cog):
         embed.add_field(name=f"", value=f">>> {show_darkium}{self.CurrencyEmoji.GOLD.value}: **{self.shortened_currency(data.gold)}**\n{self.CurrencyEmoji.SILVER.value}: **{self.shortened_currency(data.silver)}**\n{self.CurrencyEmoji.COPPER.value}: **{self.shortened_currency(data.copper)}**", inline=False)
         #Quote
         embed.add_field(name=f"", value="\n", inline=False)
-        embed.add_field(name=f"", value="▬▬▬▬▬▬ι═════════════>", inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬▬ι═══════════>", inline=False)
         embed.add_field(name=f"", value=f"**Quote**: \"{data.quote}\"", inline=False)
         embed.set_footer(text=f"Profile của {user.name}.", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/8fd7278827dbc92713e315ee03e0b502.webp?size=32")
         return embed

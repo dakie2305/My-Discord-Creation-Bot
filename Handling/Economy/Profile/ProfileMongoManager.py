@@ -44,6 +44,17 @@ def update_profile_money(guild_id: int, guild_name: str, user_id: int, user_name
                                                                                     }})
     return result
 
+
+def update_profile_money_fast(guild_id:int, data: Profile):
+    collection = db_specific[f'profile_{guild_id}']
+    
+    result = collection.update_one({"id": "profile", "user_id": data.user_id}, {"$set": {"copper": data.copper,
+                                                                                    "gold": data.gold,
+                                                                                    "silver": data.silver,
+                                                                                    "darkium": data.darkium,
+                                                                                    }})
+    return result
+
 def update_profile_quote(guild_id: int, guild_name: str, user_id: int, user_name: str, user_display_name: str, quote: str):
     collection = db_specific[f'profile_{guild_id}']
     existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
@@ -87,3 +98,9 @@ def set_authority(guild_id: int, guild_name: str, user_id: int, user_name: str, 
     result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"is_authority": True,
                                                                                     }})
     return result
+
+def remove_authority_from_server(guild_id: int):
+    collection = db_specific[f'profile_{guild_id}']
+    query = {}
+    update = {"$set": {"is_authority": False}}
+    res = collection.update_many(query, update)

@@ -516,7 +516,7 @@ async def on_message_delete(message):
 init_extension = ["cogs.games.RockPaperScissorCog", 
                   "cogs.games.TruthDareCog",
                   "cogs.economy.ProfileCog",
-                  
+                  "cogs.economy.BankCog",
                   ]
 
 bot_token = os.getenv("BOT_TOKEN_NO2")

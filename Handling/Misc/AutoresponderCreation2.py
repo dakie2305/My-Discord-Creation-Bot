@@ -12,7 +12,7 @@ class AutoresponderHandling():
 
     async def handling_auto_responder(self, message: discord.Message):
         coin_flip = ["tung đồng xu", "sấp ngửa", "sấp hay ngửa", "ngửa hay sấp", "ngửa sấp", "tung xu"]
-        conversion_rate = ["quy đổi coin", "quy đổi gold", "quy đổi silver", "quy đổi copper", "darkium"]
+        conversion_rate = ["quy đổi coin", "quy đổi gold", "quy đổi silver", "quy đổi copper", "quy đổi darkium"]
         quote = ["quote"]
         flag = False
         if message.author.bot: return flag
@@ -30,14 +30,14 @@ class AutoresponderHandling():
             embed.add_field(name="", value=f">>> 1 <a:darkium:1294615481701105734> = **10.000** <a:gold:1294615502588608563>\n1 <a:gold:1294615502588608563> = **5.000** <a:silver:1294615512919048224>\n1 <a:silver:1294615512919048224> = **5.000** <a:copper:1294615524918956052>\n", inline=False)
             embed.add_field(name="", value="-------------------------------------", inline=False)
             embed.add_field(name="", value="Đương nhiên là chưa tính tỷ lệ quy đổi ngẫu nhiên tuỳ theo ngày nha. Hãy dùng lệnh </profile:1294699979058970656> để xem profile", inline=False)
-            view = SelfDestructView(timeout=20)
+            view = SelfDestructView(timeout=120)
             _mess = await message.channel.send(embed=embed, view=view)
             view.message= _mess
             flag = True
         elif CustomFunctions.contains_substring(message.content.lower(), quote):
             flag = True
             embed = discord.Embed(title=f"", description=f"Để thay đổi **Quote** trong lệnh </profile:1294699979058970656> thì hãy dùng lệnh:\n!quote \"Ghi quote vào đây\"", color=0xc379e0)
-            view = SelfDestructView(timeout=20)
+            view = SelfDestructView(timeout=60)
             _mess = await message.channel.send(embed=embed, view=view)
             view.message= _mess
             
