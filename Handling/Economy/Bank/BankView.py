@@ -117,7 +117,19 @@ class TextInputModal(discord.ui.Modal):
             self.add_or_remove_money(guild_int=interaction.guild_id, profile= profile_user, type=self.selected_currency, is_add=True, amount= new_money_value)
         from_emoji = self.get_emoji_from_type(input=suffix)
         to_emoji = self.get_emoji_from_type(input=self.selected_currency)
-        await interaction.followup.send(f"**{profile_user.user_display_name}** đã đổi từ **{self.shortened_currency(amount)}** {from_emoji} -> **{self.shortened_currency(new_money_value)}** {to_emoji}.")
+        
+        tax = 200
+        #Cộng tiền 200 Copper cho chính quyền nếu user_profile không phải là chính quyền
+        tax_text = ""
+        if profile_user.is_authority == False:
+            tax_text = f"Đương nhiên là bị trừ {tax} {CurrencyEmoji.COPPER.value} để đóng thuế cho Chính Quyền!"
+            authority_profile = ProfileMongoManager.is_authority_existed(guild_id=interaction.guild_id)
+            if authority_profile:
+                authority_profile.copper += tax
+                ProfileMongoManager.update_profile_money_fast(guild_id=interaction.guild_id, data=authority_profile)
+            ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name= interaction.guild.name, user_id= interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, copper= -tax)
+        
+        await interaction.followup.send(f"**{profile_user.user_display_name}** đã đổi từ **{self.shortened_currency(amount)}** {from_emoji} -> **{self.shortened_currency(new_money_value)}** {to_emoji}. {tax_text}")
         
     def add_or_remove_money(self, guild_int: int, profile: Profile, type: str, amount: int, is_add: bool = True):
         if type == "D":

@@ -5,6 +5,18 @@ import CustomFunctions
 import asyncio
 import random
 from Handling.Misc.SelfDestructView import SelfDestructView
+from enum import Enum
+
+class CurrencyEmoji(Enum):
+        DARKIUM = "<a:darkium:1294615481701105734>"
+        GOLD = "<a:gold:1294615502588608563>"
+        SILVER = "<a:silver:1294615512919048224>"
+        COPPER = "<a:copper:1294615524918956052>"
+    
+class CurrencySlashCommand(Enum):
+        PROFILE = "</profile:1294699979058970656>"
+        VOTE_AUTHORITY = "</vote_authority:1294754901988999240>"
+        BANK = "</bank:1295012466417205368>"
 
 class AutoresponderHandling():
     def __init__(self, bot: commands.Bot):
@@ -14,6 +26,7 @@ class AutoresponderHandling():
         coin_flip = ["tung đồng xu", "sấp ngửa", "sấp hay ngửa", "ngửa hay sấp", "ngửa sấp", "tung xu"]
         conversion_rate = ["quy đổi coin", "quy đổi gold", "quy đổi silver", "quy đổi copper", "quy đổi darkium"]
         quote = ["quote"]
+        bank_help = ["bank help", "bank sao", "bank?"]
         flag = False
         if message.author.bot: return flag
         
@@ -38,6 +51,19 @@ class AutoresponderHandling():
             flag = True
             embed = discord.Embed(title=f"", description=f"Để thay đổi **Quote** trong lệnh </profile:1294699979058970656> thì hãy dùng lệnh:\n!quote \"Ghi quote vào đây\"", color=0xc379e0)
             view = SelfDestructView(timeout=60)
+            _mess = await message.channel.send(embed=embed, view=view)
+            view.message= _mess
+        
+        elif CustomFunctions.contains_substring(message.content.lower(), bank_help):
+            flag = True
+            embed = discord.Embed(title=f"", description=f"Hướng dẫn lệnh {CurrencySlashCommand.BANK.value}", color=0xc379e0)
+            embed.add_field(name="", value="-------------------------------------", inline=False)
+            embed.add_field(name="", value="- Đầu tiên, nếu muốn đổi sang tiền gì, ta chọn vào ô xổ xuống, chọn loại tiền ta đang cần.", inline=False)
+            embed.add_field(name="", value="- Nhìn vào tỉ lệ quy đổi, làm chút toán để biết ta sẽ cần đổi bao nhiêu.", inline=False)
+            embed.add_field(name="", value=f"- Ví dụ, muốn đổi **1** {CurrencyEmoji.SILVER.value} sang {CurrencyEmoji.COPPER.value}, thì ta sẽ chọn ô xổ xuống là Quy Đổi Sang Copper, rồi trong ô nhập t ghi là 1S là sẽ đổi từ **1** {CurrencyEmoji.SILVER.value} sang số {CurrencyEmoji.COPPER.value} như trên tỷ lệ quy đổi", inline=False)
+            embed.add_field(name="", value="-------------------------------------", inline=False)
+            embed.set_footer(text=f"Tỉ lệ quy đổi sẽ thay đổi theo mỗi ngày hoặc do Chính Quyền ép thay đổi nha!", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/8fd7278827dbc92713e315ee03e0b502.webp?size=32")
+            view = SelfDestructView(timeout=180)
             _mess = await message.channel.send(embed=embed, view=view)
             view.message= _mess
             
