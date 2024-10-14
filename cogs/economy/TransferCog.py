@@ -6,19 +6,9 @@ from Handling.Economy.Profile.ProfileClass import Profile
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 from Handling.Misc.SelfDestructView import SelfDestructView
 from Handling.Economy.Authority.AuthorityView import AuthorityView
-from enum import Enum
+from CustomEnum.SlashEnum import SlashCommand
+from CustomEnum.EmojiEnum import CurrencyEmoji
 
-class CurrencyEmoji(Enum):
-        DARKIUM = "<a:darkium:1294615481701105734>"
-        GOLD = "<a:gold:1294615502588608563>"
-        SILVER = "<a:silver:1294615512919048224>"
-        COPPER = "<a:copper:1294615524918956052>"
-    
-class CurrencySlashCommand(Enum):
-        PROFILE = "</profile:1294699979058970656>"
-        VOTE_AUTHORITY = "</vote_authority:1294754901988999240>"
-        BANK = "</bank:1295012466417205368>"
-        TRANSFER = "</transfer:1295074790872318057>"
         
 async def setup(bot: commands.Bot):
     await bot.add_cog(TransferMoneyEconomy(bot=bot))
@@ -33,7 +23,7 @@ class TransferMoneyEconomy(commands.Cog):
         message: discord.Message = ctx.message
         if message:
             view = SelfDestructView(timeout=30)
-            embed = discord.Embed(title=f"", description=f"Không hỗ trợ lệnh prefix. Vui lòng dùng lệnh {CurrencySlashCommand.TRANSFER.value} đi.", color=0xc379e0)
+            embed = discord.Embed(title=f"", description=f"Không hỗ trợ lệnh prefix. Vui lòng dùng lệnh {SlashCommand.TRANSFER.value} đi.", color=0xc379e0)
             mess = await message.reply(embed=embed, view=view)
             view.message = mess
     
@@ -57,7 +47,7 @@ class TransferMoneyEconomy(commands.Cog):
         #Kiểm tra xem người dùng lệnh đã tồn tại chưa
         user_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
         if user_profile == None:
-            embed = discord.Embed(title=f"", description=f"Vui lòng dùng lệnh {CurrencySlashCommand.PROFILE.value} trước đã!", color=0xc379e0)
+            embed = discord.Embed(title=f"", description=f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", color=0xc379e0)
             interaction.followup.send(embed=embed)
             return
         #Kiểm tra xem người dùng lệnh có đủ tiền không

@@ -22,7 +22,7 @@ def create_update_conversion_rate(guild_id: int, rate: float):
     existing_data = find_conversion_rate_by_id(guild_id=guild_id)
     if existing_data == None:
         existing_data = ConversionRate(rate=rate, last_reset=datetime.now())
-        result = collection.insert_one({"id": "conversion_rate"}, {"$set": existing_data.to_dict()})
+        result = collection.insert_one(existing_data.to_dict())
     else:
         existing_data.rate = rate
         existing_data.last_reset = datetime.now()

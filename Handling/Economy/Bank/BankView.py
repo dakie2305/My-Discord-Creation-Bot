@@ -36,8 +36,13 @@ class BankView(discord.ui.View):
         self.currency: str = None
 
     async def on_timeout(self):
-        #Xoá message
-        await self.message.delete()
+        #Disable
+        for item in self.children:
+            if isinstance(item, discord.ui.Button):
+                item.disabled = True
+            if isinstance(item, discord.ui.Select):
+                item.disabled = True
+        await self.message.edit(view=self)
 
     @discord.ui.select(placeholder='Chọn đơn vị tiền cần quy đổi',min_values=1, max_values=1, options= SELECT_OPTIONS)
     async def select_callback(self, interaction: discord.Interaction, select: discord.ui.Select):

@@ -7,6 +7,8 @@ import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 from Handling.Misc.SelfDestructView import SelfDestructView
 from Handling.Economy.Authority.AuthorityView import AuthorityView
 from enum import Enum
+from CustomEnum.SlashEnum import SlashCommand
+from CustomEnum.EmojiEnum import CurrencyEmoji
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(ProfileEconomy(bot=bot))
@@ -16,16 +18,6 @@ class ProfileEconomy(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    class CurrencyEmoji(Enum):
-        DARKIUM = "<a:darkium:1294615481701105734>"
-        GOLD = "<a:gold:1294615502588608563>"
-        SILVER = "<a:silver:1294615512919048224>"
-        COPPER = "<a:copper:1294615524918956052>"
-    
-    class CurrencySlashCommand(Enum):
-        PROFILE = "</profile:1294699979058970656>"
-        VOTE_AUTHORITY = "</vote_authority:1294754901988999240>"
-    
     #region profile
     @discord.app_commands.command(name="profile", description="Hiển thị profile của user trong server")
     @discord.app_commands.describe(user="Chọn user để xem profile của người đó.")
@@ -55,7 +47,7 @@ class ProfileEconomy(commands.Cog):
         if message:
             if quote == None:
                 quote = "None"
-            embed = discord.Embed(title=f"", description=f"Đã cập nhật quote thành công. Vui lòng dùng lệnh {self.CurrencySlashCommand.PROFILE.value} để xem profile.", color=0xddede7)
+            embed = discord.Embed(title=f"", description=f"Đã cập nhật quote thành công. Vui lòng dùng lệnh {SlashCommand.PROFILE.value} để xem profile.", color=0xddede7)
             ProfileMongoManager.update_profile_quote(guild_name=message.guild.name,guild_id=message.guild.id, user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, quote=quote)
             view = SelfDestructView(timeout=30)
             message_sent = await message.reply(embed=embed, view=view)
@@ -67,7 +59,7 @@ class ProfileEconomy(commands.Cog):
         await interaction.response.defer(ephemeral=False)
         #Kiểm tra xem đây có phải là chính quyền không
         if ProfileMongoManager.is_authority(guild_id=interaction.guild_id, user_id=interaction.user.id) != None:
-            await interaction.followup.send(content=f"Bạn đã là Chính Quyền rồi. Vì gây lãng phí tài nguyên, bạn đã bị trừ 500 {self.CurrencyEmoji.COPPER.value}!")
+            await interaction.followup.send(content=f"Bạn đã là Chính Quyền rồi. Vì gây lãng phí tài nguyên, bạn đã bị trừ 500 {CurrencyEmoji.COPPER.value}!")
             ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, copper=-500, guild_name= interaction.guild.name)
             return
         #Kiểm tra xem server đã tồn tại ai là chính quyền chưa
@@ -80,7 +72,7 @@ class ProfileEconomy(commands.Cog):
                 return
         data = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
         if data == None:
-            embed = discord.Embed(title=f"", description=f"Vui lòng dùng lệnh {self.CurrencySlashCommand.PROFILE.value} trước đã! Vì gây lãng phí tài nguyên, bạn đã bị trừ 500 {self.CurrencyEmoji.COPPER.value}!", color=0xc379e0)
+            embed = discord.Embed(title=f"", description=f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã! Vì gây lãng phí tài nguyên, bạn đã bị trừ 500 {CurrencyEmoji.COPPER.value}!", color=0xc379e0)
             await interaction.followup.send(embed=embed)
             ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, copper=-500, guild_name= interaction.guild.name)
             return
@@ -110,10 +102,10 @@ class ProfileEconomy(commands.Cog):
         embed.add_field(name=f"", value=f"Nhân phẩm: **{self.get_nhan_pham(data.dignity_point)}** ({data.dignity_point})", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬▬ι═══════════>", inline=False)
         embed.add_field(name=f"", value=f"**Tổng tài sản**:", inline=False)
-        show_darkium = f"{self.CurrencyEmoji.DARKIUM.value}: **{self.shortened_currency(data.darkium)}**\n"
+        show_darkium = f"{CurrencyEmoji.DARKIUM.value}: **{self.shortened_currency(data.darkium)}**\n"
         if data.darkium == 0:
             show_darkium = ""
-        embed.add_field(name=f"", value=f">>> {show_darkium}{self.CurrencyEmoji.GOLD.value}: **{self.shortened_currency(data.gold)}**\n{self.CurrencyEmoji.SILVER.value}: **{self.shortened_currency(data.silver)}**\n{self.CurrencyEmoji.COPPER.value}: **{self.shortened_currency(data.copper)}**", inline=False)
+        embed.add_field(name=f"", value=f">>> {show_darkium}{CurrencyEmoji.GOLD.value}: **{self.shortened_currency(data.gold)}**\n{CurrencyEmoji.SILVER.value}: **{self.shortened_currency(data.silver)}**\n{CurrencyEmoji.COPPER.value}: **{self.shortened_currency(data.copper)}**", inline=False)
         #Quote
         embed.add_field(name=f"", value="\n", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬▬ι═══════════>", inline=False)
@@ -123,19 +115,19 @@ class ProfileEconomy(commands.Cog):
     
     def shortened_currency(self, number: int):
         if number >= 1000000000:
-            suffix =number % 1000000000 // 1000000
+            suffix = int(number % 1000000000 // 1000000)
             if suffix == 0: suffix = "" 
-            return f"{number // 1000000000}B{suffix}"
+            return f"{int(number // 1000000000)}B{suffix}"
         elif number >= 1000000:
-            suffix = number % 1000000 // 1000
+            suffix = int(number % 1000000 // 1000)
             if suffix == 0: suffix = "" 
-            return f"{number // 1000000}M{suffix}"
+            return f"{int(number // 1000000)}M{suffix}"
         elif number >= 10000:
-            suffix = number % 1000 // 100
+            suffix = int(number % 1000 // 100)
             if suffix == 0: suffix = ""
-            return f"{number // 1000}K{suffix}"  
+            return f"{int(number // 1000)}K{suffix}"  
         else:
-            return str(number)
+            return str(int(number))
     
     def get_nhan_pham(self, number):
         text = "Người Thường"
