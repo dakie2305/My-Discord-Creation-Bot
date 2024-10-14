@@ -81,7 +81,7 @@ class DailyEconomy(commands.Cog):
         ProfileMongoManager.update_profile_money(guild_id=user.guild.id, guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name= user.display_name, copper=actual_money)
         
         #Nếu không phải chính quyền thì trừ tiền của chính quyền
-        if user_profile.is_authority == False:
+        if user_profile!= None and user_profile.is_authority == False:
             ProfileMongoManager.update_money_authority(guild_id=user.guild.id, copper= -actual_money)
         #Cập nhật last_attendance
         ProfileMongoManager.update_last_attendance_now(guild_id=user.guild.id, user_id=user.id)
