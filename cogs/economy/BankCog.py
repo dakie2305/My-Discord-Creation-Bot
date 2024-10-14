@@ -79,7 +79,7 @@ class BankEconomy(commands.Cog):
         if conversion_rate == None:
             ConversionRateMongoManager.create_update_conversion_rate(guild_id=user.guild.id, rate=1)
             conversion_rate = ConversionRateMongoManager.find_conversion_rate_by_id(guild_id=user.guild.id)
-        elif conversion_rate.last_reset.date() != datetime.now().date():
+        elif conversion_rate != None and conversion_rate.last_reset != None and conversion_rate.last_reset.date() != datetime.now().date():
             #Random tỷ lệ rate
             allowed_values = [0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3]
             new_rate = random.choice(allowed_values)
