@@ -59,7 +59,6 @@ class WorkEconomy(commands.Cog):
         
         if user_profile != None and user_profile.last_work != None:
             check = self.check_if_within_1h_30(input=user_profile.last_work)
-            check = False
             if check:
                 #Lấy thời gian cũ để cộng vào 1h30 xem chừng nào mới làm việc được tiếp
                 time_window = timedelta(hours=1, minutes=30)
