@@ -61,6 +61,14 @@ def update_last_attendance_now(guild_id:int, user_id: int):
                                                                                     }})
     return result
 
+def update_last_work_now(guild_id:int, user_id: int):
+    collection = db_specific[f'profile_{guild_id}']
+    today = datetime.now()
+    result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"last_work": today,
+                                                                                    }})
+    return result
+
+
 def update_profile_quote(guild_id: int, guild_name: str, user_id: int, user_name: str, user_display_name: str, quote: str):
     collection = db_specific[f'profile_{guild_id}']
     existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
@@ -82,9 +90,14 @@ def update_dignity_point(guild_id: int, guild_name: str, user_id: int, user_name
     if existing_data == None:
         existing_data = create_profile(guild_id=guild_id, user_id=user_id, user_display_name=user_display_name, user_name=user_name, guild_name= guild_name)
     existing_data.dignity_point += dignity_point
+    if existing_data.dignity_point <= 0:
+        existing_data.dignity_point = 0
+    elif existing_data.dignity_point >= 100:
+        existing_data.dignity_point = 100
+        
     result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"dignity_point": existing_data.dignity_point,
                                                                                     }})
-
+    return result
 
 #region Authority
 

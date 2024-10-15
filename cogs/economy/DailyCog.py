@@ -1,10 +1,8 @@
 from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.EmojiEnum import CurrencyEmoji
+from CustomEnum.RoleEnum import TrueHeavenRoleId
 import discord
 from discord.ext import commands
-from discord.app_commands import Choice
-from typing import Optional
-from Handling.Economy.Profile.ProfileClass import Profile
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 from datetime import datetime, timedelta
         
@@ -24,7 +22,7 @@ class DailyEconomy(commands.Cog):
             await message.reply(embed=embed)
             return
     
-    #region transfer
+    #region daily
     @discord.app_commands.command(name="daily", description="Điểm danh hằng ngày trong server!")
     async def transfer_slash_command(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=False)
@@ -71,8 +69,23 @@ class DailyEconomy(commands.Cog):
             actual_money += 200
             embed.add_field(name=f"", value=f"- Điểm danh hằng ngày: +**200** {CurrencyEmoji.COPPER.value}", inline=False)
         if user_profile != None and user_profile.is_authority:
-            actual_money += 600
-            embed.add_field(name=f"", value=f"- Là chính quyền tối cao: +**600** {CurrencyEmoji.COPPER.value}", inline=False)
+            actual_money += 3000
+            embed.add_field(name=f"", value=f"- Là chính quyền tối cao: +**3000** {CurrencyEmoji.COPPER.value}", inline=False)
+        
+        #Đặc quyền server tổng
+        if user.guild.id == 1256987900277690470:
+            for role in user.roles:
+                if role.id == TrueHeavenRoleId.MODERATOR.value:
+                    actual_money += 1000
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.MODERATOR.value}> : +**1000** {CurrencyEmoji.COPPER.value}", inline=False)
+                if role.id == TrueHeavenRoleId.CHOSEN_ONE.value:
+                    actual_money += 700
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.CHOSEN_ONE.value}> : +**700** {CurrencyEmoji.COPPER.value}", inline=False)
+                if role.id == TrueHeavenRoleId.BOOSTER.value:
+                    actual_money += 100000
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.BOOSTER.value}> : +**100000** {CurrencyEmoji.COPPER.value}", inline=False)
+        
+        
         if actual_money == 0: actual_money = 200
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
         embed.add_field(name=f"", value=f"> Tổng tiền nhận từ điểm danh {SlashCommand.DAILY.value} hôm nay:   **+{int(actual_money)} {CurrencyEmoji.COPPER.value} **", inline=False)
@@ -85,4 +98,8 @@ class DailyEconomy(commands.Cog):
             ProfileMongoManager.update_money_authority(guild_id=user.guild.id, copper= -actual_money)
         #Cập nhật last_attendance
         ProfileMongoManager.update_last_attendance_now(guild_id=user.guild.id, user_id=user.id)
+        
+        #cộng 5 điểm dignity point
+        ProfileMongoManager.update_dignity_point(guild_id=user.guild.id, guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name= user.display_name, dignity_point=5)
+        
         return embed
