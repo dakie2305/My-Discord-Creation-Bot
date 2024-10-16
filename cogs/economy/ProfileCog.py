@@ -56,7 +56,8 @@ class ProfileEconomy(commands.Cog):
     #region Authority
     @discord.app_commands.command(name="vote_authority", description="Bầu chọn bản thân làm Chính Quyền, sẽ tốn 500C mỗi lần làm")
     async def vote(self, interaction: discord.Interaction):
-        await interaction.response.defer(ephemeral=False)
+        await interaction.response.defer()
+        
         #Kiểm tra xem đây có phải là chính quyền không
         if ProfileMongoManager.is_authority(guild_id=interaction.guild_id, user_id=interaction.user.id) != None:
             await interaction.followup.send(content=f"Bạn đã là Chính Quyền rồi. Vì gây lãng phí tài nguyên, bạn đã bị trừ 500 {CurrencyEmoji.COPPER.value}!")
@@ -68,7 +69,7 @@ class ProfileEconomy(commands.Cog):
             #Get thử xem còn tồn tại trong server không
             member = interaction.guild.get_member(existed_authority.user_id)
             if member:
-                await interaction.followup.send(content=f"Server này đã có Chính Quyền là {member.mention} rồi! Vui lòng lật đổ hoặc ép Chính Quyền từ bỏ địa vị để tranh chức Chính Quyền!")
+                await interaction.followup.send(content=f"Server này đã có Chính Quyền là {member.mention} rồi! Vui lòng lật đổ hoặc ép Chính Quyền từ bỏ địa vị để tranh chức Chính Quyền!", ephemeral=True)
                 return
         data = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
         if data == None:
@@ -76,12 +77,18 @@ class ProfileEconomy(commands.Cog):
             await interaction.followup.send(embed=embed)
             ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, copper=-500, guild_name= interaction.guild.name)
             return
+        #Phải đủ tiền mới được vote
+        elif data.copper<500:
+            embed = discord.Embed(title=f"", description=f"Bạn phải có đủ **500** {CurrencyEmoji.COPPER.value} trước đã!", color=0xc379e0)
+            await interaction.followup.send(embed=embed)
+            return
+        
         embed = discord.Embed(title=f"Chính Quyền Đương Cử",description=f"Bầu chọn cho **{interaction.user.mention}** làm Chính Quyền của server {interaction.guild.name}.",color=discord.Color.blue())
         embed.set_thumbnail(url=interaction.user.avatar.url)
         embed.add_field(name=f"", value="\n", inline=False)
         embed.add_field(name=f"", value=f"> Rank: **{data.level}**", inline=False)
         embed.add_field(name=f"", value=f"> Nhân phẩm: **{self.get_nhan_pham(data.dignity_point)}** ({data.dignity_point})", inline=False)
-        view = AuthorityView(user=interaction.user)
+        view = AuthorityView(user=interaction.user, data=data)
         me = await interaction.followup.send(embed=embed, view=view)
         view.message = me
         view.embed = embed

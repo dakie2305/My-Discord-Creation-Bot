@@ -1,13 +1,15 @@
 import discord
 from discord.ui import Button, View
 from Handling.Economy.Profile import ProfileMongoManager
+from Handling.Economy.Profile.ProfileClass import Profile
 
 class AuthorityView(discord.ui.View):
-    def __init__(self, user: discord.Member):
-        super().__init__(timeout=60)
+    def __init__(self, user: discord.Member, data: Profile):
+        super().__init__(timeout=5)
         self.message: discord.Message = None
         self.embed: discord.Embed = None
         self.target_user = user
+        self.data: Profile = data
         self.vote_concluded = False
         self.yes_votes = set() 
         self.no_votes = set() 
@@ -16,7 +18,7 @@ class AuthorityView(discord.ui.View):
     async def yes_button(self, interaction: discord.Interaction, button: Button):
         if interaction.user.id == self.target_user.id:
             #Nếu tự bầu thì phải tự counter bản thân
-            self.no_votes.add(1)
+            self.no_votes.add(1257713292445618239)
         user = interaction.user
         # Nếu user đã bầu Không thì xoá khỏi list No votes
         if user.id in self.no_votes:
@@ -52,12 +54,48 @@ class AuthorityView(discord.ui.View):
         else:
             result_message = f"**{self.target_user.display_name}** đã thua bầu cử! Đáng tiếc là chỉ có {len(self.yes_votes)} người bầu ủng hộ bạn! Đừng quên bạn cũng vừa bị trừ **500** <a:copper:1294615524918956052>!"
             ProfileMongoManager.update_profile_money(guild_id=self.target_user.guild.id, guild_name=self.target_user.guild.name, user_id=self.target_user.id,user_name=self.target_user.name,user_display_name= self.target_user.display_name,copper=-500)
-        if interaction:
-            await interaction.followup.send(result_message, ephemeral=False)
-        else:
-            await self.message.channel.send(result_message)
         
-
+        embed = discord.Embed(title=f"Chính Quyền Đương Cử",description=f"{result_message}",color=discord.Color.blue())
+        embed.add_field(name=f"", value="▬▬▬▬▬ι═══════════>", inline=False)
+        embed.add_field(name=f"", value="\n", inline=False)
+        list_mention_yes = []
+        for id in self.yes_votes:
+            text = f"<@{id}>"
+            list_mention_yes.append(text)
+        result_y = ", ".join(list_mention_yes)
+        list_mention_no = []
+        for id in self.no_votes:
+            text = f"<@{id}>"
+            list_mention_no.append(text)
+        result_n = ", ".join(list_mention_no)
+        embed.add_field(name=f"Danh sách người bầu chọn", value=f"{result_y}", inline=False)
+        embed.add_field(name=f"Danh sách người phản đối", value=f"{result_n}", inline=False)
+        
+        if interaction:
+            await interaction.followup.send(embed=embed, ephemeral=False)
+        else:
+            await self.message.channel.send(embed=embed)
+        
+    def get_nhan_pham(self, number):
+        text = "Người Thường"
+        if number >= 100:
+            text = "Thánh Nhân"
+        elif number >= 75:
+            text = "Người Tốt"
+        elif number >= 60:
+            text = "Lành tính"
+        elif number >= 50:
+            text = "Người Thường"
+        elif number >= 40:
+            text = "Tiểu Nhân"
+        elif number >= 30:
+            text = "Quỷ Quyệt"
+        elif number >= 20:
+            text = "Tội Phạm"
+        else:
+            text = "Gian Thương Tà Đạo"
+        return text
+    
     async def on_timeout(self):
         # Nếu vẫn chưa đủ 10 votes thì kết luận luôn
         if not self.vote_concluded:

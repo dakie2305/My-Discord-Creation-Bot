@@ -92,20 +92,17 @@ class TransferMoneyEconomy(commands.Cog):
             #Cộng người chuyển
             ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id,guild_name=interaction.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, darkium= amount)
         
-        tax = 50
+        tax = 150
         #Cộng tiền tax Copper cho chính quyền nếu user_profile không phải là chính quyền
         tax_text = ""
         if user_profile.is_authority == False:
             tax_text = f"Đương nhiên là bị trừ {tax} {CurrencyEmoji.COPPER.value} để đóng thuế cho Chính Quyền!"
             authority_profile = ProfileMongoManager.is_authority_existed(guild_id=interaction.guild_id)
             if authority_profile:
-                authority_profile.copper += tax
+                authority_profile.copper += int(tax * authority_profile.dignity_point/100)
                 ProfileMongoManager.update_profile_money_fast(guild_id=interaction.guild_id, data=authority_profile)
             ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name= interaction.guild.name, user_id= interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, copper= -tax)
         await interaction.followup.send(f"{interaction.user.mention} đã chuyển **{amount}** {self.get_emoji_from_type(loai_tien)} cho {user.mention}. {tax_text}", ephemeral=False)
-    
-    
-    
     
     
     def get_emoji_from_type(self, input: str):

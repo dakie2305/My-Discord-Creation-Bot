@@ -54,7 +54,8 @@ async def global_sync_creation_1(ctx):
 async def help(ctx):
     message: discord.Message = ctx.message
     if message:
-        await help_command(message= message)    
+        text= help_command()
+        await message.reply(text)  
 
 @bot.command()
 @app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
