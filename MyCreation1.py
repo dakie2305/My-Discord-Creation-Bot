@@ -1223,9 +1223,9 @@ def get_bxh_noi_tu(interaction: discord.Interaction,lan: str, word_matching_chan
 #region Help
 @bot.tree.command(name="help", description="Hiện tất cả commands và hướng dẫn sử dụng bot.")
 async def help_command(interaction: discord.Interaction):
-    message = interaction.message
-    await help_command(message=message)
-    return
+    await interaction.response.defer(ephemeral=False)
+    text = help_command()
+    await interaction.followup.send(content=f"{text}")
 
 
 async def help_command(message: discord.Message):
@@ -1259,7 +1259,7 @@ async def help_command(message: discord.Message):
 `/snipe`: Lệnh dùng để hiển thị lại 7 tin nhắn bị xoá gần nhất trong channel dùng lệnh.
 `/therapy`: Lệnh dùng để thiết lập channel dùng để tâm sự cùng bot.
     """
-    await message.reply(content=text)
+    return text
     
 
 
@@ -1595,6 +1595,8 @@ async def on_message(message):
         #Xử lý therapy
         model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
         asyncio.create_task(TherapyHandling(bot=bot, model=model).handling_therapy_ai(message=message))
+        speakFlag = False
+    if not message.content and message.embeds:
         speakFlag = False
 
     await sub_function_ai_response(message=message, speakFlag=speakFlag)

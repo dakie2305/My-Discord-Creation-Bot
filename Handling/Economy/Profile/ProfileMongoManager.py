@@ -2,6 +2,7 @@ from typing import List
 from pymongo import MongoClient
 from datetime import datetime, timedelta
 from Handling.Economy.Profile.ProfileClass import Profile
+import Handling.Economy.ConversionRate.ConversionRateMongoManager as ConversionRateMongoManager 
 
 # Connect to the MongoDB server
 client = MongoClient("mongodb://localhost:27017/")
@@ -31,10 +32,91 @@ def update_profile_money(guild_id: int, guild_name: str, user_id: int, user_name
     existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
     if existing_data == None:
         existing_data = create_profile(guild_id=guild_id, user_id=user_id, user_display_name=user_display_name, user_name=user_name, guild_name= guild_name)
+    
     existing_data.copper += copper
     existing_data.silver += silver
     existing_data.gold += gold
     existing_data.darkium += darkium
+    
+    #Tìm rate hiện tại
+    rate = 1.0
+    rate_bank = ConversionRateMongoManager.find_conversion_rate_by_id(guild_id=guild_id)
+    if rate_bank!= None and rate_bank.rate != None:
+        rate = rate_bank.rate
+    
+    #Nếu copper âm thì auto convert đồng khác qua copper nếu âm
+    while existing_data.copper < 0:
+        from_type = None
+        if existing_data.silver > 0:
+            from_type = "S"
+            existing_data.silver -=1
+        elif existing_data.gold > 0:
+            from_type = "G"
+            existing_data.darkium -=1
+        elif existing_data.darkium > 0:
+            from_type = "D"
+            existing_data.darkium -=1
+        if from_type!= None:
+            converted_money = convert_currency(amount=1, rate=rate, from_currency_type=from_type, to_currency_type="C")
+            existing_data.copper += converted_money
+        else: break
+    
+    #Nếu silver âm thì auto convert đồng khác qua
+    while existing_data.silver < 0:
+        from_type = None
+        amount = 1
+        #Có thể dùng copper cộng dồn lên để đổi
+        copper_needed_for_silver = int(1 * 5000 * rate)
+        if existing_data.gold > 0:
+            from_type = "G"
+            existing_data.gold -=1
+            amount = 1
+            converted_money = convert_currency(amount=amount, rate=rate, from_currency_type=from_type, to_currency_type="S")
+            existing_data.silver += converted_money
+        elif existing_data.darkium > 1:
+            from_type = "D"
+            existing_data.darkium -=1
+            amount =1
+            converted_money = convert_currency(amount=amount, rate=rate, from_currency_type=from_type, to_currency_type="S")
+            existing_data.silver += converted_money
+        elif existing_data.copper >= copper_needed_for_silver:
+            from_type = "C"
+            existing_data.copper -=copper_needed_for_silver
+            amount = copper_needed_for_silver
+            existing_data.silver += 1
+        else: break
+    
+    #Nếu gold âm thì auto convert đồng khác qua
+    while existing_data.gold < 0:
+        from_type = None
+        amount = 1
+        #Có thể dùng copper hoặc silver cộng dồn lên để đổi
+        copper_needed_for_one_gold = int(1 * 5000 * 5000 * rate)
+        silver_needed_for_one_gold  = int(1 * 5000 * rate)
+        if existing_data.darkium > 0:
+            from_type = "D"
+            existing_data.darkium -=1
+            amount = 1
+            converted_money = convert_currency(amount=amount, rate=rate, from_currency_type=from_type, to_currency_type="G")
+            existing_data.silver += converted_money
+        elif existing_data.silver >= silver_needed_for_one_gold:
+            from_type = "S"
+            existing_data.silver -=silver_needed_for_one_gold
+            existing_data.gold += 1
+        elif existing_data.copper >= copper_needed_for_one_gold:
+            from_type = "C"
+            existing_data.copper -=copper_needed_for_one_gold
+            existing_data.gold += 1
+        else: break
+    
+    #Nếu darkium âm thì chỉ có convert gold qua thôi, không convert mấy khác
+    while existing_data.darkium < 0:
+        gold_needed_for_one_darkium  = int(1 * 10000 * rate)
+        if existing_data.gold >= gold_needed_for_one_darkium:
+            existing_data.gold -=gold_needed_for_one_darkium
+            existing_data.darkium += 1
+        else: break
+    
     
     result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"copper": existing_data.copper,
                                                                                     "gold": existing_data.gold,
@@ -44,6 +126,39 @@ def update_profile_money(guild_id: int, guild_name: str, user_id: int, user_name
                                                                                     }})
     return result
 
+def convert_currency(amount: int, rate: float, from_currency_type: str, to_currency_type: str):
+        #Đổi darkium sang các đơn vị khác
+        if from_currency_type == to_currency_type: return amount
+        result = 0
+        if from_currency_type == "D":
+            if to_currency_type == "G": #Base 10000
+                result = int(amount * 10000 * rate)
+            elif to_currency_type == "S": #Base 10000 * 5000
+                result = int(amount * 10000 * 5000 * rate)
+            elif to_currency_type == "C": #Base 10000 * 5000 * 5000
+                result = int(amount * 10000 * 5000 *  500 * rate)
+        elif from_currency_type == "G":
+            if to_currency_type == "D": #Base 1/10000
+                result = int(amount / 10000 * rate)
+            elif to_currency_type == "S": #Base 5000
+                result = int(amount * 5000 * rate)
+            elif to_currency_type == "C": #Base  5000 * 5000
+                result = int(amount * 5000 *  5000 * rate)
+        elif from_currency_type == "S":
+            if to_currency_type == "D": #Base 1/5000/10000
+                result = int(amount / 5000 / 10000 * rate)
+            elif to_currency_type == "G": #Base 1/5000
+                result = int(amount / 5000 * rate)
+            elif to_currency_type == "C": #Base  5000
+                result = int(amount * 5000 * rate)
+        elif from_currency_type == "C":
+            if to_currency_type == "D": #Base 1/5000/5000/10000
+                result = int(amount /5000 / 5000 / 10000 * rate)
+            elif to_currency_type == "G": #Base 1/5000/5000
+                result = int(amount / 5000 / 5000 * rate)
+            elif to_currency_type == "S": #Base  1/5000
+                result = int(amount / 5000 * rate)
+        return result
 
 def update_profile_money_fast(guild_id:int, data: Profile):
     collection = db_specific[f'profile_{guild_id}']
@@ -68,6 +183,14 @@ def update_last_work_now(guild_id:int, user_id: int):
                                                                                     }})
     return result
 
+def is_in_greatest_debt(guild_id:int, user_id: int):
+    existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
+    if existing_data == None:
+        return False
+    if existing_data.copper <= 0 and existing_data.silver <= 0 and existing_data.gold and existing_data.darkium <= 0:
+        return True
+    else:
+        return False
 
 def update_profile_quote(guild_id: int, guild_name: str, user_id: int, user_name: str, user_display_name: str, quote: str):
     collection = db_specific[f'profile_{guild_id}']
@@ -112,6 +235,86 @@ def update_money_authority(guild_id: int, gold: int= 0, silver: int = 0, copper:
     existing_data.silver += silver
     existing_data.gold += gold
     existing_data.darkium += darkium
+    
+    #Tìm rate hiện tại
+    rate = 1.0
+    rate_bank = ConversionRateMongoManager.find_conversion_rate_by_id(guild_id=guild_id)
+    if rate_bank!= None and rate_bank.rate != None:
+        rate = rate_bank.rate
+    
+    #Nếu copper âm thì auto convert đồng khác qua copper nếu âm
+    while existing_data.copper < 0:
+        from_type = None
+        if existing_data.silver > 0:
+            from_type = "S"
+            existing_data.silver -=1
+        elif existing_data.gold > 0:
+            from_type = "G"
+            existing_data.darkium -=1
+        elif existing_data.darkium > 0:
+            from_type = "D"
+            existing_data.darkium -=1
+        if from_type!= None:
+            converted_money = convert_currency(amount=1, rate=rate, from_currency_type=from_type, to_currency_type="C")
+            existing_data.copper += converted_money
+        else: break
+    
+    #Nếu silver âm thì auto convert đồng khác qua
+    while existing_data.silver < 0:
+        from_type = None
+        amount = 1
+        #Có thể dùng copper cộng dồn lên để đổi
+        copper_needed_for_silver = int(1 * 5000 * rate)
+        if existing_data.gold > 0:
+            from_type = "G"
+            existing_data.gold -=1
+            amount = 1
+            converted_money = convert_currency(amount=amount, rate=rate, from_currency_type=from_type, to_currency_type="S")
+            existing_data.silver += converted_money
+        elif existing_data.darkium > 1:
+            from_type = "D"
+            existing_data.darkium -=1
+            amount =1
+            converted_money = convert_currency(amount=amount, rate=rate, from_currency_type=from_type, to_currency_type="S")
+            existing_data.silver += converted_money
+        elif existing_data.copper >= copper_needed_for_silver:
+            from_type = "C"
+            existing_data.copper -=copper_needed_for_silver
+            amount = copper_needed_for_silver
+            existing_data.silver += 1
+        else: break
+    
+    #Nếu gold âm thì auto convert đồng khác qua
+    while existing_data.gold < 0:
+        from_type = None
+        amount = 1
+        #Có thể dùng copper hoặc silver cộng dồn lên để đổi
+        copper_needed_for_one_gold = int(1 * 5000 * 5000 * rate)
+        silver_needed_for_one_gold  = int(1 * 5000 * rate)
+        if existing_data.darkium > 0:
+            from_type = "D"
+            existing_data.darkium -=1
+            amount = 1
+            converted_money = convert_currency(amount=amount, rate=rate, from_currency_type=from_type, to_currency_type="G")
+            existing_data.silver += converted_money
+        elif existing_data.silver >= silver_needed_for_one_gold:
+            from_type = "S"
+            existing_data.silver -=silver_needed_for_one_gold
+            existing_data.gold += 1
+        elif existing_data.copper >= copper_needed_for_one_gold:
+            from_type = "C"
+            existing_data.copper -=copper_needed_for_one_gold
+            existing_data.gold += 1
+        else: break
+    
+    #Nếu darkium âm thì chỉ có convert gold qua thôi, không convert mấy khác
+    while existing_data.darkium < 0:
+        gold_needed_for_one_darkium  = int(1 * 10000 * rate)
+        if existing_data.gold >= gold_needed_for_one_darkium:
+            existing_data.gold -=gold_needed_for_one_darkium
+            existing_data.darkium += 1
+        else: break
+    
         
     result = collection.update_one({"id": "profile", "user_id": existing_data.user_id}, {"$set": {"copper": existing_data.copper,
                                                                                         "gold": existing_data.gold,

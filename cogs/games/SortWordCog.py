@@ -82,7 +82,7 @@ class SortWords(commands.Cog):
             #Kiểm xem có game Sort Word ở đây không
             sw_info, lan = await self.check_if_message_inside_game(source=message)
             if sw_info == None:
-                await message.channel.send(f"Không tìm được trò chơi sắp xếp từ để xoá trong channel này")
+                await message.channel.send(f"Không tìm được trò chơi sắp xếp từ để reset trong channel này")
                 return
             await self.process_reset(message=message, sw_info=sw_info, language=lan)
             return
@@ -105,7 +105,7 @@ class SortWords(commands.Cog):
         
         #Tạo lại
         data = SwClass.SortWordInfo(channel_id=message.channel.id, channel_name=message.channel.name, current_word="hi", unsorted_word="ih")
-        result = SwMongoManager.create_info(data=data, guild_id=message.guild.id, lang='en')
+        result = SwMongoManager.create_info(data=data, guild_id=message.guild.id, lang=language)
         message_tu_hien_tai = f"\nTừ hiện tại: `'{data.unsorted_word}'`."
         await message.channel.send(f"Đã reset trò chơi trong channel này. {message_tu_hien_tai}")
         

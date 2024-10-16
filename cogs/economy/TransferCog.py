@@ -39,7 +39,7 @@ class TransferMoneyEconomy(commands.Cog):
         Choice(name="Copper", value="C"),
     ])
     async def transfer_slash_command(self, interaction: discord.Interaction, amount: int,  user: discord.Member, loai_tien: str):
-        await interaction.response.defer(ephemeral=False)
+        await interaction.response.defer()
         
         if user.id == interaction.user.id:
             await interaction.followup.send(f"Chuyển tiền cho bản thân chi vậy?", ephemeral=True)
@@ -50,6 +50,13 @@ class TransferMoneyEconomy(commands.Cog):
             embed = discord.Embed(title=f"", description=f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", color=0xc379e0)
             interaction.followup.send(embed=embed)
             return
+        #Kiểm tra xem người nhận có tồn tại profile chưa
+        receive_user = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=user.id)
+        if receive_user == None:
+            embed = discord.Embed(title=f"", description=f"Người nhận tiền {user.mention} vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", color=0xc379e0)
+            interaction.followup.send(embed=embed)
+            return
+        
         #Kiểm tra xem người dùng lệnh có đủ tiền không
         not_sufficient = False
         if loai_tien == "C" and user_profile.copper < amount:

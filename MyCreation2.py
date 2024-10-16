@@ -472,6 +472,8 @@ async def on_message(message):
     auto_rep = AutoresponderHandling(bot=bot)
     if await auto_rep.handling_auto_responder(message=message):
         speakFlag = False
+    if not message.content and message.embeds:
+        speakFlag = False
     await sub_function_ai_response(message=message, speakFlag=speakFlag)
     await bot.process_commands(message)
 

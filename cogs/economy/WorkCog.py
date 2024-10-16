@@ -6,6 +6,7 @@ from discord.ext import commands
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 from datetime import datetime, timedelta
 import random
+from Handling.Misc.SelfDestructView import SelfDestructView
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(WorkEconomy(bot=bot))
@@ -43,8 +44,10 @@ class WorkEconomy(commands.Cog):
     async def work(self, ctx):
         message: discord.Message = ctx.message
         if message:
-            embed = await self.embed_work_command(user=message.author)
-            await message.reply(embed=embed)
+            embed, view = await self.embed_work_command(user=message.author)
+            mes = await message.reply(embed=embed, view=view)
+            if view != None:
+                view.message = mes
             return
     
     #region work
@@ -65,7 +68,8 @@ class WorkEconomy(commands.Cog):
                 work_next_time = user_profile.last_work + time_window
                 unix_time = int(work_next_time.timestamp())
                 embed = discord.Embed(title=f"", description=f"🚫 Bạn đã làm việc rồi. Vui lòng đợi đến để {SlashCommand.WORK.value} lại vào lúc <t:{unix_time}:t> !", color=0xc379e0)
-                return embed
+                view = SelfDestructView(timeout=120)
+                return embed, view
         dignity_point = 50
         tax = 80
         pay_tax = True
@@ -133,7 +137,7 @@ class WorkEconomy(commands.Cog):
             ProfileMongoManager.update_money_authority(guild_id=user.guild.id, copper= tax)
         ProfileMongoManager.update_last_work_now(guild_id=user.guild.id, user_id=user.id)
         embed = discord.Embed(title=f"", description=f"{base_text}", color=0x1ae8e8)
-        return embed
+        return embed, None
         
         
     def check_if_within_1h_30(self, input: datetime):
