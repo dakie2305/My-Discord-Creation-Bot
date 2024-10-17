@@ -54,8 +54,8 @@ async def global_sync_creation_1(ctx):
 async def help(ctx):
     message: discord.Message = ctx.message
     if message:
-        text= help_command()
-        await message.reply(text)  
+        text = help_command()
+        await message.channel.send(text)  
 
 @bot.command()
 @app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
@@ -1580,7 +1580,7 @@ async def on_ready():
         await bot.load_extension(ext)
         
 @bot.event
-async def on_message(message):
+async def on_message(message: discord.Message):
     if message.author == bot.user:
         return
     speakFlag= True
@@ -1597,7 +1597,7 @@ async def on_message(message):
         model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
         asyncio.create_task(TherapyHandling(bot=bot, model=model).handling_therapy_ai(message=message))
         speakFlag = False
-    if not message.content and message.embeds:
+    if message.embeds:
         speakFlag = False
 
     await sub_function_ai_response(message=message, speakFlag=speakFlag)

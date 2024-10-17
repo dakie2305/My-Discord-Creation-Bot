@@ -11,6 +11,8 @@ from Handling.Misc.SelfDestructView import SelfDestructView
 from enum import Enum
 from datetime import datetime
 import random
+import CustomFunctions
+import CustomEnum.UserEnum as UserEnum
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(BankEconomy(bot=bot))
@@ -34,6 +36,16 @@ class BankEconomy(commands.Cog):
     @discord.app_commands.command(name="bank", description="Gọi ngân hàng chính quyền để đổi tiền")
     async def show_bank_info(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=False)
+        
+        #Không cho dùng bot nếu không phải user
+        if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
+        
+        
         self_delete_view = SelfDestructView(timeout=120)
         embed, bank_view = await self.get_bank_embed(user=interaction.user)
         if bank_view == None:
@@ -48,6 +60,14 @@ class BankEconomy(commands.Cog):
     async def bank(self, ctx):
         message: discord.Message = ctx.message
         if message:
+            #Không cho dùng bot nếu không phải user
+            if CustomFunctions.check_if_dev_mode() == True and message.author.id != UserEnum.UserId.DARKIE.value:
+                view = SelfDestructView(timeout=30)
+                embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
+                mess = await message.reply(embed=embed, view=view)
+                view.message = mess
+                return
+            
             self_delete_view = SelfDestructView(timeout=120)
             embed, bank_view = await self.get_bank_embed(user=message.author)
             if bank_view == None:

@@ -8,6 +8,8 @@ from Handling.Misc.SelfDestructView import SelfDestructView
 from Handling.Economy.Authority.AuthorityView import AuthorityView
 from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.EmojiEnum import CurrencyEmoji
+import CustomFunctions
+import CustomEnum.UserEnum as UserEnum
 
         
 async def setup(bot: commands.Bot):
@@ -40,6 +42,14 @@ class TransferMoneyEconomy(commands.Cog):
     ])
     async def transfer_slash_command(self, interaction: discord.Interaction, amount: int,  user: discord.Member, loai_tien: str):
         await interaction.response.defer()
+        
+        #Không cho dùng bot nếu không phải user
+        if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
         
         if user.id == interaction.user.id:
             await interaction.followup.send(f"Chuyển tiền cho bản thân chi vậy?", ephemeral=True)

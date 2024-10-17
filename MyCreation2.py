@@ -464,7 +464,7 @@ async def on_ready():
         await bot.load_extension(ext)
 
 @bot.event
-async def on_message(message):
+async def on_message(message: discord.Message):
     if message.author == bot.user:
         return
     await steal_content_from_2tai(message=message)
@@ -472,7 +472,7 @@ async def on_message(message):
     auto_rep = AutoresponderHandling(bot=bot)
     if await auto_rep.handling_auto_responder(message=message):
         speakFlag = False
-    if not message.content and message.embeds:
+    if message.embeds:
         speakFlag = False
     await sub_function_ai_response(message=message, speakFlag=speakFlag)
     await bot.process_commands(message)
@@ -528,6 +528,7 @@ init_extension = ["cogs.games.RockPaperScissorCog",
                   "cogs.economy.TransferCog",
                   "cogs.economy.DailyCog",
                   "cogs.economy.WorkCog",
+                  "cogs.economy.AuthorityCog",
                   ]
 
 bot_token = os.getenv("BOT_TOKEN_NO2")
