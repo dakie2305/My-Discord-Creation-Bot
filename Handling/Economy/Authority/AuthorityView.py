@@ -5,7 +5,7 @@ from Handling.Economy.Profile.ProfileClass import Profile
 
 class AuthorityView(discord.ui.View):
     def __init__(self, user: discord.Member, data: Profile):
-        super().__init__(timeout=5)
+        super().__init__(timeout=60)
         self.message: discord.Message = None
         self.embed: discord.Embed = None
         self.target_user = user
