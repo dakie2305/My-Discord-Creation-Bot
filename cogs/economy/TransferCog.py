@@ -112,6 +112,9 @@ class TransferMoneyEconomy(commands.Cog):
                 authority_profile.copper += int(tax * authority_profile.dignity_point/100)
                 ProfileMongoManager.update_profile_money_fast(guild_id=interaction.guild_id, data=authority_profile)
             ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name= interaction.guild.name, user_id= interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, copper= -tax)
+        #Cập nhập level progressing, transfer chỉ được cộng 1 ít
+        ProfileMongoManager.update_level_progressing(guild_id=user.guild.id, user_id= user.id, bonus_exp= -10)
+        ProfileMongoManager.update_level_progressing(guild_id=user.guild.id, user_id= interaction.user.id, bonus_exp= -10)
         await interaction.followup.send(f"{interaction.user.mention} đã chuyển **{amount}** {self.get_emoji_from_type(loai_tien)} cho {user.mention}. {tax_text}", ephemeral=False)
     
     

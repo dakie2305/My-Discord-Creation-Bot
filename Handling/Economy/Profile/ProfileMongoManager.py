@@ -176,6 +176,39 @@ def update_last_attendance_now(guild_id:int, user_id: int):
                                                                                     }})
     return result
 
+def update_level_progressing(guild_id:int, user_id: int, bonus_exp: int = 0):
+    collection = db_specific[f'profile_{guild_id}']
+    existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
+    if existing_data == None: return
+    
+    if existing_data.level < 10:
+        existing_data.level_progressing += 65
+    elif existing_data.level >= 10 and existing_data.level < 25:
+        existing_data.level_progressing += 50
+    elif existing_data.level >= 25 and existing_data.level < 50:
+        existing_data.level_progressing += 45
+    elif existing_data.level >= 50 and existing_data.level < 75:
+        existing_data.level_progressing += 35
+    elif existing_data.level >= 75 and existing_data.level < 99:
+        existing_data.level_progressing += 30
+    elif existing_data.level == 99:
+        #Cực khó sau level 99
+        existing_data.level_progressing += 1
+    
+    if bonus_exp < 0: bonus_exp = 0
+    #Cộng thêm bonus nếu có
+    existing_data.level_progressing += bonus_exp
+    
+    if existing_data.level_progressing >= 1000:
+        lp = existing_data.level_progressing
+        existing_data.level_progressing =  lp - 1000
+        existing_data.level += 1
+    
+    result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"level_progressing": existing_data.level_progressing,
+                                                                                    "level": existing_data.level,
+                                                                                    }})
+    return result
+
 def update_last_work_now(guild_id:int, user_id: int):
     collection = db_specific[f'profile_{guild_id}']
     today = datetime.now()

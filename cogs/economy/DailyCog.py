@@ -101,5 +101,7 @@ class DailyEconomy(commands.Cog):
         
         #cộng 5 điểm dignity point
         ProfileMongoManager.update_dignity_point(guild_id=user.guild.id, guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name= user.display_name, dignity_point=5)
+        #Cập nhập level progressing
+        ProfileMongoManager.update_level_progressing(guild_id=user.guild.id, user_id= user.id, bonus_exp=50)
         
         return embed

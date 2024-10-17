@@ -73,10 +73,15 @@ class WorkEconomy(commands.Cog):
                 embed = discord.Embed(title=f"", description=f"🚫 Bạn đã làm việc rồi. Vui lòng đợi đến để {SlashCommand.WORK.value} lại vào lúc <t:{unix_time}:t> !", color=0xc379e0)
                 view = SelfDestructView(timeout=120)
                 return embed, view
+        
+        
+        
+        authority_user = ProfileMongoManager.is_authority(guild_id=user.guild.id, user_id= user.id)
         dignity_point = 50
         tax = 80
         pay_tax = True
         bonus = False
+        
         if user_profile != None and user_profile.dignity_point != None:
             dignity_point = user_profile.dignity_point
             if user_profile.dignity_point == 0: 
@@ -100,7 +105,11 @@ class WorkEconomy(commands.Cog):
                     if dignity_rate >= dice_bonus:
                         bonus = True
         base_money = 600
-        base_text = f"Hôm nay bạn đã làm việc chăm chỉ, và nhận được {base_money} {CurrencyEmoji.COPPER.value}! "
+        base_authority_money = 2
+        text_authority = ""
+        if authority_user!=None:
+            text_authority = f" và **{2}** {CurrencyEmoji.SILVER.value}"
+        base_text = f"Hôm nay bạn đã làm việc chăm chỉ, và nhận được **{base_money}** {CurrencyEmoji.COPPER.value}{text_authority}! "
         #random thêm để xem có được cộng trừ bonus không
         chance = random.randint(0, 10)
         if chance >= 5:
@@ -124,13 +133,15 @@ class WorkEconomy(commands.Cog):
         text_tax = f"Là công dân gương mẫu nên bạn đã đóng thêm thuế {tax} {CurrencyEmoji.COPPER.value}."
         if pay_tax:
             base_money -= tax
-            text_tax = f"Là công dân gương mẫu nên bạn đã đóng thêm thuế {tax} {CurrencyEmoji.COPPER.value}."
+            text_tax = f"\nLà công dân gương mẫu nên bạn đã đóng thêm thuế {tax} {CurrencyEmoji.COPPER.value}."
         else:
-            text_tax = f"Với chút tài mọn, bạn đã trốn đóng thuế thành công."
+            text_tax = f"\nVới chút tài mọn, bạn đã trốn đóng thuế thành công."
+        
+        
         
         if base_money == 0: base_money = 300
         base_text += text_tax
-        base_text += f"\n\n> Tổng tiền nhận từ {SlashCommand.WORK.value} hôm nay: **{base_money}** {CurrencyEmoji.COPPER.value}."
+        base_text += f"\n\n> Tổng tiền nhận từ {SlashCommand.WORK.value} hôm nay: **{base_money}** {CurrencyEmoji.COPPER.value}{text_authority}."
         
         #Cộng tiền, cộng 2 điểm nhân phẩm
         ProfileMongoManager.update_profile_money(guild_id=user.guild.id, guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, copper=base_money)
@@ -139,6 +150,14 @@ class WorkEconomy(commands.Cog):
         if pay_tax:
             ProfileMongoManager.update_money_authority(guild_id=user.guild.id, copper= tax)
         ProfileMongoManager.update_last_work_now(guild_id=user.guild.id, user_id=user.id)
+        
+        #Cộng thêm cho chính quyền
+        if authority_user != None:
+            ProfileMongoManager.update_money_authority(guild_id=user.guild.id, silver=base_authority_money)
+        
+        #Cập nhập level progressing
+        ProfileMongoManager.update_level_progressing(guild_id=user.guild.id, user_id= user.id)
+        
         embed = discord.Embed(title=f"", description=f"{base_text}", color=0x1ae8e8)
         return embed, None
         

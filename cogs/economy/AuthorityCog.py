@@ -100,13 +100,20 @@ class AuthorityEconomy(commands.Cog):
     #region Authority view
     @authority_group.command(name="riot", description="Bạo động để phá chính quyền đương nhiệm của server!")
     async def riot_authority_slash(self, interaction: discord.Interaction):
-        await interaction.response.defer(ephemeral=True)
+        await interaction.response.defer()
+        
+        if interaction.user.id != UserEnum.UserId.DARKIE.value:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật chức năng! Vui lòng đợi nhé!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view)
+            view.message = mess
+            return
         
         #Không cho dùng bot nếu không phải user
         if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
             view = SelfDestructView(timeout=30)
             embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
-            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            mess = await interaction.followup.send(embed=embed, view=view)
             view.message = mess
             return
         
@@ -120,9 +127,6 @@ class AuthorityEconomy(commands.Cog):
         if existed_authority == None:
             await interaction.followup.send(content=f"Server không tồn tại Chính Quyền! Vui lòng dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", ephemeral=True)
             return
-        
-        
-        
 
 
     def get_nhan_pham(self, number):

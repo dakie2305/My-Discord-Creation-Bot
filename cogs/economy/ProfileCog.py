@@ -77,12 +77,16 @@ class ProfileEconomy(commands.Cog):
         if data == None:
             data = ProfileMongoManager.create_profile(guild_id=user.guild.id, user_id=user.id, guild_name=user.guild.name, user_name=user.name, user_display_name=user.display_name)
         
-        embed = discord.Embed(title=f"", description=f"Rank: **{data.level}**", color=0xddede7)
+        embed = discord.Embed(title=f"", description=f"**Profile {user.mention}**", color=0xddede7)
         embed.set_thumbnail(url=user.avatar.url)
         if data.is_authority:
             embed.add_field(name=f"", value="**Chính Quyền Tối Cao**", inline=False)
-        embed.add_field(name=f"", value=f"Nhân phẩm: **{self.get_nhan_pham(data.dignity_point)}** ({data.dignity_point})", inline=False)
-        embed.add_field(name=f"", value="▬▬▬▬▬ι═══════════>", inline=False)
+        embed.add_field(name=f"", value=f"Nhân phẩm: **{self.get_nhan_pham(data.dignity_point)}** ({data.dignity_point})", inline=True)
+        embed.add_field(name=f"", value=f"Địa Vị: **{self.get_dia_vi(data)}**", inline=True)
+        embed.add_field(name=f"", value=f"Rank: **{data.level}**", inline=False)
+        bar_progress = self.progress_bar(input_value= data.level_progressing)
+        embed.add_field(name=f"", value=f"{bar_progress}\n", inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
         embed.add_field(name=f"", value=f"**Tổng tài sản**:", inline=False)
         show_darkium = f"{CurrencyEmoji.DARKIUM.value}: **{self.shortened_currency(data.darkium)}**\n"
         if data.darkium == 0:
@@ -90,7 +94,7 @@ class ProfileEconomy(commands.Cog):
         embed.add_field(name=f"", value=f">>> {show_darkium}{CurrencyEmoji.GOLD.value}: **{self.shortened_currency(data.gold)}**\n{CurrencyEmoji.SILVER.value}: **{self.shortened_currency(data.silver)}**\n{CurrencyEmoji.COPPER.value}: **{self.shortened_currency(data.copper)}**", inline=False)
         #Quote
         embed.add_field(name=f"", value="\n", inline=False)
-        embed.add_field(name=f"", value="▬▬▬▬▬ι═══════════>", inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
         embed.add_field(name=f"", value=f"**Quote**: \"{data.quote}\"", inline=False)
         embed.set_footer(text=f"Profile của {user.name}.", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/8fd7278827dbc92713e315ee03e0b502.webp?size=32")
         return embed
@@ -129,4 +133,41 @@ class ProfileEconomy(commands.Cog):
             text = "Tội Phạm"
         else:
             text = "Gian Thương Tà Đạo"
+        return text
+    
+    def progress_bar(self, input_value: int, total_progress: int = 1000, bar_length=15):
+        # Calculate the percentage of progress
+        percentage = (input_value / total_progress) * 100
+        # Determine the number of filled (█) characters
+        filled_length = int(bar_length * input_value // total_progress)
+        # Create the progress bar string
+        bar = '█' * filled_length + '░' * (bar_length - filled_length)
+        # Format the output with percentage
+        return f'{bar} **{int(percentage)}%**'
+
+    
+    def get_dia_vi(self, data: Profile):
+        text = "Hạ Đẳng"
+        total_wealth = 0
+        total_wealth += data.copper
+        total_wealth += data.silver * 5000
+        total_wealth += data.gold * 5000 * 5000
+        total_wealth += data.darkium * 5000 * 5000 *10000
+        
+        if total_wealth > 250250260000:
+            text= "Đỉnh Cấp Xã Hội"
+        if total_wealth > 150250260000:
+            text= "Giới Tinh Anh"
+        if total_wealth > 100250260000:
+            text= "Thượng Đẳng"
+        if total_wealth > 50250260000:
+            text= "Thượng Lưu"
+        if total_wealth > 25250260000:
+            text= "Thượng Lưu"
+        if total_wealth > 250260000:
+            text= "Trung Lưu"
+        if total_wealth > 100000000:
+            text= "Hạ Lưu"
+        else:
+            text = "Hạ Đẳng"
         return text
