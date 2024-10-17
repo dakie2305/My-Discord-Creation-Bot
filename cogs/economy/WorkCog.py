@@ -54,8 +54,11 @@ class WorkEconomy(commands.Cog):
     @discord.app_commands.command(name="work", description="Lệnh lao động trong server!")
     async def work_slash_command(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=False)
-        embed = await self.embed_work_command(user=interaction.user)
-        await interaction.followup.send(embed=embed)
+        embed, view = await self.embed_work_command(user=interaction.user)
+        mess = await interaction.followup.send(embed=embed)
+        if view != None:
+            view.message = mess
+        return
         
     async def embed_work_command(self, user: discord.Member):
         user_profile = ProfileMongoManager.find_profile_by_id(guild_id=user.guild.id, user_id=user.id)
