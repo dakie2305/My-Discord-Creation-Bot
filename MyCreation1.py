@@ -54,7 +54,7 @@ async def global_sync_creation_1(ctx):
 async def help(ctx):
     message: discord.Message = ctx.message
     if message:
-        text = help_command()
+        text = get_help_text()
         await message.channel.send(text)  
 
 @bot.command()
@@ -1223,13 +1223,13 @@ def get_bxh_noi_tu(interaction: discord.Interaction,lan: str, word_matching_chan
 
 #region Help
 @bot.tree.command(name="help", description="Hiện tất cả commands và hướng dẫn sử dụng bot.")
-async def help_command(interaction: discord.Interaction):
+async def help_command_slash(interaction: discord.Interaction):
     await interaction.response.defer(ephemeral=False)
-    text = help_command()
+    text = get_help_text()
     await interaction.followup.send(content=f"{text}")
 
 
-async def help_command(message: discord.Message):
+async def get_help_text(message: discord.Message):
     #Trả về text hướng dẫn command
     text = """**-= Lệnh của Creations 1 =-**
     

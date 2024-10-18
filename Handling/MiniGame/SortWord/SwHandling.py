@@ -64,7 +64,7 @@ class SwHandlingFunction():
         
         #Tạo lại
         data = SortWordInfo(channel_id=message.channel.id, channel_name=message.channel.name, current_word="hi", unsorted_word="ih")
-        result = SwMongoManager.create_info(data=data, guild_id=message.guild.id, lang='en')
+        result = SwMongoManager.create_info(data=data, guild_id=message.guild.id, lang=language)
         message_tu_hien_tai = f"\nTừ hiện tại: `'{data.unsorted_word}'`. Chữ này có **{len(data.current_word)}** chữ cái."
         await message.channel.send(f"Đã reset trò chơi trong channel này. {message_tu_hien_tai}")
 
@@ -132,7 +132,7 @@ class SwHandlingFunction():
             sw_info, lan = await self.check_if_message_inside_game(source=message)
             if sw_info.current_round>=1200:
                 #Reset
-                await message.channel.send(f"Đã chơi được 1000 round rồi. Cảm ơn mọi người đã chơi nhé. Đến lúc reset lại rồi, nên mọi người bắt đầu lại nhé!")
+                await message.channel.send(f"Đã chơi được 1200 round rồi. Cảm ơn mọi người đã chơi nhé. Đến lúc reset lại rồi, nên mọi người bắt đầu lại nhé!")
                 await self.process_reset(message=message, sw_info=sw_info, language=lan)
                 return
             else:
