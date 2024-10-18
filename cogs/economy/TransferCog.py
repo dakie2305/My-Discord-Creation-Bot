@@ -11,7 +11,6 @@ from CustomEnum.EmojiEnum import CurrencyEmoji
 import CustomFunctions
 import CustomEnum.UserEnum as UserEnum
 
-        
 async def setup(bot: commands.Bot):
     await bot.add_cog(TransferMoneyEconomy(bot=bot))
     print("Transfer Money Economy is ready!")
@@ -34,13 +33,14 @@ class TransferMoneyEconomy(commands.Cog):
     @discord.app_commands.command(name="transfer", description="Chuyển tiền đến user trong server!")
     @discord.app_commands.describe(amount="Chọn số lượng tiền cần chuyển.")
     @discord.app_commands.describe(user="Chọn user để chuyển tiền.")
+    @discord.app_commands.describe(message="Lời nhắn khi chuyển tiền.")
     @discord.app_commands.choices(loai_tien=[
         Choice(name="Darkium", value="D"),
         Choice(name="Gold", value="G"),
         Choice(name="Silver", value="S"),
         Choice(name="Copper", value="C"),
     ])
-    async def transfer_slash_command(self, interaction: discord.Interaction, amount: int,  user: discord.Member, loai_tien: str):
+    async def transfer_slash_command(self, interaction: discord.Interaction, amount: int,  user: discord.Member, loai_tien: str, message: str = None):
         await interaction.response.defer()
         
         #Không cho dùng bot nếu không phải user
@@ -105,6 +105,9 @@ class TransferMoneyEconomy(commands.Cog):
         tax = 150
         #Cộng tiền tax Copper cho chính quyền nếu user_profile không phải là chính quyền
         tax_text = ""
+        extra_mess = ""
+        if message != None:
+            extra_mess = f" với lời nhắn: *{message}*"
         if user_profile.is_authority == False:
             tax_text = f"Đương nhiên là bị trừ {tax} {CurrencyEmoji.COPPER.value} để đóng thuế cho Chính Quyền!"
             authority_profile = ProfileMongoManager.is_authority_existed(guild_id=interaction.guild_id)
@@ -115,7 +118,7 @@ class TransferMoneyEconomy(commands.Cog):
         #Cập nhập level progressing, transfer chỉ được cộng 1 ít
         ProfileMongoManager.update_level_progressing(guild_id=user.guild.id, user_id= user.id, bonus_exp= -10)
         ProfileMongoManager.update_level_progressing(guild_id=user.guild.id, user_id= interaction.user.id, bonus_exp= -10)
-        await interaction.followup.send(f"{interaction.user.mention} đã chuyển **{amount}** {self.get_emoji_from_type(loai_tien)} cho {user.mention}. {tax_text}", ephemeral=False)
+        await interaction.followup.send(f"{interaction.user.mention} đã chuyển **{amount}** {self.get_emoji_from_type(loai_tien)} cho {user.mention}{extra_mess}. {tax_text}", ephemeral=False)
     
     
     def get_emoji_from_type(self, input: str):
