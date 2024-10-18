@@ -233,6 +233,14 @@ def update_profile_quote(guild_id: int, guild_name: str, user_id: int, user_name
     
     result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"quote": quote,
                                                                                     }})
+    
+def update_jail_time(guild_id:int, user_id: int, jail_time: datetime = None):
+    collection = db_specific[f'profile_{guild_id}']
+    existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
+    if existing_data == None: return
+    result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"jail_time": jail_time,
+                                                                                    }})
+    return result
 
 def delete_profile(guild_id: int, user_id: int):
     collection = db_specific[f'profile_{guild_id}']

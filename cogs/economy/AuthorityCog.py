@@ -6,6 +6,7 @@ from Handling.Economy.Profile.ProfileClass import Profile
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 from Handling.Misc.SelfDestructView import SelfDestructView
 from Handling.Economy.Authority.AuthorityView import AuthorityView
+from Handling.Economy.Authority.AuthorityRiotView import AuthorityRiotView
 from enum import Enum
 from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.EmojiEnum import CurrencyEmoji
@@ -127,7 +128,36 @@ class AuthorityEconomy(commands.Cog):
         if existed_authority == None:
             await interaction.followup.send(content=f"Server không tồn tại Chính Quyền! Vui lòng dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", ephemeral=True)
             return
-
+        #Kiểm tra xem user có /profile chưa
+        user_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id= interaction.user.id)
+        if user_profile == None:
+            embed = discord.Embed(title=f"", description=f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", color=0xc379e0)
+            view = SelfDestructView(15)
+            mes = await interaction.followup.send(embed=embed, view=view)
+            view.message = mes
+            return
+        
+        #Mỗi lần bạo động cần tốn 500 Silver để phát động, và chính quyền sẽ cần tốn 350 Silver để dẹp loạn
+        #Kiểm xem user có đủ 500 Silver không
+        if user_profile.silver < 500:
+            embed = discord.Embed(title=f"", description=f"Để kêu gọi bạo động chính quyền thì bạn cần **500**{CurrencyEmoji.SILVER.value}!", color=0xc379e0)
+            view = SelfDestructView(15)
+            mes = await interaction.followup.send(embed=embed, view=view)
+            view.message = mes
+            return
+        #Trừ 500 silver
+        ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, silver=-500)
+        #Đưa ra embed bạo động
+        embed = discord.Embed(title=f"Lời Kêu Gọi Bạo Động",description=f"{interaction.user.mention} đã kêu gọi mọi người đứng lên khởi nghĩa chống lại Chính Quyền Server <@{existed_authority.user_id}>!",color=discord.Color.red())
+        embed.add_field(name=f"", value="▬▬▬▬▬ι═══════════>", inline=False)
+        embed.add_field(name=f"", value=f"- Nếu kêu gọi thành công nhiều **người bạo động** chính quyền thì {interaction.user.mention} sẽ nhận được **200**{CurrencyEmoji.SILVER.value} và Chính Quyền <@{existed_authority.user_id}> sẽ mất **1000**{CurrencyEmoji.SILVER.value}!", inline=False)
+        embed.add_field(name=f"", value=f"- Chính Quyền <@{existed_authority.user_id}> hoàn toàn có thể bỏ ra **500**{CurrencyEmoji.SILVER.value} để lập tức điều động bắt giữ những kẻ bạo động, hoặc huy động **người phản đối** bạo động để tránh mất tiền!", inline=False)
+        embed.set_image(url="https://kustomsignals.com/wp-content/uploads/2022/09/shutterstock_56579431-1024x680.jpg")
+        
+        view = AuthorityRiotView(user=interaction.user, user_authority=existed_authority)
+        view.embed = embed
+        mes = await interaction.followup.send(embed=embed, view=view)
+        view.message = mes
 
     def get_nhan_pham(self, number):
         text = "Người Thường"

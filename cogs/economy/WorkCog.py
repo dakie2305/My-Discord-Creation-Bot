@@ -7,6 +7,8 @@ import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 from datetime import datetime, timedelta
 import random
 from Handling.Misc.SelfDestructView import SelfDestructView
+import CustomEnum.UserEnum as UserEnum
+import CustomFunctions
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(WorkEconomy(bot=bot))
@@ -32,7 +34,7 @@ class WorkEconomy(commands.Cog):
                 "Vì thành tích công việc quá dở tệ, nên {title} {person} đã kêu {user_name} vào phòng riêng để làm việc lại về thái độ. ", 
                 "Trong lúc làm việc, {title} {person} đã thấy {user_name} chểnh mảng và làm hư đồ tùm lum, gây hại cho nhân loại. ",
                 "Trong lúc test lệnh trong server {server_name}, {user_name} đã spam quá nhiều và bị {title} {person} phát hiện và báo cáo admin. ",
-                "Để gáng hoàn thành KPI, {user_name} đã không từ thủ đoạn bỉ ổi nào, và đã bị chính quyền server {server_name} phát giát. ",
+                "Để gáng hoàn thành KPI, {user_name} đã không từ thủ đoạn bỉ ổi nào, và đã bị chính quyền server {server_name} phát giác. ",
                 "Vì không hoàn thành KPI đăng content trong server {server_name}, {title} {person} quyết định phạt {user_name} một chút để làm gương. ",
                 "Vì chuyên gia quậy phá và spam trong {server_name}, {title} {person} đã quyết định giam thưởng và trừ lương {user_name}. ",
                 "Vì liên tục spam không ngừng trong {server_name}, {user_name} đã bị chính quyền tiễn vong lương thưởng. ",
@@ -44,6 +46,14 @@ class WorkEconomy(commands.Cog):
     async def work(self, ctx):
         message: discord.Message = ctx.message
         if message:
+            #Không cho dùng bot nếu không phải user
+            if CustomFunctions.check_if_dev_mode() == True and message.author.id != UserEnum.UserId.DARKIE.value:
+                view = SelfDestructView(timeout=30)
+                embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
+                mess = await message.reply(embed=embed, view=view)
+                view.message = mess
+                return
+            
             embed, view = await self.embed_work_command(user=message.author)
             mes = await message.reply(embed=embed, view=view)
             if view != None:
@@ -54,6 +64,14 @@ class WorkEconomy(commands.Cog):
     @discord.app_commands.command(name="work", description="Lệnh lao động trong server!")
     async def work_slash_command(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=False)
+        #Không cho dùng bot nếu không phải user
+        if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
+        
         embed, view = await self.embed_work_command(user=interaction.user)
         mess = await interaction.followup.send(embed=embed)
         if view != None:
@@ -64,17 +82,24 @@ class WorkEconomy(commands.Cog):
         user_profile = ProfileMongoManager.find_profile_by_id(guild_id=user.guild.id, user_id=user.id)
         
         if user_profile != None and user_profile.last_work != None:
-            check = self.check_if_within_1h_30(input=user_profile.last_work)
+            time_window = timedelta(hours=1, minutes=30)
+            check = self.check_if_within_time_delta(input=user_profile.last_work, time_window=time_window)
             if check:
                 #Lấy thời gian cũ để cộng vào 1h30 xem chừng nào mới làm việc được tiếp
-                time_window = timedelta(hours=1, minutes=30)
                 work_next_time = user_profile.last_work + time_window
                 unix_time = int(work_next_time.timestamp())
-                embed = discord.Embed(title=f"", description=f"🚫 Bạn đã làm việc rồi. Vui lòng đợi đến để {SlashCommand.WORK.value} lại vào lúc <t:{unix_time}:t> !", color=0xc379e0)
+                embed = discord.Embed(title=f"", description=f"🚫 Bạn đã làm việc rồi. Vui lòng thực hiện lại lệnh {SlashCommand.WORK.value} vào lúc <t:{unix_time}:t> !", color=0xc379e0)
                 view = SelfDestructView(timeout=120)
                 return embed, view
         
-        
+        #Không cho thực hiện nếu còn jail_time
+        if user_profile.jail_time != None:
+            if user_profile.jail_time > datetime.now():
+                unix_time = int(user_profile.jail_time.timestamp())
+                embed = discord.Embed(title=f"", description=f"⛓️ Bạn đã bị chính quyền bắt giữ rồi, vui lòng đợi đến <t:{unix_time}:t> !", color=0xc379e0)
+                return embed, None
+            else:
+                ProfileMongoManager.update_jail_time(guild_id=user.guild.id, user_id=user.id, jail_time=None)
         
         authority_user = ProfileMongoManager.is_authority(guild_id=user.guild.id, user_id= user.id)
         dignity_point = 50
@@ -162,9 +187,8 @@ class WorkEconomy(commands.Cog):
         return embed, None
         
         
-    def check_if_within_1h_30(self, input: datetime):
+    def check_if_within_time_delta(self, input: datetime, time_window: timedelta):
         now = datetime.now()
-        time_window = timedelta(hours=1, minutes=30)
         if now - time_window <= input <= now + time_window:
             return True
         else:

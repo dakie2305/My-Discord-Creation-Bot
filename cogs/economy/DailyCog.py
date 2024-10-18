@@ -5,6 +5,9 @@ import discord
 from discord.ext import commands
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 from datetime import datetime, timedelta
+import CustomFunctions
+from Handling.Misc.SelfDestructView import SelfDestructView
+import CustomEnum.UserEnum as UserEnum
         
 async def setup(bot: commands.Bot):
     await bot.add_cog(DailyEconomy(bot=bot))
@@ -18,17 +21,32 @@ class DailyEconomy(commands.Cog):
     async def daily(self, ctx):
         message: discord.Message = ctx.message
         if message:
+            #Không cho dùng bot nếu không phải user
+            if CustomFunctions.check_if_dev_mode() == True and message.author.id != UserEnum.UserId.DARKIE.value:
+                view = SelfDestructView(timeout=30)
+                embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
+                mess = await message.reply(embed=embed, view=view)
+                view.message = mess
+                return
+            
             embed = await self.embed_daily_command(user=message.author)
             await message.reply(embed=embed)
             return
     
     #region daily
     @discord.app_commands.command(name="daily", description="Điểm danh hằng ngày trong server!")
-    async def transfer_slash_command(self, interaction: discord.Interaction):
+    async def daily_slash_command(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=False)
+        #Không cho dùng bot nếu không phải user
+        if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
+        
         embed = await self.embed_daily_command(user=interaction.user)
         await interaction.followup.send(embed=embed)
-        
     
     async def embed_daily_command(self, user: discord.Member):
         dignity_point = 50
@@ -44,7 +62,14 @@ class DailyEconomy(commands.Cog):
                 unix_time = int(tommorow.timestamp())
                 embed = discord.Embed(title=f"", description=f"🚫 Bạn đã điểm danh xong hôm nay rồi, vui lòng đợi đến ngày mai <t:{unix_time}:D> !", color=0xc379e0)
                 return embed
-            
+            #Không cho thực hiện nếu còn jail_time
+            if user_profile.jail_time != None:
+                if user_profile.jail_time > datetime.now():
+                    unix_time = int(user_profile.jail_time.timestamp())
+                    embed = discord.Embed(title=f"", description=f"⛓️ Bạn đã bị chính quyền bắt giữ rồi, vui lòng đợi đến <t:{unix_time}:t> !", color=0xc379e0)
+                    return embed
+                else:
+                    ProfileMongoManager.update_jail_time(guild_id=user.guild.id, user_id=user.id, jail_time=None)
             dignity_point = user_profile.dignity_point
             if user_profile.last_attendance != None and user_profile.last_attendance.date() == yesterday:
                 consecutive_date = True
@@ -114,3 +139,10 @@ class DailyEconomy(commands.Cog):
         ProfileMongoManager.update_level_progressing(guild_id=user.guild.id, user_id= user.id, bonus_exp=50)
         
         return embed
+    
+    def check_if_within_time_delta(self, input: datetime, time_window: timedelta):
+        now = datetime.now()
+        if now - time_window <= input <= now + time_window:
+            return True
+        else:
+            return False
