@@ -79,8 +79,17 @@ class DailyEconomy(commands.Cog):
                     actual_money += 1000
                     embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.MODERATOR.value}> : +**1000** {CurrencyEmoji.COPPER.value}", inline=False)
                 if role.id == TrueHeavenRoleId.CHOSEN_ONE.value:
-                    actual_money += 700
-                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.CHOSEN_ONE.value}> : +**700** {CurrencyEmoji.COPPER.value}", inline=False)
+                    actual_money += 1000
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.CHOSEN_ONE.value}> : +**1000** {CurrencyEmoji.COPPER.value}", inline=False)
+                if role.id == TrueHeavenRoleId.TOP_1_WORD_MATCHING.value or role.id == TrueHeavenRoleId.TOP_1_WORD_SORT.value:
+                    actual_money += 1500
+                    embed.add_field(name=f"", value=f"- Là <@&{role.id}> : +**1000** {CurrencyEmoji.COPPER.value}", inline=False)
+                if role.id == TrueHeavenRoleId.TOP_2_WORD_MATCHING.value or role.id == TrueHeavenRoleId.TOP_2_WORD_SORT.value:
+                    actual_money += 1200
+                    embed.add_field(name=f"", value=f"- Là <@&{role.id}> : +**700** {CurrencyEmoji.COPPER.value}", inline=False)
+                if role.id == TrueHeavenRoleId.TOP_3_WORD_MATCHING.value or role.id == TrueHeavenRoleId.TOP_3_WORD_SORT.value:
+                    actual_money += 1000
+                    embed.add_field(name=f"", value=f"- Là <@&{role.id}> : +**700** {CurrencyEmoji.COPPER.value}", inline=False)
                 if role.id == TrueHeavenRoleId.BOOSTER.value:
                     actual_money += 65000
                     embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.BOOSTER.value}> : +**65000** {CurrencyEmoji.COPPER.value}", inline=False)

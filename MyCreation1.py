@@ -1365,8 +1365,9 @@ async def sub_function_ai_response(message: discord.Message, speakFlag = True):
                 interaction_logger.info(f"Username {message.author.name}, Display user name {message.author.display_name} violated chat when talking to {bot.user}")
                 interaction_logger.info(f"Username {message.author.name} violated chat {message.content} when talking to {bot.user}")
                 return
+            referenced_message = await message.channel.fetch_message(message.reference.message_id)
+            if referenced_message.embeds: return
             async with message.channel.typing():
-                referenced_message = await message.channel.fetch_message(message.reference.message_id)
                 model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
                 prompt = await CustomFunctions.get_proper_prompt(message,"Creation 1", referenced_message)
                 print(f"Prompt generated from {bot.user}: {prompt}")
@@ -1596,8 +1597,6 @@ async def on_message(message: discord.Message):
         #Xử lý therapy
         model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
         asyncio.create_task(TherapyHandling(bot=bot, model=model).handling_therapy_ai(message=message))
-        speakFlag = False
-    if message.embeds:
         speakFlag = False
 
     await sub_function_ai_response(message=message, speakFlag=speakFlag)

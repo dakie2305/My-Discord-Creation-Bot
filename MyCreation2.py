@@ -326,8 +326,9 @@ async def sub_function_ai_response(message: discord.Message, speakFlag: bool = T
                 interaction_logger.info(f"Username {message.author.name}, Display user name {message.author.display_name} violated chat when talking to {bot.user}")
                 interaction_logger.info(f"Username {message.author.name} violated chat {message.content} when talking to {bot.user}")
                 return
+            referenced_message = await message.channel.fetch_message(message.reference.message_id)
+            if referenced_message.embeds: return
             async with message.channel.typing():
-                referenced_message = await message.channel.fetch_message(message.reference.message_id)
                 model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
                 prompt = await CustomFunctions.get_proper_prompt(message,"Creation 2", referenced_message)
                 print(f"Prompt generated from {bot.user}: {prompt}")
@@ -471,8 +472,6 @@ async def on_message(message: discord.Message):
     speakFlag = True
     auto_rep = AutoresponderHandling(bot=bot)
     if await auto_rep.handling_auto_responder(message=message):
-        speakFlag = False
-    if message.embeds:
         speakFlag = False
     await sub_function_ai_response(message=message, speakFlag=speakFlag)
     await bot.process_commands(message)

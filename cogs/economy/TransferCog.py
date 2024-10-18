@@ -29,6 +29,39 @@ class TransferMoneyEconomy(commands.Cog):
             view.message = mess
     
     
+    @commands.command()
+    async def um(self, ctx, amount: int = None, user: discord.Member = None, loai_tien: str = None):
+        #Chỉ dành owner hoặc Darkie
+        message: discord.Message = ctx.message
+        if message:
+            view = SelfDestructView(timeout=5)
+            text = ""
+            if message.author.id != message.guild.owner_id and message.author.id != UserEnum.UserId.DARKIE.value:
+                text = "Lệnh dành riêng cho Owner server để cập nhật tiền cho một user bất kỳ!"
+            elif amount == None or user == None or loai_tien == None:
+                text = f"Sai cú pháp lệnh! Vui lòng nhập đúng như bên dưới để chuyển {CurrencyEmoji.COPPER.value}\n !um 100 @user C"
+            elif loai_tien != "C" and loai_tien != "D" and loai_tien != "G" and loai_tien != "S":
+                text = f"Sai loại tiền! Loại tiền chỉ được nhập một trong những giá trị sau: C, S, G, D"
+            else:
+                emoji = ""
+                if loai_tien == "S" or loai_tien == "s":
+                    emoji = f"{CurrencyEmoji.SILVER.value}"
+                    ProfileMongoManager.update_profile_money(guild_id=user.guild.id,guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, silver= amount)
+                elif loai_tien == "G" or loai_tien == "g":
+                    emoji = f"{CurrencyEmoji.GOLD.value}"
+                    ProfileMongoManager.update_profile_money(guild_id=user.guild.id,guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, gold= amount)
+                elif loai_tien == "D" or loai_tien == "d":
+                    emoji = f"{CurrencyEmoji.GOLD.value}"
+                    ProfileMongoManager.update_profile_money(guild_id=user.guild.id,guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, darkium= amount)
+                else:
+                    emoji = f"{CurrencyEmoji.COPPER.value}"
+                    ProfileMongoManager.update_profile_money(guild_id=user.guild.id,guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, copper= amount)
+                text = f"Owner đã chuyển **{amount}** {emoji} cho {user.display_name}"
+            embed = discord.Embed(title=f"", description=f"{text}", color=0xc379e0)
+            mess = await message.reply(embed=embed, view=view)
+            view.message = mess
+            return  
+
     #region transfer
     @discord.app_commands.command(name="transfer", description="Chuyển tiền đến user trong server!")
     @discord.app_commands.describe(amount="Chọn số lượng tiền cần chuyển.")
@@ -64,7 +97,13 @@ class TransferMoneyEconomy(commands.Cog):
         receive_user = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=user.id)
         if receive_user == None:
             embed = discord.Embed(title=f"", description=f"Người nhận tiền {user.mention} vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", color=0xc379e0)
-            interaction.followup.send(embed=embed)
+            await interaction.followup.send(embed=embed)
+            return
+        #Kiểm tra xem amount có âm không
+        if amount <= 0:
+            embed = discord.Embed(title=f"", description=f"Khỏi test bug! Vì gây lãng phí tài nguyên, {interaction.user.mention} đã bị trừ **500**{CurrencyEmoji.COPPER.value}!", color=0xc379e0)
+            ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id,guild_name=interaction.guild.name, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, copper= -500)
+            await interaction.followup.send(embed=embed)
             return
         
         #Kiểm tra xem người dùng lệnh có đủ tiền không
@@ -119,6 +158,7 @@ class TransferMoneyEconomy(commands.Cog):
         ProfileMongoManager.update_level_progressing(guild_id=user.guild.id, user_id= user.id, bonus_exp= -10)
         ProfileMongoManager.update_level_progressing(guild_id=user.guild.id, user_id= interaction.user.id, bonus_exp= -10)
         await interaction.followup.send(f"{interaction.user.mention} đã chuyển **{amount}** {self.get_emoji_from_type(loai_tien)} cho {user.mention}{extra_mess}. {tax_text}", ephemeral=False)
+    
     
     
     def get_emoji_from_type(self, input: str):
