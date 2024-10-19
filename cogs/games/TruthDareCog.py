@@ -6,6 +6,8 @@ import db.DbMongoManager as DbMongoManager
 import CustomFunctions
 import random
 from Handling.MiniGame.TruthDare.TruthDareView import TruthDareView
+import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
+from CustomEnum.SlashEnum import SlashCommand 
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(TruthDare(bot=bot))
@@ -47,3 +49,9 @@ class TruthDare(commands.Cog):
         await interaction.followup.send(f"Bạn đã chọn {question_type}.", ephemeral=True)
         message= await channel.send(embed=embed, view= view)
         view.message = message
+        
+        #Kiểm tra quest
+        quest_progress = QuestMongoManager.increase_truth_dare_count(guild_id=interaction.guild_id, user_id=interaction.user.id, is_truth=ran)
+        if quest_progress != None and quest_progress == True:
+            quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
+            await channel.send(embed=quest_embed, content=f"{interaction.user.mention}")

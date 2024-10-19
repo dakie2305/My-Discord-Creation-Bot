@@ -10,7 +10,7 @@ import db.DbMongoManager as db
 
 class AuthorityRiotPreventView(discord.ui.View):
     def __init__(self, user: discord.Member, rioting_user: discord.Member):
-        super().__init__(timeout=120)
+        super().__init__(timeout=60)
         self.message: discord.Message = None
         self.user = user
         self.rioting_user = rioting_user

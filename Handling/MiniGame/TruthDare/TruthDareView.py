@@ -2,6 +2,8 @@ from Handling.MiniGame.SortWord import SwMongoManager as SwMongoManager
 import CustomFunctions
 import db.DbMongoManager as DbMongoManager
 import discord
+import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
+from CustomEnum.SlashEnum import SlashCommand 
 
 class TruthDareView(discord.ui.View):
     def __init__(self):
@@ -33,6 +35,12 @@ class TruthDareView(discord.ui.View):
         view.message = message
         DbMongoManager.update_or_insert_user_count(guild_id=interaction.guild_id, user_id= interaction.user.id, user_name= interaction.user.name, user_display_name=interaction.user.display_name, truth_game_index=index)
         
+        #Kiểm tra quest
+        quest_progress = QuestMongoManager.increase_truth_dare_count(guild_id=interaction.guild_id, user_id=interaction.user.id, is_truth=True)
+        if quest_progress != None and quest_progress == True:
+            quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
+            await channel.send(embed=quest_embed, content=f"{interaction.user.mention}")
+        
     @discord.ui.button(label="Thách thức", style=discord.ButtonStyle.secondary, custom_id="dare_button")
     async def buttonDare_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.defer(ephemeral=True)
@@ -50,3 +58,9 @@ class TruthDareView(discord.ui.View):
         message= await channel.send(embed=embed, view= view)
         view.message = message
         DbMongoManager.update_or_insert_user_count(guild_id=interaction.guild_id, user_id= interaction.user.id, user_name= interaction.user.name, user_display_name=interaction.user.display_name, dare_game_index=index)
+        
+        #Kiểm tra quest
+        quest_progress = QuestMongoManager.increase_truth_dare_count(guild_id=interaction.guild_id, user_id=interaction.user.id, is_truth=False)
+        if quest_progress != None and quest_progress == True:
+            quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để nhận thưởng mới nha!", color=0xc379e0)
+            await channel.send(embed=quest_embed, content=f"{interaction.user.mention}")

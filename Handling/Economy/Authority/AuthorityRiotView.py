@@ -8,7 +8,7 @@ from Handling.Economy.Authority.AuthorityRiotPreventView import AuthorityRiotPre
 
 class AuthorityRiotView(discord.ui.View):
     def __init__(self, user: discord.Member, user_authority: Profile):
-        super().__init__(timeout=75)
+        super().__init__(timeout=80)
         self.message: discord.Message = None
         self.embed: discord.Embed = None
         self.target_user = user

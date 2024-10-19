@@ -1227,7 +1227,7 @@ async def help_command_slash(interaction: discord.Interaction):
     await interaction.followup.send(content=f"{text}")
 
 
-async def get_help_text(message: discord.Message):
+async def get_help_text():
     #Trả về text hướng dẫn command
     text = """**-= Lệnh của Creations 1 =-**
     

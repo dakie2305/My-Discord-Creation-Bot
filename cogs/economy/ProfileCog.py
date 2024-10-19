@@ -154,19 +154,19 @@ class ProfileEconomy(commands.Cog):
         total_wealth += data.gold * 5000 * 5000
         total_wealth += data.darkium * 5000 * 5000 *10000
         
-        if total_wealth > 25025026000:
+        if total_wealth > 2002502600:
             text= "Đỉnh Cấp Xã Hội"
-        if total_wealth > 15025026000:
+        if total_wealth > 1502502600:
             text= "Giới Tinh Anh"
-        if total_wealth > 10025026000:
+        if total_wealth > 1002502600:
             text= "Thượng Đẳng"
-        if total_wealth > 5025026000:
+        if total_wealth > 502502600:
             text= "Thượng Lưu"
-        if total_wealth > 2525026000:
+        if total_wealth > 100502600:
             text= "Thượng Lưu"
-        if total_wealth > 25026000:
+        if total_wealth > 5502600:
             text= "Trung Lưu"
-        if total_wealth > 10000000:
+        if total_wealth > 1000000:
             text= "Hạ Lưu"
         else:
             text = "Hạ Đẳng"

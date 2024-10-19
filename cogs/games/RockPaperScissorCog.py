@@ -5,6 +5,8 @@ from typing import Optional
 from collections import deque
 from datetime import datetime, timedelta
 from Handling.MiniGame.RockPaperScissor import RpsClass, RpsMongoManager, RpsView
+import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
+from CustomEnum.SlashEnum import SlashCommand 
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(RockPaperScissors(bot=bot))
@@ -39,6 +41,12 @@ class RockPaperScissors(commands.Cog):
         view.message_id = message.id
         view.channel_id = interaction.channel_id
         view.message = message
+        
+        check_quest_message = QuestMongoManager.increase_rps_count(guild_id=interaction.guild_id, user_id=interaction.user.id, channel_id=interaction.channel_id)
+        if check_quest_message == True:
+            quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
+            await interaction.followup.send(embed=quest_embed, content= f"{user.mention}")
+        
     
     #region bxh_rps command
     @discord.app_commands.command(name="bxh_rps", description="Xem xếp hạng Kéo - Búa - Bao")

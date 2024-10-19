@@ -168,7 +168,7 @@ def update_profile_money_fast(guild_id:int, data: Profile):
                                                                                     "darkium": data.darkium,
                                                                                     }})
     return result
-
+#region daily
 def update_last_attendance_now(guild_id:int, user_id: int):
     collection = db_specific[f'profile_{guild_id}']
     today = datetime.now()
@@ -176,6 +176,17 @@ def update_last_attendance_now(guild_id:int, user_id: int):
                                                                                     }})
     return result
 
+#region quest finished
+def increase_quest_finished(guild_id:int, user_id: int):
+    collection = db_specific[f'profile_{guild_id}']
+    existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
+    if existing_data == None: return
+    existing_data.quest_finished += 1
+    result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"quest_finished": existing_data.quest_finished,
+                                                                                    }})
+    return result
+
+#region level
 def update_level_progressing(guild_id:int, user_id: int, bonus_exp: int = 0):
     collection = db_specific[f'profile_{guild_id}']
     existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
@@ -194,6 +205,7 @@ def update_level_progressing(guild_id:int, user_id: int, bonus_exp: int = 0):
     elif existing_data.level == 99:
         #Cực khó sau level 99
         existing_data.level_progressing += 1
+        bonus_exp = 0
     
     if bonus_exp < 0: bonus_exp = 0
     #Cộng thêm bonus nếu có
@@ -209,6 +221,7 @@ def update_level_progressing(guild_id:int, user_id: int, bonus_exp: int = 0):
                                                                                     }})
     return result
 
+#region work
 def update_last_work_now(guild_id:int, user_id: int):
     collection = db_specific[f'profile_{guild_id}']
     today = datetime.now()
@@ -225,6 +238,7 @@ def is_in_greatest_debt(guild_id:int, user_id: int):
     else:
         return False
 
+#region quote
 def update_profile_quote(guild_id: int, guild_name: str, user_id: int, user_name: str, user_display_name: str, quote: str):
     collection = db_specific[f'profile_{guild_id}']
     existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)

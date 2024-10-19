@@ -6,6 +6,10 @@ import asyncio
 import random
 from Handling.Misc.SelfDestructView import SelfDestructView
 from enum import Enum
+import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
+from CustomEnum.SlashEnum import SlashCommand 
+from CustomEnum.EmojiEnum import EmojiCreation2 
+
 
 class CurrencyEmoji(Enum):
         DARKIUM = "<a:darkium:1294615481701105734>"
@@ -27,6 +31,10 @@ class AutoresponderHandling():
         conversion_rate = ["quy đổi coin", "quy đổi gold", "quy đổi silver", "quy đổi copper", "quy đổi darkium"]
         quote = ["quote"]
         bank_help = ["bank help", "bank sao", "bank?"]
+        
+        dignity_help = ["tăng nhân phẩm", "điểm nhân phẩm", "nhân phẩm là gì", "nhân phẩm?"]
+        dia_vi_help = ["tăng địa vị", "điểm nhân phẩm", "nhân phẩm là gì", "nhân phẩm?"]
+        
         flag = False
         if message.author.bot: return flag
         
@@ -37,6 +45,7 @@ class AutoresponderHandling():
             if mess_coin:
                 await self.edit_embed_coin_flip(message=mess_coin, user=message.author)
             flag = True
+            
         elif CustomFunctions.contains_substring(message.content.lower(), conversion_rate):
             embed = discord.Embed(title=f"", description=f"**Đơn vị quy đổi chuẩn của Creation 2 rất đơn giản thôi!**", color=0xc379e0)
             embed.add_field(name="", value="-------------------------------------", inline=False)
@@ -66,6 +75,31 @@ class AutoresponderHandling():
             view = SelfDestructView(timeout=180)
             _mess = await message.channel.send(embed=embed, view=view)
             view.message= _mess
+        
+        elif CustomFunctions.contains_substring(message.content.lower(), dignity_help):
+            flag = True
+            embed = discord.Embed(title=f"", description=f"Hướng dẫn **Diểm nhân phẩm**", color=0xc379e0)
+            embed.add_field(name="", value="-------------------------------------", inline=False)
+            embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Điểm nhân phẩm sẽ quyết định rất nhiều điều, về số tiền bạn kiếm được, về kinh nghiệm bạn kiếm được... và sẽ tác động đến những lệnh khác mà cần tốn tiền.", inline=False)
+            embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Điểm nhân phẩm càng thấp thì nhân phẩm bạn sẽ thấp và có thể gặp bất lợi, nhưng đồng thời cũng có lợi ở đôi chỗ khác như {SlashCommand.WORK.value} thì có thể trốn thuế nhiều hơn.", inline=False)
+            embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Để tăng nhân phẩm thì chỉ cần dùng những lệnh cơ bản như {SlashCommand.WORK.value}, {SlashCommand.DAILY.value} là được.", inline=False)
+            embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Nhân phẩm sẽ giảm khi bạn bạo động, hoặc khi chơi các mini game cờ bạc nhưng để bị thua.", inline=False)
+            embed.add_field(name="", value="-------------------------------------", inline=False)
+            view = SelfDestructView(timeout=180)
+            _mess = await message.channel.send(embed=embed, view=view)
+            view.message= _mess
+            
+        elif CustomFunctions.contains_substring(message.content.lower(), dia_vi_help):
+            flag = True
+            embed = discord.Embed(title=f"", description=f"Hướng dẫn **Địa Vị**", color=0xc379e0)
+            embed.add_field(name="", value="-------------------------------------", inline=False)
+            embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Địa vị chính là tổng số tài sản của bạn cộng lại mà ra. Tổng tài sản càng nhiều thì địa vị sẽ tăng lên, và ngược lại.", inline=False)
+            embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Để kiếm được tiền thì bạn có thể dùng những lệnh như {SlashCommand.WORK.value}, {SlashCommand.DAILY.value}, hoặc đi bạo động chính quyền, hoặc chơi các lệnh cờ bạc! Vô vàn lựa chọn cho bạn chọn!", inline=False)
+            embed.add_field(name="", value="-------------------------------------", inline=False)
+            view = SelfDestructView(timeout=180)
+            _mess = await message.channel.send(embed=embed, view=view)
+            view.message= _mess
+            
             
         return flag
     
@@ -96,4 +130,9 @@ class AutoresponderHandling():
                 emoji_state = '<:coin_ngua:1287452465733570684>'
             embed_updated = discord.Embed(title=f"", description=f"Đùa thôi. Đồng xu đã quay ra **`{state}`** {emoji_state}!", color=0x03F8FC)
             await message.edit(embed=embed_updated)
+        
+        check_quest_message = QuestMongoManager.increase_coin_flip_count(guild_id=message.guild.id, user_id=message.author.id, channel_id=message.channel.id)
+        if check_quest_message == True:
+            quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
+            await message.channel.send(embed=quest_embed, content=f"{message.author.mention}")
         return

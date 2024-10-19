@@ -16,11 +16,12 @@ import random
 import string
 import CustomButton
 from typing import Optional
-from collections import deque
-import requests
 import PIL
 import asyncio
 from Handling.Misc.AutoresponderCreation2 import AutoresponderHandling
+from Handling.Economy.Quest.QuestHandling import QuestHandling
+import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
+from CustomEnum.SlashEnum import SlashCommand 
 
 load_dotenv()
 intents = discord.Intents.all()
@@ -238,6 +239,11 @@ async def edit_embed_coin_flip(message: discord.Message, user: discord.Member):
             emoji_state = '<:coin_ngua:1287452465733570684>'
         embed_updated = discord.Embed(title=f"", description=f"Đùa thôi. Đồng xu đã quay ra **`{state}`** {emoji_state}!", color=0x03F8FC)
         await message.edit(embed=embed_updated)
+    
+    check_quest_message = QuestMongoManager.increase_coin_flip_count(guild_id=message.guild.id, user_id=message.author.id, channel_id=message.channel.id)
+    if check_quest_message == True:
+        quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
+        await message.channel.send(embed=quest_embed, content=f"{message.author.mention}")
     return
 #endregion
 
@@ -473,7 +479,11 @@ async def on_message(message: discord.Message):
     auto_rep = AutoresponderHandling(bot=bot)
     if await auto_rep.handling_auto_responder(message=message):
         speakFlag = False
+    
     await sub_function_ai_response(message=message, speakFlag=speakFlag)
+    quest = QuestHandling(bot=bot)
+    await quest.handling_quest_progress(message=message)
+    
     await bot.process_commands(message)
 
 @bot.event
@@ -518,6 +528,20 @@ async def on_message_delete(message):
     else:
         print("Message deleted in a private message.")
     return
+
+@bot.event
+async def on_reaction_add(reaction, user):
+    if user == bot.user:
+        return
+    message: discord.Message = reaction.message
+    if message != None:
+        check_quest_message = QuestMongoManager.increase_emoji_count(guild_id=message.guild.id, user_id=message.author.id, channel_id=message.channel.id)
+        if check_quest_message == True:
+            quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
+            await message.channel.send(embed=quest_embed, content=f"{message.author.mention}")
+    return
+
+
 
 #Cog command
 init_extension = ["cogs.games.RockPaperScissorCog", 

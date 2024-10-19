@@ -3,6 +3,7 @@ from pymongo import MongoClient
 from datetime import datetime, timedelta
 import Handling.Economy.ConversionRate.ConversionRateMongoManager as ConversionRateMongoManager 
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
+from Handling.Economy.Profile.ProfileClass import Profile
 from Handling.Economy.Quest.QuestClass import QuestProfile
 import random
 from CustomEnum.EmojiEnum import EmojiCreation2
@@ -13,32 +14,39 @@ client = MongoClient("mongodb://localhost:27017/")
 # Create or switch to the database
 db_specific = client["economy_database"]
 
-list_quest_general_type = [
-    "emoji_reaction_count", 
-    "message_count", 
-    "attachments_count", 
-    "truth_game_count",
-    "dare_game_count",
-    "coin_flip_game_count",
-    "rps_game_count",
-    ]
-
 #region Quest
-def find_quest_by_use_id(guild_id: int, user_id: int):
+def find_quest_by_user_id(guild_id: int, user_id: int):
     collection = db_specific[f'quest_{guild_id}']
     data = collection.find_one({"id": "quest", "user_id": user_id})
     if data:
         return QuestProfile.from_dict(data)
     return None
 
-def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_name: str, user_display_name: str, channel_id: int, channel_name: str):
+def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_name: str, user_display_name: str, channel_id: int, channel_name: str, data: Profile = None):
     #Mỗi server là một collection, chia theo server id
     collection = db_specific[f'quest_{guild_id}']
     existing_data = collection.find_one({"id": "quest", "user_id": user_id})
     if existing_data:
         return None
     quest_type = random.choice(list_quest_general_type)
-    quest_difficult_rate = random.randint(1, 4) #dễ, trung bình, khó, huyển thoại
+    quest_difficult_rate = 1  #dễ, trung bình, khó, huyển thoại
+    if data != None and data.level != None:
+        if data.level >= 1 and data.level < 15:
+            # 5% 4, 20% 3, 30% 2
+            quest_difficult_rate = get_value(lengend=5, hard=20, avarage=30)
+        elif data.level >= 15 and data.level < 30:
+            # 5% 4, 20% 3, 40% 2
+            quest_difficult_rate = get_value(lengend=5, hard=30, avarage=40)
+        elif data.level >= 30 and data.level < 50:
+            # 5% 4, 35% 3, 35% 2
+            quest_difficult_rate = get_value(lengend=5, hard=35, avarage=35)
+        elif data.level >= 50 and data.level < 75:
+            # 10% 4, 35% 3, 35% 2
+            quest_difficult_rate = get_value(lengend=10, hard=35, avarage=35)
+        elif data.level >= 75 and data.level < 99:
+            quest_difficult_rate = get_value(lengend=10, hard=50, avarage=10)
+        elif data.level >= 99:
+            quest_difficult_rate = get_value(lengend=15, hard=55, avarage=25)
     reward_type = "C"
     bonus_exp = 0
     emoji = EmojiCreation2.COPPER.value
@@ -78,7 +86,7 @@ def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_n
         quest_des = f"**{base_reward_amount}**{emoji}"
     
     if quest_type == "attachments_count":
-        base_amount = quest_difficult_rate * 8
+        base_amount = quest_difficult_rate * 10
         rand_reward_amount = random.randint(1, 5)
         base_reward_amount = 500
         if reward_type == "C":
@@ -129,7 +137,135 @@ def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_n
     result = collection.insert_one(data.to_dict())
     return data
 
+def get_value(lengend: int, hard: int, avarage: int):
+    rand_num = random.randint(0, 100)
+    if rand_num < lengend:  # % lengend chance
+        return 4
+    elif rand_num < hard:  # % hard chance
+        return 3
+    elif rand_num < avarage:  # 30% chance (25% + 30% = 55%)
+        return 2
+    else:  # % easy chance
+        return 1
+
+
 def delete_quest(guild_id: int, user_id: int):
     collection = db_specific[f'quest_{guild_id}']
     result = collection.delete_one({"id": "quest", "user_id": user_id})
     return result
+
+#region Quest truth dare
+def increase_truth_dare_count(guild_id: int, user_id: int, is_truth: bool):
+    collection = db_specific[f'quest_{guild_id}']
+    quest_type = "truth_game_count"
+    if is_truth == False:
+        quest_type = "dare_game_count"
+        
+    data = collection.find_one({"id": "quest", "user_id": user_id, "quest_type": quest_type})
+    if data == None: return False
+    existing_data = QuestProfile.from_dict(data)
+    if is_truth: 
+        existing_data.truth_game_count += 1
+        existing_data.quest_progress += 1
+    else:
+        existing_data.dare_game_count += 1
+        existing_data.quest_progress += 1
+    
+    is_completed = False if existing_data.quest_progress < existing_data.quest_total_progress else True
+    collection.update_one({"id": "quest", "user_id": user_id}, {"$set": {"truth_game_count": existing_data.truth_game_count,
+                                                                                    "quest_progress": existing_data.quest_progress,
+                                                                                    "dare_game_count": existing_data.dare_game_count,
+                                                                                    }})
+    if is_completed:
+        ProfileMongoManager.increase_quest_finished(guild_id=guild_id, user_id=user_id)
+    return is_completed
+
+#region Message Count
+def increase_message_count(guild_id: int, user_id: int, channel_id: int):
+    collection = db_specific[f'quest_{guild_id}']
+    data = collection.find_one({"id": "quest", "user_id": user_id, "quest_type": "message_count", "quest_channel": channel_id})
+    if data == None: return False
+    existing_data = QuestProfile.from_dict(data)
+    existing_data.quest_progress += 1
+    
+    is_completed = False if existing_data.quest_progress < existing_data.quest_total_progress else True
+    collection.update_one({"id": "quest", "user_id": user_id}, {"$set": {
+                                                                            "quest_progress": existing_data.quest_progress,
+                                                                        }})
+    if is_completed:
+        ProfileMongoManager.increase_quest_finished(guild_id=guild_id, user_id=user_id)
+    return is_completed
+
+#region Attachment Count
+def increase_attachment_count(guild_id: int, user_id: int, channel_id: int, count: int):
+    collection = db_specific[f'quest_{guild_id}']
+    data = collection.find_one({"id": "quest", "user_id": user_id, "quest_type": "attachments_count","quest_channel": channel_id})
+    if data == None: return False
+    existing_data = QuestProfile.from_dict(data)
+    existing_data.quest_progress += count
+    
+    is_completed = False if existing_data.quest_progress < existing_data.quest_total_progress else True
+    collection.update_one({"id": "quest", "user_id": user_id}, {"$set": {
+                                                                            "quest_progress": existing_data.quest_progress,
+                                                                        }})
+    if is_completed:
+        ProfileMongoManager.increase_quest_finished(guild_id=guild_id, user_id=user_id)
+    return is_completed
+
+#region Coin Flip Count
+def increase_coin_flip_count(guild_id: int, user_id: int, channel_id: int):
+    collection = db_specific[f'quest_{guild_id}']
+    data = collection.find_one({"id": "quest", "user_id": user_id, "quest_type": "coin_flip_game_count"})
+    if data == None: return False
+    existing_data = QuestProfile.from_dict(data)
+    existing_data.quest_progress += 1
+    
+    is_completed = False if existing_data.quest_progress < existing_data.quest_total_progress else True
+    collection.update_one({"id": "quest", "user_id": user_id}, {"$set": {
+                                                                            "quest_progress": existing_data.quest_progress,
+                                                                        }})
+    if is_completed:
+        ProfileMongoManager.increase_quest_finished(guild_id=guild_id, user_id=user_id)
+    return is_completed
+
+#region Kéo Búa Bao Count
+def increase_rps_count(guild_id: int, user_id: int, channel_id: int):
+    collection = db_specific[f'quest_{guild_id}']
+    data = collection.find_one({"id": "quest", "user_id": user_id, "quest_type": "rps_game_count"})
+    if data == None: return False
+    existing_data = QuestProfile.from_dict(data)
+    existing_data.quest_progress += 1
+    is_completed = False if existing_data.quest_progress < existing_data.quest_total_progress else True
+    collection.update_one({"id": "quest", "user_id": user_id}, {"$set": {
+                                                                            "quest_progress": existing_data.quest_progress,
+                                                                        }})
+    if is_completed:
+        ProfileMongoManager.increase_quest_finished(guild_id=guild_id, user_id=user_id)
+    return is_completed
+
+#region Emoji Count
+def increase_emoji_count(guild_id: int, user_id: int, channel_id: int):
+    collection = db_specific[f'quest_{guild_id}']
+    data = collection.find_one({"id": "quest", "user_id": user_id, "quest_type": "emoji_reaction_count","quest_channel": channel_id})
+    if data == None: return False
+    existing_data = QuestProfile.from_dict(data)
+    existing_data.quest_progress += 1
+    is_completed = False if existing_data.quest_progress < existing_data.quest_total_progress else True
+    collection.update_one({"id": "quest", "user_id": user_id}, {"$set": {
+                                                                            "quest_progress": existing_data.quest_progress,
+                                                                        }})
+    if is_completed:
+        ProfileMongoManager.increase_quest_finished(guild_id=guild_id, user_id=user_id)
+    return is_completed
+
+
+
+list_quest_general_type = [
+    "emoji_reaction_count", 
+    "message_count", 
+    "attachments_count", 
+    "truth_game_count",
+    "dare_game_count",
+    "coin_flip_game_count",
+    "rps_game_count",
+    ]

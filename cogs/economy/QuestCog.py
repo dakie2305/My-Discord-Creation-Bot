@@ -66,13 +66,34 @@ class QuestEconomy(commands.Cog):
         data = ProfileMongoManager.find_profile_by_id(guild_id=user.guild.id, user_id=user.id)
         if data == None:
             data = ProfileMongoManager.create_profile(guild_id=user.guild.id, user_id=user.id, guild_name=user.guild.name, user_name=user.name, user_display_name=user.display_name)
-        quest = QuestMongoManager.find_quest_by_use_id(guild_id=user.guild.id, user_id=user.id)
+        quest = QuestMongoManager.find_quest_by_user_id(guild_id=user.guild.id, user_id=user.id)
         
         #Tìm xem channel có list chanel dành cho quest chưa
         guild_extra_info = DbMongoManager.find_guild_extra_info_by_id(guild_id=user.guild.id)
         if guild_extra_info == None or guild_extra_info.list_channels_quests == None or len(guild_extra_info.list_channels_quests) == 0:
             embed = discord.Embed(title=f"Owner Server vui lòng dùng lệnh {SlashCommand.QUEST_CHANNELS} để thêm channel cho Hệ Thống Nhiệm Vụ chọn!",color=discord.Color.red())
             return embed
+        
+        #Kiểm xem quest cũ đã hoàn thành chưa
+        if quest != None and quest.quest_progress!= None and quest.quest_total_progress != None and quest.quest_progress >= quest.quest_total_progress:
+            #Hoàn thành
+            new_embed = discord.Embed(title=f"", description=f"Chúc mừng **{user.name}** đã hoàn thành nhiệm vụ: {quest.quest_title}!",color=discord.Color.blue())
+            new_embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+            new_embed.add_field(name=f"", value=f"Bạn đã được nhận thưởng sau:", inline=False)
+            new_embed.add_field(name=f"", value=f"{EmojiCreation2.GOLDEN_GIFT_BOX.value}: {quest.quest_description}", inline=False)
+            if quest.bonus_exp != None and quest.bonus_exp != 0:
+                new_embed.add_field(name=f"", value=f"{EmojiCreation2.GOLDEN_GIFT_BOX.value}: {quest.bonus_exp} Điểm Kinh Nghiệm", inline=False)
+            new_embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+            new_embed.add_field(name=f"", value=f"> Đừng quên dùng lệnh {SlashCommand.QUEST.value} để nhận nhiệm vụ trong server nhé", inline=False)
+            new_embed.set_footer(text=f"Quest {user.name}", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/8fd7278827dbc92713e315ee03e0b502.webp?size=32")
+            #Cộng tiền
+            ProfileMongoManager.update_profile_money(guild_id=user.guild.id, guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name= user.display_name, gold=quest.quest_reward_gold, silver=quest.quest_reward_silver, copper=quest.quest_reward_copper)
+            #Cộng kinh nghiệm
+            ProfileMongoManager.update_level_progressing(guild_id=user.guild.id, user_id=user.id, bonus_exp= 80 + quest.bonus_exp)
+            #Xoá quest hiện tại
+            QuestMongoManager.delete_quest(guild_id=user.guild.id, user_id=user.id)
+            
+            return new_embed
         
         list_channels_quests = guild_extra_info.list_channels_quests
         random_quest_channel_id = random.choice(list_channels_quests)
