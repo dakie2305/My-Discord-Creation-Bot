@@ -894,7 +894,6 @@ async def first_command(interaction: discord.Interaction, user : discord.Member,
     end_time = datetime.now() + CustomFunctions.get_timedelta(duration, time_format)
     mordern_date_time_format = end_time.strftime(f"%d/%m/%Y %H:%M")
     # Save user's roles
-    # original_roles = user.roles[1:]  # Exclude @everyone role
     original_roles = [role for role in user.roles if not role.is_default() and not role.is_premium_subscriber()]
     stored_original_roles = []
     for role in original_roles:
@@ -917,7 +916,6 @@ async def first_command(interaction: discord.Interaction, user : discord.Member,
     jail_until= end_time,
     roles=stored_original_roles
     )
-    print(user_info)
     
     
     #Tìm xem user này đã có chưa, chưa có thì insert

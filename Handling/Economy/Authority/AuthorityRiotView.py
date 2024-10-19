@@ -60,10 +60,11 @@ class AuthorityRiotView(discord.ui.View):
             await self.conclude_vote(interaction)
 
     async def conclude_vote(self, interaction: discord.Interaction=None):
-        await self.message.edit(embed=self.embed, view= None)
+        if self.message != None:
+            await self.message.edit(embed=self.embed, view= None)
         riot_win = False
         if len(self.yes_votes) > len(self.no_votes):
-            result_message = f"Anh hùng **{self.target_user.display_name}** đã bạo động thành công khiến Chính Quyền mất **1000**{CurrencyEmoji.SILVER.value} và nhận được **200**{CurrencyEmoji.SILVER.value}! Đã có **{len(self.yes_votes)}** người đứng ra ủng hộ bạo động chính quyền!"
+            result_message = f"Anh hùng **{self.target_user.display_name}** đã bạo động thành công khiến Chính Quyền mất **1000**{CurrencyEmoji.SILVER.value} và nhận được **500**{CurrencyEmoji.SILVER.value}! Đã có **{len(self.yes_votes)}** người đứng ra ủng hộ bạo động chính quyền!"
             riot_win = True
         else:
             result_message = f"Thành phần phản động **{self.target_user.display_name}** đã tổ chức khủng bố Chính Quyền nhưng đã bị dập tắt bạo động ngay lập tức! Thủ phạm **{self.target_user.display_name}** bị phạt **100K**{CurrencyEmoji.COPPER.value} và cùng **{len(self.yes_votes)}** thành phần phản động khác bị tống giam trong 3 tiếng!"
@@ -73,9 +74,12 @@ class AuthorityRiotView(discord.ui.View):
             embed.set_thumbnail(url="https://miro.medium.com/v2/resize:fit:640/format:webp/1*svtb7AdUWnBGfuZfCJc8Og.gif")
             #Trừ tiền của phản động
             ProfileMongoManager.update_profile_money(guild_id=self.target_user.guild.id, guild_name=self.target_user.guild.name, user_id=self.target_user.id, user_display_name= self.target_user.display_name, user_name=self.target_user.name, copper=-100000)
+            #Cộng nhân phẩm cho chính quyền
+            ProfileMongoManager.update_dignity_point(guild_id=self.target_user.guild.id, guild_name=self.target_user.guild.name, user_id=self.user_authority.user_id, user_name= self.user_authority.user_name, user_display_name=self.user_authority.user_display_name, dignity_point=15)
+            ProfileMongoManager.update_level_progressing(guild_id=self.target_user.guild.id, user_id=self.user_authority.user_id, bonus_exp=10)
         else:
             #Cộng tiền cho phản động
-            ProfileMongoManager.update_profile_money(guild_id=self.target_user.guild.id, guild_name=self.target_user.guild.name, user_id=self.target_user.id, user_display_name= self.target_user.display_name, user_name=self.target_user.name, silver=200)
+            ProfileMongoManager.update_profile_money(guild_id=self.target_user.guild.id, guild_name=self.target_user.guild.name, user_id=self.target_user.id, user_display_name= self.target_user.display_name, user_name=self.target_user.name, silver=500)
             #Trừ tiền của chính quyền
             ProfileMongoManager.update_profile_money(guild_id=self.target_user.guild.id, guild_name=self.target_user.guild.name, user_id=self.user_authority.user_id, user_display_name= self.user_authority.user_display_name, user_name=self.user_authority.user_name, silver=-1000)
             embed.set_thumbnail(url="https://img.freepik.com/premium-photo/violent-riot-street-fight-criminal-gangs-extremists-faces-shadows-black-clothes-hoods-fire-flames-background-looting_884546-10051.jpg")
@@ -102,7 +106,8 @@ class AuthorityRiotView(discord.ui.View):
         if interaction:
             await interaction.followup.send(embed=embed, ephemeral=False)
         else:
-            await self.message.channel.send(embed=embed)
+            if self.message != None:
+                await self.message.channel.send(embed=embed)
         
     def get_nhan_pham(self, number):
         text = "Người Thường"
