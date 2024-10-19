@@ -1,0 +1,135 @@
+from typing import List
+from pymongo import MongoClient
+from datetime import datetime, timedelta
+import Handling.Economy.ConversionRate.ConversionRateMongoManager as ConversionRateMongoManager 
+import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
+from Handling.Economy.Quest.QuestClass import QuestProfile
+import random
+from CustomEnum.EmojiEnum import EmojiCreation2
+
+
+# Connect to the MongoDB server
+client = MongoClient("mongodb://localhost:27017/")
+# Create or switch to the database
+db_specific = client["economy_database"]
+
+list_quest_general_type = [
+    "emoji_reaction_count", 
+    "message_count", 
+    "attachments_count", 
+    "truth_game_count",
+    "dare_game_count",
+    "coin_flip_game_count",
+    "rps_game_count",
+    ]
+
+#region Quest
+def find_quest_by_use_id(guild_id: int, user_id: int):
+    collection = db_specific[f'quest_{guild_id}']
+    data = collection.find_one({"id": "quest", "user_id": user_id})
+    if data:
+        return QuestProfile.from_dict(data)
+    return None
+
+def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_name: str, user_display_name: str, channel_id: int, channel_name: str):
+    #Mỗi server là một collection, chia theo server id
+    collection = db_specific[f'quest_{guild_id}']
+    existing_data = collection.find_one({"id": "quest", "user_id": user_id})
+    if existing_data:
+        return None
+    quest_type = random.choice(list_quest_general_type)
+    quest_difficult_rate = random.randint(1, 4) #dễ, trung bình, khó, huyển thoại
+    reward_type = "C"
+    bonus_exp = 0
+    emoji = EmojiCreation2.COPPER.value
+    if quest_difficult_rate == 2 or quest_difficult_rate == 3:
+        reward_type = "S"
+        emoji = EmojiCreation2.SILVER.value
+        bonus_exp = 10
+    elif quest_difficult_rate == 4:
+        reward_type = "G"
+        emoji = EmojiCreation2.GOLD.value
+        bonus_exp = 20
+    base_amount = 1
+    if quest_type == "emoji_reaction_count":
+        base_amount = quest_difficult_rate * 250
+        rand_reward_amount = random.randint(1, 5)
+        base_reward_amount = 1000
+        if reward_type == "C":
+            base_reward_amount = 1000 * rand_reward_amount
+        elif reward_type == "S":
+            base_reward_amount = 100 * rand_reward_amount
+        elif reward_type == "G":
+            base_reward_amount = 1 * rand_reward_amount
+        quest_title = f"Thả **{base_amount}** reactions bất kỳ tại kênh <#{channel_id}>"
+        quest_des = f"**{base_reward_amount}**{emoji}"
+    
+    if quest_type == "message_count":
+        base_amount = quest_difficult_rate * 150
+        rand_reward_amount = random.randint(1, 5)
+        base_reward_amount = 2000
+        if reward_type == "C":
+            base_reward_amount = 2000 * rand_reward_amount
+        elif reward_type == "S":
+            base_reward_amount = 200 * rand_reward_amount
+        elif reward_type == "G":
+            base_reward_amount = 5 * rand_reward_amount
+        quest_title = f"Nhắn **{base_amount}** tin nhắn tại kênh <#{channel_id}>"
+        quest_des = f"**{base_reward_amount}**{emoji}"
+    
+    if quest_type == "attachments_count":
+        base_amount = quest_difficult_rate * 8
+        rand_reward_amount = random.randint(1, 5)
+        base_reward_amount = 500
+        if reward_type == "C":
+            base_reward_amount = 500 * rand_reward_amount
+        elif reward_type == "S":
+            base_reward_amount = 1 * rand_reward_amount
+        elif reward_type == "G":
+            base_reward_amount = 1
+        quest_title = f"Thả **{base_amount}** attachments bất kỳ vào kênh <#{channel_id}>"
+        quest_des = f"**{base_reward_amount}**{emoji}"
+    
+    if quest_type == "truth_game_count" or quest_type == "dare_game_count":
+        game_name = "Truth"
+        if quest_type == "dare_game_count": game_name = "Dare"
+        base_amount = quest_difficult_rate * 20
+        rand_reward_amount = random.randint(1, 5)
+        base_reward_amount = 3000
+        if reward_type == "C":
+            base_reward_amount = 3000 * rand_reward_amount
+        elif reward_type == "S":
+            base_reward_amount = 5 * rand_reward_amount
+        elif reward_type == "G":
+            base_reward_amount = 1 * rand_reward_amount
+        quest_title = f"Chơi **{base_amount}** trò {game_name} trong game Truth Dare"
+        quest_des = f"**{base_reward_amount}**{emoji}"
+    
+    if quest_type == "rps_game_count":
+        base_amount = quest_difficult_rate * 8
+        rand_reward_amount = random.randint(1, 5)
+        base_reward_amount = 2000
+        if reward_type == "C":
+            base_reward_amount = 2000 * rand_reward_amount
+        elif reward_type == "S":
+            base_reward_amount = 1 * rand_reward_amount
+        elif reward_type == "G":
+            base_reward_amount = 1
+        quest_title = f"Chơi **{base_amount}** trận game Kéo Búa Bao"
+        quest_des = f"**{base_reward_amount}**{emoji}"
+    
+    data = QuestProfile(user_id=user_id, user_display_name=user_display_name, user_name=user_name, guild_name= guild_name, quest_type= quest_type, quest_channel=channel_id, channel_name= channel_name, quest_title=quest_title, quest_description=quest_des, quest_difficult_rate=quest_difficult_rate, quest_total_progress=base_amount, bonus_exp=bonus_exp)
+    
+    if reward_type == "C":
+        data.quest_reward_copper = base_reward_amount
+    elif reward_type == "S":
+        data.quest_reward_silver = base_reward_amount
+    elif reward_type == "G":
+        data.quest_reward_gold = base_reward_amount 
+    result = collection.insert_one(data.to_dict())
+    return data
+
+def delete_quest(guild_id: int, user_id: int):
+    collection = db_specific[f'quest_{guild_id}']
+    result = collection.delete_one({"id": "quest", "user_id": user_id})
+    return result

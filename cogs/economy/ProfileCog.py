@@ -8,7 +8,7 @@ from Handling.Misc.SelfDestructView import SelfDestructView
 from Handling.Economy.Authority.AuthorityView import AuthorityView
 from enum import Enum
 from CustomEnum.SlashEnum import SlashCommand
-from CustomEnum.EmojiEnum import CurrencyEmoji
+from CustomEnum.EmojiEnum import EmojiCreation2
 import CustomFunctions
 import CustomEnum.UserEnum as UserEnum
 
@@ -88,10 +88,10 @@ class ProfileEconomy(commands.Cog):
         embed.add_field(name=f"", value=f"{bar_progress}\n", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
         embed.add_field(name=f"", value=f"**Tổng tài sản**:", inline=False)
-        show_darkium = f"{CurrencyEmoji.DARKIUM.value}: **{self.shortened_currency(data.darkium)}**\n"
+        show_darkium = f"{EmojiCreation2.DARKIUM.value}: **{self.shortened_currency(data.darkium)}**\n"
         if data.darkium == 0:
             show_darkium = ""
-        embed.add_field(name=f"", value=f">>> {show_darkium}{CurrencyEmoji.GOLD.value}: **{self.shortened_currency(data.gold)}**\n{CurrencyEmoji.SILVER.value}: **{self.shortened_currency(data.silver)}**\n{CurrencyEmoji.COPPER.value}: **{self.shortened_currency(data.copper)}**", inline=False)
+        embed.add_field(name=f"", value=f">>> {show_darkium}{EmojiCreation2.GOLD.value}: **{self.shortened_currency(data.gold)}**\n{EmojiCreation2.SILVER.value}: **{self.shortened_currency(data.silver)}**\n{EmojiCreation2.COPPER.value}: **{self.shortened_currency(data.copper)}**", inline=False)
         #Quote
         embed.add_field(name=f"", value="\n", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)

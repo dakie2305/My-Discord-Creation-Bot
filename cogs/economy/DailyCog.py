@@ -1,5 +1,5 @@
 from CustomEnum.SlashEnum import SlashCommand
-from CustomEnum.EmojiEnum import CurrencyEmoji
+from CustomEnum.EmojiEnum import EmojiCreation2
 from CustomEnum.RoleEnum import TrueHeavenRoleId
 import discord
 from discord.ext import commands
@@ -80,49 +80,49 @@ class DailyEconomy(commands.Cog):
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
         #Tuỳ vào điểm nhân phẩm để cộng tiền, base là 500 * +- dignity point, và +5 nhân phẩm
         base_money = 500
-        embed.add_field(name=f"", value=f"- Tiền điểm danh: +**{base_money}** {CurrencyEmoji.COPPER.value}", inline=False)
+        embed.add_field(name=f"", value=f"- Tiền điểm danh: +**{base_money}** {EmojiCreation2.COPPER.value}", inline=False)
         actual_money = 0
         if dignity_point >= 50:
             actual_money = base_money + int(base_money*dignity_point/100)
-            embed.add_field(name=f"", value=f"- Điểm nhân phẩm {dignity_point}: +**{int(base_money*dignity_point/100)}** {CurrencyEmoji.COPPER.value}", inline=False)
+            embed.add_field(name=f"", value=f"- Điểm nhân phẩm {dignity_point}: +**{int(base_money*dignity_point/100)}** {EmojiCreation2.COPPER.value}", inline=False)
         else:
             rate = base_money*dignity_point/100
             if rate == 0: rate = 400
             actual_money = base_money - rate
-            embed.add_field(name=f"", value=f"- Điểm nhân phẩm {dignity_point}: -**{rate}** {CurrencyEmoji.COPPER.value}", inline=False)
+            embed.add_field(name=f"", value=f"- Điểm nhân phẩm {dignity_point}: -**{rate}** {EmojiCreation2.COPPER.value}", inline=False)
         if consecutive_date == True:
             actual_money += 200
-            embed.add_field(name=f"", value=f"- Điểm danh hằng ngày: +**200** {CurrencyEmoji.COPPER.value}", inline=False)
+            embed.add_field(name=f"", value=f"- Điểm danh hằng ngày: +**200** {EmojiCreation2.COPPER.value}", inline=False)
         if user_profile != None and user_profile.is_authority:
             actual_money += 3000
-            embed.add_field(name=f"", value=f"- Là chính quyền tối cao: +**3000** {CurrencyEmoji.COPPER.value}", inline=False)
+            embed.add_field(name=f"", value=f"- Là chính quyền tối cao: +**3000** {EmojiCreation2.COPPER.value}", inline=False)
         
         #Đặc quyền server tổng
         if user.guild.id == 1256987900277690470:
             for role in user.roles:
                 if role.id == TrueHeavenRoleId.MODERATOR.value:
                     actual_money += 1000
-                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.MODERATOR.value}> : +**1000** {CurrencyEmoji.COPPER.value}", inline=False)
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.MODERATOR.value}> : +**1000** {EmojiCreation2.COPPER.value}", inline=False)
                 if role.id == TrueHeavenRoleId.CHOSEN_ONE.value:
                     actual_money += 1000
-                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.CHOSEN_ONE.value}> : +**1000** {CurrencyEmoji.COPPER.value}", inline=False)
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.CHOSEN_ONE.value}> : +**1000** {EmojiCreation2.COPPER.value}", inline=False)
                 if role.id == TrueHeavenRoleId.TOP_1_WORD_MATCHING.value or role.id == TrueHeavenRoleId.TOP_1_WORD_SORT.value:
                     actual_money += 1500
-                    embed.add_field(name=f"", value=f"- Là <@&{role.id}> : +**1500** {CurrencyEmoji.COPPER.value}", inline=False)
+                    embed.add_field(name=f"", value=f"- Là <@&{role.id}> : +**1500** {EmojiCreation2.COPPER.value}", inline=False)
                 if role.id == TrueHeavenRoleId.TOP_2_WORD_MATCHING.value or role.id == TrueHeavenRoleId.TOP_2_WORD_SORT.value:
                     actual_money += 1200
-                    embed.add_field(name=f"", value=f"- Là <@&{role.id}> : +**1200** {CurrencyEmoji.COPPER.value}", inline=False)
+                    embed.add_field(name=f"", value=f"- Là <@&{role.id}> : +**1200** {EmojiCreation2.COPPER.value}", inline=False)
                 if role.id == TrueHeavenRoleId.TOP_3_WORD_MATCHING.value or role.id == TrueHeavenRoleId.TOP_3_WORD_SORT.value:
                     actual_money += 1000
-                    embed.add_field(name=f"", value=f"- Là <@&{role.id}> : +**1000** {CurrencyEmoji.COPPER.value}", inline=False)
+                    embed.add_field(name=f"", value=f"- Là <@&{role.id}> : +**1000** {EmojiCreation2.COPPER.value}", inline=False)
                 if role.id == TrueHeavenRoleId.BOOSTER.value:
                     actual_money += 65000
-                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.BOOSTER.value}> : +**65000** {CurrencyEmoji.COPPER.value}", inline=False)
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.BOOSTER.value}> : +**65000** {EmojiCreation2.COPPER.value}", inline=False)
         
         
         if actual_money == 0: actual_money = 200
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
-        embed.add_field(name=f"", value=f"> Tổng tiền nhận từ điểm danh {SlashCommand.DAILY.value} hôm nay:   **+{int(actual_money)} {CurrencyEmoji.COPPER.value} **", inline=False)
+        embed.add_field(name=f"", value=f"> Tổng tiền nhận từ điểm danh {SlashCommand.DAILY.value} hôm nay:   **+{int(actual_money)} {EmojiCreation2.COPPER.value} **", inline=False)
         embed.set_footer(text=f"{user.name} điểm danh.", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/8fd7278827dbc92713e315ee03e0b502.webp?size=32")
         #Cộng tiền cho user
         ProfileMongoManager.update_profile_money(guild_id=user.guild.id, guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name= user.display_name, copper=actual_money)

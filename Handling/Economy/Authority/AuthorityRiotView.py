@@ -2,7 +2,7 @@ import discord
 from discord.ui import Button, View
 from Handling.Economy.Profile import ProfileMongoManager
 from Handling.Economy.Profile.ProfileClass import Profile
-from CustomEnum.EmojiEnum import CurrencyEmoji
+from CustomEnum.EmojiEnum import EmojiCreation2
 from datetime import datetime, timedelta
 from Handling.Economy.Authority.AuthorityRiotPreventView import AuthorityRiotPreventView
 
@@ -44,7 +44,7 @@ class AuthorityRiotView(discord.ui.View):
                 
         if(interaction.user.id == self.user_authority.user_id):
             #Tạo một View AuthorityRiotPrevent
-            new_embed = discord.Embed(title=f"Chính Quyền Vào Cuộc",description=f"Chính Quyền <@{self.user_authority.user_id}> có chấp nhận tốn **500**{CurrencyEmoji.SILVER.value} để phòng chống bạo động không?",color=discord.Color.green())
+            new_embed = discord.Embed(title=f"Chính Quyền Vào Cuộc",description=f"Chính Quyền <@{self.user_authority.user_id}> có chấp nhận tốn **500**{EmojiCreation2.SILVER.value} để phòng chống bạo động không?",color=discord.Color.green())
             new_view = AuthorityRiotPreventView(user=interaction.user, rioting_user=self.target_user)
             new_view.old_riot_message = self.message
             new_view.yes_votes = self.yes_votes
@@ -64,10 +64,10 @@ class AuthorityRiotView(discord.ui.View):
             await self.message.edit(embed=self.embed, view= None)
         riot_win = False
         if len(self.yes_votes) > len(self.no_votes):
-            result_message = f"Anh hùng **{self.target_user.display_name}** đã bạo động thành công khiến Chính Quyền mất **1000**{CurrencyEmoji.SILVER.value} và nhận được **500**{CurrencyEmoji.SILVER.value}! Đã có **{len(self.yes_votes)}** người đứng ra ủng hộ bạo động chính quyền!"
+            result_message = f"Anh hùng **{self.target_user.display_name}** đã bạo động thành công khiến Chính Quyền mất **1000**{EmojiCreation2.SILVER.value} và nhận được **500**{EmojiCreation2.SILVER.value}! Đã có **{len(self.yes_votes)}** người đứng ra ủng hộ bạo động chính quyền!"
             riot_win = True
         else:
-            result_message = f"Thành phần phản động **{self.target_user.display_name}** đã tổ chức khủng bố Chính Quyền nhưng đã bị dập tắt bạo động ngay lập tức! Thủ phạm **{self.target_user.display_name}** bị phạt **100K**{CurrencyEmoji.COPPER.value} và cùng **{len(self.yes_votes)}** thành phần phản động khác bị tống giam trong 3 tiếng!"
+            result_message = f"Thành phần phản động **{self.target_user.display_name}** đã tổ chức khủng bố Chính Quyền nhưng đã bị dập tắt bạo động ngay lập tức! Thủ phạm **{self.target_user.display_name}** bị phạt **100K**{EmojiCreation2.COPPER.value} và cùng **{len(self.yes_votes)}** thành phần phản động khác bị tống giam trong 3 tiếng!"
             riot_win = False
         embed = discord.Embed(title=f"Kết Quả Bạo Động",description=f"{result_message}",color=discord.Color.blue())
         if riot_win == False:

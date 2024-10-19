@@ -2,7 +2,7 @@ import discord
 from discord.ui import Button, View
 from Handling.Economy.Profile import ProfileMongoManager
 from Handling.Economy.Profile.ProfileClass import Profile
-from CustomEnum.EmojiEnum import CurrencyEmoji
+from CustomEnum.EmojiEnum import EmojiCreation2
 from datetime import datetime, timedelta
 from Handling.Misc.SelfDestructView import SelfDestructView
 from db.Class.CustomClass import UserInfo
@@ -26,7 +26,7 @@ class AuthorityRiotPreventView(discord.ui.View):
         #Lấy profile của chính quyền (user)
         authority_profile = ProfileMongoManager.is_authority(guild_id=interaction.guild_id, user_id=self.user.id)
         if authority_profile.silver < 1000:
-            embed = discord.Embed(title=f"", description=f"Để bắt giữ tất cả thành phần bạo động thì Chính Quyền cần **1000**{CurrencyEmoji.SILVER.value}!", color=0xc379e0)
+            embed = discord.Embed(title=f"", description=f"Để bắt giữ tất cả thành phần bạo động thì Chính Quyền cần **1000**{EmojiCreation2.SILVER.value}!", color=0xc379e0)
             view = SelfDestructView(20)
             mes = await interaction.followup.send(embed=embed, view=view)
             view.message = mes
@@ -37,7 +37,7 @@ class AuthorityRiotPreventView(discord.ui.View):
         #Trừ tiền chính quyền
         authority_profile.silver -= 1000
         ProfileMongoManager.update_profile_money_fast(guild_id=interaction.guild_id, data= authority_profile)
-        result_message = f"Thành phần phản động **{self.rioting_user.display_name}** đã tổ chức khủng bố Chính Quyền nhưng đã bị dập tắt bạo động ngay lập tức! Thủ phạm **{self.rioting_user.display_name}** bị phạt **100K**{CurrencyEmoji.COPPER.value} và cùng **{len(self.yes_votes)}** thành phần phản động khác bị tống giam trong 3 tiếng!"
+        result_message = f"Thành phần phản động **{self.rioting_user.display_name}** đã tổ chức khủng bố Chính Quyền nhưng đã bị dập tắt bạo động ngay lập tức! Thủ phạm **{self.rioting_user.display_name}** bị phạt **100K**{EmojiCreation2.COPPER.value} và cùng **{len(self.yes_votes)}** thành phần phản động khác bị tống giam trong 3 tiếng!"
         
         #Trừ tiền của phản động
         ProfileMongoManager.update_profile_money(guild_id=self.rioting_user.guild.id, guild_name=self.rioting_user.guild.name, user_id=self.rioting_user.id, user_display_name= self.rioting_user.display_name, user_name=self.rioting_user.name, copper=-100000)

@@ -7,7 +7,7 @@ import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 from Handling.Misc.SelfDestructView import SelfDestructView
 from Handling.Economy.Authority.AuthorityView import AuthorityView
 from CustomEnum.SlashEnum import SlashCommand
-from CustomEnum.EmojiEnum import CurrencyEmoji
+from CustomEnum.EmojiEnum import EmojiCreation2
 import CustomFunctions
 import CustomEnum.UserEnum as UserEnum
 
@@ -39,22 +39,22 @@ class TransferMoneyEconomy(commands.Cog):
             if message.author.id != message.guild.owner_id and message.author.id != UserEnum.UserId.DARKIE.value:
                 text = "Lệnh dành riêng cho Owner server để cập nhật tiền cho một user bất kỳ!"
             elif amount == None or user == None or loai_tien == None:
-                text = f"Sai cú pháp lệnh! Vui lòng nhập đúng như bên dưới để chuyển {CurrencyEmoji.COPPER.value}\n !um 100 @user C"
+                text = f"Sai cú pháp lệnh! Vui lòng nhập đúng như bên dưới để chuyển {EmojiCreation2.COPPER.value}\n !um 100 @user C"
             elif loai_tien != "C" and loai_tien != "D" and loai_tien != "G" and loai_tien != "S":
                 text = f"Sai loại tiền! Loại tiền chỉ được nhập một trong những giá trị sau: C, S, G, D"
             else:
                 emoji = ""
                 if loai_tien == "S" or loai_tien == "s":
-                    emoji = f"{CurrencyEmoji.SILVER.value}"
+                    emoji = f"{EmojiCreation2.SILVER.value}"
                     ProfileMongoManager.update_profile_money(guild_id=user.guild.id,guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, silver= amount)
                 elif loai_tien == "G" or loai_tien == "g":
-                    emoji = f"{CurrencyEmoji.GOLD.value}"
+                    emoji = f"{EmojiCreation2.GOLD.value}"
                     ProfileMongoManager.update_profile_money(guild_id=user.guild.id,guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, gold= amount)
                 elif loai_tien == "D" or loai_tien == "d":
-                    emoji = f"{CurrencyEmoji.GOLD.value}"
+                    emoji = f"{EmojiCreation2.GOLD.value}"
                     ProfileMongoManager.update_profile_money(guild_id=user.guild.id,guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, darkium= amount)
                 else:
-                    emoji = f"{CurrencyEmoji.COPPER.value}"
+                    emoji = f"{EmojiCreation2.COPPER.value}"
                     ProfileMongoManager.update_profile_money(guild_id=user.guild.id,guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, copper= amount)
                 text = f"Owner đã chuyển **{amount}** {emoji} cho {user.display_name}"
             embed = discord.Embed(title=f"", description=f"{text}", color=0xc379e0)
@@ -101,7 +101,7 @@ class TransferMoneyEconomy(commands.Cog):
             return
         #Kiểm tra xem amount có âm không
         if amount <= 0:
-            embed = discord.Embed(title=f"", description=f"Khỏi test bug! Vì gây lãng phí tài nguyên, {interaction.user.mention} đã bị trừ **500**{CurrencyEmoji.COPPER.value}!", color=0xc379e0)
+            embed = discord.Embed(title=f"", description=f"Khỏi test bug! Vì gây lãng phí tài nguyên, {interaction.user.mention} đã bị trừ **500**{EmojiCreation2.COPPER.value}!", color=0xc379e0)
             ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id,guild_name=interaction.guild.name, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, copper= -500)
             await interaction.followup.send(embed=embed)
             return
@@ -148,7 +148,7 @@ class TransferMoneyEconomy(commands.Cog):
         if message != None:
             extra_mess = f" với lời nhắn: *{message}*"
         if user_profile.is_authority == False:
-            tax_text = f"Đương nhiên là bị trừ {tax} {CurrencyEmoji.COPPER.value} để đóng thuế cho Chính Quyền!"
+            tax_text = f"Đương nhiên là bị trừ {tax} {EmojiCreation2.COPPER.value} để đóng thuế cho Chính Quyền!"
             authority_profile = ProfileMongoManager.is_authority_existed(guild_id=interaction.guild_id)
             if authority_profile:
                 authority_profile.copper += int(tax * authority_profile.dignity_point/100)
@@ -163,12 +163,12 @@ class TransferMoneyEconomy(commands.Cog):
     
     def get_emoji_from_type(self, input: str):
         if input == "D" or input == "D":
-            return CurrencyEmoji.DARKIUM.value
+            return EmojiCreation2.DARKIUM.value
         if input == "G" or input == "G":
-            return CurrencyEmoji.GOLD.value
+            return EmojiCreation2.GOLD.value
         if input == "S" or input == "S":
-            return CurrencyEmoji.SILVER.value
+            return EmojiCreation2.SILVER.value
         if input == "C" or input == "C":
-            return CurrencyEmoji.COPPER.value
+            return EmojiCreation2.COPPER.value
     
         

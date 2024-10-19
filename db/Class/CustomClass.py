@@ -35,12 +35,13 @@ class UserInfo:
 #region Guild Info
 
 class GuildExtraInfo:
-    def __init__(self, guild_id: int, guild_name :str, allowed_ai_bot: bool, list_channels_ai_talk: List[int] = None, enabled_ai_until: datetime = None, therapy_channel: int = None):
+    def __init__(self, guild_id: int, guild_name :str, allowed_ai_bot: bool, list_channels_ai_talk: List[int] = None, enabled_ai_until: datetime = None, therapy_channel: int = None, list_channels_quests: List[int] = None):
         self.guild_id = guild_id
         self.guild_name = guild_name
         self.allowed_ai_bot = allowed_ai_bot
         self.therapy_channel = therapy_channel
         self.list_channels_ai_talk: List[int] = list_channels_ai_talk if list_channels_ai_talk else []
+        self.list_channels_quests: List[int] = list_channels_quests if list_channels_quests else []
         self.enabled_ai_until = enabled_ai_until
 
     def to_dict(self):
@@ -49,7 +50,8 @@ class GuildExtraInfo:
             "guild_name": self.guild_name,
             "allowed_ai_bot": self.allowed_ai_bot,
             "therapy_channel": self.therapy_channel,
-            "list_channels_ai_talk": self.list_channels_ai_talk,
+            "list_channels_quests": [data for data in self.list_channels_quests],
+            "list_channels_ai_talk": [data for data in self.list_channels_ai_talk],
             "enabled_ai_until": self.enabled_ai_until.isoformat() if self.enabled_ai_until else None
         }
 
@@ -60,7 +62,8 @@ class GuildExtraInfo:
             guild_name=data["guild_name"],
             allowed_ai_bot=data["allowed_ai_bot"],
             therapy_channel=data.get("therapy_channel", None),
-            list_channels_ai_talk=data["list_channels_ai_talk"],
+            list_channels_quests = [item for item in data.get("list_channels_quests", [])],
+            list_channels_ai_talk = [item for item in data.get("list_channels_ai_talk", [])],
             enabled_ai_until=datetime.fromisoformat(data["enabled_ai_until"]) if data["enabled_ai_until"] else None
         )
         

@@ -1,5 +1,5 @@
 from CustomEnum.SlashEnum import SlashCommand
-from CustomEnum.EmojiEnum import CurrencyEmoji
+from CustomEnum.EmojiEnum import EmojiCreation2
 from CustomEnum.RoleEnum import TrueHeavenRoleId
 import discord
 from discord.ext import commands
@@ -133,8 +133,8 @@ class WorkEconomy(commands.Cog):
         base_authority_money = 2
         text_authority = ""
         if authority_user!=None:
-            text_authority = f" và **{2}** {CurrencyEmoji.SILVER.value}"
-        base_text = f"Hôm nay bạn đã làm việc chăm chỉ, và nhận được **{base_money}** {CurrencyEmoji.COPPER.value}{text_authority}! "
+            text_authority = f" và **{2}** {EmojiCreation2.SILVER.value}"
+        base_text = f"Hôm nay bạn đã làm việc chăm chỉ, và nhận được **{base_money}** {EmojiCreation2.COPPER.value}{text_authority}! "
         #random thêm để xem có được cộng trừ bonus không
         chance = random.randint(0, 10)
         if chance >= 5:
@@ -145,20 +145,20 @@ class WorkEconomy(commands.Cog):
                 #Cộng thêm tiền dựa trên phần trăm của điểm dignity point
                 bonus_money = int(base_money/dignity_point*10)
                 base_money += bonus_money
-                base_text += f"Bạn được cộng thêm {bonus_money} {CurrencyEmoji.COPPER.value}! "
+                base_text += f"Bạn được cộng thêm {bonus_money} {EmojiCreation2.COPPER.value}! "
             else:
                 text = self.get_bonus_message(False, user.guild.name, user.mention)
                 base_text += text
                 #Trừ tiền dựa trên phần trăm của điểm dignity point
                 bonus_money = int(base_money/dignity_point*10)
                 base_money -= bonus_money
-                base_text += f"Bạn bị trừ {bonus_money} {CurrencyEmoji.COPPER.value}! "
+                base_text += f"Bạn bị trừ {bonus_money} {EmojiCreation2.COPPER.value}! "
         
         #dựa vào Pay_tax để xác định trốn thuế hay đóng thuế
-        text_tax = f"Là công dân gương mẫu nên bạn đã đóng thêm thuế {tax} {CurrencyEmoji.COPPER.value}."
+        text_tax = f"Là công dân gương mẫu nên bạn đã đóng thêm thuế {tax} {EmojiCreation2.COPPER.value}."
         if pay_tax:
             base_money -= tax
-            text_tax = f"\nLà công dân gương mẫu nên bạn đã đóng thêm thuế {tax} {CurrencyEmoji.COPPER.value}."
+            text_tax = f"\nLà công dân gương mẫu nên bạn đã đóng thêm thuế {tax} {EmojiCreation2.COPPER.value}."
         else:
             text_tax = f"\nVới chút tài mọn, bạn đã trốn đóng thuế thành công."
         
@@ -166,7 +166,7 @@ class WorkEconomy(commands.Cog):
         
         if base_money == 0: base_money = 300
         base_text += text_tax
-        base_text += f"\n\n> Tổng tiền nhận từ {SlashCommand.WORK.value} hôm nay: **{base_money}** {CurrencyEmoji.COPPER.value}{text_authority}."
+        base_text += f"\n\n> Tổng tiền nhận từ {SlashCommand.WORK.value} hôm nay: **{base_money}** {EmojiCreation2.COPPER.value}{text_authority}."
         
         #Cộng tiền, cộng 2 điểm nhân phẩm
         ProfileMongoManager.update_profile_money(guild_id=user.guild.id, guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, copper=base_money)

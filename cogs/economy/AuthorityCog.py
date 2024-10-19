@@ -9,7 +9,7 @@ from Handling.Economy.Authority.AuthorityView import AuthorityView
 from Handling.Economy.Authority.AuthorityRiotView import AuthorityRiotView
 from enum import Enum
 from CustomEnum.SlashEnum import SlashCommand
-from CustomEnum.EmojiEnum import CurrencyEmoji
+from CustomEnum.EmojiEnum import EmojiCreation2
 import CustomEnum.UserEnum as UserEnum
 
 import CustomFunctions
@@ -64,7 +64,7 @@ class AuthorityEconomy(commands.Cog):
             return
         #Kiểm tra xem đây có phải là chính quyền không
         if ProfileMongoManager.is_authority(guild_id=interaction.guild_id, user_id=interaction.user.id) != None:
-            await interaction.followup.send(content=f"Bạn đã là Chính Quyền rồi. Vì gây lãng phí tài nguyên, bạn đã bị trừ 500 {CurrencyEmoji.COPPER.value}!")
+            await interaction.followup.send(content=f"Bạn đã là Chính Quyền rồi. Vì gây lãng phí tài nguyên, bạn đã bị trừ 500 {EmojiCreation2.COPPER.value}!")
             ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, copper=-500, guild_name= interaction.guild.name)
             return
         #Kiểm tra xem server đã tồn tại ai là chính quyền chưa
@@ -77,13 +77,13 @@ class AuthorityEconomy(commands.Cog):
                 return
         data = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
         if data == None:
-            embed = discord.Embed(title=f"", description=f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã! Vì gây lãng phí tài nguyên, bạn đã bị trừ 500 {CurrencyEmoji.COPPER.value}!", color=0xc379e0)
+            embed = discord.Embed(title=f"", description=f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã! Vì gây lãng phí tài nguyên, bạn đã bị trừ 500 {EmojiCreation2.COPPER.value}!", color=0xc379e0)
             await interaction.followup.send(embed=embed)
             ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, copper=-500, guild_name= interaction.guild.name)
             return
         #Phải đủ tiền mới được vote
         elif data.copper<500:
-            embed = discord.Embed(title=f"", description=f"Bạn phải có đủ **500** {CurrencyEmoji.COPPER.value} trước đã!", color=0xc379e0)
+            embed = discord.Embed(title=f"", description=f"Bạn phải có đủ **500** {EmojiCreation2.COPPER.value} trước đã!", color=0xc379e0)
             await interaction.followup.send(embed=embed)
             return
         
@@ -113,7 +113,7 @@ class AuthorityEconomy(commands.Cog):
         
         #Kiểm tra xem đây có phải là chính quyền không
         if ProfileMongoManager.is_authority(guild_id=interaction.guild_id, user_id=interaction.user.id) != None:
-            await interaction.followup.send(content=f"Bạn đã là Chính Quyền thì không thể tự bạo động. Vì gây lãng phí tài nguyên, bạn đã bị trừ 500 {CurrencyEmoji.COPPER.value}!")
+            await interaction.followup.send(content=f"Bạn đã là Chính Quyền thì không thể tự bạo động. Vì gây lãng phí tài nguyên, bạn đã bị trừ 500 {EmojiCreation2.COPPER.value}!")
             ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, copper=-500, guild_name= interaction.guild.name)
             return
         #Kiểm tra xem server đã tồn tại ai là chính quyền chưa
@@ -145,7 +145,7 @@ class AuthorityEconomy(commands.Cog):
             if money_for_riot == 0: money_for_riot = 50
         
         if user_profile.silver < money_for_riot:
-            embed = discord.Embed(title=f"", description=f"Để kêu gọi bạo động chính quyền thì bạn cần **{money_for_riot}**{CurrencyEmoji.SILVER.value}!", color=0xc379e0)
+            embed = discord.Embed(title=f"", description=f"Để kêu gọi bạo động chính quyền thì bạn cần **{money_for_riot}**{EmojiCreation2.SILVER.value}!", color=0xc379e0)
             mes = await interaction.followup.send(embed=embed)
             return
         #Trừ 500 silver
@@ -153,13 +153,13 @@ class AuthorityEconomy(commands.Cog):
         #Đưa ra embed bạo động
         embed = discord.Embed(title=f"Lời Kêu Gọi Bạo Động",description=f"{interaction.user.mention} đã kêu gọi mọi người đứng lên khởi nghĩa chống lại Chính Quyền Server <@{existed_authority.user_id}>!",color=discord.Color.red())
         embed.add_field(name=f"", value="▬▬▬▬▬ι═══════════>", inline=False)
-        embed.add_field(name=f"", value=f"- Nếu kêu gọi thành công nhiều **người bạo động** chính quyền thì {interaction.user.mention} sẽ nhận được **500**{CurrencyEmoji.SILVER.value} và Chính Quyền <@{existed_authority.user_id}> sẽ mất **1000**{CurrencyEmoji.SILVER.value}!", inline=False)
-        embed.add_field(name=f"", value=f"- Chính Quyền <@{existed_authority.user_id}> có thể bỏ ra **500**{CurrencyEmoji.SILVER.value} để lập tức điều động bắt giữ những kẻ bạo động, hoặc huy động **người phản đối** bạo động để tránh mất tiền!", inline=False)
+        embed.add_field(name=f"", value=f"- Nếu kêu gọi thành công nhiều **người bạo động** chính quyền thì {interaction.user.mention} sẽ nhận được **500**{EmojiCreation2.SILVER.value} và Chính Quyền <@{existed_authority.user_id}> sẽ mất **1000**{EmojiCreation2.SILVER.value}!", inline=False)
+        embed.add_field(name=f"", value=f"- Chính Quyền <@{existed_authority.user_id}> có thể bỏ ra **500**{EmojiCreation2.SILVER.value} để lập tức điều động bắt giữ những kẻ bạo động, hoặc huy động **người phản đối** bạo động để tránh mất tiền!", inline=False)
         embed.set_image(url="https://kustomsignals.com/wp-content/uploads/2022/09/shutterstock_56579431-1024x680.jpg")
         
         view = AuthorityRiotView(user=interaction.user, user_authority=existed_authority)
         view.embed = embed
-        await interaction.followup.send(f"Bạn đã bị trừ **{money_base_riot}** {CurrencyEmoji.SILVER.value} để tạo bạo động!",ephemeral=True)
+        await interaction.followup.send(f"Bạn đã bị trừ **{money_base_riot}** {EmojiCreation2.SILVER.value} để tạo bạo động!",ephemeral=True)
         called_channel = interaction.channel
         mes = await called_channel.send(embed=embed, view=view, content= authority_user.mention if authority_user != None else "", allowed_mentions=discord.AllowedMentions(users=True))
         view.message = mes
