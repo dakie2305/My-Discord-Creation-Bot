@@ -41,7 +41,18 @@ class AuthorityEconomy(commands.Cog):
             #Get thử xem còn tồn tại trong server không
             member = interaction.guild.get_member(existed_authority.user_id)
             if member:
-                await interaction.followup.send(content=f"Server này đã có Chính Quyền là {member.mention} rồi! Vui lòng lật đổ hoặc ép Chính Quyền từ bỏ địa vị để tranh chức Chính Quyền!", ephemeral=True)
+                #Kiểm xem chính quyền có mặc nợ không, có thì từ chức và phạt authority
+                if ProfileMongoManager.is_in_debt(data= existed_authority, copper_threshold=50000):
+                    embed = discord.Embed(title=f"", description=f"Chính Quyền đã nợ nần quá nhiều và tự sụp đổ. Hãy dùng lệnh {self.CurrencySlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", color=0xddede7)
+                    existed_authority.copper = -10000
+                    existed_authority.silver = 0
+                    existed_authority.gold = 0
+                    existed_authority.darkium = 0
+                    ProfileMongoManager.update_profile_money_fast(guild_id= interaction.guild.id, data=existed_authority)
+                    ProfileMongoManager.remove_authority_from_server(guild_id=interaction.guild.id)
+                    return embed, None
+                else:
+                    await interaction.followup.send(content=f"Server này đã có Chính Quyền là {member.mention} rồi! Vui lòng bào tiền Chính Quyền, hoặc ép Chính Quyền từ bỏ địa vị để tranh chức Chính Quyền!", ephemeral=True)
             else:
                 await interaction.followup.send(f"Chính Quyền đã lưu vong khỏi server. Vui lòng dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!")
                 ProfileMongoManager.delete_profile(guild_id=interaction.guild_id, user_id= existed_authority.user_id)
@@ -163,6 +174,30 @@ class AuthorityEconomy(commands.Cog):
         called_channel = interaction.channel
         mes = await called_channel.send(embed=embed, view=view, content= authority_user.mention if authority_user != None else "", allowed_mentions=discord.AllowedMentions(users=True))
         view.message = mes
+    
+    #region Authority riot
+    @authority_group.command(name="overthrow", description="Lật đổ chính quyền đương nhiệm trong server!")
+    async def riot_authority_slash(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
+        if interaction.user.id != interaction.guild.owner_id and interaction.user.id != UserEnum.UserId.DARKIE.value:
+            text = "Lệnh hiện tại chỉ mới dành cho Owner server!"
+            await interaction.followup.send(f"{text}",ephemeral=True)
+            return
+        #Nếu là server owner thì chỉ việc remove như bình thường 
+        else:
+            authority = ProfileMongoManager.is_authority_existed(guild_id=interaction.guild.id)
+            if authority == None:
+                await interaction.followup.send(f"Server không có chính quyền để lật đổ!",ephemeral=True)
+                return
+            authority.silver = 0
+            authority.gold = 0
+            authority.darkium = 0
+            ProfileMongoManager.update_profile_money_fast(guild_id= interaction.guild.id, data=authority)
+            ProfileMongoManager.remove_authority_from_server(guild_id=interaction.guild.id)
+            await interaction.followup.send(f"Bạn đã lật đổ chính quyền của Server!",ephemeral=True)
+            channel = interaction.channel
+            embed = discord.Embed(title=f"", description=f"Chính Quyền của server đã bị lật đổ! Vui lòng dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", color=0xddede7)
+            await channel.send(embed=embed)            
 
     def get_nhan_pham(self, number):
         text = "Người Thường"

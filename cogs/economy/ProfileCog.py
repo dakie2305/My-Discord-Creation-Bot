@@ -77,6 +77,17 @@ class ProfileEconomy(commands.Cog):
         if data == None:
             data = ProfileMongoManager.create_profile(guild_id=user.guild.id, user_id=user.id, guild_name=user.guild.name, user_name=user.name, user_display_name=user.display_name)
         
+        
+        if data.is_authority and ProfileMongoManager.is_in_debt(data= data, copper_threshold=50000):
+            embed = discord.Embed(title=f"", description=f"Chính Quyền đã nợ nần quá nhiều và tự sụp đổ. Hãy dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", color=0xddede7)
+            data.copper = -10000
+            data.silver = 0
+            data.gold = 0
+            data.darkium = 0
+            ProfileMongoManager.update_profile_money_fast(guild_id= user.guild.id, data=data)
+            ProfileMongoManager.remove_authority_from_server(guild_id=user.guild.id)
+            return embed
+        
         embed = discord.Embed(title=f"", description=f"**Profile {user.mention}**", color=0xddede7)
         embed.set_thumbnail(url=user.avatar.url)
         if data.is_authority:

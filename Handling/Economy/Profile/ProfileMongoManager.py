@@ -27,6 +27,7 @@ def create_profile(guild_id: int, guild_name: str, user_id: int, user_name: str,
     result = collection.insert_one(data.to_dict())
     return data
 
+
 def update_profile_money(guild_id: int, guild_name: str, user_id: int, user_name: str, user_display_name: str, gold: int= 0, silver: int = 0, copper:int = 0, darkium: int = 0):
     collection = db_specific[f'profile_{guild_id}']
     existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
@@ -229,14 +230,15 @@ def update_last_work_now(guild_id:int, user_id: int):
                                                                                     }})
     return result
 
-def is_in_greatest_debt(guild_id:int, user_id: int):
-    existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
+def is_in_debt(data: Profile, darkium_threshold = 0, gold_threshold = 0, silver_threshold = 0, copper_threshold = 0):
+    existing_data = data
     if existing_data == None:
         return False
-    if existing_data.copper <= 0 and existing_data.silver <= 0 and existing_data.gold and existing_data.darkium <= 0:
+    if existing_data.copper <= copper_threshold and existing_data.silver <= silver_threshold and existing_data.gold <= gold_threshold and existing_data.darkium <= darkium_threshold:
         return True
     else:
         return False
+
 
 #region quote
 def update_profile_quote(guild_id: int, guild_name: str, user_id: int, user_name: str, user_display_name: str, quote: str):
@@ -405,6 +407,7 @@ def set_authority(guild_id: int, guild_name: str, user_id: int, user_name: str, 
     result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"is_authority": True,
                                                                                     }})
     return result
+
 
 def remove_authority_from_server(guild_id: int):
     collection = db_specific[f'profile_{guild_id}']

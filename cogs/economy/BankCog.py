@@ -13,6 +13,8 @@ from datetime import datetime
 import random
 import CustomFunctions
 import CustomEnum.UserEnum as UserEnum
+from CustomEnum.SlashEnum import SlashCommand
+from CustomEnum.EmojiEnum import EmojiCreation2
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(BankEconomy(bot=bot))
@@ -21,16 +23,6 @@ async def setup(bot: commands.Bot):
 class BankEconomy(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        
-    class CurrencyEmoji(Enum):
-        DARKIUM = "<a:darkium:1294615481701105734>"
-        GOLD = "<a:gold:1294615502588608563>"
-        SILVER = "<a:silver:1294615512919048224>"
-        COPPER = "<a:copper:1294615524918956052>"
-    
-    class CurrencySlashCommand(Enum):
-        PROFILE = "</profile:1294699979058970656>"
-        VOTE_AUTHORITY = "</vote_authority:1294754901988999240>"
     
     #region Bank
     @discord.app_commands.command(name="bank", description="Gọi ngân hàng chính quyền để đổi tiền")
@@ -81,17 +73,28 @@ class BankEconomy(commands.Cog):
     async def get_bank_embed(self, user: discord.Member):
         user_profile = ProfileMongoManager.find_profile_by_id(guild_id=user.guild.id, user_id=user.id)
         if user_profile == None:
-            embed = discord.Embed(title=f"", description=f"Vui lòng dùng lệnh {self.CurrencySlashCommand.PROFILE.value} trước đã!", color=0xddede7)
+            embed = discord.Embed(title=f"", description=f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", color=0xddede7)
             return embed, None
         
         authority = ProfileMongoManager.is_authority_existed(guild_id=user.guild.id)
         if authority == None:
-            embed = discord.Embed(title=f"", description=f"Server vẫn chưa tồn tại Chính Quyền. Vui lòng dùng lệnh {self.CurrencySlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", color=0xddede7)
+            embed = discord.Embed(title=f"", description=f"Server vẫn chưa tồn tại Chính Quyền. Vui lòng dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", color=0xddede7)
             return embed, None
         authority_user = self.bot.get_guild(user.guild.id).get_member(authority.user_id)
         # Nếu không get được tức là authority không trong server
         if authority_user == None:
-            embed = discord.Embed(title=f"", description=f"Chính Quyền đã lưu vong khỏi server. Vui lòng dùng lệnh {self.CurrencySlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", color=0xddede7)
+            embed = discord.Embed(title=f"", description=f"Chính Quyền đã lưu vong khỏi server. Vui lòng dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", color=0xddede7)
+            ProfileMongoManager.remove_authority_from_server(guild_id=user.guild.id)
+            return embed, None
+        
+        #Kiểm xem chính quyền có mặc nợ không, có thì từ chức và phạt authority
+        if ProfileMongoManager.is_in_debt(data= authority, copper_threshold=50000):
+            embed = discord.Embed(title=f"", description=f"Chính Quyền đã nợ nần quá nhiều và tự sụp đổ. Hãy dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", color=0xddede7)
+            authority.copper = -10000
+            authority.silver = 0
+            authority.gold = 0
+            authority.darkium = 0
+            ProfileMongoManager.update_profile_money_fast(guild_id= user.guild.id, data=authority)
             ProfileMongoManager.remove_authority_from_server(guild_id=user.guild.id)
             return embed, None
         
@@ -112,9 +115,9 @@ class BankEconomy(commands.Cog):
         embed.add_field(name=f"", value=f"Tỷ lệ quy đổi tiền hôm nay: **{conversion_rate.rate}**", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
         
-        embed.add_field(name="", value=f">>> 1 {self.CurrencyEmoji.DARKIUM.value} = **{int(10000 * conversion_rate.rate)}** {self.CurrencyEmoji.GOLD.value}", inline=False)
-        embed.add_field(name="", value=f">>> 1 {self.CurrencyEmoji.GOLD.value} = **{int(5000 * conversion_rate.rate)}** {self.CurrencyEmoji.SILVER.value}", inline=False)
-        embed.add_field(name="", value=f">>> 1 {self.CurrencyEmoji.SILVER.value} = **{int(5000 * conversion_rate.rate)}** {self.CurrencyEmoji.COPPER.value}", inline=False)
+        embed.add_field(name="", value=f">>> 1 {EmojiCreation2.DARKIUM.value} = **{int(10000 * conversion_rate.rate)}** {EmojiCreation2.GOLD.value}", inline=False)
+        embed.add_field(name="", value=f">>> 1 {EmojiCreation2.GOLD.value} = **{int(5000 * conversion_rate.rate)}** {EmojiCreation2.SILVER.value}", inline=False)
+        embed.add_field(name="", value=f">>> 1 {EmojiCreation2.SILVER.value} = **{int(5000 * conversion_rate.rate)}** {EmojiCreation2.COPPER.value}", inline=False)
         
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
         embed.set_footer(text=f"Để hiểu rõ hơn về cách ngân hàng hoạt động hãy dùng nhắn câu:\nbank help", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/8fd7278827dbc92713e315ee03e0b502.webp?size=32")
