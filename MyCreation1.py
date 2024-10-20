@@ -1227,38 +1227,37 @@ async def help_command_slash(interaction: discord.Interaction):
     await interaction.followup.send(content=f"{text}")
 
 
-async def get_help_text():
+def get_help_text():
     #Trả về text hướng dẫn command
     text = """**-= Lệnh của Creations 1 =-**
-    
-**Lệnh trong trò chơi nối từ:**
-`!bat_dau_noi_tu_english:` bắt đầu một game nối từ tiếng anh trong channel hiện tại. Dùng thêm một lần nữa để xoá trò chơi nối từ khỏi channel đó.
-`!bat_dau_noi_tu_vn:` bắt đầu một game nối từ tiếng anh trong channel hiện tại. Dùng thêm một lần nữa để xoá trò chơi nối từ khỏi channel đó.
-`!reset_noi_tu:`: reset channel nối từ để bắt đầu lại từ đầu.
-`!give_skill <id_skill> <@user>` : chỉ dành cho chủ Server. Lệnh dùng để đưa kỹ năng đặc biệt cho player trong channel nối từ.
-`!remove_skill <id_skill|all|random> <@user>`: chỉ dành cho chủ Server. Lệnh dùng để xoá kỹ năng đặc biệt cho user trong channel nối từ. (Có thể dùng all, random để xoá tất cả hoặc xoá ngẫu nhiên kỹ năng của player) 
-`!use_skill`: Lệnh dùng để hiển thị bảng kỹ năng đặc biệt của player trong channel nối từ và cách dùng kỹ năng đó.
-`/bxh_noi_tu`: Lệnh dùng để hiển thị bảng xếp hạng điểm của các player trong channel nối từ.
+    **Lệnh trong trò chơi nối từ:**
+    `!bat_dau_noi_tu_english:` bắt đầu một game nối từ tiếng anh trong channel hiện tại. Dùng thêm một lần nữa để xoá trò chơi nối từ khỏi channel đó.
+    `!bat_dau_noi_tu_vn:` bắt đầu một game nối từ tiếng anh trong channel hiện tại. Dùng thêm một lần nữa để xoá trò chơi nối từ khỏi channel đó.
+    `!reset_noi_tu:`: reset channel nối từ để bắt đầu lại từ đầu.
+    `!give_skill <id_skill> <@user>` : chỉ dành cho chủ Server. Lệnh dùng để đưa kỹ năng đặc biệt cho player trong channel nối từ.
+    `!remove_skill <id_skill|all|random> <@user>`: chỉ dành cho chủ Server. Lệnh dùng để xoá kỹ năng đặc biệt cho user trong channel nối từ. (Có thể dùng all, random để xoá tất cả hoặc xoá ngẫu nhiên kỹ năng của player) 
+    `!use_skill`: Lệnh dùng để hiển thị bảng kỹ năng đặc biệt của player trong channel nối từ và cách dùng kỹ năng đó.
+    `/bxh_noi_tu`: Lệnh dùng để hiển thị bảng xếp hạng điểm của các player trong channel nối từ.
 
-**Lệnh trong trò chơi đoán từ (Sort Word):**
-`!start_sw_en:` bắt đầu một game đoán từ tiếng Anh trong channel hiện tại. Dùng thêm một lần nữa để xoá trò chơi khỏi channel đó.
-`!start_sw_vn:` bắt đầu một game đoán từ tiếng Việt trong channel hiện tại. Dùng thêm một lần nữa để xoá trò chơi khỏi channel đó.
-`!reset_sw:`: reset channel game đoán từ hiện tại để bắt đầu lại từ đầu.
-`!sws_give_skill <id_skill> <@user>` : chỉ dành cho chủ Server. Lệnh dùng để đưa kỹ năng đặc biệt cho player trong channel đoán từ.
-`!sws`: Lệnh dùng để hiển thị bảng kỹ năng đặc biệt của player trong channel đoán từ và cách dùng kỹ năng đó.
-`/bxh_sw`: Lệnh dùng để hiển thị bảng xếp hạng điểm của các player trong channel game đoán từ.
+    **Lệnh trong trò chơi đoán từ (Sort Word):**
+    `!start_sw_en:` bắt đầu một game đoán từ tiếng Anh trong channel hiện tại. Dùng thêm một lần nữa để xoá trò chơi khỏi channel đó.
+    `!start_sw_vn:` bắt đầu một game đoán từ tiếng Việt trong channel hiện tại. Dùng thêm một lần nữa để xoá trò chơi khỏi channel đó.
+    `!reset_sw:`: reset channel game đoán từ hiện tại để bắt đầu lại từ đầu.
+    `!sws_give_skill <id_skill> <@user>` : chỉ dành cho chủ Server. Lệnh dùng để đưa kỹ năng đặc biệt cho player trong channel đoán từ.
+    `!sws`: Lệnh dùng để hiển thị bảng kỹ năng đặc biệt của player trong channel đoán từ và cách dùng kỹ năng đó.
+    `/bxh_sw`: Lệnh dùng để hiển thị bảng xếp hạng điểm của các player trong channel game đoán từ.
 
-**Lệnh trong trò chơi Kéo - Búa - Bao:**
-`/keo_bua_bao [@user]`: Lệnh dùng để chơi kéo búa bao với người chơi khác. Nếu không chọn người chơi thì sẽ chơi với bot. 
-`/bxh_rps [@user]`: Lệnh dùng để xem xếp hạng Kéo - Búa - Bao. Có thể xem thứ hạng của player khác và xếp hạng theo nhiều mục khác nhau.
+    **Lệnh trong trò chơi Kéo - Búa - Bao:**
+    `/keo_bua_bao [@user]`: Lệnh dùng để chơi kéo búa bao. Nếu không chọn người chơi thì sẽ chơi với bot. 
+    `/bxh_rps [@user]`: Lệnh dùng để xem xếp hạng Kéo - Búa - Bao. Có thể xem thứ hạng của player khác và xếp hạng theo nhiều mục khác nhau.
 
-**Lệnh lặt vặt:**
-`/say`: Lệnh dùng để gửi tin nhắn, hình ảnh ần danh.
-`/truth_dare`: Lệnh dùng để gửi tạo mới trò chơi Truth Or Dare.
-`/snipe`: Lệnh dùng để hiển thị lại 7 tin nhắn bị xoá gần nhất trong channel dùng lệnh.
-`/therapy`: Lệnh dùng để thiết lập channel dùng để tâm sự cùng bot.
+    **Lệnh lặt vặt:**
+    `/say`: Lệnh dùng để gửi tin nhắn, hình ảnh ần danh.
+    `/truth_dare`: Lệnh dùng để gửi tạo mới trò chơi Truth Or Dare.
+    `/snipe`: Lệnh dùng để hiển thị lại 7 tin nhắn bị xoá gần nhất trong channel dùng lệnh.
+    `/therapy`: Lệnh dùng để thiết lập channel dùng để tâm sự cùng bot.
     """
-    return text
+    return "Darkie đang làm lại lệnh help sau."
     
 
 

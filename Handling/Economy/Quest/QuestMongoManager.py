@@ -22,7 +22,7 @@ def find_quest_by_user_id(guild_id: int, user_id: int):
         return QuestProfile.from_dict(data)
     return None
 
-def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_name: str, user_display_name: str, channel_id: int, channel_name: str, data: Profile = None):
+def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_name: str, user_display_name: str, channel_id: int, channel_name: str, data_profile: Profile = None):
     #Mỗi server là một collection, chia theo server id
     collection = db_specific[f'quest_{guild_id}']
     existing_data = collection.find_one({"id": "quest", "user_id": user_id})
@@ -30,41 +30,41 @@ def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_n
         return None
     quest_type = random.choice(list_quest_general_type)
     quest_difficult_rate = 1  #dễ, trung bình, khó, huyển thoại
-    if data != None and data.level != None:
-        if data.level >= 1 and data.level < 15:
+    if data_profile != None and data_profile.level != None:
+        if data_profile.level >= 1 and data_profile.level < 15:
             # 5% 4, 20% 3, 30% 2
-            quest_difficult_rate = get_value(lengend=5, hard=20, avarage=30)
-        elif data.level >= 15 and data.level < 30:
+            quest_difficult_rate = get_value(lengend=10, hard=20, avarage=30)
+        elif data_profile.level >= 15 and data_profile.level < 30:
             # 5% 4, 20% 3, 40% 2
-            quest_difficult_rate = get_value(lengend=5, hard=30, avarage=40)
-        elif data.level >= 30 and data.level < 50:
+            quest_difficult_rate = get_value(lengend=10, hard=30, avarage=40)
+        elif data_profile.level >= 30 and data_profile.level < 50:
             # 5% 4, 35% 3, 35% 2
-            quest_difficult_rate = get_value(lengend=5, hard=35, avarage=35)
-        elif data.level >= 50 and data.level < 75:
+            quest_difficult_rate = get_value(lengend=10, hard=35, avarage=35)
+        elif data_profile.level >= 50 and data_profile.level < 75:
             # 10% 4, 35% 3, 35% 2
             quest_difficult_rate = get_value(lengend=10, hard=35, avarage=35)
-        elif data.level >= 75 and data.level < 99:
+        elif data_profile.level >= 75 and data_profile.level < 99:
             quest_difficult_rate = get_value(lengend=10, hard=50, avarage=10)
-        elif data.level >= 99:
-            quest_difficult_rate = get_value(lengend=15, hard=55, avarage=25)
+        elif data_profile.level >= 99:
+            quest_difficult_rate = get_value(lengend=20, hard=55, avarage=25)
     reward_type = "C"
     bonus_exp = 0
     emoji = EmojiCreation2.COPPER.value
     if quest_difficult_rate == 2 or quest_difficult_rate == 3:
         reward_type = "S"
         emoji = EmojiCreation2.SILVER.value
-        bonus_exp = 10
+        bonus_exp = 15
     elif quest_difficult_rate == 4:
         reward_type = "G"
         emoji = EmojiCreation2.GOLD.value
-        bonus_exp = 20
+        bonus_exp = 35
     base_amount = 1
     if quest_type == "emoji_reaction_count":
-        base_amount = quest_difficult_rate * 250
+        base_amount = quest_difficult_rate * 150
         rand_reward_amount = random.randint(1, 5)
-        base_reward_amount = 1000
+        base_reward_amount = 2000
         if reward_type == "C":
-            base_reward_amount = 1000 * rand_reward_amount
+            base_reward_amount = 2000 * rand_reward_amount
         elif reward_type == "S":
             base_reward_amount = 100 * rand_reward_amount
         elif reward_type == "G":
@@ -73,11 +73,11 @@ def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_n
         quest_des = f"**{base_reward_amount}**{emoji}"
     
     if quest_type == "message_count":
-        base_amount = quest_difficult_rate * 150
+        base_amount = quest_difficult_rate * 80
         rand_reward_amount = random.randint(1, 5)
-        base_reward_amount = 2000
+        base_reward_amount = 3000
         if reward_type == "C":
-            base_reward_amount = 2000 * rand_reward_amount
+            base_reward_amount = 3000 * rand_reward_amount
         elif reward_type == "S":
             base_reward_amount = 200 * rand_reward_amount
         elif reward_type == "G":
@@ -95,7 +95,7 @@ def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_n
             base_reward_amount = 1 * rand_reward_amount
         elif reward_type == "G":
             base_reward_amount = 1
-        quest_title = f"Thả **{base_amount}** attachments bất kỳ vào kênh <#{channel_id}>"
+        quest_title = f"Thả **{base_amount}** ảnh, video bất kỳ vào kênh <#{channel_id}>"
         quest_des = f"**{base_reward_amount}**{emoji}"
     
     if quest_type == "truth_game_count" or quest_type == "dare_game_count":
@@ -116,7 +116,7 @@ def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_n
     if quest_type == "rps_game_count":
         base_amount = quest_difficult_rate * 8
         rand_reward_amount = random.randint(1, 5)
-        base_reward_amount = 2000
+        base_reward_amount = 2500
         if reward_type == "C":
             base_reward_amount = 2000 * rand_reward_amount
         elif reward_type == "S":
@@ -126,16 +126,17 @@ def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_n
         quest_title = f"Chơi **{base_amount}** trận game Kéo Búa Bao"
         quest_des = f"**{base_reward_amount}**{emoji}"
     
-    data = QuestProfile(user_id=user_id, user_display_name=user_display_name, user_name=user_name, guild_name= guild_name, quest_type= quest_type, quest_channel=channel_id, channel_name= channel_name, quest_title=quest_title, quest_description=quest_des, quest_difficult_rate=quest_difficult_rate, quest_total_progress=base_amount, bonus_exp=bonus_exp)
+    quest_profile = QuestProfile(user_id=user_id, user_display_name=user_display_name, user_name=user_name, guild_name= guild_name, quest_type= quest_type, quest_channel=channel_id, channel_name= channel_name, quest_title=quest_title, quest_description=quest_des, quest_difficult_rate=quest_difficult_rate, quest_total_progress=base_amount, bonus_exp=bonus_exp)
     
     if reward_type == "C":
-        data.quest_reward_copper = base_reward_amount
+        quest_profile.quest_reward_copper = base_reward_amount
     elif reward_type == "S":
-        data.quest_reward_silver = base_reward_amount
+        quest_profile.quest_reward_silver = base_reward_amount
     elif reward_type == "G":
-        data.quest_reward_gold = base_reward_amount 
-    result = collection.insert_one(data.to_dict())
-    return data
+        quest_profile.quest_reward_gold = base_reward_amount 
+    quest_profile.reset_date = datetime.now() + timedelta(days=2)
+    result = collection.insert_one(quest_profile.to_dict())
+    return quest_profile
 
 def get_value(lengend: int, hard: int, avarage: int):
     rand_num = random.randint(0, 100)

@@ -7,8 +7,8 @@ from datetime import datetime, timedelta
 from Handling.Economy.Authority.AuthorityRiotPreventView import AuthorityRiotPreventView
 
 class AuthorityRiotView(discord.ui.View):
-    def __init__(self, user: discord.Member, user_authority: Profile):
-        super().__init__(timeout=80)
+    def __init__(self, user: discord.Member, user_authority: Profile, timeout: int = 80):
+        super().__init__(timeout=timeout)
         self.message: discord.Message = None
         self.embed: discord.Embed = None
         self.target_user = user

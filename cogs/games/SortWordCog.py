@@ -89,6 +89,7 @@ class SortWords(commands.Cog):
         
     async def process_reset(self, message: discord.Message, sw_info: SwClass.SortWordInfo, language: str):
         embed = discord.Embed(title=f"Xếp hạng các player theo điểm.", description=f"Game Sắp Xếp Từ", color=0x03F8FC)
+        embed.add_field(name=f"", value=f"Lượt chơi thứ: {sw_info.current_round}/1200", inline=False)
         embed.add_field(name=f"", value="___________________", inline=False)
         count = 0
         if sw_info.player_profiles:
@@ -131,6 +132,7 @@ class SortWords(commands.Cog):
         elif lan == 'vn':
             lan = "Tiếng Việt"
         embed = discord.Embed(title=f"Xếp hạng các player theo điểm.", description=f"Trò Chơi Đoán Từ {lan}", color=0x03F8FC)
+        embed.add_field(name=f"", value=f"Lượt chơi thứ: {sw_info.current_round}/1200", inline=False)
         embed.add_field(name=f"", value="___________________", inline=False)
         count = 0
         if sw_info.player_profiles:

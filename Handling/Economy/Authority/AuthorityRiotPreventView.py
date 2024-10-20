@@ -9,8 +9,8 @@ from db.Class.CustomClass import UserInfo
 import db.DbMongoManager as db 
 
 class AuthorityRiotPreventView(discord.ui.View):
-    def __init__(self, user: discord.Member, rioting_user: discord.Member):
-        super().__init__(timeout=60)
+    def __init__(self, user: discord.Member, rioting_user: discord.Member, timeout: int = 60):
+        super().__init__(timeout=timeout)
         self.message: discord.Message = None
         self.user = user
         self.rioting_user = rioting_user
@@ -38,7 +38,6 @@ class AuthorityRiotPreventView(discord.ui.View):
         authority_profile.silver -= 1000
         ProfileMongoManager.update_profile_money_fast(guild_id=interaction.guild_id, data= authority_profile)
         result_message = f"Thành phần phản động **{self.rioting_user.display_name}** đã tổ chức khủng bố Chính Quyền nhưng đã bị dập tắt bạo động ngay lập tức! Thủ phạm **{self.rioting_user.display_name}** bị phạt **100K**{EmojiCreation2.COPPER.value} và cùng **{len(self.yes_votes)}** thành phần phản động khác bị tống giam trong 3 tiếng!"
-        
         #Trừ tiền của phản động
         ProfileMongoManager.update_profile_money(guild_id=self.rioting_user.guild.id, guild_name=self.rioting_user.guild.name, user_id=self.rioting_user.id, user_display_name= self.rioting_user.display_name, user_name=self.rioting_user.name, copper=-100000)
         

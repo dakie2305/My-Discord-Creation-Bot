@@ -1,8 +1,5 @@
 import discord
 from discord.ext import commands
-from discord.app_commands import Choice
-from typing import Optional
-from Handling.Economy.Profile.ProfileClass import Profile
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 from Handling.Misc.SelfDestructView import SelfDestructView
 from Handling.Economy.Authority.AuthorityView import AuthorityView
@@ -11,7 +8,7 @@ from enum import Enum
 from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.EmojiEnum import EmojiCreation2
 import CustomEnum.UserEnum as UserEnum
-
+from datetime import datetime, timedelta
 import CustomFunctions
 
 async def setup(bot: commands.Bot):
@@ -138,7 +135,7 @@ class AuthorityEconomy(commands.Cog):
         
         #Mỗi lần bạo động cần tốn base 100 Silver * 0.dignity_point  để phát động, và chính quyền sẽ cần tốn 500 Silver để dẹp loạn
         #Kiểm xem user có đủ 100 Silver không
-        money_base_riot = 200
+        money_base_riot = 120
         money_for_riot = money_base_riot
         if existed_authority.dignity_point != None:
             money_for_riot = int(money_base_riot * existed_authority.dignity_point / 100)
@@ -148,16 +145,19 @@ class AuthorityEconomy(commands.Cog):
             embed = discord.Embed(title=f"", description=f"Để kêu gọi bạo động chính quyền thì bạn cần **{money_for_riot}**{EmojiCreation2.SILVER.value}!", color=0xc379e0)
             mes = await interaction.followup.send(embed=embed)
             return
-        #Trừ 500 silver
-        ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, silver=-500)
+        #Trừ silver
+        ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, silver=-money_for_riot)
+        timeout = 70 #Cho timeout giây để kết thúc
+        endtime = datetime.now() + timedelta(seconds=timeout)
         #Đưa ra embed bạo động
         embed = discord.Embed(title=f"Lời Kêu Gọi Bạo Động",description=f"{interaction.user.mention} đã kêu gọi mọi người đứng lên khởi nghĩa chống lại Chính Quyền Server <@{existed_authority.user_id}>!",color=discord.Color.red())
         embed.add_field(name=f"", value="▬▬▬▬▬ι═══════════>", inline=False)
+        embed.add_field(name=f"", value=f"Thời gian kết thúc: <t:{int(endtime.timestamp())}:r>", inline=False)
         embed.add_field(name=f"", value=f"- Nếu kêu gọi thành công nhiều **người bạo động** chính quyền thì {interaction.user.mention} sẽ nhận được **500**{EmojiCreation2.SILVER.value} và Chính Quyền <@{existed_authority.user_id}> sẽ mất **1000**{EmojiCreation2.SILVER.value}!", inline=False)
         embed.add_field(name=f"", value=f"- Chính Quyền <@{existed_authority.user_id}> có thể bỏ ra **500**{EmojiCreation2.SILVER.value} để lập tức điều động bắt giữ những kẻ bạo động, hoặc huy động **người phản đối** bạo động để tránh mất tiền!", inline=False)
         embed.set_image(url="https://kustomsignals.com/wp-content/uploads/2022/09/shutterstock_56579431-1024x680.jpg")
         
-        view = AuthorityRiotView(user=interaction.user, user_authority=existed_authority)
+        view = AuthorityRiotView(user=interaction.user, user_authority=existed_authority, timeout=timeout)
         view.embed = embed
         await interaction.followup.send(f"Bạn đã bị trừ **{money_base_riot}** {EmojiCreation2.SILVER.value} để tạo bạo động!",ephemeral=True)
         called_channel = interaction.channel

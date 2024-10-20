@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-from discord.app_commands import Choice
 from typing import Optional
 from Handling.Economy.Quest.QuestClass import QuestProfile
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
@@ -14,6 +13,7 @@ import CustomEnum.UserEnum as UserEnum
 import db.DbMongoManager as DbMongoManager
 import random
 from db.Class.CustomClass import GuildExtraInfo
+from datetime import datetime, timedelta
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(QuestEconomy(bot=bot))
@@ -74,6 +74,12 @@ class QuestEconomy(commands.Cog):
             embed = discord.Embed(title=f"Owner Server vui lòng dùng lệnh {SlashCommand.QUEST_CHANNELS} để thêm channel cho Hệ Thống Nhiệm Vụ chọn!",color=discord.Color.red())
             return embed
         
+        #Kiểm tra xem nếu today đã lố quest.reset_date thì xoá quest làm lại
+        if quest != None and quest.reset_date != None and quest.reset_date.date() <= datetime.now().date():
+            QuestMongoManager.delete_quest(guild_id=user.guild.id, user_id=user.id)
+            quest = None
+        
+        
         #Kiểm xem quest cũ đã hoàn thành chưa
         if quest != None and quest.quest_progress!= None and quest.quest_total_progress != None and quest.quest_progress >= quest.quest_total_progress:
             #Hoàn thành
@@ -92,7 +98,6 @@ class QuestEconomy(commands.Cog):
             ProfileMongoManager.update_level_progressing(guild_id=user.guild.id, user_id=user.id, bonus_exp= 80 + quest.bonus_exp)
             #Xoá quest hiện tại
             QuestMongoManager.delete_quest(guild_id=user.guild.id, user_id=user.id)
-            
             return new_embed
         
         list_channels_quests = guild_extra_info.list_channels_quests
@@ -110,22 +115,21 @@ class QuestEconomy(commands.Cog):
         if quest == None:
             #Tạo random quest
             quest = QuestMongoManager.create_new_random_quest(guild_id=user.guild.id, guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, channel_id=quest_channel.id, channel_name=quest_channel.name)
-
         embed = discord.Embed(title=f"", description=f"**Nhiệm vụ dành cho {user.mention}**", color=0xe9f5ec)
         embed.set_thumbnail(url=user.avatar.url)
+        if quest.reset_date != None:
+            embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Thời gian reset nhiệm vụ: <t:{int(quest.reset_date.timestamp())}:D> ", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Cấp độ nhiệm vụ: **{self.get_cap_do_quest(quest.quest_difficult_rate)}**", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Tổng nhiệm vụ hoàn thành: **{data.quest_finished}**", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
-        embed.add_field(name=f"", value=f"- Mô tả nhiệm vụ: {quest.quest_title}", inline=False)
+        embed.add_field(name=f"", value=f"**Mô tả nhiệm vụ**: {quest.quest_title}", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} `Tiến độ`: {quest.quest_progress}/{quest.quest_total_progress}", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.GOLDEN_GIFT_BOX.value} Phần Thường: {quest.quest_description}", inline=False)
         if quest.bonus_exp != None and quest.bonus_exp != 0:
             embed.add_field(name=f"", value=f"{EmojiCreation2.GOLDEN_GIFT_BOX.value} Điểm thưởng: +**{quest.bonus_exp}** Kinh Nghiệm", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
-        embed.set_footer(text=f"{user.name}. Nhớ đừng quên tuân theo đúng luật server khi làm quest!", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/8fd7278827dbc92713e315ee03e0b502.webp?size=32")
+        embed.set_footer(text=f"Nhớ đừng quên tuân theo đúng luật server khi làm quest! Khó quá thì dùng lệnh /quests reset!", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/8fd7278827dbc92713e315ee03e0b502.webp?size=32")
         return embed
-    
-    
     
     quest_group = discord.app_commands.Group(name="quests", description="Các lệnh liên quan đến Nhiệm Vụ của server!")
     #region quest channels
@@ -166,7 +170,7 @@ class QuestEconomy(commands.Cog):
             await interaction.followup.send(f"Đã tạo Guild Extra Info và thêm channel này vào trong hệ thống nhiệm vụ của server này.", ephemeral= True)
     
     #region quest reset
-    @quest_group.command(name="reset", description="Reset nhiệm vụ của bản thân. Tốn 200 Silver để reset")
+    @quest_group.command(name="reset", description="Reset nhiệm vụ của bản thân. Tốn 10 Silver để reset")
     async def quest_reset_slash(self, interaction: discord.Interaction):
         await interaction.response.defer()
         #Không cho dùng bot nếu không phải user
@@ -174,13 +178,33 @@ class QuestEconomy(commands.Cog):
             embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
             await interaction.followup.send(embed=embed, ephemeral=True)
             return
+        #Kiểm xem có quest không
+        quest = QuestMongoManager.find_quest_by_user_id(guild_id=interaction.guild_id, user_id=interaction.user.id)        
+        if quest == None:
+            embed = discord.Embed(title=f"Bạn làm gì có quest để mà reset?! Vui lòng dùng lệnh {SlashCommand.QUEST.value} trước đã!",color=discord.Color.blue())
+            await interaction.followup.send(embed=embed, ephemeral=True)
+            return
         
-        # if interaction.user.id != UserEnum.UserId.DARKIE.value:
-        view = SelfDestructView(timeout=30)
-        embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật chức năng! Vui lòng đợi nhé!",color=discord.Color.blue())
-        mess = await interaction.followup.send(embed=embed, view=view)
-        view.message = mess
+        #Kiểm tra xem đủ 10 silver không
+        profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
+        if profile == None:
+            embed = discord.Embed(title=f"Vui lòng dùng lệnh {SlashCommand.QUEST.value} hoặc {SlashCommand.PROFILE.value} trước đã!",color=discord.Color.blue())
+            await interaction.followup.send(embed=embed, ephemeral=True)
+            return
+        elif profile.silver < 10:
+            embed = discord.Embed(title=f"Bạn không có đủ 10 {EmojiCreation2.SILVER.value} để reset quest hiện tại!",color=discord.Color.blue())
+            await interaction.followup.send(embed=embed, ephemeral=True)
+            return
+        
+        QuestMongoManager.delete_quest(guild_id=interaction.guild_id, user_id=interaction.user.id)
+        profile.silver -= 10
+        ProfileMongoManager.update_profile_money_fast(guild_id=interaction.guild_id, data=profile)
+        embed = discord.Embed(title=f"Bạn đã bị trừ 10 {EmojiCreation2.SILVER.value} để reset nhiệm vụ hiện tại! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để nhận Nhiệm Vụ mới.",color=discord.Color.blue())
+        await interaction.followup.send(embed=embed, ephemeral=True)
         return
+        
+        
+        
 
     
     def get_cap_do_quest(self, input: int):
