@@ -42,7 +42,7 @@ class RockPaperScissors(commands.Cog):
         view.channel_id = interaction.channel_id
         view.message = message
         
-        check_quest_message = QuestMongoManager.increase_rps_count(guild_id=interaction.guild_id, user_id=interaction.user.id, channel_id=interaction.channel_id)
+        check_quest_message = QuestMongoManager.increase_rps_count(guild_id=interaction.guild_id, user_id=interaction.user.id)
         if check_quest_message == True:
             quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
             await interaction.followup.send(embed=quest_embed, content= f"{user.mention}")

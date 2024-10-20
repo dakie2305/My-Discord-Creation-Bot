@@ -33,7 +33,7 @@ class AutoresponderHandling():
         bank_help = ["bank help", "bank sao", "bank?"]
         
         dignity_help = ["tăng nhân phẩm", "điểm nhân phẩm", "nhân phẩm là gì", "nhân phẩm?"]
-        dia_vi_help = ["tăng địa vị", "điểm nhân phẩm", "nhân phẩm là gì", "nhân phẩm?"]
+        dia_vi_help = ["tăng địa vị", "điểm địa vị", "địa vị là gì", "địa vị?"]
         
         flag = False
         if message.author.bot: return flag
@@ -131,7 +131,7 @@ class AutoresponderHandling():
             embed_updated = discord.Embed(title=f"", description=f"Đùa thôi. Đồng xu đã quay ra **`{state}`** {emoji_state}!", color=0x03F8FC)
             await message.edit(embed=embed_updated)
         
-        check_quest_message = QuestMongoManager.increase_coin_flip_count(guild_id=message.guild.id, user_id=message.author.id, channel_id=message.channel.id)
+        check_quest_message = QuestMongoManager.increase_coin_flip_count(guild_id=message.guild.id, user_id=message.author.id)
         if check_quest_message == True:
             quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
             await message.channel.send(embed=quest_embed, content=f"{message.author.mention}")

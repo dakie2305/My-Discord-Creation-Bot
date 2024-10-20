@@ -214,7 +214,7 @@ def increase_attachment_count(guild_id: int, user_id: int, channel_id: int, coun
     return is_completed
 
 #region Coin Flip Count
-def increase_coin_flip_count(guild_id: int, user_id: int, channel_id: int):
+def increase_coin_flip_count(guild_id: int, user_id: int):
     collection = db_specific[f'quest_{guild_id}']
     data = collection.find_one({"id": "quest", "user_id": user_id, "quest_type": "coin_flip_game_count"})
     if data == None: return False
@@ -230,7 +230,7 @@ def increase_coin_flip_count(guild_id: int, user_id: int, channel_id: int):
     return is_completed
 
 #region Kéo Búa Bao Count
-def increase_rps_count(guild_id: int, user_id: int, channel_id: int):
+def increase_rps_count(guild_id: int, user_id: int):
     collection = db_specific[f'quest_{guild_id}']
     data = collection.find_one({"id": "quest", "user_id": user_id, "quest_type": "rps_game_count"})
     if data == None: return False

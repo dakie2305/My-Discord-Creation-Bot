@@ -4,9 +4,7 @@ from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
 import CustomFunctions
-import db.Class.UserList as DefaultUserList
 import google.generativeai as genai
-import time
 import DailyLogger
 from discord.ext import commands, tasks
 from discord import app_commands
@@ -17,7 +15,6 @@ import string
 import CustomButton
 from typing import Optional
 import PIL
-import asyncio
 from Handling.Misc.AutoresponderCreation2 import AutoresponderHandling
 from Handling.Economy.Quest.QuestHandling import QuestHandling
 import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
@@ -199,52 +196,6 @@ async def random_ai_talk(interaction: discord.Interaction):
         data = GuildExtraInfo(guild_id=interaction.guild.id, guild_name= interaction.guild.name, allowed_ai_bot=True, list_channels_ai_talk= list_channels_ai_talk)
         db.insert_guild_extra_info(data)
         await interaction.followup.send(f"Đã tạo Guild Extra Info. Bot lâu lâu sẽ nói chuyện trong channel này.", ephemeral= True)
-#endregion
-
-#region Coin flip command
-@bot.tree.command(name="cf", description="Tung đồng xu sấp/ngửa cho vui.")
-async def cf(interaction: discord.Interaction):
-    embed = discord.Embed(title=f"", description=f"{interaction.user.mention} đã tung đồng xu. Đồng xu đang quay <a:doge_coin:1287452452827697276> ...", color=0x03F8FC)
-    await interaction.response.send_message(embed=embed)
-    mess = await interaction.original_response()
-    if mess:
-        await edit_embed_coin_flip(message=mess, user=interaction.user)
-    return
-
-
-async def edit_embed_coin_flip(message: discord.Message, user: discord.Member):
-    await asyncio.sleep(3)
-    choice = random.randint(0,10)
-    emoji_state = '<:coin_ngua:1287452465733570684>'
-    state = 'ngửa'
-    if choice > 0 and choice <=5:
-        state = 'sấp'
-        emoji_state = '<:coin_sap:1287452474952777750>'
-    elif choice == 10:
-        #Troll player
-        response = CustomFunctions.get_random_response("OnCoinFlip.txt")
-        embed_updated = discord.Embed(title=f"", description=f"{user.mention} đã tung đồng xu. {response}", color=0x03F8FC)
-        await message.edit(embed=embed_updated)
-        return
-    embed_updated = discord.Embed(title=f"", description=f"{user.mention} đã tung đồng xu. Đồng xu đã quay ra **`{state}`** {emoji_state}!", color=0x03F8FC)
-    await message.edit(embed=embed_updated)
-    if choice == 0:
-        await asyncio.sleep(2)
-        #Troll tập 2
-        if state == 'ngửa':
-            state = 'sấp'
-            emoji_state = '<:coin_sap:1287452474952777750>'
-        else:
-            state = 'ngửa'
-            emoji_state = '<:coin_ngua:1287452465733570684>'
-        embed_updated = discord.Embed(title=f"", description=f"Đùa thôi. Đồng xu đã quay ra **`{state}`** {emoji_state}!", color=0x03F8FC)
-        await message.edit(embed=embed_updated)
-    
-    check_quest_message = QuestMongoManager.increase_coin_flip_count(guild_id=message.guild.id, user_id=message.author.id, channel_id=message.channel.id)
-    if check_quest_message == True:
-        quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
-        await message.channel.send(embed=quest_embed, content=f"{message.author.mention}")
-    return
 #endregion
 
 #region Help Command
@@ -549,6 +500,8 @@ async def on_reaction_add(reaction, user):
 #Cog command
 init_extension = ["cogs.games.RockPaperScissorCog", 
                   "cogs.games.TruthDareCog",
+                  "cogs.games.CoinFlipCog",
+                  
                   "cogs.economy.ProfileCog",
                   "cogs.economy.BankCog",
                   "cogs.economy.TransferCog",

@@ -91,7 +91,7 @@ class TransferMoneyEconomy(commands.Cog):
         user_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
         if user_profile == None:
             embed = discord.Embed(title=f"", description=f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", color=0xc379e0)
-            interaction.followup.send(embed=embed)
+            await interaction.followup.send(embed=embed)
             return
         #Kiểm tra xem người nhận có tồn tại profile chưa
         receive_user = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=user.id)
