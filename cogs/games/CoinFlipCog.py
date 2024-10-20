@@ -45,7 +45,6 @@ class CoinFlip(commands.Cog):
         if (sap_ngua != None and (so_tien == None or loai_tien == None)):
             so_tien = 500
             loai_tien = "C"
-        
         profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
         if sap_ngua != None and profile == None:
             await interaction.followup.send(f"Để cá cược thì bạn phải thực hiện lệnh {SlashCommand.PROFILE.value} trước đã!")
@@ -60,7 +59,9 @@ class CoinFlip(commands.Cog):
             elif loai_tien == "G" and profile.gold < so_tien:
                 await interaction.followup.send(f"Bạn không có đủ {EmojiCreation2.GOLD.value} để cá cược!")
                 return
-            
+        if so_tien != None and so_tien < 0:
+            await interaction.followup.send(f"Đm không được nhập số âm vào tiền!")
+            return
         
         embed = discord.Embed(title=f"", description=f"{interaction.user.mention} đã tung đồng xu. Đồng xu đang quay {EmojiCreation2.DOGE_COIN.value} ...", color=0x03F8FC)
         mess = await interaction.followup.send(embed=embed)
