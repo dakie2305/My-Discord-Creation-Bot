@@ -8,6 +8,7 @@ import random
 from Handling.MiniGame.TruthDare.TruthDareView import TruthDareView
 import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
 from CustomEnum.SlashEnum import SlashCommand 
+from Handling.Misc.SelfDestructView import SelfDestructView
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(TruthDare(bot=bot))
@@ -53,5 +54,7 @@ class TruthDare(commands.Cog):
         #Kiểm tra quest
         quest_progress = QuestMongoManager.increase_truth_dare_count(guild_id=interaction.guild_id, user_id=interaction.user.id, is_truth=ran)
         if quest_progress != None and quest_progress == True:
+            view = SelfDestructView(60)
             quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
-            await channel.send(embed=quest_embed, content=f"{interaction.user.mention}")
+            m = await channel.send(embed=quest_embed, content=f"{interaction.user.mention}", view= view)
+            view.message = m

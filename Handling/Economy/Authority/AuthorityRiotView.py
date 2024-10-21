@@ -64,7 +64,7 @@ class AuthorityRiotView(discord.ui.View):
             await self.message.edit(embed=self.embed, view= None)
         riot_win = False
         if len(self.yes_votes) > len(self.no_votes):
-            result_message = f"Anh hùng **{self.target_user.display_name}** đã bạo động thành công khiến Chính Quyền mất **1000**{EmojiCreation2.SILVER.value} và nhận được **500**{EmojiCreation2.SILVER.value}! Đã có **{len(self.yes_votes)}** người đứng ra ủng hộ bạo động chính quyền!"
+            result_message = f"Anh hùng **{self.target_user.display_name}** đã bạo động thành công khiến Chính Quyền mất **1000**{EmojiCreation2.SILVER.value} và nhận được **300**{EmojiCreation2.SILVER.value}! Đã có **{len(self.yes_votes)}** người đứng ra ủng hộ bạo động chính quyền!"
             riot_win = True
         else:
             result_message = f"Thành phần phản động **{self.target_user.display_name}** đã tổ chức khủng bố Chính Quyền nhưng đã bị dập tắt bạo động ngay lập tức! Thủ phạm **{self.target_user.display_name}** bị phạt **100K**{EmojiCreation2.COPPER.value} và cùng **{len(self.yes_votes)}** thành phần phản động khác bị tống giam trong 3 tiếng!"
@@ -79,7 +79,7 @@ class AuthorityRiotView(discord.ui.View):
             ProfileMongoManager.update_level_progressing(guild_id=self.target_user.guild.id, user_id=self.user_authority.user_id, bonus_exp=10)
         else:
             #Cộng tiền cho phản động
-            ProfileMongoManager.update_profile_money(guild_id=self.target_user.guild.id, guild_name=self.target_user.guild.name, user_id=self.target_user.id, user_display_name= self.target_user.display_name, user_name=self.target_user.name, silver=500)
+            ProfileMongoManager.update_profile_money(guild_id=self.target_user.guild.id, guild_name=self.target_user.guild.name, user_id=self.target_user.id, user_display_name= self.target_user.display_name, user_name=self.target_user.name, silver=300)
             #Trừ tiền của chính quyền
             ProfileMongoManager.update_profile_money(guild_id=self.target_user.guild.id, guild_name=self.target_user.guild.name, user_id=self.user_authority.user_id, user_display_name= self.user_authority.user_display_name, user_name=self.user_authority.user_name, silver=-1000)
             embed.set_thumbnail(url="https://img.freepik.com/premium-photo/violent-riot-street-fight-criminal-gangs-extremists-faces-shadows-black-clothes-hoods-fire-flames-background-looting_884546-10051.jpg")

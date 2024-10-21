@@ -81,7 +81,7 @@ class QuestEconomy(commands.Cog):
         
         
         #Kiểm xem quest cũ đã hoàn thành chưa
-        if quest != None and quest.quest_progress!= None and quest.quest_total_progress != None and quest.quest_progress >= quest.quest_total_progress:
+        if quest != None and quest.quest_progress!= None and quest.quest_total_progress != None and quest.quest_progress >= quest.quest_total_progress and quest.quest_title != None:
             #Hoàn thành
             new_embed = discord.Embed(title=f"", description=f"Chúc mừng **{user.name}** đã hoàn thành nhiệm vụ: {quest.quest_title}!",color=discord.Color.blue())
             new_embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
@@ -95,7 +95,7 @@ class QuestEconomy(commands.Cog):
             #Cộng tiền
             ProfileMongoManager.update_profile_money(guild_id=user.guild.id, guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name= user.display_name, gold=quest.quest_reward_gold, silver=quest.quest_reward_silver, copper=quest.quest_reward_copper)
             #Cộng kinh nghiệm
-            ProfileMongoManager.update_level_progressing(guild_id=user.guild.id, user_id=user.id, bonus_exp= 80 + quest.bonus_exp)
+            ProfileMongoManager.update_level_progressing(guild_id=user.guild.id, user_id=user.id, bonus_exp= 40 + quest.bonus_exp)
             #Xoá quest hiện tại
             QuestMongoManager.delete_quest(guild_id=user.guild.id, user_id=user.id)
             return new_embed

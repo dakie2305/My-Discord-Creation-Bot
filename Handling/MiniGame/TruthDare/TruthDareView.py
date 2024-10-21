@@ -4,6 +4,7 @@ import db.DbMongoManager as DbMongoManager
 import discord
 import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
 from CustomEnum.SlashEnum import SlashCommand 
+from Handling.Misc.SelfDestructView import SelfDestructView
 
 class TruthDareView(discord.ui.View):
     def __init__(self):
@@ -38,8 +39,10 @@ class TruthDareView(discord.ui.View):
         #Kiểm tra quest
         quest_progress = QuestMongoManager.increase_truth_dare_count(guild_id=interaction.guild_id, user_id=interaction.user.id, is_truth=True)
         if quest_progress != None and quest_progress == True:
+            view = SelfDestructView(60)
             quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
-            await channel.send(embed=quest_embed, content=f"{interaction.user.mention}")
+            m = await channel.send(embed=quest_embed, content=f"{interaction.user.mention}", view=view)
+            view.message = m
         
     @discord.ui.button(label="Thách thức", style=discord.ButtonStyle.secondary, custom_id="dare_button")
     async def buttonDare_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -62,5 +65,7 @@ class TruthDareView(discord.ui.View):
         #Kiểm tra quest
         quest_progress = QuestMongoManager.increase_truth_dare_count(guild_id=interaction.guild_id, user_id=interaction.user.id, is_truth=False)
         if quest_progress != None and quest_progress == True:
-            quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để nhận thưởng mới nha!", color=0xc379e0)
-            await channel.send(embed=quest_embed, content=f"{interaction.user.mention}")
+            view = SelfDestructView(60)
+            quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
+            m = await channel.send(embed=quest_embed, content=f"{interaction.user.mention}", view=view)
+            view.message = m

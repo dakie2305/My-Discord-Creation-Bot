@@ -489,7 +489,7 @@ async def on_reaction_add(reaction, user):
     message: discord.Message = reaction.message
     user_target: discord.Member = user
     if user_target != None and message != None:
-        check_quest_message = QuestMongoManager.increase_emoji_count(guild_id=message.guild.id, user_id=user_target.id, channel_id=message.channel.id)
+        check_quest_message = QuestMongoManager.increase_emoji_count(guild_id=user_target.guild.id, user_id=user_target.id, channel_id=message.channel.id)
         if check_quest_message == True:
             quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
             await message.channel.send(embed=quest_embed, content=f"{message.author.mention}")

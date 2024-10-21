@@ -165,6 +165,8 @@ def increase_truth_dare_count(guild_id: int, user_id: int, is_truth: bool):
     data = collection.find_one({"id": "quest", "user_id": user_id, "quest_type": quest_type})
     if data == None: return False
     existing_data = QuestProfile.from_dict(data)
+    if existing_data.quest_progress >= existing_data.quest_total_progress:
+        return True
     if is_truth: 
         existing_data.truth_game_count += 1
         existing_data.quest_progress += 1
@@ -176,6 +178,7 @@ def increase_truth_dare_count(guild_id: int, user_id: int, is_truth: bool):
     collection.update_one({"id": "quest", "user_id": user_id}, {"$set": {"truth_game_count": existing_data.truth_game_count,
                                                                                     "quest_progress": existing_data.quest_progress,
                                                                                     "dare_game_count": existing_data.dare_game_count,
+                                                                                    "is_completed": is_completed,
                                                                                     }})
     if is_completed:
         ProfileMongoManager.increase_quest_finished(guild_id=guild_id, user_id=user_id)
@@ -187,11 +190,13 @@ def increase_message_count(guild_id: int, user_id: int, channel_id: int):
     data = collection.find_one({"id": "quest", "user_id": user_id, "quest_type": "message_count", "quest_channel": channel_id})
     if data == None: return False
     existing_data = QuestProfile.from_dict(data)
+    if existing_data.quest_progress >= existing_data.quest_total_progress:
+        return True
     existing_data.quest_progress += 1
-    
     is_completed = False if existing_data.quest_progress < existing_data.quest_total_progress else True
     collection.update_one({"id": "quest", "user_id": user_id}, {"$set": {
                                                                             "quest_progress": existing_data.quest_progress,
+                                                                            "is_completed": is_completed,
                                                                         }})
     if is_completed:
         ProfileMongoManager.increase_quest_finished(guild_id=guild_id, user_id=user_id)
@@ -203,11 +208,13 @@ def increase_attachment_count(guild_id: int, user_id: int, channel_id: int, coun
     data = collection.find_one({"id": "quest", "user_id": user_id, "quest_type": "attachments_count","quest_channel": channel_id})
     if data == None: return False
     existing_data = QuestProfile.from_dict(data)
+    if existing_data.quest_progress >= existing_data.quest_total_progress:
+        return True
     existing_data.quest_progress += count
-    
     is_completed = False if existing_data.quest_progress < existing_data.quest_total_progress else True
     collection.update_one({"id": "quest", "user_id": user_id}, {"$set": {
                                                                             "quest_progress": existing_data.quest_progress,
+                                                                            "is_completed": is_completed,
                                                                         }})
     if is_completed:
         ProfileMongoManager.increase_quest_finished(guild_id=guild_id, user_id=user_id)
@@ -219,11 +226,14 @@ def increase_coin_flip_count(guild_id: int, user_id: int):
     data = collection.find_one({"id": "quest", "user_id": user_id, "quest_type": "coin_flip_game_count"})
     if data == None: return False
     existing_data = QuestProfile.from_dict(data)
+    if existing_data.quest_progress >= existing_data.quest_total_progress:
+        return True
     existing_data.quest_progress += 1
     
     is_completed = False if existing_data.quest_progress < existing_data.quest_total_progress else True
     collection.update_one({"id": "quest", "user_id": user_id}, {"$set": {
                                                                             "quest_progress": existing_data.quest_progress,
+                                                                            "is_completed": is_completed,
                                                                         }})
     if is_completed:
         ProfileMongoManager.increase_quest_finished(guild_id=guild_id, user_id=user_id)
@@ -235,10 +245,13 @@ def increase_rps_count(guild_id: int, user_id: int):
     data = collection.find_one({"id": "quest", "user_id": user_id, "quest_type": "rps_game_count"})
     if data == None: return False
     existing_data = QuestProfile.from_dict(data)
+    if existing_data.quest_progress >= existing_data.quest_total_progress:
+        return True
     existing_data.quest_progress += 1
     is_completed = False if existing_data.quest_progress < existing_data.quest_total_progress else True
     collection.update_one({"id": "quest", "user_id": user_id}, {"$set": {
                                                                             "quest_progress": existing_data.quest_progress,
+                                                                            "is_completed": is_completed,
                                                                         }})
     if is_completed:
         ProfileMongoManager.increase_quest_finished(guild_id=guild_id, user_id=user_id)
@@ -250,10 +263,13 @@ def increase_emoji_count(guild_id: int, user_id: int, channel_id: int):
     data = collection.find_one({"id": "quest", "user_id": user_id, "quest_type": "emoji_reaction_count","quest_channel": channel_id})
     if data == None: return False
     existing_data = QuestProfile.from_dict(data)
+    if existing_data.quest_progress >= existing_data.quest_total_progress:
+        return True
     existing_data.quest_progress += 1
     is_completed = False if existing_data.quest_progress < existing_data.quest_total_progress else True
     collection.update_one({"id": "quest", "user_id": user_id}, {"$set": {
                                                                             "quest_progress": existing_data.quest_progress,
+                                                                            "is_completed": is_completed,
                                                                         }})
     if is_completed:
         ProfileMongoManager.increase_quest_finished(guild_id=guild_id, user_id=user_id)

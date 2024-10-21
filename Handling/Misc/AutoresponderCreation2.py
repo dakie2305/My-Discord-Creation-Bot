@@ -35,6 +35,8 @@ class AutoresponderHandling():
         dignity_help = ["tăng nhân phẩm", "điểm nhân phẩm", "nhân phẩm là gì", "nhân phẩm?"]
         dia_vi_help = ["tăng địa vị", "điểm địa vị", "địa vị là gì", "địa vị?"]
         
+        bbb_warning = ["bbb", "BBB"]
+        
         flag = False
         if message.author.bot: return flag
         
@@ -100,6 +102,18 @@ class AutoresponderHandling():
             _mess = await message.channel.send(embed=embed, view=view)
             view.message= _mess
             
+        elif CustomFunctions.contains_substring(message.content.lower(), bbb_warning) and message.channel.id != 1297787832986767381 and message.guild.id == 1256987900277690470:
+            flag = True
+            await message.delete()
+            view = SelfDestructView(timeout=5)
+            _mess = await message.channel.send(content=f"Shhhhh... We do not talk about this topic here.", view=view)
+            view.message= _mess
+        
+        elif message.guild.id == 1256987900277690470 and len(message.author.roles) == 1 and message.author.roles[0].is_default():
+            flag = True
+            view = SelfDestructView(timeout=30)
+            _mess = await message.reply(content=f"Hey, <#1257002970529267774> <- ?", view=view)
+            view.message= _mess
             
         return flag
     

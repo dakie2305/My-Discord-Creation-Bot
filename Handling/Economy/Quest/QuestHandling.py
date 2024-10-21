@@ -5,6 +5,7 @@ import string
 import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
 from discord.ext import commands
 from CustomEnum.SlashEnum import SlashCommand 
+from Handling.Misc.SelfDestructView import SelfDestructView
 
 class QuestHandling():
     def __init__ (self, bot: commands.Bot):
@@ -17,16 +18,20 @@ class QuestHandling():
         if message.attachments and len(message.attachments)> 0:
             check_attachment_count = QuestMongoManager.increase_attachment_count(guild_id=message.guild.id, user_id=message.author.id, channel_id=message.channel.id, count=len(message.attachments))
             if check_attachment_count == True:
+                view = SelfDestructView(timeout=60)
                 quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
-                await message.channel.send(embed=quest_embed, content=f"{message.author.mention}")
+                m = await message.channel.send(embed=quest_embed, content=f"{message.author.mention}", view= view)
+                view.message = m
         
         if str.isspace(message.content): return
         if message.content and message.content[0] in string.punctuation and len(message.content) < 5: return
         if message.content and message.content[0] == ":" and len(message.content) < 3: return
         check_quest_message = QuestMongoManager.increase_message_count(guild_id=message.guild.id, user_id=message.author.id, channel_id=message.channel.id)
         if check_quest_message == True:
+            view = SelfDestructView(timeout=60)
             quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
-            await message.channel.send(embed=quest_embed, content=f"{message.author.mention}")
+            m = await message.channel.send(embed=quest_embed, content=f"{message.author.mention}", view=view)
+            view.message = m
         
 
         

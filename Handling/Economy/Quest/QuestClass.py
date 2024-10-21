@@ -2,7 +2,7 @@ from typing import List, Optional
 from datetime import datetime
 
 class QuestProfile:
-    def __init__(self, user_id: int, user_name: str, user_display_name: str, guild_name: str, quest_type: str, quest_channel: int, channel_name: str, quest_title: str, quest_description: str, quest_total_progress: int, quest_progress:int = 0, truth_game_count: int = 0, dare_game_count: int = 0, coin_flip_count = 0, rps_count = 0, quest_reward_copper:int = 0, quest_reward_silver:int = 0, quest_reward_gold : int = 0, quest_difficult_rate: int = 0, bonus_exp: int = 0, reset_date: datetime = None):
+    def __init__(self, user_id: int, user_name: str, user_display_name: str, guild_name: str, quest_type: str, quest_channel: int, channel_name: str, quest_title: str, quest_description: str, quest_total_progress: int, quest_progress:int = 0, truth_game_count: int = 0, dare_game_count: int = 0, coin_flip_count = 0, rps_count = 0, quest_reward_copper:int = 0, quest_reward_silver:int = 0, quest_reward_gold : int = 0, quest_difficult_rate: int = 0, bonus_exp: int = 0, reset_date: datetime = None, is_completed = False):
         self.id = "quest"
         self.user_id = user_id
         self.user_name = user_name
@@ -24,6 +24,7 @@ class QuestProfile:
         self.quest_reward_gold = quest_reward_gold
         self.quest_difficult_rate = quest_difficult_rate
         self.bonus_exp = bonus_exp
+        self.is_completed = is_completed
         self.reset_date = reset_date if reset_date else None
     
     def to_dict(self):
@@ -50,6 +51,7 @@ class QuestProfile:
             "quest_difficult_rate": self.quest_difficult_rate,
             "bonus_exp": self.bonus_exp,
             "reset_date": self.reset_date,
+            "is_completed": self.is_completed,
         }
         
     @staticmethod
@@ -76,6 +78,7 @@ class QuestProfile:
                 quest_difficult_rate=data.get("quest_difficult_rate", None),
                 bonus_exp=data.get("bonus_exp", None),
                 reset_date=data.get("reset_date", None),
+                is_completed=data.get("is_completed", False),
             )
 
 list_quest_general_type = [

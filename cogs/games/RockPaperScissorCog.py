@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from Handling.MiniGame.RockPaperScissor import RpsClass, RpsMongoManager, RpsView
 import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
 from CustomEnum.SlashEnum import SlashCommand 
+from Handling.Misc.SelfDestructView import SelfDestructView
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(RockPaperScissors(bot=bot))
@@ -22,12 +23,12 @@ class RockPaperScissors(commands.Cog):
     @discord.app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
     @discord.app_commands.describe(user="Chọn user để chơi cùng. Không chọn tức là sẽ chơi với bot")
     async def create_rps(self, interaction: discord.Interaction, user: Optional[discord.Member] = None):
-        await interaction.response.defer()
+        await interaction.response.defer(ephemeral= True)
         if user is None:
             user = self.bot.user
         
         if user.id == interaction.user.id:
-            await interaction.followup.send("Bạn không thể chơi với chính bạn được!")
+            await interaction.followup.send("Bạn không thể chơi với chính bạn được!", ephemeral=True)
             return
         # Get the current epoch time (in seconds)
         start_time = datetime.now()
@@ -37,15 +38,19 @@ class RockPaperScissors(commands.Cog):
         embed = discord.Embed(title=f"", description= f"{interaction.user.mention} đã mời {user.mention} chơi Kéo Búa Bao!", color=0xC3A757)  # Yellowish color
         embed.add_field(name="______________", value= f"Cả hai vui lòng chọn lượt chơi của mình. Thời gian còn lại: <t:{unix_time}:R>", inline=False)
         view = RpsView.RPSView(player_1= interaction.user, player_2=user, embed=embed)
-        message = await interaction.followup.send(embed=embed, view= view, content= f"{user.mention}")
+        await interaction.followup.send(content= f"Đã tạo trò chơi Kéo Búa Bao!", ephemeral= True)
+        channel = interaction.channel
+        message = await channel.send(embed=embed, view= view, content= f"{user.mention}")
         view.message_id = message.id
         view.channel_id = interaction.channel_id
         view.message = message
         
         check_quest_message = QuestMongoManager.increase_rps_count(guild_id=interaction.guild_id, user_id=interaction.user.id)
         if check_quest_message == True:
+            view = SelfDestructView(60)
             quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
-            await interaction.followup.send(embed=quest_embed, content= f"{user.mention}")
+            m = await channel.send(embed=quest_embed, content= f"{user.mention}", view = view)
+            view.message = m
         
     
     #region bxh_rps command
