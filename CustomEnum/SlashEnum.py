@@ -9,3 +9,6 @@ class SlashCommand(Enum):
     QUEST_CHANNELS = "</quests channels:1297233430307668070>"
     QUEST_RESET = "</quests reset:1297233430307668070>"
     QUEST = "</quest:1297233430307668069>"
+    TRUTH_DARE = "</truth_dare:1293631694733053987>"
+    COIN_FLIP = "</cf:1287456826744504392>"
+    KEO_BUA_BAO = "</keo_bua_bao:1293631694733053985>"
