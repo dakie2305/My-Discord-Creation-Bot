@@ -105,7 +105,6 @@ class CoinFlip(commands.Cog):
                 au_money_tax = int(so_tien/2)
                 if au_money_tax == 0: au_money_tax = 1
                 gambling_text = f'\n{user.mention} đã chọn **`{player_choice}`** và thua mất **{so_tien}**{currency_emoji} và mất 1 điểm nhân phẩm! Chính Quyền đã lấy **{au_money_tax}** {currency_emoji} để làm thuế!'
-            
         embed_updated = discord.Embed(title=f"", description=f"{user.mention} đã tung đồng xu. Đồng xu đã quay ra **`{state}`** {emoji_state}!{gambling_text}", color=0x03F8FC)
         await message.edit(embed=embed_updated)
         if choice == 0:
@@ -168,7 +167,11 @@ class CoinFlip(commands.Cog):
             if is_player_win == False:
                 #Trừ 1 điểm nhân phẩm
                 ProfileMongoManager.update_dignity_point(guild_id=user.guild.id, guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, dignity_point=-1)
-            
+            #Cộng kinh nghiệm nếu thắng
+            elif profile != None and so_tien != None and is_player_win == True:
+                bonus_exp = self.get_bonus_exp_based_on_amount(so_tien=so_tien, loai_tien=loai_tien, profile=profile)
+                ProfileMongoManager.update_level_progressing(guild_id=user.guild.id, user_id=user.id, bonus_exp=bonus_exp)
+                
             ProfileMongoManager.update_profile_money_fast(guild_id=user.guild.id, data=profile)
             if authority_profile and profile.is_authority == False: ProfileMongoManager.update_profile_money_fast(guild_id=user.guild.id, data=authority_profile)
         
@@ -177,3 +180,18 @@ class CoinFlip(commands.Cog):
             quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
             await message.channel.send(embed=quest_embed, content=f"{message.author.mention}")
         return
+    
+    def get_bonus_exp_based_on_amount(self, so_tien:int = None, loai_tien:str = None, profile: Profile = None):
+        if profile == None or so_tien == None or loai_tien == None: return 0
+        if so_tien < 10000 and loai_tien == "C": return 0
+        if loai_tien == "C":
+            exp = int(so_tien / 5000 * profile.level)
+            return exp
+        elif loai_tien == "S":
+            exp = int(so_tien / 100 * profile.level)
+            if exp == 0: exp = 20
+            return exp
+        elif loai_tien == "G":
+            exp = int(so_tien / 10 * profile.level)
+            if exp == 0: exp = 50
+            return exp

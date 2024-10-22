@@ -93,7 +93,7 @@ class WorkEconomy(commands.Cog):
                 return embed, view
         
         #Không cho thực hiện nếu còn jail_time
-        if user_profile.jail_time != None:
+        if user_profile != None and user_profile.jail_time != None:
             if user_profile.jail_time > datetime.now():
                 unix_time = int(user_profile.jail_time.timestamp())
                 embed = discord.Embed(title=f"", description=f"⛓️ Bạn đã bị chính quyền bắt giữ rồi, vui lòng đợi đến <t:{unix_time}:t> !", color=0xc379e0)
@@ -129,7 +129,8 @@ class WorkEconomy(commands.Cog):
                     dice_bonus = random.randint(0, 10)
                     if dignity_rate >= dice_bonus:
                         bonus = True
-        base_money = 600
+        money_based_on_level = int(user_profile.level/20*500)
+        base_money = 600 + money_based_on_level
         base_authority_money = 2
         text_authority = ""
         if authority_user!=None:

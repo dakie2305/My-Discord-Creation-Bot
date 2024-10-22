@@ -28,7 +28,7 @@ class AutoresponderHandling():
 
     async def handling_auto_responder(self, message: discord.Message):
         coin_flip = ["tung đồng xu", "sấp ngửa", "sấp hay ngửa", "ngửa hay sấp", "ngửa sấp", "tung xu"]
-        conversion_rate = ["quy đổi coin", "quy đổi gold", "quy đổi silver", "quy đổi copper", "quy đổi darkium"]
+        conversion_rate = ["quy đổi coin", "quy đổi gold", "quy đổi silver", "quy đổi copper", "quy đổi darkium", "quy đổi tiền tệ"]
         quote = ["quote"]
         bank_help = ["bank help", "bank sao", "bank?"]
         
@@ -104,10 +104,10 @@ class AutoresponderHandling():
             
         elif CustomFunctions.contains_substring(message.content.lower(), bbb_warning) and message.channel.id != 1297787832986767381 and message.guild.id == 1256987900277690470:
             flag = True
-            await message.delete()
             view = SelfDestructView(timeout=5)
             _mess = await message.channel.send(content=f"Shhhhh... We do not talk about this topic here.", view=view)
             view.message= _mess
+            await message.delete()
         
         elif message.guild.id == 1256987900277690470 and len(message.author.roles) == 1 and message.author.roles[0].is_default():
             flag = True

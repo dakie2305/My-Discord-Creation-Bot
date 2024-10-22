@@ -427,7 +427,7 @@ async def on_ready():
 async def on_message(message: discord.Message):
     if message.author == bot.user:
         return
-    await steal_content_from_2tai(message=message)
+    # await steal_content_from_2tai(message=message)
     speakFlag = True
     auto_rep = AutoresponderHandling(bot=bot)
     if await auto_rep.handling_auto_responder(message=message):

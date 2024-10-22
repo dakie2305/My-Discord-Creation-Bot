@@ -78,8 +78,9 @@ class DailyEconomy(commands.Cog):
         embed.set_thumbnail(url=user.avatar.url)
         embed.add_field(name=f"", value="\n", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
-        #Tuỳ vào điểm nhân phẩm để cộng tiền, base là 500 * +- dignity point, và +5 nhân phẩm
-        base_money = 500
+        #Tuỳ vào điểm nhân phẩm để cộng tiền, base là 500 * +- dignity point, và +5 nhân phẩm, nhân với level
+        money_based_on_level = int(user_profile.level/20*500)
+        base_money = 500 + money_based_on_level
         embed.add_field(name=f"", value=f"- Tiền điểm danh: +**{base_money}** {EmojiCreation2.COPPER.value}", inline=False)
         actual_money = 0
         if dignity_point >= 50:
