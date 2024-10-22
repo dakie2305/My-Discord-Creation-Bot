@@ -23,7 +23,7 @@ class CoinFlip(commands.Cog):
 
     #region Coin flip
     @discord.app_commands.command(name="cf", description="Tung đồng xu sấp/ngửa cho vui")
-    @discord.app_commands.describe(sap_ngua="Sấp = True, Ngửa = False.")
+    @discord.app_commands.describe(sap_ngua="Chọn sấp ngửa.")
     @discord.app_commands.describe(so_tien="Chọn số tiền muốn cá cược.")
     @discord.app_commands.describe(loai_tien="Chọn loại tiền muốn cược.")
     @discord.app_commands.choices(loai_tien=[
@@ -31,7 +31,11 @@ class CoinFlip(commands.Cog):
         Choice(name="Silver", value="S"),
         Choice(name="Copper", value="C"),
     ])
-    async def coin_flip_slash_command(self, interaction: discord.Interaction, sap_ngua: bool = None, so_tien:int = None, loai_tien:str = None):
+    @discord.app_commands.choices(sap_ngua=[
+        Choice(name="Sấp", value="s"),
+        Choice(name="Ngửa", value="n"),
+    ])
+    async def coin_flip_slash_command(self, interaction: discord.Interaction, sap_ngua: str = None, so_tien:int = None, loai_tien:str = None):
         await interaction.response.defer(ephemeral=False)
         
         #Không cho dùng bot nếu không phải user
@@ -66,7 +70,9 @@ class CoinFlip(commands.Cog):
         embed = discord.Embed(title=f"", description=f"{interaction.user.mention} đã tung đồng xu. Đồng xu đang quay {EmojiCreation2.DOGE_COIN.value} ...", color=0x03F8FC)
         mess = await interaction.followup.send(embed=embed)
         if mess:
-            await self.edit_embed_coin_flip(message=mess, user=interaction.user, sap_ngua=sap_ngua, so_tien=so_tien, loai_tien=loai_tien, profile=profile)
+            sap_ngua_true_false = True
+            if sap_ngua == "n": sap_ngua = False
+            await self.edit_embed_coin_flip(message=mess, user=interaction.user, sap_ngua=sap_ngua_true_false, so_tien=so_tien, loai_tien=loai_tien, profile=profile)
         return
     
     async def edit_embed_coin_flip(self, message: discord.Message, user: discord.Member, sap_ngua: bool = None, so_tien:int = None, loai_tien:str = None, profile: Profile = None):

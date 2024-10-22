@@ -7,6 +7,7 @@ from Handling.Economy.Profile.ProfileClass import Profile
 from Handling.Economy.Quest.QuestClass import QuestProfile
 import random
 from CustomEnum.EmojiEnum import EmojiCreation2
+from CustomEnum.SlashEnum import SlashCommand
 
 
 # Connect to the MongoDB server
@@ -59,6 +60,7 @@ def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_n
         emoji = EmojiCreation2.GOLD.value
         bonus_exp = 35
     base_amount = 1
+    quest_title = ""
     if quest_type == "emoji_reaction_count":
         base_amount = quest_difficult_rate * 150
         rand_reward_amount = random.randint(1, 5)
@@ -71,8 +73,7 @@ def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_n
             base_reward_amount = 1 * rand_reward_amount
         quest_title = f"Thả **{base_amount}** reactions bất kỳ tại kênh <#{channel_id}>"
         quest_des = f"**{base_reward_amount}**{emoji}"
-    
-    if quest_type == "message_count":
+    elif quest_type == "message_count":
         base_amount = quest_difficult_rate * 80
         rand_reward_amount = random.randint(1, 5)
         base_reward_amount = 3000
@@ -84,8 +85,7 @@ def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_n
             base_reward_amount = 5 * rand_reward_amount
         quest_title = f"Nhắn **{base_amount}** tin nhắn tại kênh <#{channel_id}>"
         quest_des = f"**{base_reward_amount}**{emoji}"
-    
-    if quest_type == "attachments_count":
+    elif quest_type == "attachments_count":
         base_amount = quest_difficult_rate * 10
         rand_reward_amount = random.randint(1, 5)
         base_reward_amount = 500
@@ -97,8 +97,7 @@ def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_n
             base_reward_amount = 1
         quest_title = f"Thả **{base_amount}** ảnh, video bất kỳ vào kênh <#{channel_id}>"
         quest_des = f"**{base_reward_amount}**{emoji}"
-    
-    if quest_type == "truth_game_count" or quest_type == "dare_game_count":
+    elif quest_type == "truth_game_count" or quest_type == "dare_game_count":
         game_name = "Truth"
         if quest_type == "dare_game_count": game_name = "Dare"
         base_amount = quest_difficult_rate * 20
@@ -110,10 +109,9 @@ def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_n
             base_reward_amount = 5 * rand_reward_amount
         elif reward_type == "G":
             base_reward_amount = 1 * rand_reward_amount
-        quest_title = f"Chơi **{base_amount}** trò {game_name} trong game Truth Dare"
+        quest_title = f"Chơi **{base_amount}** trò {game_name} trong game Truth Dare ({SlashCommand.TRUTH_DARE.value})"
         quest_des = f"**{base_reward_amount}**{emoji}"
-    
-    if quest_type == "rps_game_count":
+    elif quest_type == "rps_game_count":
         base_amount = quest_difficult_rate * 8
         rand_reward_amount = random.randint(1, 5)
         base_reward_amount = 2500
@@ -123,7 +121,7 @@ def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_n
             base_reward_amount = 1 * rand_reward_amount
         elif reward_type == "G":
             base_reward_amount = 1
-        quest_title = f"Chơi **{base_amount}** trận game Kéo Búa Bao"
+        quest_title = f"Chơi **{base_amount}** trận game Kéo Búa Bao ({SlashCommand.KEO_BUA_BAO.value})"
         quest_des = f"**{base_reward_amount}**{emoji}"
     
     quest_profile = QuestProfile(user_id=user_id, user_display_name=user_display_name, user_name=user_name, guild_name= guild_name, quest_type= quest_type, quest_channel=channel_id, channel_name= channel_name, quest_title=quest_title, quest_description=quest_des, quest_difficult_rate=quest_difficult_rate, quest_total_progress=base_amount, bonus_exp=bonus_exp)

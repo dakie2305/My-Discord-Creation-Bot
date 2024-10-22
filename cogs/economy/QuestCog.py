@@ -71,7 +71,7 @@ class QuestEconomy(commands.Cog):
         #Tìm xem channel có list chanel dành cho quest chưa
         guild_extra_info = DbMongoManager.find_guild_extra_info_by_id(guild_id=user.guild.id)
         if guild_extra_info == None or guild_extra_info.list_channels_quests == None or len(guild_extra_info.list_channels_quests) == 0:
-            embed = discord.Embed(title=f"Owner Server vui lòng dùng lệnh {SlashCommand.QUEST_CHANNELS} để thêm channel cho Hệ Thống Nhiệm Vụ chọn!",color=discord.Color.red())
+            embed = discord.Embed(title=f"Owner Server vui lòng dùng lệnh {SlashCommand.QUEST_CHANNELS.value} để thêm channel cho Hệ Thống Nhiệm Vụ chọn!",color=discord.Color.red())
             return embed
         
         #Kiểm tra xem nếu today đã lố quest.reset_date thì xoá quest làm lại
