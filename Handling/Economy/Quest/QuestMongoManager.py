@@ -61,6 +61,7 @@ def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_n
         bonus_exp = 35
     base_amount = 1
     quest_title = ""
+    quest_des = ""
     if quest_type == "emoji_reaction_count":
         base_amount = quest_difficult_rate * 150
         rand_reward_amount = random.randint(1, 5)
