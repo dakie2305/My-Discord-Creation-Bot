@@ -70,8 +70,10 @@ class CoinFlip(commands.Cog):
         embed = discord.Embed(title=f"", description=f"{interaction.user.mention} đã tung đồng xu. Đồng xu đang quay {EmojiCreation2.DOGE_COIN.value} ...", color=0x03F8FC)
         mess = await interaction.followup.send(embed=embed)
         if mess:
-            sap_ngua_true_false = True
-            if sap_ngua == "n": sap_ngua = False
+            if sap_ngua != None and sap_ngua == 'n': sap_ngua_true_false = False
+            elif sap_ngua != None and sap_ngua == 's': sap_ngua_true_false = True
+            else : sap_ngua_true_false = None
+            print(sap_ngua)
             await self.edit_embed_coin_flip(message=mess, user=interaction.user, sap_ngua=sap_ngua_true_false, so_tien=so_tien, loai_tien=loai_tien, profile=profile)
         return
     
