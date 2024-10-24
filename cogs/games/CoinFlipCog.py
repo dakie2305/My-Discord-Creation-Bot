@@ -49,6 +49,8 @@ class CoinFlip(commands.Cog):
         if (sap_ngua != None and (so_tien == None or loai_tien == None)):
             so_tien = 500
             loai_tien = "C"
+            
+            
         profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
         if sap_ngua != None and profile == None:
             await interaction.followup.send(f"Để cá cược thì bạn phải thực hiện lệnh {SlashCommand.PROFILE.value} trước đã!")
@@ -63,8 +65,8 @@ class CoinFlip(commands.Cog):
             elif loai_tien == "G" and profile.gold < so_tien:
                 await interaction.followup.send(f"Bạn không có đủ {EmojiCreation2.GOLD.value} để cá cược!")
                 return
-        if so_tien != None and so_tien < 0:
-            await interaction.followup.send(f"Đm không được nhập số âm vào tiền!")
+        if so_tien != None and so_tien <= 0:
+            await interaction.followup.send(f"Số tiền nhập không hợp lệ!")
             return
         
         embed = discord.Embed(title=f"", description=f"{interaction.user.mention} đã tung đồng xu. Đồng xu đang quay {EmojiCreation2.DOGE_COIN.value} ...", color=0x03F8FC)
@@ -139,7 +141,7 @@ class CoinFlip(commands.Cog):
         
         if sap_ngua != None and profile != None:
             #Lấy profile của authority ra luôn
-            authority_profile = ProfileMongoManager.is_authority_existed(guild_id=user.guild.id)
+            authority_profile = ProfileMongoManager.get_authority(guild_id=user.guild.id)
             #Tính cộng trừ tiền cho player
             if loai_tien == "C":
                 if is_player_win:
@@ -177,8 +179,12 @@ class CoinFlip(commands.Cog):
                 ProfileMongoManager.update_dignity_point(guild_id=user.guild.id, guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, dignity_point=-1)
             #Cộng kinh nghiệm nếu thắng
             elif profile != None and so_tien != None and is_player_win == True:
-                bonus_exp = self.get_bonus_exp_based_on_amount(so_tien=so_tien, loai_tien=loai_tien, profile=profile)
-                ProfileMongoManager.update_level_progressing(guild_id=user.guild.id, user_id=user.id, bonus_exp=bonus_exp)
+                if loai_tien == "C" and so_tien > 10000:
+                    bonus_exp = self.get_bonus_exp_based_on_amount(so_tien=so_tien, loai_tien=loai_tien, profile=profile)
+                    ProfileMongoManager.update_level_progressing(guild_id=user.guild.id, user_id=user.id, bonus_exp=bonus_exp)
+                elif loai_tien == "S" or loai_tien == "G":
+                    bonus_exp = self.get_bonus_exp_based_on_amount(so_tien=so_tien, loai_tien=loai_tien, profile=profile)
+                    ProfileMongoManager.update_level_progressing(guild_id=user.guild.id, user_id=user.id, bonus_exp=bonus_exp)
                 
             ProfileMongoManager.update_profile_money_fast(guild_id=user.guild.id, data=profile)
             if authority_profile and profile.is_authority == False: ProfileMongoManager.update_profile_money_fast(guild_id=user.guild.id, data=authority_profile)

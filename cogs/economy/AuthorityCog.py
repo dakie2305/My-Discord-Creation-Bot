@@ -36,7 +36,7 @@ class AuthorityEconomy(commands.Cog):
             return
         
         #Kiểm tra xem server đã tồn tại ai là chính quyền chưa
-        existed_authority = ProfileMongoManager.is_authority_existed(guild_id=interaction.guild_id)
+        existed_authority = ProfileMongoManager.get_authority(guild_id=interaction.guild_id)
         if existed_authority!= None:
             #Get thử xem còn tồn tại trong server không
             member = interaction.guild.get_member(existed_authority.user_id)
@@ -76,7 +76,7 @@ class AuthorityEconomy(commands.Cog):
             ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, copper=-500, guild_name= interaction.guild.name)
             return
         #Kiểm tra xem server đã tồn tại ai là chính quyền chưa
-        existed_authority = ProfileMongoManager.is_authority_existed(guild_id=interaction.guild_id)
+        existed_authority = ProfileMongoManager.get_authority(guild_id=interaction.guild_id)
         if existed_authority!= None:
             #Get thử xem còn tồn tại trong server không
             member = interaction.guild.get_member(existed_authority.user_id)
@@ -125,7 +125,7 @@ class AuthorityEconomy(commands.Cog):
             ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, copper=-500, guild_name= interaction.guild.name)
             return
         #Kiểm tra xem server đã tồn tại ai là chính quyền chưa
-        existed_authority = ProfileMongoManager.is_authority_existed(guild_id=interaction.guild_id)
+        existed_authority = ProfileMongoManager.get_authority(guild_id=interaction.guild_id)
         if existed_authority == None:
             await interaction.followup.send(content=f"Server không tồn tại Chính Quyền! Vui lòng dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", ephemeral=True)
             return
@@ -185,7 +185,7 @@ class AuthorityEconomy(commands.Cog):
             return
         #Nếu là server owner thì chỉ việc remove như bình thường 
         else:
-            authority = ProfileMongoManager.is_authority_existed(guild_id=interaction.guild.id)
+            authority = ProfileMongoManager.get_authority(guild_id=interaction.guild.id)
             if authority == None:
                 await interaction.followup.send(f"Server không có chính quyền để lật đổ!",ephemeral=True)
                 return

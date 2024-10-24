@@ -76,7 +76,7 @@ class BankEconomy(commands.Cog):
             embed = discord.Embed(title=f"", description=f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", color=0xddede7)
             return embed, None
         
-        authority = ProfileMongoManager.is_authority_existed(guild_id=user.guild.id)
+        authority = ProfileMongoManager.get_authority(guild_id=user.guild.id)
         if authority == None:
             embed = discord.Embed(title=f"", description=f"Server vẫn chưa tồn tại Chính Quyền. Vui lòng dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", color=0xddede7)
             return embed, None

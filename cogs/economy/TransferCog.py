@@ -149,7 +149,7 @@ class TransferMoneyEconomy(commands.Cog):
             extra_mess = f" với lời nhắn: *{message}*"
         if user_profile.is_authority == False:
             tax_text = f"Đương nhiên là bị trừ {tax} {EmojiCreation2.COPPER.value} để đóng thuế cho Chính Quyền!"
-            authority_profile = ProfileMongoManager.is_authority_existed(guild_id=interaction.guild_id)
+            authority_profile = ProfileMongoManager.get_authority(guild_id=interaction.guild_id)
             if authority_profile:
                 authority_profile.copper += int(tax * authority_profile.dignity_point/100)
                 ProfileMongoManager.update_profile_money_fast(guild_id=interaction.guild_id, data=authority_profile)

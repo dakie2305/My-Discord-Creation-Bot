@@ -111,7 +111,6 @@ class TextInputModal(discord.ui.Modal):
         
         #Tính lại số tiền cần cộng, số tiền cần trừ
         new_money_value = self.convert_currency(amount=amount, rate=self.rate, from_currency_type=suffix, to_currency_type=self.selected_currency)
-        
         #Trừ số tiền đã đổi
         #Nếu new money value = 0 thì khỏi
         if new_money_value != 0:
@@ -128,7 +127,7 @@ class TextInputModal(discord.ui.Modal):
         tax_text = ""
         if profile_user.is_authority == False:
             tax_text = f"Đương nhiên là bị trừ {tax} {CurrencyEmoji.COPPER.value} để đóng thuế cho Chính Quyền!"
-            authority_profile = ProfileMongoManager.is_authority_existed(guild_id=interaction.guild_id)
+            authority_profile = ProfileMongoManager.get_authority(guild_id=interaction.guild_id)
             if authority_profile:
                 authority_profile.copper += tax
                 ProfileMongoManager.update_profile_money_fast(guild_id=interaction.guild_id, data=authority_profile)
@@ -204,30 +203,30 @@ class TextInputModal(discord.ui.Modal):
         result = 0
         if from_currency_type == "D":
             if to_currency_type == "G": #Base 10000
-                result = int(amount * 10000 * rate)
+                result = int(amount * (10000 * rate))
             elif to_currency_type == "S": #Base 10000 * 5000
-                result = int(amount * 10000 * 5000 * rate)
+                result = int(amount * (10000 * rate) * (5000 * rate))
             elif to_currency_type == "C": #Base 10000 * 5000 * 5000
-                result = int(amount * 10000 * 5000 *  500 * rate)
+                result = int(amount * (10000 * rate) * (5000*rate) *  (500 * rate))
         elif from_currency_type == "G":
             if to_currency_type == "D": #Base 1/10000
-                result = int(amount / 10000 * rate)
+                result = int(amount / (10000 * rate))
             elif to_currency_type == "S": #Base 5000
-                result = int(amount * 5000 * rate)
+                result = int(amount * (5000 * rate))
             elif to_currency_type == "C": #Base  5000 * 5000
-                result = int(amount * 5000 *  5000 * rate)
+                result = int(amount * (5000 * rate) * (5000 * rate))
         elif from_currency_type == "S":
             if to_currency_type == "D": #Base 1/5000/10000
-                result = int(amount / 5000 / 10000 * rate)
+                result = int(amount / (5000 * rate) / (10000 * rate))
             elif to_currency_type == "G": #Base 1/5000
-                result = int(amount / 5000 * rate)
+                result = int(amount / (5000 * rate))
             elif to_currency_type == "C": #Base  5000
-                result = int(amount * 5000 * rate)
+                result = int(amount * (5000 * rate))
         elif from_currency_type == "C":
             if to_currency_type == "D": #Base 1/5000/5000/10000
-                result = int(amount /5000 / 5000 / 10000 * rate)
+                result = int(amount / (5000 * rate) / (5000 * rate) / (10000 * rate))
             elif to_currency_type == "G": #Base 1/5000/5000
-                result = int(amount / 5000 / 5000 * rate)
+                result = int(amount / (5000 * rate) / (5000 * rate))
             elif to_currency_type == "S": #Base  1/5000
-                result = int(amount / 5000 * rate)
+                result = int(amount / (5000 * rate))
         return result

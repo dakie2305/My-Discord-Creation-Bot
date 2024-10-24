@@ -239,6 +239,13 @@ def is_in_debt(data: Profile, darkium_threshold = 0, gold_threshold = 0, silver_
     else:
         return False
 
+#region crime
+def update_last_crime_now(guild_id:int, user_id: int):
+    collection = db_specific[f'profile_{guild_id}']
+    today = datetime.now()
+    result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"last_crime": today,
+                                                                                    }})
+    return result
 
 #region quote
 def update_profile_quote(guild_id: int, guild_name: str, user_id: int, user_name: str, user_display_name: str, quote: str):
@@ -380,7 +387,7 @@ def update_money_authority(guild_id: int, gold: int= 0, silver: int = 0, copper:
                                                                                         }})
     return result
 
-def is_authority_existed(guild_id: int):
+def get_authority(guild_id: int):
     collection = db_specific[f'profile_{guild_id}']
     data = collection.find_one({"id": "profile", "is_authority": True})
     if data:
