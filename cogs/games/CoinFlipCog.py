@@ -192,12 +192,15 @@ class CoinFlip(commands.Cog):
         if so_tien < 10000 and loai_tien == "C": return 0
         if loai_tien == "C":
             exp = int(so_tien / 5000 * profile.level)
+            if exp > 50: exp = 50
             return exp
         elif loai_tien == "S":
             exp = int(so_tien / 100 * profile.level)
             if exp == 0: exp = 20
+            if exp > 50: exp = 50
             return exp
         elif loai_tien == "G":
             exp = int(so_tien / 10 * profile.level)
             if exp == 0: exp = 50
+            if exp > 80: exp = 80
             return exp

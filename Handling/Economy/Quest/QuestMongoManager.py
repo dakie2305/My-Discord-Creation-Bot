@@ -62,10 +62,11 @@ def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_n
     base_amount = 1
     quest_title = ""
     quest_des = ""
+    base_reward_amount = 2000
     if quest_type == "emoji_reaction_count":
-        base_amount = quest_difficult_rate * 150
+        base_amount = quest_difficult_rate * 120
         rand_reward_amount = random.randint(1, 5)
-        base_reward_amount = 2000
+        base_reward_amount = 1800
         if reward_type == "C":
             base_reward_amount = 2000 * rand_reward_amount
         elif reward_type == "S":
@@ -123,6 +124,18 @@ def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_n
         elif reward_type == "G":
             base_reward_amount = 1
         quest_title = f"Chơi **{base_amount}** trận game Kéo Búa Bao ({SlashCommand.KEO_BUA_BAO.value})"
+        quest_des = f"**{base_reward_amount}**{emoji}"
+    elif quest_type == "coin_flip_game_count":
+        base_amount = quest_difficult_rate * 20
+        rand_reward_amount = random.randint(1, 5)
+        base_reward_amount = 1000
+        if reward_type == "C":
+            base_reward_amount = 1000 * rand_reward_amount
+        elif reward_type == "S":
+            base_reward_amount = 1 * rand_reward_amount
+        elif reward_type == "G":
+            base_reward_amount = 1
+        quest_title = f"Chơi **{base_amount}** trận game Tung Xu ({SlashCommand.COIN_FLIP.value})"
         quest_des = f"**{base_reward_amount}**{emoji}"
     
     quest_profile = QuestProfile(user_id=user_id, user_display_name=user_display_name, user_name=user_name, guild_name= guild_name, quest_type= quest_type, quest_channel=channel_id, channel_name= channel_name, quest_title=quest_title, quest_description=quest_des, quest_difficult_rate=quest_difficult_rate, quest_total_progress=base_amount, bonus_exp=bonus_exp)
