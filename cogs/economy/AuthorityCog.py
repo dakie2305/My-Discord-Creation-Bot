@@ -42,7 +42,7 @@ class AuthorityEconomy(commands.Cog):
             member = interaction.guild.get_member(existed_authority.user_id)
             if member:
                 #Kiểm xem chính quyền có mặc nợ không, có thì từ chức và phạt authority
-                if ProfileMongoManager.is_in_debt(data= existed_authority, copper_threshold=50000):
+                if ProfileMongoManager.is_in_debt(data= existed_authority, copper_threshold=100000):
                     embed = discord.Embed(title=f"", description=f"Chính Quyền đã nợ nần quá nhiều và tự sụp đổ. Hãy dùng lệnh {self.CurrencySlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", color=0xddede7)
                     existed_authority.copper = -10000
                     existed_authority.silver = 0
@@ -158,7 +158,7 @@ class AuthorityEconomy(commands.Cog):
             return
         #Trừ silver
         ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, silver=-money_for_riot)
-        timeout = 70 #Cho timeout giây để kết thúc
+        timeout = 60 #Cho timeout giây để kết thúc
         endtime = datetime.now() + timedelta(seconds=timeout)
         #Đưa ra embed bạo động
         embed = discord.Embed(title=f"Lời Kêu Gọi Bạo Động",description=f"{interaction.user.mention} đã kêu gọi mọi người đứng lên khởi nghĩa chống lại Chính Quyền Server <@{existed_authority.user_id}>!",color=discord.Color.red())
@@ -170,7 +170,7 @@ class AuthorityEconomy(commands.Cog):
         
         view = AuthorityRiotView(user=interaction.user, user_authority=existed_authority, timeout=timeout)
         view.embed = embed
-        await interaction.followup.send(f"Bạn đã bị trừ **{money_base_riot}** {EmojiCreation2.SILVER.value} để tạo bạo động!",ephemeral=True)
+        await interaction.followup.send(f"Bạn đã bị trừ **{money_for_riot}** {EmojiCreation2.SILVER.value} để tạo bạo động!",ephemeral=True)
         called_channel = interaction.channel
         mes = await called_channel.send(embed=embed, view=view, content= authority_user.mention if authority_user != None else "", allowed_mentions=discord.AllowedMentions(users=True))
         view.message = mes

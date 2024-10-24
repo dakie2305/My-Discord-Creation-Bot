@@ -88,7 +88,7 @@ class BankEconomy(commands.Cog):
             return embed, None
         
         #Kiểm xem chính quyền có mặc nợ không, có thì từ chức và phạt authority
-        if ProfileMongoManager.is_in_debt(data= authority, copper_threshold=50000):
+        if ProfileMongoManager.is_in_debt(data= authority, copper_threshold=100000):
             embed = discord.Embed(title=f"", description=f"Chính Quyền đã nợ nần quá nhiều và tự sụp đổ. Hãy dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", color=0xddede7)
             authority.copper = -10000
             authority.silver = 0

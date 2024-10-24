@@ -130,6 +130,5 @@ class AuthorityRiotView(discord.ui.View):
         return text
     
     async def on_timeout(self):
-        # Nếu vẫn chưa đủ 10 votes thì kết luận luôn
-        if not self.vote_concluded:
-            await self.conclude_vote()
+        await self.conclude_vote()
+            
