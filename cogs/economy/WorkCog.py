@@ -81,6 +81,9 @@ class WorkEconomy(commands.Cog):
     async def embed_work_command(self, user: discord.Member):
         user_profile = ProfileMongoManager.find_profile_by_id(guild_id=user.guild.id, user_id=user.id)
         
+        if user_profile == None:
+            user_profile = ProfileMongoManager.create_profile(guild_id=user.guild.id, guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name)
+        
         if user_profile != None and user_profile.last_work != None:
             time_window = timedelta(hours=1, minutes=30)
             check = self.check_if_within_time_delta(input=user_profile.last_work, time_window=time_window)
@@ -129,7 +132,8 @@ class WorkEconomy(commands.Cog):
                     dice_bonus = random.randint(0, 10)
                     if dignity_rate >= dice_bonus:
                         bonus = True
-        money_based_on_level = int(user_profile.level/20*500)
+        level_bonus = int(user_profile.level/20*500) if user_profile.level != None else 0
+        money_based_on_level = level_bonus
         base_money = 600 + money_based_on_level
         base_authority_money = 2
         text_authority = ""

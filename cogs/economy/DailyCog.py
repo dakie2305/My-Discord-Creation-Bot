@@ -57,6 +57,9 @@ class DailyEconomy(commands.Cog):
         yesterday = today - timedelta(days=1)
         tommorow = datetime.today() + timedelta(days=1)
         
+        if user_profile == None:
+            user_profile = ProfileMongoManager.create_profile(guild_id=user.guild.id, guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name)
+        
         if user_profile != None:
             if user_profile.last_attendance != None and user_profile.last_attendance.date() == today:
                 unix_time = int(tommorow.timestamp())
@@ -79,8 +82,8 @@ class DailyEconomy(commands.Cog):
         embed.add_field(name=f"", value="\n", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
         #Tuỳ vào điểm nhân phẩm để cộng tiền, base là 500 * +- dignity point, và +5 nhân phẩm, nhân với level
-        money_based_on_level = int(user_profile.level/20*500)
-        base_money = 500 + money_based_on_level
+        level_bonus = int(user_profile.level/20*500) if user_profile.level != None else 0
+        base_money = 500 + level_bonus
         embed.add_field(name=f"", value=f"- Tiền điểm danh: +**{base_money}** {EmojiCreation2.COPPER.value}", inline=False)
         actual_money = 0
         if dignity_point >= 50:

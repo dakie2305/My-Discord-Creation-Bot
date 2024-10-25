@@ -19,6 +19,7 @@ from Handling.Misc.AutoresponderCreation2 import AutoresponderHandling
 from Handling.Economy.Quest.QuestHandling import QuestHandling
 import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
 from CustomEnum.SlashEnum import SlashCommand 
+from Handling.Misc.SelfDestructView import SelfDestructView
 
 load_dotenv()
 intents = discord.Intents.all()
@@ -442,6 +443,8 @@ async def on_message(message: discord.Message):
 @bot.event
 async def on_message_delete(message):
     message: discord.Message = message
+    if message == None: return
+    if message.guild == None: return
     channel_where_message_deleted = message.channel
     if message.guild.id == 1256987900277690470 and message.attachments != None and len(message.attachments)>0:
         #Áp dụng log images cho server true Heavens
@@ -491,8 +494,10 @@ async def on_reaction_add(reaction, user):
     if user_target != None and message != None:
         check_quest_message = QuestMongoManager.increase_emoji_count(guild_id=user_target.guild.id, user_id=user_target.id, channel_id=message.channel.id)
         if check_quest_message == True:
+            view = SelfDestructView(30)
             quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
-            await message.channel.send(embed=quest_embed, content=f"{message.author.mention}")
+            m = await message.channel.send(embed=quest_embed, view=view, content=f"{message.author.mention}")
+            view.message = m
     return
 
 
