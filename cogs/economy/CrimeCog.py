@@ -178,7 +178,7 @@ class CrimeEconomy(commands.Cog):
         if user_win:
             dignity_point = 10
             #Random chọn giữa silver và copper
-            silver_chance = self.get_chance(25)
+            silver_chance = self.get_chance(10)
             money = 0
             emoji = EmojiCreation2.COPPER.value
             if silver_chance and target_profile != None and target_profile.silver >= 5:
@@ -325,12 +325,12 @@ class CrimeEconomy(commands.Cog):
         if user_win:
             dignity_point = 15
             #Random chọn giữa silver và copper
-            silver_chance = self.get_chance(35)
+            silver_chance = self.get_chance(10)
             money = 0
             emoji = EmojiCreation2.COPPER.value
             if silver_chance:
                 #random 3 silver nhân với level của user
-                money = 3 * user_profile.level
+                money = 2 * user_profile.level
                 if money > 100: money = 100 #Cap lại
                 emoji = EmojiCreation2.SILVER.value
             else:

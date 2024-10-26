@@ -25,7 +25,7 @@ class AuthorityInterceptView(discord.ui.View):
         if self.authority_user == None:
             await interaction.followup.send(f"Server này không có chính quyền để giải quyết!", ephemeral=True)
             return
-        elif interaction.user.id != self.authority_user.id:
+        elif interaction.user.id != self.authority_user.user_id:
             await interaction.followup.send(f"Chỉ Chính Quyền <@{self.authority_user.user_id}> mới có thể giải quyết, vui lòng gọi Chính Quyền!", ephemeral=True)
             return
         
