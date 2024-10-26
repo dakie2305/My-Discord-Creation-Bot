@@ -468,7 +468,6 @@ async def on_message_delete(message):
                 data_attachmenta = db.SnipeMessageAttachments(filename=att.filename, url=new_url,content_type=att.content_type,size=att.size)
                 user_attachments.append(data_attachmenta)
         snipe_message = db.SnipeMessage(author_id=message.author.id, author_username=message.author.name, author_display_name= message.author.display_name, deleted_date= datetime.now(), user_message_content=message.content, user_attachments=user_attachments)
-        print(snipe_message.to_dict())
         #Kiểm tra coi đã tồn tại SnipeChannelInfo chưa, chưa thì tạo mới
         existing_snipe_channel_info = db.find_snipe_channel_info_by_id(channel_id=channel_where_message_deleted.id, guild_id=message.guild.id)
         if existing_snipe_channel_info == None:

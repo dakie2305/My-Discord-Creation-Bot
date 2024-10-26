@@ -75,7 +75,6 @@ class CoinFlip(commands.Cog):
             if sap_ngua != None and sap_ngua == 'n': sap_ngua_true_false = False
             elif sap_ngua != None and sap_ngua == 's': sap_ngua_true_false = True
             else : sap_ngua_true_false = None
-            print(sap_ngua)
             await self.edit_embed_coin_flip(message=mess, user=interaction.user, sap_ngua=sap_ngua_true_false, so_tien=so_tien, loai_tien=loai_tien, profile=profile)
         return
     

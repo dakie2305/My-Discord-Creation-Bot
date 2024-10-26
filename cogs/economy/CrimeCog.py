@@ -208,7 +208,10 @@ class CrimeEconomy(commands.Cog):
             #Trừ nhân phẩm người đánh
             ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, dignity_point= -dignity_point)
         new_embed = discord.Embed(title=f"", description=f"{result_text}", color=0xc379e0)
-        await me.edit(embed=new_embed, view=None, content=f"{target_user.mention}")
+        try:
+            await me.edit(embed=new_embed, view=None, content=f"{target_user.mention}")
+        except Exception:
+            return
     
     #region Fight
     async def process_fight_command(self, interaction: discord.Interaction, user: discord.Member, target_user: discord.Member, user_profile: Profile, target_profile: Profile):
@@ -294,7 +297,10 @@ class CrimeEconomy(commands.Cog):
             ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, dignity_point= -dignity_point)
         new_embed = discord.Embed(title=f"", description=f"{result_text}", color=0xc379e0)
         new_embed.set_image(url=fight_gif)
-        await me.edit(embed=new_embed, view=None, content=f"{target_user.mention}")
+        try:
+            await me.edit(embed=new_embed, view=None, content=f"{target_user.mention}")
+        except Exception:
+            return
     
     
     #region Laundry
@@ -359,7 +365,10 @@ class CrimeEconomy(commands.Cog):
             #Trừ nhân phẩm
             ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, dignity_point= -dignity_point)
         new_embed = discord.Embed(title=f"", description=f"{result_text}", color=0xc379e0)
-        await me.edit(embed=new_embed, view=None, content=f"")
+        try:
+            await me.edit(embed=new_embed, view=None, content=f"")
+        except Exception:
+            return
     
     #region smuggler
     async def process_smuggler_command(self, interaction: discord.Interaction, user: discord.Member, target_user: discord.Member, user_profile: Profile, target_profile: Profile):
@@ -405,7 +414,10 @@ class CrimeEconomy(commands.Cog):
             #Trừ nhân phẩm
             ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, dignity_point= -dignity_point)
         new_embed = discord.Embed(title=f"", description=f"{result_text}", color=0xc379e0)
-        await me.edit(embed=new_embed, view=None, content=f"")
+        try:
+            await me.edit(embed=new_embed, view=None, content=f"")
+        except Exception:
+            return
     
     
     def get_chance(self, chance: int):
