@@ -5,6 +5,10 @@ from typing import List, Optional
 import random
 import Handling.MiniGame.RockPaperScissor.RpsMongoManager as RpsMongoManager
 import CustomFunctions
+from CustomEnum.SlashEnum import SlashCommand
+from CustomEnum.EmojiEnum import EmojiCreation2
+import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
+from Handling.Economy.Profile.ProfileClass import Profile
 
 class RPSView(discord.ui.View):
     def __init__(self, player_1: discord.Member, player_2: discord.Member, embed: discord.Embed):
@@ -16,6 +20,12 @@ class RPSView(discord.ui.View):
         self.channel_id = None
         self.message: discord.Message = None
         self.choices = {}
+        
+        self.user_profile: Profile = None
+        self.target_profile: Profile = None
+        self.so_tien: int = None
+        self.loai_tien: str = None
+        self.emoji: str = None
     
     @discord.ui.button(label="🔨 Búa", style=discord.ButtonStyle.green)
     async def rock(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -53,22 +63,29 @@ class RPSView(discord.ui.View):
         player2_choice = self.choices[self.player_2.id]
         win_player :discord.Member = None
         lose_player :discord.Member = None
+        win_gambling_text = ""
+        is_user_profile_win = False
+        if self.so_tien != None and self.loai_tien != None:
+            win_gambling_text = f"và đã thắng được **{self.so_tien}**{self.emoji}"
         #Hoà
         if player1_choice == player2_choice:
             result = f"Cả hai player đều chọn **`{self.translate_choice(player1_choice)}`** nên trận này coi như hoà!"
             RpsMongoManager.player_profile_on_draw(guild_id=interaction.guild.id, player_1_id= self.player_1.id, player_1_display_name=self.player_1.display_name, player_1_user_name= self.player_1.name, player_2_id=self.player_2.id, player_2_display_name=self.player_2.display_name, player_2_user_name= self.player_2.name)
+            is_user_profile_win = None
         #Player 1 thắng
         elif (player1_choice == "rock" and player2_choice == "scissors") or \
              (player1_choice == "paper" and player2_choice == "rock") or \
              (player1_choice == "scissors" and player2_choice == "paper"):
-            result = f"{self.player_1.mention} chọn **`{self.translate_choice(player1_choice)}`**, còn {self.player_2.mention} đã chọn **`{self.translate_choice(player2_choice)}`**. {self.player_1.mention} đã thắng trận này!\nĐừng quên dùng lệnh **`/bxh_rps`** để xem bảng xếp hạng nhé!"
+            result = f"{self.player_1.mention} chọn **`{self.translate_choice(player1_choice)}`**, còn {self.player_2.mention} đã chọn **`{self.translate_choice(player2_choice)}`**. {self.player_1.mention} đã thắng trận này{win_gambling_text}!\nĐừng quên dùng lệnh **`/bxh_rps`** để xem bảng xếp hạng nhé!"
             win_player = self.player_1
             lose_player = self.player_2
+            is_user_profile_win = True
         #PLayer 2 thắng
         else:
-            result = f"{self.player_1.mention} chọn **`{self.translate_choice(player1_choice)}`**, còn {self.player_2.mention} đã chọn **`{self.translate_choice(player2_choice)}`**. {self.player_2.mention} đã thắng trận này!\nĐừng quên dùng lệnh **`/bxh_rps`** để xem bảng xếp hạng nhé!"
+            result = f"{self.player_1.mention} chọn **`{self.translate_choice(player1_choice)}`**, còn {self.player_2.mention} đã chọn **`{self.translate_choice(player2_choice)}`**. {self.player_2.mention} đã thắng trận này{win_gambling_text}!\nĐừng quên dùng lệnh **`/bxh_rps`** để xem bảng xếp hạng nhé!"
             win_player = self.player_2
             lose_player = self.player_1
+            is_user_profile_win = False
         
         if win_player != None and lose_player != None:
             #Kiểm tra humi point và len point trước
@@ -85,6 +102,52 @@ class RPSView(discord.ui.View):
             #lose point +1, cons_lose +1
             RpsMongoManager.create_update_player_profile(guild_id=interaction.guild.id, user_id= lose_player.id, user_name=lose_player.name,user_display_name=lose_player.display_name, lose_point=1, game_consecutive_round_lose=1)
             
+            #Nếu có tiền cược thì cộng và trừ tiền cược
+            if self.so_tien != None and self.loai_tien != None:
+                #Tính Copper
+                if self.loai_tien == "C":
+                    if is_user_profile_win == True:
+                        #Cộng người thắng, trừ người thua
+                        ProfileMongoManager.update_profile_money(guild_id=interaction.guild.id, guild_name=interaction.guild.name, user_id=self.user_profile.user_id, user_name=self.user_profile.user_name, user_display_name=self.user_profile.user_display_name, copper=self.so_tien)
+                        if self.target_profile != None:
+                            ProfileMongoManager.update_profile_money(guild_id=interaction.guild.id, guild_name=interaction.guild.name, user_id=self.target_profile.user_id, user_name=self.target_profile.user_name, user_display_name=self.target_profile.user_display_name, copper=-self.so_tien)
+                    elif is_user_profile_win == False:
+                        if self.target_profile != None:
+                            #Chính quyền chỉ ăn 1/2
+                            if self.target_profile.is_authority == False:
+                                ProfileMongoManager.update_profile_money(guild_id=interaction.guild.id, guild_name=interaction.guild.name, user_id=self.target_profile.user_id, user_name=self.target_profile.user_name, user_display_name=self.target_profile.user_display_name, copper=self.so_tien)
+                            else:
+                                ProfileMongoManager.update_profile_money(guild_id=interaction.guild.id, guild_name=interaction.guild.name, user_id=self.target_profile.user_id, user_name=self.target_profile.user_name, user_display_name=self.target_profile.user_display_name, copper=int(self.so_tien/2))
+                        ProfileMongoManager.update_profile_money(guild_id=interaction.guild.id, guild_name=interaction.guild.name, user_id=self.user_profile.user_id, user_name=self.user_profile.user_name, user_display_name=self.user_profile.user_display_name, copper=-self.so_tien)
+                
+                if self.loai_tien == "S":
+                    if is_user_profile_win == True:
+                        ProfileMongoManager.update_profile_money(guild_id=interaction.guild.id, guild_name=interaction.guild.name, user_id=self.user_profile.user_id, user_name=self.user_profile.user_name, user_display_name=self.user_profile.user_display_name, silver=self.so_tien)
+                        if self.target_profile != None:
+                            ProfileMongoManager.update_profile_money(guild_id=interaction.guild.id, guild_name=interaction.guild.name, user_id=self.target_profile.user_id, user_name=self.target_profile.user_name, user_display_name=self.target_profile.user_display_name, silver=-self.so_tien)
+                    elif is_user_profile_win == False:
+                        if self.target_profile != None:
+                            #Chính quyền chỉ ăn 1/2
+                            if self.target_profile.is_authority == False:
+                                ProfileMongoManager.update_profile_money(guild_id=interaction.guild.id, guild_name=interaction.guild.name, user_id=self.target_profile.user_id, user_name=self.target_profile.user_name, user_display_name=self.target_profile.user_display_name, silver=self.so_tien)
+                            else:
+                                ProfileMongoManager.update_profile_money(guild_id=interaction.guild.id, guild_name=interaction.guild.name, user_id=self.target_profile.user_id, user_name=self.target_profile.user_name, user_display_name=self.target_profile.user_display_name, silver=int(self.so_tien/2))
+                        ProfileMongoManager.update_profile_money(guild_id=interaction.guild.id, guild_name=interaction.guild.name, user_id=self.user_profile.user_id, user_name=self.user_profile.user_name, user_display_name=self.user_profile.user_display_name, silver=-self.so_tien)
+                
+                if self.loai_tien == "G":
+                    if is_user_profile_win == True:
+                        ProfileMongoManager.update_profile_money(guild_id=interaction.guild.id, guild_name=interaction.guild.name, user_id=self.user_profile.user_id, user_name=self.user_profile.user_name, user_display_name=self.user_profile.user_display_name, gold=self.so_tien)
+                        if self.target_profile != None:
+                            ProfileMongoManager.update_profile_money(guild_id=interaction.guild.id, guild_name=interaction.guild.name, user_id=self.target_profile.user_id, user_name=self.target_profile.user_name, user_display_name=self.target_profile.user_display_name, gold=-self.so_tien)
+                    elif is_user_profile_win == False:
+                        if self.target_profile != None:
+                            #Chính quyền chỉ ăn 1/2
+                            if self.target_profile.is_authority == False:
+                                ProfileMongoManager.update_profile_money(guild_id=interaction.guild.id, guild_name=interaction.guild.name, user_id=self.target_profile.user_id, user_name=self.target_profile.user_name, user_display_name=self.target_profile.user_display_name, gold=self.so_tien)
+                            else:
+                                ProfileMongoManager.update_profile_money(guild_id=interaction.guild.id, guild_name=interaction.guild.name, user_id=self.target_profile.user_id, user_name=self.target_profile.user_name, user_display_name=self.target_profile.user_display_name, gold=int(self.so_tien/2))
+                        ProfileMongoManager.update_profile_money(guild_id=interaction.guild.id, guild_name=interaction.guild.name, user_id=self.user_profile.user_id, user_name=self.user_profile.user_name, user_display_name=self.user_profile.user_display_name, gold=-self.so_tien)
+                
             if flagLegend:
                 file = CustomFunctions.get_congrat_humilate_gif(is_congrat=True)
                 await interaction.message.reply(content=f"{win_player.mention} đã thắng 5 ván liên tiếp và được cộng **`1`** điểm Huyền Thoại!", file= file)

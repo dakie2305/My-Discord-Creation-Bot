@@ -108,6 +108,7 @@ class AuthorityEconomy(commands.Cog):
 
     #region Authority riot
     @authority_group.command(name="riot", description="Bạo động để phá chính quyền đương nhiệm của server!")
+    @discord.app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
     async def riot_authority_slash(self, interaction: discord.Interaction):
         await interaction.response.defer()
         

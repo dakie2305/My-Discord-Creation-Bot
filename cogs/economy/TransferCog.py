@@ -68,7 +68,6 @@ class TransferMoneyEconomy(commands.Cog):
     @discord.app_commands.describe(user="Chọn user để chuyển tiền.")
     @discord.app_commands.describe(message="Lời nhắn khi chuyển tiền.")
     @discord.app_commands.choices(loai_tien=[
-        Choice(name="Darkium", value="D"),
         Choice(name="Gold", value="G"),
         Choice(name="Silver", value="S"),
         Choice(name="Copper", value="C"),

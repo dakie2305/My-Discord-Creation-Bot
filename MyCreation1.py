@@ -1279,7 +1279,7 @@ async def check_jail_expiry():
                 #Lấy thời hạn tù đày
                 jailed_time = (jail_user.jail_until)
                 if jailed_time > now:
-                    return
+                    continue
                 user = guild.get_member(jail_user.user_id)
                 if user:
                     #Xoá role Đáy Xã Hội

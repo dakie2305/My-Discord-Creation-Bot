@@ -116,7 +116,7 @@ class AuthorityRiotPreventView(discord.ui.View):
             embed.add_field(name="Lý do bị tù đày:", value="Thành phần bạo động", inline=False)  # Single-line field
             embed.add_field(name="Thời gian ra đại lao:", value=f"{mordern_date_time_format}", inline=True)
             embed.add_field(name="Ghi chú", value="Nếu quá thời hạn phạt tù mà chưa được ra tù thì hãy la làng lên nhé!", inline=False) 
-            embed.set_footer(text=f"Đã bị tống giam bởi: Chính Quyền {self.user.mention}")  # Footer text
+            embed.set_footer(text=f"Đã bị tống giam bởi: Chính Quyền {self.user.name}")  # Footer text
             channel = interaction.guild.get_channel(1257012036718563380)
             if channel:
                 await channel.send(embed=embed)
