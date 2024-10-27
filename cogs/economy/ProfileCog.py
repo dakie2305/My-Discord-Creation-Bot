@@ -86,6 +86,7 @@ class ProfileEconomy(commands.Cog):
             data.darkium = 0
             ProfileMongoManager.update_profile_money_fast(guild_id= user.guild.id, data=data)
             ProfileMongoManager.remove_authority_from_server(guild_id=user.guild.id)
+            ProfileMongoManager.update_last_authority(guild_id=user.guild.id, user_id=data.user_id)
             return embed
         
         embed = discord.Embed(title=f"", description=f"**Profile {user.mention}**", color=0xddede7)

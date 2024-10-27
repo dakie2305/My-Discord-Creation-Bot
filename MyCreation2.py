@@ -478,7 +478,6 @@ async def on_message_delete(message):
             print(f"Successfully create new Snipe Channel Info for guild {message.guild.name}")
         else:
             #Cập nhật snipe_messages của SnipeChannelInfo ấy
-            print(snipe_message)
             result = db.update_or_insert_snipe_message_info(guild_id=message.guild.id, channel_id=channel_where_message_deleted.id, snipe_message=snipe_message)
     else:
         print("Message deleted in a private message.")
@@ -505,6 +504,7 @@ async def on_reaction_add(reaction, user):
 init_extension = ["cogs.games.RockPaperScissorCog", 
                   "cogs.games.TruthDareCog",
                   "cogs.games.CoinFlipCog",
+                  "cogs.games.SicBoCog",
                   
                   "cogs.economy.ProfileCog",
                   "cogs.economy.BankCog",

@@ -44,7 +44,7 @@ class RockPaperScissors(commands.Cog):
         #Không cho dùng bot nếu không phải user
         if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
             embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
-            await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            await interaction.followup.send(embed=embed, ephemeral=True)
             return
         
         if so_tien != None and loai_tien == None:
@@ -69,7 +69,7 @@ class RockPaperScissors(commands.Cog):
                 return
             
         target_profile = None
-        if user != None and user.bot == False:
+        if user != None and user.bot == False and so_tien != None:
             target_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=user.id)
             if target_profile == None:
                 await interaction.followup.send(f"Đổi thủ của bạn vẫn chưa dùng lệnh {SlashCommand.PROFILE.value}!")
@@ -98,6 +98,7 @@ class RockPaperScissors(commands.Cog):
         unix_time = int(end_time.timestamp())
         # Tạo embed thông báo
         text = f"{interaction.user.mention} đã mời {user.mention} chơi Kéo Búa Bao!"
+        emoji = None
         if so_tien != None and loai_tien != None:
             if loai_tien == "C": emoji = EmojiCreation2.COPPER.value
             elif loai_tien == "S": emoji = EmojiCreation2.SILVER.value
@@ -123,7 +124,7 @@ class RockPaperScissors(commands.Cog):
         if check_quest_message == True:
             view = SelfDestructView(60)
             quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
-            m = await channel.send(embed=quest_embed, content= f"{user.mention}", view = view)
+            m = await channel.send(embed=quest_embed, content= f"{interaction.user.mention}", view = view)
             view.message = m
         
     

@@ -66,7 +66,7 @@ class RPSView(discord.ui.View):
         win_gambling_text = ""
         is_user_profile_win = False
         if self.so_tien != None and self.loai_tien != None:
-            win_gambling_text = f"và đã thắng được **{self.so_tien}**{self.emoji}"
+            win_gambling_text = f" và đã thắng được **{self.so_tien}**{self.emoji}"
         #Hoà
         if player1_choice == player2_choice:
             result = f"Cả hai player đều chọn **`{self.translate_choice(player1_choice)}`** nên trận này coi như hoà!"

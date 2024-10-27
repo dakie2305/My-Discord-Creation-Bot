@@ -92,8 +92,8 @@ def update_profile_money(guild_id: int, guild_name: str, user_id: int, user_name
         from_type = None
         amount = 1
         #Có thể dùng copper hoặc silver cộng dồn lên để đổi
-        copper_needed_for_one_gold = int(1 * 5000 * 5000 * rate)
-        silver_needed_for_one_gold  = int(1 * 5000 * rate)
+        copper_needed_for_one_gold = int(1 * (5000*rate) * (5000 * rate))
+        silver_needed_for_one_gold  = int(1 * (5000*rate))
         if existing_data.darkium > 0:
             from_type = "D"
             existing_data.darkium -=1
@@ -421,3 +421,15 @@ def remove_authority_from_server(guild_id: int):
     query = {}
     update = {"$set": {"is_authority": False}}
     res = collection.update_many(query, update)
+
+def update_last_authority(guild_id: int, user_id: int):
+    collection = db_specific[f'profile_{guild_id}']
+    result = collection.update_one({"id": "conversion_rate"}, {"$set": {"last_authority":user_id}})
+    
+    
+def update_last_riot_now(guild_id:int, user_id: int):
+    collection = db_specific[f'profile_{guild_id}']
+    today = datetime.now()
+    result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"last_riot": today,
+                                                                                    }})
+    return result

@@ -85,6 +85,7 @@ class BankEconomy(commands.Cog):
         if authority_user == None:
             embed = discord.Embed(title=f"", description=f"Chính Quyền đã lưu vong khỏi server. Vui lòng dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", color=0xddede7)
             ProfileMongoManager.remove_authority_from_server(guild_id=user.guild.id)
+            ProfileMongoManager.update_last_authority(guild_id=user.guild.id, user_id=authority.user_id)
             return embed, None
         
         #Kiểm xem chính quyền có mặc nợ không, có thì từ chức và phạt authority
@@ -96,6 +97,7 @@ class BankEconomy(commands.Cog):
             authority.darkium = 0
             ProfileMongoManager.update_profile_money_fast(guild_id= user.guild.id, data=authority)
             ProfileMongoManager.remove_authority_from_server(guild_id=user.guild.id)
+            ProfileMongoManager.update_last_authority(guild_id=user.guild.id, user_id=authority.user_id)
             return embed, None
         
         conversion_rate = ConversionRateMongoManager.find_conversion_rate_by_id(guild_id=user.guild.id)

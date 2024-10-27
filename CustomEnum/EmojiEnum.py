@@ -11,3 +11,11 @@ class EmojiCreation2(Enum):
     COPPER = "<a:copper:1294615524918956052>"
     SHINY_POINT = "<a:shiny_point:1297210803119853630>"
     GOLDEN_GIFT_BOX = "<a:golden_gift_box:1297211386618974246>"
+    
+    DICE_ROLLING = "<a:dice_rolling:1294617477552017450>"
+    DICE_1 = "<:dice_1:1294617495910482021>"
+    DICE_2 = "<:dice_2:1294617503800098927>"
+    DICE_3 = "<:dice_3:1294617512465535046>"
+    DICE_4 = "<:dice_4:1294617525853622324>"
+    DICE_5= "<:dice_5:1294617537207734333>"
+    DICE_6= "<:dice_6:1294617547777507379>"

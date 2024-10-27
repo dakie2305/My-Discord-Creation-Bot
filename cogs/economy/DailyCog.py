@@ -65,6 +65,7 @@ class DailyEconomy(commands.Cog):
                 unix_time = int(tommorow.timestamp())
                 embed = discord.Embed(title=f"", description=f"🚫 Bạn đã điểm danh xong hôm nay rồi, vui lòng đợi đến ngày mai <t:{unix_time}:D> !", color=0xc379e0)
                 return embed
+            
             #Không cho thực hiện nếu còn jail_time
             if user_profile.jail_time != None:
                 if user_profile.jail_time > datetime.now():

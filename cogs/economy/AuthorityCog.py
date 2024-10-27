@@ -50,6 +50,7 @@ class AuthorityEconomy(commands.Cog):
                     existed_authority.darkium = 0
                     ProfileMongoManager.update_profile_money_fast(guild_id= interaction.guild.id, data=existed_authority)
                     ProfileMongoManager.remove_authority_from_server(guild_id=interaction.guild.id)
+                    ProfileMongoManager.update_last_authority(guild_id=interaction.guild.id, user_id=existed_authority.user_id)
                     return embed, None
                 else:
                     await interaction.followup.send(content=f"Server này đã có Chính Quyền là {member.mention} rồi! Vui lòng bào tiền Chính Quyền, hoặc ép Chính Quyền từ bỏ địa vị để tranh chức Chính Quyền!", ephemeral=True)
@@ -145,6 +146,27 @@ class AuthorityEconomy(commands.Cog):
             view.message = mes
             return
         
+        #Không cho riot trong vòng cùng 1 ngày
+        if user_profile != None and user_profile.last_riot != None:
+            if user_profile.last_riot.date() == datetime.now().date():
+                tommorow = datetime.today() + timedelta(days=1)
+                unix_time = int(tommorow.timestamp())
+                embed = discord.Embed(title=f"", description=f"🚫 Bạn đã bạo động trong hôm nay rồi, vui lòng đợi đến <t:{unix_time}:D> để thực hiện lại lệnh!", color=0xc379e0)
+                view = SelfDestructView(60)
+                m = await interaction.followup.send(embed=embed, view=view)
+                view.message = m
+                return
+        
+        #Không cho thực hiện nếu còn jail_time
+        if user_profile != None and user_profile.jail_time != None:
+            if user_profile.jail_time > datetime.now():
+                unix_time = int(user_profile.jail_time.timestamp())
+                embed = discord.Embed(title=f"", description=f"⛓️ Bạn đã bị chính quyền bắt giữ rồi, vui lòng đợi đến <t:{unix_time}:t> để thực hiện lại lệnh!", color=0xc379e0)
+                view = SelfDestructView(60)
+                m = await interaction.followup.send(embed=embed, view=view)
+                view.message = m
+                return
+        
         #Mỗi lần bạo động cần tốn base 100 Silver * 0.dignity_point  để phát động, và chính quyền sẽ cần tốn 500 Silver để dẹp loạn
         #Kiểm xem user có đủ 100 Silver không
         money_base_riot = 180
@@ -195,6 +217,7 @@ class AuthorityEconomy(commands.Cog):
             authority.darkium = 0
             ProfileMongoManager.update_profile_money_fast(guild_id= interaction.guild.id, data=authority)
             ProfileMongoManager.remove_authority_from_server(guild_id=interaction.guild.id)
+            ProfileMongoManager.update_last_authority(guild_id=interaction.guild.id, user_id=authority.user_id)
             await interaction.followup.send(f"Bạn đã lật đổ chính quyền của Server!",ephemeral=True)
             channel = interaction.channel
             embed = discord.Embed(title=f"", description=f"Chính Quyền của server đã bị lật đổ! Vui lòng dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", color=0xddede7)
