@@ -111,9 +111,9 @@ class SicboCog(commands.Cog):
             gambling_text = f" **{so_tien}** {self.get_emoji_from_loai_tien(loai_tien=loai_tien)}"
         
         if is_player_win == True:
-            result_text = f"> {user.mention} đã thắng{gambling_text}!"
+            result_text = f"\n{user.mention} đã thắng{gambling_text}!"
         else:
-            result_text = f"> {user.mention} đã thua{gambling_text}! Chính quyền đã lấy một nửa số tiền cá cược để làm thuế!"
+            result_text = f"\n{user.mention} đã thua{gambling_text}! Chính quyền đã lấy một nửa số tiền cá cược để làm thuế!"
             if first_num == second_num == third_num:
                 result_text = f"\n{user.mention} đã thua{gambling_text} vì xúc xắc đều quay ra ba con giống nhau! Chính quyền đã lấy một nửa số tiền cá cược để làm thuế!"
         embed_updated = discord.Embed(title=f"", description=f"{user.mention} đã chơi tài xỉu và chọn **{tai_xiu}**.\nXúc xắc đã quay ra: {first_dice_emoji} | {second_dice_emoji} | {third_dice_emoji}!\n{result_text}", color=0x03F8FC)
