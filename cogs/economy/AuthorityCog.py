@@ -4,6 +4,7 @@ import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 from Handling.Misc.SelfDestructView import SelfDestructView
 from Handling.Economy.Authority.AuthorityView import AuthorityView
 from Handling.Economy.Authority.AuthorityRiotView import AuthorityRiotView
+import Handling.Economy.ConversionRate.ConversionRateMongoManager as ConversionRateMongoManager
 from enum import Enum
 from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.EmojiEnum import EmojiCreation2
@@ -84,6 +85,11 @@ class AuthorityEconomy(commands.Cog):
             if member:
                 await interaction.followup.send(content=f"Server này đã có Chính Quyền là {member.mention} rồi! Vui lòng lật đổ hoặc ép Chính Quyền từ bỏ địa vị để tranh chức Chính Quyền!", ephemeral=True)
                 return
+        conversion_rate = ConversionRateMongoManager.find_conversion_rate_by_id(guild_id=interaction.guild_id)
+        if conversion_rate != None and conversion_rate.last_authority == interaction.user.id:
+            await interaction.followup.send(content=f"Bạn đã từng là chính quyền rồi! Vui lòng nhường chức Chính Quyền cho người khác!", ephemeral=True)
+            return
+            
         data = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
         if data == None:
             embed = discord.Embed(title=f"", description=f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã! Vì gây lãng phí tài nguyên, bạn đã bị trừ 500 {EmojiCreation2.COPPER.value}!", color=0xc379e0)
@@ -114,12 +120,12 @@ class AuthorityEconomy(commands.Cog):
         await interaction.response.defer()
         
         # #Không cho dùng bot nếu không phải user
-        if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
-            view = SelfDestructView(timeout=30)
-            embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
-            mess = await interaction.followup.send(embed=embed, view=view)
-            view.message = mess
-            return
+        # if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
+        #     view = SelfDestructView(timeout=30)
+        #     embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
+        #     mess = await interaction.followup.send(embed=embed, view=view)
+        #     view.message = mess
+        #     return
         
         #Kiểm tra xem đây có phải là chính quyền không
         if ProfileMongoManager.is_authority(guild_id=interaction.guild_id, user_id=interaction.user.id) != None:
@@ -179,6 +185,9 @@ class AuthorityEconomy(commands.Cog):
             embed = discord.Embed(title=f"", description=f"Để kêu gọi bạo động chính quyền thì bạn cần **{money_for_riot}**{EmojiCreation2.SILVER.value}!", color=0xc379e0)
             mes = await interaction.followup.send(embed=embed)
             return
+        
+        #Cập nhật last riot
+        ProfileMongoManager.update_last_riot_now(guild_id=interaction.guild_id, user_id=interaction.user.id)
         #Trừ silver
         ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, silver=-money_for_riot)
         timeout = 60 #Cho timeout giây để kết thúc
@@ -223,6 +232,26 @@ class AuthorityEconomy(commands.Cog):
             embed = discord.Embed(title=f"", description=f"Chính Quyền của server đã bị lật đổ! Vui lòng dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", color=0xddede7)
             await channel.send(embed=embed)            
 
+    #region unjail
+    @discord.app_commands.describe(user="Chọn user cần thả tù treo.")
+    @authority_group.command(name="unjail", description="Thả cầm tù dành cho những ai bị phạt tù!")
+    async def unjail_authority_slash(self, interaction: discord.Interaction, user: discord.Member):
+        await interaction.response.defer(ephemeral=True)
+         #Kiểm tra xem server đã tồn tại ai là chính quyền chưa
+        existed_authority = ProfileMongoManager.get_authority(guild_id=interaction.guild_id)
+        if existed_authority == None:
+            await interaction.followup.send(content=f"Server không tồn tại Chính Quyền! Vui lòng dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", ephemeral=True)
+            return
+        if interaction.user.id != existed_authority.user_id and interaction.user.id != interaction.guild.owner_id:
+            await interaction.followup.send(content=f"Chỉ chính quyền mới được quyền dùng lệnh này để thả giam những người bị tù!", ephemeral=True)
+            return
+        user_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=user.id)
+        if user_profile == None:
+            await interaction.followup.send(content=f"Người này chưa dùng lệnh {SlashCommand.PROFILE.value}!", ephemeral=True)
+            return
+        ProfileMongoManager.update_jail_time(guild_id=interaction.guild_id, user_id=user.id, jail_time=None)
+        await interaction.followup.send(content=f"Đã thả giam lệnh cho {user.display_name}!", ephemeral=True)
+        
     def get_nhan_pham(self, number):
         text = "Người Thường"
         if number >= 100:

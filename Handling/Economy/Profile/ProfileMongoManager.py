@@ -53,10 +53,7 @@ def update_profile_money(guild_id: int, guild_name: str, user_id: int, user_name
             existing_data.silver -=1
         elif existing_data.gold > 0:
             from_type = "G"
-            existing_data.darkium -=1
-        elif existing_data.darkium > 0:
-            from_type = "D"
-            existing_data.darkium -=1
+            existing_data.gold -=1
         if from_type!= None:
             converted_money = convert_currency(amount=1, rate=rate, from_currency_type=from_type, to_currency_type="C")
             existing_data.copper += converted_money
@@ -74,7 +71,7 @@ def update_profile_money(guild_id: int, guild_name: str, user_id: int, user_name
             amount = 1
             converted_money = convert_currency(amount=amount, rate=rate, from_currency_type=from_type, to_currency_type="S")
             existing_data.silver += converted_money
-        elif existing_data.darkium > 1:
+        elif existing_data.darkium > 0:
             from_type = "D"
             existing_data.darkium -=1
             amount =1
@@ -99,7 +96,7 @@ def update_profile_money(guild_id: int, guild_name: str, user_id: int, user_name
             existing_data.darkium -=1
             amount = 1
             converted_money = convert_currency(amount=amount, rate=rate, from_currency_type=from_type, to_currency_type="G")
-            existing_data.silver += converted_money
+            existing_data.gold += converted_money
         elif existing_data.silver >= silver_needed_for_one_gold:
             from_type = "S"
             existing_data.silver -=silver_needed_for_one_gold
@@ -314,10 +311,7 @@ def update_money_authority(guild_id: int, gold: int= 0, silver: int = 0, copper:
             existing_data.silver -=1
         elif existing_data.gold > 0:
             from_type = "G"
-            existing_data.darkium -=1
-        elif existing_data.darkium > 0:
-            from_type = "D"
-            existing_data.darkium -=1
+            existing_data.gold -=1
         if from_type!= None:
             converted_money = convert_currency(amount=1, rate=rate, from_currency_type=from_type, to_currency_type="C")
             existing_data.copper += converted_money
@@ -335,7 +329,7 @@ def update_money_authority(guild_id: int, gold: int= 0, silver: int = 0, copper:
             amount = 1
             converted_money = convert_currency(amount=amount, rate=rate, from_currency_type=from_type, to_currency_type="S")
             existing_data.silver += converted_money
-        elif existing_data.darkium > 1:
+        elif existing_data.darkium > 0:
             from_type = "D"
             existing_data.darkium -=1
             amount =1
@@ -353,14 +347,14 @@ def update_money_authority(guild_id: int, gold: int= 0, silver: int = 0, copper:
         from_type = None
         amount = 1
         #Có thể dùng copper hoặc silver cộng dồn lên để đổi
-        copper_needed_for_one_gold = int(1 * 5000 * 5000 * rate)
-        silver_needed_for_one_gold  = int(1 * 5000 * rate)
+        copper_needed_for_one_gold = int(1 * (5000*rate) * (5000 * rate))
+        silver_needed_for_one_gold  = int(1 * (5000*rate))
         if existing_data.darkium > 0:
             from_type = "D"
             existing_data.darkium -=1
             amount = 1
             converted_money = convert_currency(amount=amount, rate=rate, from_currency_type=from_type, to_currency_type="G")
-            existing_data.silver += converted_money
+            existing_data.gold += converted_money
         elif existing_data.silver >= silver_needed_for_one_gold:
             from_type = "S"
             existing_data.silver -=silver_needed_for_one_gold
@@ -379,7 +373,6 @@ def update_money_authority(guild_id: int, gold: int= 0, silver: int = 0, copper:
             existing_data.darkium += 1
         else: break
     
-        
     result = collection.update_one({"id": "profile", "user_id": existing_data.user_id}, {"$set": {"copper": existing_data.copper,
                                                                                         "gold": existing_data.gold,
                                                                                         "silver": existing_data.silver,

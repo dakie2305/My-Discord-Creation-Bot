@@ -12,6 +12,7 @@ import random
 from discord.app_commands import Choice
 import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
 from Handling.Economy.Profile.ProfileClass import Profile
+from datetime import datetime, timedelta
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(SicboCog(bot=bot))
@@ -39,7 +40,6 @@ class SicboCog(commands.Cog):
     ])
     async def sb_normal_slash_command(self, interaction: discord.Interaction, tai_xiu: str, so_tien:int = None, loai_tien:str = None):
         await interaction.response.defer(ephemeral=False)
-        
         #Không cho dùng bot nếu không phải user
         if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
             view = SelfDestructView(timeout=30)
@@ -75,6 +75,7 @@ class SicboCog(commands.Cog):
         if so_tien != None and so_tien <= 0:
             await interaction.followup.send(f"Số tiền nhập không hợp lệ!")
             return
+        
         gambling_text = ""
         if so_tien != None and loai_tien != None:
             emoji = self.get_emoji_from_loai_tien(loai_tien=loai_tien)
@@ -93,6 +94,12 @@ class SicboCog(commands.Cog):
         third_num, third_dice_emoji = self.get_random_dice()
         count_all = first_num + second_num + third_num
         await asyncio.sleep(4)
+        
+        l_chance = self.get_chance(3)
+        if l_chance:
+            await self.police_in(message=message, user=user, so_tien=so_tien, loai_tien=loai_tien, profile=profile)
+            return
+            
         #Xỉu là 4-10
         #Tài là 11 - 17
         is_player_win = False
@@ -110,13 +117,16 @@ class SicboCog(commands.Cog):
         if so_tien != None:
             gambling_text = f" **{so_tien}** {self.get_emoji_from_loai_tien(loai_tien=loai_tien)}"
         
+        chinh_quyen_text = ""
+        if profile.is_authority == False:
+            chinh_quyen_text = "Chính quyền đã lấy một nửa số tiền cá cược để làm thuế!"
         if is_player_win == True:
             result_text = f"\n{user.mention} đã thắng{gambling_text}!"
         else:
-            result_text = f"\n{user.mention} đã thua{gambling_text}! Chính quyền đã lấy một nửa số tiền cá cược để làm thuế!"
+            result_text = f"\n{user.mention} đã thua{gambling_text}! {chinh_quyen_text}"
             if first_num == second_num == third_num:
-                result_text = f"\n{user.mention} đã thua{gambling_text} vì xúc xắc đều quay ra ba con giống nhau! Chính quyền đã lấy một nửa số tiền cá cược để làm thuế!"
-        embed_updated = discord.Embed(title=f"", description=f"{user.mention} đã chơi tài xỉu và chọn **{tai_xiu}**.\nXúc xắc đã quay ra: {first_dice_emoji} | {second_dice_emoji} | {third_dice_emoji}!\n{result_text}", color=0x03F8FC)
+                result_text = f"\n{user.mention} đã thua{gambling_text} vì xúc xắc đều quay ra ba con giống nhau! {chinh_quyen_text}"
+        embed_updated = discord.Embed(title=f"", description=f"{user.mention} đã chơi tài xỉu và chọn **{tai_xiu}** với tiền cược là{gambling_text}.\nXúc xắc đã quay ra: {first_dice_emoji} | {second_dice_emoji} | {third_dice_emoji} |\n{result_text}", color=0x03F8FC)
         
         if so_tien != None and loai_tien!= None and profile != None:
             if loai_tien == "G": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, gold=so_tien)
@@ -125,6 +135,12 @@ class SicboCog(commands.Cog):
 
             
         await message.edit(embed=embed_updated)
+        check_quest_message = QuestMongoManager.increase_sb_normal_count(guild_id=user.guild.id, user_id=user.id)
+        if check_quest_message == True:
+            view = SelfDestructView(60)
+            quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
+            ms = await message.channel.send(embed=quest_embed, content=f"{user.mention}", view=view)
+            view.message = ms
         return
     
     def update_player_money_and_authority_money(self, is_player_win: bool, guild_int: int, profile: Profile, copper: int = 0, silver: int = 0, gold: int = 0):
@@ -132,14 +148,277 @@ class SicboCog(commands.Cog):
         if is_player_win:
             #Cộng user, trừ authority
             ProfileMongoManager.update_profile_money(guild_id=guild_int, guild_name=profile.guild_name, user_id=profile.user_id, user_name=profile.user_name, user_display_name=profile.user_display_name, gold=gold, silver=silver, copper=copper)
-            ProfileMongoManager.update_money_authority(guild_id=guild_int, silver=-silver, copper=-copper, gold=-gold)
+            if profile.is_authority == False:
+                ProfileMongoManager.update_money_authority(guild_id=guild_int, silver=-silver, copper=-copper, gold=-gold)
         else:
             ProfileMongoManager.update_profile_money(guild_id=guild_int, guild_name=profile.guild_name, user_id=profile.user_id, user_name=profile.user_name, user_display_name=profile.user_display_name, gold=-gold, silver=-silver, copper=-copper)
             #Authority chỉ ăn 50%
-            ProfileMongoManager.update_money_authority(guild_id=guild_int, silver=int(silver/2), copper=int(copper/2), gold=int(gold/2))
+            if profile.is_authority == False:
+                ProfileMongoManager.update_money_authority(guild_id=guild_int, silver=int(silver/2), copper=int(copper/2), gold=int(gold/2))
         
+    
+    async def police_in(self, message: discord.Message, user: discord.Member, so_tien:int = None, loai_tien:str = None, profile: Profile = None):
+        #Công an ập vào
+            lost_money_text = ""
+            if so_tien != None:
+                lost_money_text = f"{user.mention} cũng đã bị Chính Quyền tịch thu số tiền **{so_tien}** {self.get_emoji_from_loai_tien(loai_tien=loai_tien)}!"
+            lose_embed = discord.Embed(title=f"", description=f"Công an đã ập vào để bắt quả tang {user.mention} vì tổ chức chơi đánh bạc tài xỉu và bị giam 3 tiếng!\n{lost_money_text}", color=0x03F8FC)
+            await message.edit(embed=lose_embed)
+            time_window = timedelta(hours=3)
+            jail_time = datetime.now() + time_window
+            ProfileMongoManager.update_jail_time(guild_id=user.guild.id, user_id=user.id, jail_time=jail_time)
+            if so_tien != None and loai_tien!= None and profile != None:
+                if loai_tien == "G": self.update_player_money_and_authority_money(is_player_win=False, guild_int=user.guild.id, profile=profile, gold=so_tien)
+                elif loai_tien == "S": self.update_player_money_and_authority_money(is_player_win=False, guild_int=user.guild.id, profile=profile, silver=so_tien)
+                elif loai_tien == "C": self.update_player_money_and_authority_money(is_player_win=False, guild_int=user.guild.id, profile=profile, copper=so_tien)
+            return
+
+    
+    #region tài xỉu double
+    @sb_group.command(name="double", description="Tài xỉu Double!")
+    @discord.app_commands.describe(number="Đoán con số xúc xắc sẽ xuất hiện hai lần.")
+    @discord.app_commands.describe(so_tien="Chọn số tiền muốn cá cược.")
+    @discord.app_commands.describe(loai_tien="Chọn loại tiền muốn cược.")
+    @discord.app_commands.choices(loai_tien=[
+        Choice(name="Gold", value="G"),
+        Choice(name="Silver", value="S"),
+        Choice(name="Copper", value="C"),
+    ])
+    async def sb_double_slash_command(self, interaction: discord.Interaction, number: int = None, so_tien:int = None, loai_tien:str = None):
+        await interaction.response.defer(ephemeral=False)
+        #Không cho dùng bot nếu không phải user
+        if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
         
+        if number != None and (number < 1 or number > 6):
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Chỉ được chọn từ 1 đến 6!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
         
+        if (so_tien != None and loai_tien == None):
+            loai_tien = "C"
+            
+        if (so_tien == None and loai_tien != None):
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Đã chọn loại tiền thì vui lòng chọn giá tiền cần cá cược!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
+            
+        profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
+        if so_tien != None and profile == None:
+            await interaction.followup.send(f"Để cá cược thì bạn phải thực hiện lệnh {SlashCommand.PROFILE.value} trước đã!")
+            return
+        elif so_tien != None and profile != None:
+            if loai_tien == "C" and profile.copper < so_tien:
+                await interaction.followup.send(f"Bạn không có đủ {EmojiCreation2.COPPER.value} để cá cược!")
+                return
+            elif loai_tien == "S" and profile.silver < so_tien:
+                await interaction.followup.send(f"Bạn không có đủ {EmojiCreation2.SILVER.value} để cá cược!")
+                return
+            elif loai_tien == "G" and profile.gold < so_tien:
+                await interaction.followup.send(f"Bạn không có đủ {EmojiCreation2.GOLD.value} để cá cược!")
+                return
+        if so_tien != None and so_tien <= 0:
+            await interaction.followup.send(f"Số tiền nhập không hợp lệ!")
+            return
+        
+        gambling_number_guess = ""
+        if number != None:
+            gambling_number_guess = f" và đặt cược vào số **{number}**"
+        
+        gambling_money_text = ""
+        if so_tien != None and loai_tien != None:
+            emoji = self.get_emoji_from_loai_tien(loai_tien=loai_tien)
+            gambling_money_text = f" với tiền cược là **{so_tien}**{emoji}"
+            
+        embed = discord.Embed(title=f"", description=f"{interaction.user.mention} đã chơi tài xỉu đôi{gambling_number_guess}{gambling_money_text}.\nNhà cái đã tung xúc xắc {EmojiCreation2.DICE_ROLLING.value} {EmojiCreation2.DICE_ROLLING.value}", color=0x03F8FC)
+        mess = await interaction.followup.send(embed=embed)
+        if mess:
+            await self.edit_embed_sb_double(message=mess, user=interaction.user, number=number, so_tien=so_tien, loai_tien=loai_tien, profile=profile)
+        return
+    
+    
+    
+    async def edit_embed_sb_double(self, message: discord.Message, user: discord.Member, number: int = None, so_tien:int = None, loai_tien:str = None, profile: Profile = None):
+        first_num, first_dice_emoji = self.get_random_dice()
+        second_num, second_dice_emoji = self.get_random_dice()
+        third_num, third_dice_emoji = self.get_random_dice()
+        await asyncio.sleep(4)
+        l_chance = self.get_chance(3)
+        if l_chance:
+            await self.police_in(message=message, user=user, so_tien=so_tien, loai_tien=loai_tien, profile=profile)
+            return
+            
+        #Nếu không có ít nhất hai cái trùng thì thua
+        is_player_win = False
+        if number == None:
+            if first_num == second_num or second_num == third_num or first_num == third_num:
+                is_player_win= True
+        else:
+            count = sum(1 for x in (first_num, second_num, third_num) if x == number)
+            if count >= 2:
+                is_player_win = True
+            
+        gambling_number_guess = ""
+        if number != None:
+            gambling_number_guess = f" và đặt cược vào số **{number}**"
+        gambling_text = ""
+        if so_tien != None:
+            #Nếu thắng thì tỉ lệ ăn 1:4
+            #Nếu thắng cả đoán số thì tỉ lệ ăn 1:6
+            if number == None and so_tien != None and is_player_win == True:
+                so_tien = so_tien*4
+            elif number != None and so_tien != None and is_player_win == True:
+                so_tien = so_tien*6
+            gambling_text = f" **{so_tien}** {self.get_emoji_from_loai_tien(loai_tien=loai_tien)}"
+        
+        chinh_quyen_text = ""
+        if profile.is_authority == False:
+            chinh_quyen_text = "Chính quyền đã lấy một nửa số tiền cá cược để làm thuế!"
+        
+        if is_player_win == True:
+            result_text = f"\n{user.mention} đã thắng{gambling_text}!"
+        else:
+            result_text = f"\n{user.mention} đã thua{gambling_text}! {chinh_quyen_text}"
+            
+        embed_updated = discord.Embed(title=f"", description=f"{user.mention} đã chơi tài xỉu đôi{gambling_number_guess}.\nXúc xắc đã quay ra: {first_dice_emoji} | {second_dice_emoji} | {third_dice_emoji} |\n{result_text}", color=0x03F8FC)
+        
+        if so_tien != None and loai_tien!= None and profile != None:
+            if loai_tien == "G": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, gold=so_tien)
+            elif loai_tien == "S": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, silver=so_tien)
+            elif loai_tien == "C": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, copper=so_tien)
+        await message.edit(embed=embed_updated)
+        
+        return
+    
+        #region tài xỉu triple
+    @sb_group.command(name="triple", description="Tài xỉu Triple!")
+    @discord.app_commands.describe(number="Đoán con số xúc xắc sẽ xuất hiện ba lần.")
+    @discord.app_commands.describe(so_tien="Chọn số tiền muốn cá cược.")
+    @discord.app_commands.describe(loai_tien="Chọn loại tiền muốn cược.")
+    @discord.app_commands.choices(loai_tien=[
+        Choice(name="Gold", value="G"),
+        Choice(name="Silver", value="S"),
+        Choice(name="Copper", value="C"),
+    ])
+    async def sb_triple_slash_command(self, interaction: discord.Interaction, number: int = None, so_tien:int = None, loai_tien:str = None):
+        await interaction.response.defer(ephemeral=False)
+        #Không cho dùng bot nếu không phải user
+        if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
+        
+        if number != None and (number < 1 or number > 6):
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Chỉ được chọn từ 1 đến 6!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
+        
+        if (so_tien != None and loai_tien == None):
+            loai_tien = "C"
+            
+        if (so_tien == None and loai_tien != None):
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Đã chọn loại tiền thì vui lòng chọn giá tiền cần cá cược!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
+            
+        profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
+        if so_tien != None and profile == None:
+            await interaction.followup.send(f"Để cá cược thì bạn phải thực hiện lệnh {SlashCommand.PROFILE.value} trước đã!")
+            return
+        elif so_tien != None and profile != None:
+            if loai_tien == "C" and profile.copper < so_tien:
+                await interaction.followup.send(f"Bạn không có đủ {EmojiCreation2.COPPER.value} để cá cược!")
+                return
+            elif loai_tien == "S" and profile.silver < so_tien:
+                await interaction.followup.send(f"Bạn không có đủ {EmojiCreation2.SILVER.value} để cá cược!")
+                return
+            elif loai_tien == "G" and profile.gold < so_tien:
+                await interaction.followup.send(f"Bạn không có đủ {EmojiCreation2.GOLD.value} để cá cược!")
+                return
+        if so_tien != None and so_tien <= 0:
+            await interaction.followup.send(f"Số tiền nhập không hợp lệ!")
+            return
+        
+        gambling_number_guess = ""
+        if number != None:
+            gambling_number_guess = f" và đặt cược vào số **{number}**"
+        
+        gambling_money_text = ""
+        if so_tien != None and loai_tien != None:
+            emoji = self.get_emoji_from_loai_tien(loai_tien=loai_tien)
+            gambling_money_text = f" với tiền cược là **{so_tien}**{emoji}"
+            
+        embed = discord.Embed(title=f"", description=f"{interaction.user.mention} đã chơi tài xỉu ba{gambling_number_guess}{gambling_money_text}.\nNhà cái đã tung xúc xắc {EmojiCreation2.DICE_ROLLING.value} {EmojiCreation2.DICE_ROLLING.value}", color=0x03F8FC)
+        mess = await interaction.followup.send(embed=embed)
+        if mess:
+            await self.edit_embed_sb_triple(message=mess, user=interaction.user, number=number, so_tien=so_tien, loai_tien=loai_tien, profile=profile)
+        return
+    
+    async def edit_embed_sb_triple(self, message: discord.Message, user: discord.Member, number: int = None, so_tien:int = None, loai_tien:str = None, profile: Profile = None):
+        first_num, first_dice_emoji = self.get_random_dice()
+        second_num, second_dice_emoji = self.get_random_dice()
+        third_num, third_dice_emoji = self.get_random_dice()
+        await asyncio.sleep(4)
+        l_chance = self.get_chance(3)
+        if l_chance:
+            await self.police_in(message=message, user=user, so_tien=so_tien, loai_tien=loai_tien, profile=profile)
+            return
+            
+        #Nếu không có ít nhất ba cái trùng thì thua
+        is_player_win = False
+        if number == None:
+            if first_num == second_num and second_num == third_num and first_num == third_num:
+                is_player_win= True
+        else:
+            if first_num == number and second_num == number and first_num == number:
+                is_player_win = True
+            
+        gambling_number_guess = ""
+        if number != None:
+            gambling_number_guess = f" và đặt cược vào số **{number}**"
+        gambling_text = ""
+        if so_tien != None:
+            #Nếu thắng thì tỉ lệ ăn 1:8
+            #Nếu thắng cả đoán số thì tỉ lệ ăn 1:10
+            if number == None and so_tien != None and is_player_win == True:
+                so_tien = so_tien*8
+            elif number != None and so_tien != None and is_player_win == True:
+                so_tien = so_tien*10
+            gambling_text = f" **{so_tien}** {self.get_emoji_from_loai_tien(loai_tien=loai_tien)}"
+        
+        chinh_quyen_text = ""
+        if profile.is_authority == False:
+            chinh_quyen_text = "Chính quyền đã lấy một nửa số tiền cá cược để làm thuế!"
+        
+        if is_player_win == True:
+            result_text = f"\n{user.mention} đã thắng{gambling_text}!"
+        else:
+            result_text = f"\n{user.mention} đã thua{gambling_text}! {chinh_quyen_text}"
+            
+        embed_updated = discord.Embed(title=f"", description=f"{user.mention} đã chơi tài xỉu ba{gambling_number_guess}.\nXúc xắc đã quay ra: {first_dice_emoji} | {second_dice_emoji} | {third_dice_emoji} |\n{result_text}", color=0x03F8FC)
+        
+        if so_tien != None and loai_tien!= None and profile != None:
+            if loai_tien == "G": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, gold=so_tien)
+            elif loai_tien == "S": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, silver=so_tien)
+            elif loai_tien == "C": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, copper=so_tien)
+        await message.edit(embed=embed_updated)
+        
+        return
+    
     
     def get_random_dice(self):
         list_dice= [
@@ -159,4 +438,9 @@ class SicboCog(commands.Cog):
         if loai_tien == "S": return EmojiCreation2.SILVER.value
         return EmojiCreation2.COPPER.value
         
-    
+    def get_chance(self, chance: int):
+        rand_num = random.randint(0, 100)
+        if rand_num < chance:
+            return True
+        else:
+            return False

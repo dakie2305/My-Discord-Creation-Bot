@@ -190,8 +190,10 @@ class CoinFlip(commands.Cog):
         
         check_quest_message = QuestMongoManager.increase_coin_flip_count(guild_id=user.guild.id, user_id=user.id)
         if check_quest_message == True:
+            view = SelfDestructView(60)
             quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
-            await message.channel.send(embed=quest_embed, content=f"{message.author.mention}")
+            ms = await message.channel.send(embed=quest_embed, content=f"{message.author.mention}", view=view)
+            view.message = ms
         return
     
     def get_bonus_exp_based_on_amount(self, so_tien:int = None, loai_tien:str = None, profile: Profile = None):

@@ -137,6 +137,18 @@ def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_n
             base_reward_amount = 1
         quest_title = f"Chơi **{base_amount}** trận game Tung Xu ({SlashCommand.COIN_FLIP.value})"
         quest_des = f"**{base_reward_amount}**{emoji}"
+    elif quest_type == "sb_normal_count":
+        base_amount = quest_difficult_rate * 20
+        rand_reward_amount = random.randint(1, 5)
+        base_reward_amount = 1000
+        if reward_type == "C":
+            base_reward_amount = 1000 * rand_reward_amount
+        elif reward_type == "S":
+            base_reward_amount = 1 * rand_reward_amount
+        elif reward_type == "G":
+            base_reward_amount = 1
+        quest_title = f"Chơi **{base_amount}** trận game Tài Xỉu bình thường ({SlashCommand.SB_NORMAL.value})"
+        quest_des = f"**{base_reward_amount}**{emoji}"
     
     quest_profile = QuestProfile(user_id=user_id, user_display_name=user_display_name, user_name=user_name, guild_name= guild_name, quest_type= quest_type, quest_channel=channel_id, channel_name= channel_name, quest_title=quest_title, quest_description=quest_des, quest_difficult_rate=quest_difficult_rate, quest_total_progress=base_amount, bonus_exp=bonus_exp)
     
@@ -251,6 +263,25 @@ def increase_coin_flip_count(guild_id: int, user_id: int):
         ProfileMongoManager.increase_quest_finished(guild_id=guild_id, user_id=user_id)
     return is_completed
 
+#region sb Normal count
+def increase_sb_normal_count(guild_id: int, user_id: int):
+    collection = db_specific[f'quest_{guild_id}']
+    data = collection.find_one({"id": "quest", "user_id": user_id, "quest_type": "sb_normal_count"})
+    if data == None: return False
+    existing_data = QuestProfile.from_dict(data)
+    if existing_data.quest_progress >= existing_data.quest_total_progress:
+        return True
+    existing_data.quest_progress += 1
+    
+    is_completed = False if existing_data.quest_progress < existing_data.quest_total_progress else True
+    collection.update_one({"id": "quest", "user_id": user_id}, {"$set": {
+                                                                            "quest_progress": existing_data.quest_progress,
+                                                                            "is_completed": is_completed,
+                                                                        }})
+    if is_completed:
+        ProfileMongoManager.increase_quest_finished(guild_id=guild_id, user_id=user_id)
+    return is_completed
+
 #region Kéo Búa Bao Count
 def increase_rps_count(guild_id: int, user_id: int):
     collection = db_specific[f'quest_{guild_id}']
@@ -297,4 +328,5 @@ list_quest_general_type = [
     "dare_game_count",
     "coin_flip_game_count",
     "rps_game_count",
+    "sb_normal_count",
     ]

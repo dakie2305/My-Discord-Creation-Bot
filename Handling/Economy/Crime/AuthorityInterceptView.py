@@ -38,7 +38,7 @@ class AuthorityInterceptView(discord.ui.View):
             if fine_money == None or fine_money <500 : fine_money = 500
             if fine_money == None or fine_money > 45000 : fine_money = 45000
             dignity_point = 10
-            embed = discord.Embed(title=f"", description=f"{self.user.mention} đã bị Chính Quyền <@{self.authority_user.user_id}> phát hiện gây rối mất trật tự!", color=0xc379e0)
+            embed = discord.Embed(title=f"", description=f"<@{self.user_profile.user_id}> đã bị Chính Quyền <@{self.authority_user.user_id}> phát hiện gây rối mất trật tự!", color=0xc379e0)
             embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Trừ **{fine_money}** {EmojiCreation2.COPPER.value}", inline=False)
             embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Trừ **{dignity_point} nhân phẩm**", inline=False)
             embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Tống vào tù trong 3 tiếng!", inline=False)
@@ -74,7 +74,7 @@ class AuthorityInterceptView(discord.ui.View):
                 emoji = EmojiCreation2.COPPER.value
             
             dignity_point = 10
-            embed = discord.Embed(title=f"", description=f"{self.user.mention} đã bị Chính Quyền <@{self.authority_user.user_id}> phát hiện ăn cắp!", color=0xc379e0)
+            embed = discord.Embed(title=f"", description=f"<@{self.user_profile.user_id}> đã bị Chính Quyền <@{self.authority_user.user_id}> phát hiện ăn cắp!", color=0xc379e0)
             embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Trừ **{money}** {emoji}", inline=False)
             embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Trừ **{dignity_point} nhân phẩm**", inline=False)
             embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Tống vào tù trong 3 tiếng!", inline=False)
@@ -110,7 +110,7 @@ class AuthorityInterceptView(discord.ui.View):
                 emoji = EmojiCreation2.COPPER.value
             
             dignity_point = 15
-            embed = discord.Embed(title=f"", description=f"{self.user.mention} đã bị Chính Quyền <@{self.authority_user.user_id}> phát hiện tội trốn thuế và rửa tiền!", color=0xc379e0)
+            embed = discord.Embed(title=f"", description=f"<@{self.user_profile.user_id}> đã bị Chính Quyền <@{self.authority_user.user_id}> phát hiện tội trốn thuế và rửa tiền!", color=0xc379e0)
             embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Trừ **{money}** {emoji}", inline=False)
             embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Trừ **{dignity_point} nhân phẩm**", inline=False)
             embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Tống vào tù trong 5 tiếng!", inline=False)
@@ -136,7 +136,7 @@ class AuthorityInterceptView(discord.ui.View):
             money += 2000
             emoji = EmojiCreation2.COPPER.value
             dignity_point = 15
-            embed = discord.Embed(title=f"", description=f"{self.user.mention} đã bị Chính Quyền <@{self.authority_user.user_id}> phát hiện tội buôn lậu hàng cấm!", color=0xc379e0)
+            embed = discord.Embed(title=f"", description=f"<@{self.user_profile.user_id}> đã bị Chính Quyền <@{self.authority_user.user_id}> phát hiện tội buôn lậu hàng cấm!", color=0xc379e0)
             embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Trừ **{money}** {emoji}", inline=False)
             embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Trừ **{dignity_point} nhân phẩm**", inline=False)
             embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Tống vào tù trong 3 tiếng!", inline=False)

@@ -154,7 +154,9 @@ class CrimeEconomy(commands.Cog):
             if user_profile.level + 5 < target_profile.level:
                 user_win = self.get_chance(25)
             else:
-                user_win = self.get_chance(75)
+                if target_profile.is_authority == True:
+                    user_win = self.get_chance(10)
+                else: user_win = self.get_chance(75)
         else:
             user_win = self.get_chance(25)
         
@@ -253,7 +255,9 @@ class CrimeEconomy(commands.Cog):
             if user_profile.level < target_profile.level:
                 user_win_fight = self.get_chance(25)
             else:
-                user_win_fight = self.get_chance(75)
+                if target_profile.is_authority == True:
+                    user_win_fight = self.get_chance(25)
+                else: user_win_fight = self.get_chance(75)
         else:
             user_win_fight = self.get_chance(25)
         
@@ -309,7 +313,8 @@ class CrimeEconomy(commands.Cog):
         #Rửa tiền thì tuỳ vào xem có phải chính quyền không
         if user_profile.is_authority == False:
             user_win = self.get_chance(75)
-        else:user_win = self.get_chance(25)
+        else:
+            user_win = self.get_chance(25)
         
         preloading_text = f"{user.mention} đang chuẩn bị rửa tiền và trốn thuế!"
         if user_profile.is_authority == False:
