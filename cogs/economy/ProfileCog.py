@@ -90,7 +90,8 @@ class ProfileEconomy(commands.Cog):
             return embed
         
         embed = discord.Embed(title=f"", description=f"**Profile {user.mention}**", color=0xddede7)
-        embed.set_thumbnail(url=user.avatar.url)
+        if user.avatar != None:
+            embed.set_thumbnail(url=user.avatar.url)
         if data.is_authority:
             embed.add_field(name=f"", value="**Chính Quyền Tối Cao**", inline=False)
         embed.add_field(name=f"", value=f"Nhân phẩm: **{self.get_nhan_pham(data.dignity_point)}** ({data.dignity_point})", inline=True)

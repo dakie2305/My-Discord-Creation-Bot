@@ -103,7 +103,8 @@ class AuthorityEconomy(commands.Cog):
             return
         
         embed = discord.Embed(title=f"Chính Quyền Đương Cử",description=f"Bầu chọn cho **{interaction.user.mention}** làm Chính Quyền của server {interaction.guild.name}.",color=discord.Color.blue())
-        embed.set_thumbnail(url=interaction.user.avatar.url)
+        if interaction.user.avatar != None:
+            embed.set_thumbnail(url=interaction.user.avatar.url)
         embed.add_field(name=f"", value="\n", inline=False)
         embed.add_field(name=f"", value=f"> Rank: **{data.level}**", inline=False)
         embed.add_field(name=f"", value=f"> Nhân phẩm: **{self.get_nhan_pham(data.dignity_point)}** ({data.dignity_point})", inline=False)
