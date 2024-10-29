@@ -107,16 +107,19 @@ class LeaderboardEconomy(commands.Cog):
                     if profile.copper > 0:
                         text_money += f"**{self.shortened_currency(profile.copper)}** {EmojiCreation2.COPPER.value}  "
                     if (index+1) == 1:
-                        embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.FIRST_CUP.value}**: <@{profile.user_id}> \n{text_money}", inline=False)
+                        embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.FIRST_CUP.value}**: <@{profile.user_id}>", inline=False)
+                        embed.add_field(name=f"", value=f"{text_money}", inline=False)
                     elif (index+1) == 2:
-                        embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.SECOND_CUP.value}**: <@{profile.user_id}> \n{text_money}", inline=False)
+                        embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.SECOND_CUP.value}**: <@{profile.user_id}>", inline=False)
+                        embed.add_field(name=f"", value=f"{text_money}", inline=False)
                     elif (index+1) == 3:
-                        embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.THIRD_CUP.value}**: <@{profile.user_id}> \n{text_money}", inline=False)
+                        embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.THIRD_CUP.value}**: <@{profile.user_id}>", inline=False)
+                        embed.add_field(name=f"", value=f"{text_money}", inline=False)
                     else:
-                        embed.add_field(name=f"", value=f"**Hạng {index+1}**: <@{profile.user_id}> \n{text_money}", inline=False)
-                    embed.add_field(name=f"", value=f"\n", inline=False)
+                        embed.add_field(name=f"", value=f"**Hạng {index+1}**: <@{profile.user_id}>", inline=False)
+                        embed.add_field(name=f"", value=f"{text_money}", inline=False)
                     count+=1
-                    if count >= 25: break
+                    if count >= 10: break
             else:
                 embed.add_field(name=f"", value=f"Xếp hạng của {user.mention}", inline=True)
                 embed.add_field(name=f"", value=f"_____________", inline=False)
@@ -133,13 +136,17 @@ class LeaderboardEconomy(commands.Cog):
                         if profile.copper > 0:
                             text_money += f"**{self.shortened_currency(profile.copper)}** {EmojiCreation2.COPPER.value}  "
                         if (index+1) == 1:
-                            embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.FIRST_CUP.value}**: <@{profile.user_id}> \n{text_money}", inline=False)
+                            embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.FIRST_CUP.value}**: <@{profile.user_id}>", inline=False)
+                            embed.add_field(name=f"", value=f"{text_money}", inline=False)
                         elif (index+1) == 2:
-                            embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.SECOND_CUP.value}**: <@{profile.user_id}> \n{text_money}", inline=False)
+                            embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.SECOND_CUP.value}**: <@{profile.user_id}>", inline=False)
+                            embed.add_field(name=f"", value=f"{text_money}", inline=False)
                         elif (index+1) == 3:
-                            embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.THIRD_CUP.value}**: <@{profile.user_id}> \n{text_money}", inline=False)
+                            embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.THIRD_CUP.value}**: <@{profile.user_id}>", inline=False)
+                            embed.add_field(name=f"", value=f"{text_money}", inline=False)
                         else:
-                            embed.add_field(name=f"", value=f"**Hạng {index+1}**: <@{profile.user_id}> \n{text_money}", inline=False)
+                            embed.add_field(name=f"", value=f"**Hạng {index+1}**: <@{profile.user_id}>", inline=False)
+                            embed.add_field(name=f"", value=f"{text_money}", inline=False)
                         break
             embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
             return embed
@@ -180,7 +187,7 @@ class LeaderboardEconomy(commands.Cog):
                     else:
                         embed.add_field(name=f"", value=f"**Hạng {index+1}**: <@{profile.user_id}> với **{short_text}** {emoji}", inline=False)
                     count+=1
-                    if count >= 25: break
+                    if count >= 20: break
             else:
                 embed.add_field(name=f"", value=f"Xếp hạng của {user.mention}", inline=True)
                 embed.add_field(name=f"", value=f"_____________", inline=False)
@@ -222,7 +229,7 @@ class LeaderboardEconomy(commands.Cog):
                     else:
                         embed.add_field(name=f"", value=f"**Hạng {index+1}**: <@{profile.user_id}> Rank **{profile.level}**", inline=False)
                     count+=1
-                    if count >= 25: break
+                    if count >= 20: break
             else:
                 embed.add_field(name=f"", value=f"Xếp hạng của {user.mention}", inline=True)
                 embed.add_field(name=f"", value=f"_____________", inline=False)
@@ -262,7 +269,7 @@ class LeaderboardEconomy(commands.Cog):
                     else:
                         embed.add_field(name=f"", value=f"**Hạng {index+1}**: <@{profile.user_id}> {text}", inline=False)
                     count+=1
-                    if count >= 25: break
+                    if count >= 20: break
             else:
                 embed.add_field(name=f"", value=f"Xếp hạng của {user.mention}", inline=True)
                 embed.add_field(name=f"", value=f"_____________", inline=False)
