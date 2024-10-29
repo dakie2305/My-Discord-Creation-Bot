@@ -17,6 +17,16 @@ def find_profile_by_id(guild_id: int, user_id: int):
         return Profile.from_dict(data)
     return None
 
+def find_all_profiles(guild_id: int):
+    collection = db_specific[f'profile_{guild_id}']
+    data = list(collection.find())
+    return [Profile.from_dict(profile) for profile in data]
+
+def drop_profile_collection(guild_id: int):
+    collection = db_specific[f'profile_{guild_id}']
+    if collection:
+        collection.drop()
+
 def create_profile(guild_id: int, guild_name: str, user_id: int, user_name: str, user_display_name: str):
     #Mỗi server là một collection, chia theo server id
     collection = db_specific[f'profile_{guild_id}']

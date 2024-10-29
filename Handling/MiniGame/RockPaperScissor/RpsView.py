@@ -29,14 +29,17 @@ class RPSView(discord.ui.View):
     
     @discord.ui.button(label="🔨 Búa", style=discord.ButtonStyle.green)
     async def rock(self, interaction: discord.Interaction, button: discord.ui.Button):
+        print(f"At guild: {interaction.guild.name}, user {interaction.user.name} choose Rock")
         await self.handle_choice(interaction, "rock")
 
     @discord.ui.button(label="🗞️ Bao", style=discord.ButtonStyle.blurple)
     async def paper(self, interaction: discord.Interaction, button: discord.ui.Button):
+        print(f"At guild: {interaction.guild.name}, user {interaction.user.name} choose Paper")
         await self.handle_choice(interaction, "paper")
 
     @discord.ui.button(label="✂️ Kéo", style=discord.ButtonStyle.red)
     async def scissors(self, interaction: discord.Interaction, button: discord.ui.Button,):
+        print(f"At guild: {interaction.guild.name}, user {interaction.user.name} choose Scissors")
         await self.handle_choice(interaction, "scissors")
 
     async def handle_choice(self, interaction: discord.Interaction, choice: str):

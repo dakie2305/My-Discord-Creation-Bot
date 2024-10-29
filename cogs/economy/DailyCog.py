@@ -79,7 +79,8 @@ class DailyEconomy(commands.Cog):
                 consecutive_date = True
         
         embed = discord.Embed(title=f"", description=f"**Điểm danh ngày thành công!**", color=0xc379e0)
-        embed.set_thumbnail(url=user.avatar.url)
+        if user.avatar:
+            embed.set_thumbnail(url=user.avatar.url)
         embed.add_field(name=f"", value="\n", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
         #Tuỳ vào điểm nhân phẩm để cộng tiền, base là 500 * +- dignity point, và +5 nhân phẩm, nhân với level

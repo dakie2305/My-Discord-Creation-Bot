@@ -9,7 +9,7 @@ import DailyLogger
 from discord.ext import commands, tasks
 from discord import app_commands
 import db.DbMongoManager as db
-from db.DbMongoManager import UserInfo, GuildExtraInfo, SnipeChannelInfo, ConversationInfo, SnipeMessage, SnipeMessageAttachments
+from db.DbMongoManager import UserInfo, GuildExtraInfo
 import random
 import string
 import CustomButton
@@ -20,6 +20,8 @@ from Handling.Economy.Quest.QuestHandling import QuestHandling
 import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
 from CustomEnum.SlashEnum import SlashCommand 
 from Handling.Misc.SelfDestructView import SelfDestructView
+import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
+import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
 
 load_dotenv()
 intents = discord.Intents.all()
@@ -498,7 +500,26 @@ async def on_reaction_add(reaction, user):
             view.message = m
     return
 
-
+@bot.event
+async def on_member_remove(member: discord.Member):
+    guild = member.guild
+    profile = ProfileMongoManager.find_profile_by_id(guild_id=guild.id, user_id=member.id)
+    if profile!= None:
+        #Xoá profile cho đỡ tốn data
+        ProfileMongoManager.delete_profile(guild_id=guild.id, user_id=member.id)
+        print(f"Member {member.name} left server {guild.name} so their economy profile is deleted!")
+    quest = QuestMongoManager.find_quest_by_user_id(guild_id=guild.id, user_id=member.id)
+    if quest != None:
+        #Xoá quest cho đỡ tốn dung lượng
+        QuestMongoManager.delete_quest(guild_id=guild.id, user_id=member.id)
+        print(f"Member {member.name} left server {guild.name} so their quest is deleted!")
+    
+@bot.event
+async def on_guild_remove(self, guild: discord.Guild):
+    #drop collection quest và profile
+    ProfileMongoManager.drop_profile_collection(guild_id=guild.id)
+    QuestMongoManager.drop_quest_collection(guild_id=guild.id)
+    
 
 #Cog command
 init_extension = ["cogs.games.RockPaperScissorCog", 
@@ -514,6 +535,7 @@ init_extension = ["cogs.games.RockPaperScissorCog",
                   "cogs.economy.AuthorityCog",
                   "cogs.economy.QuestCog",
                   "cogs.economy.CrimeCog",
+                  "cogs.economy.LeaderboardCog",
                   ]
 
 bot_token = os.getenv("BOT_TOKEN_NO2")

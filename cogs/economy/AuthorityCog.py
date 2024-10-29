@@ -19,6 +19,7 @@ async def setup(bot: commands.Bot):
 class AuthorityEconomy(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+        self.last_used: datetime = None
     
     # Define the parent command group for 'authority'
     authority_group = discord.app_commands.Group(name="authority", description="Các lệnh liên quan đến Chính Quyền của server!")
@@ -102,6 +103,16 @@ class AuthorityEconomy(commands.Cog):
             await interaction.followup.send(embed=embed)
             return
         
+        # Kiểm tra xem command có nằm trong giới hạn 15 phút không
+        now = datetime.now()
+        if self.last_used and (now - self.last_used) < timedelta(minutes=15):
+            time_remaining = (self.last_used + timedelta(minutes=15) - now).seconds
+            minutes, seconds = divmod(time_remaining, 60)
+            await interaction.followup.send(f"Đã có người tiến hành bầu cử. Vui lòng thử lại lệnh sau {minutes} phút {seconds} giây.", ephemeral=True)
+            return
+        # Set the last used time to now
+        self.last_used = now
+        
         embed = discord.Embed(title=f"Chính Quyền Đương Cử",description=f"Bầu chọn cho **{interaction.user.mention}** làm Chính Quyền của server {interaction.guild.name}.",color=discord.Color.blue())
         if interaction.user.avatar != None:
             embed.set_thumbnail(url=interaction.user.avatar.url)
@@ -143,7 +154,6 @@ class AuthorityEconomy(commands.Cog):
             if authority_user == None:
                 await interaction.followup.send(content=f"Chính Quyền đã lưu vong khỏi Server! Vui lòng dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", ephemeral=True)
                 return
-            
         #Kiểm tra xem user có /profile chưa
         user_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id= interaction.user.id)
         if user_profile == None:

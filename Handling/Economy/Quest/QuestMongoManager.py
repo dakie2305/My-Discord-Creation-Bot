@@ -23,6 +23,12 @@ def find_quest_by_user_id(guild_id: int, user_id: int):
         return QuestProfile.from_dict(data)
     return None
 
+def drop_quest_collection(guild_id: int):
+    collection = db_specific[f'quest_{guild_id}']
+    if collection:
+        collection.drop()
+
+
 def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_name: str, user_display_name: str, channel_id: int, channel_name: str, data_profile: Profile = None):
     #Mỗi server là một collection, chia theo server id
     collection = db_specific[f'quest_{guild_id}']

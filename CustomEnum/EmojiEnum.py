@@ -19,3 +19,7 @@ class EmojiCreation2(Enum):
     DICE_4 = "<:dice_4:1294617525853622324>"
     DICE_5= "<:dice_5:1294617537207734333>"
     DICE_6= "<:dice_6:1294617547777507379>"
+    
+    FIRST_CUP = "<a:first_cup:1300842408111505439>"
+    SECOND_CUP = "<a:second_cup:1300842477707853854>"
+    THIRD_CUP = "<a:third_cup:1300842482879172649>"
