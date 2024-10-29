@@ -26,6 +26,7 @@ class SicboCog(commands.Cog):
     
     #region tài xỉu normal
     @sb_group.command(name="normal", description="Tài xỉu phiên bản đơn giản hoá")
+    @discord.app_commands.checks.cooldown(1, 5)
     @discord.app_commands.describe(tai_xiu="Chọn tài/xỉu.")
     @discord.app_commands.describe(so_tien="Chọn số tiền muốn cá cược.")
     @discord.app_commands.describe(loai_tien="Chọn loại tiền muốn cược.")
@@ -87,6 +88,16 @@ class SicboCog(commands.Cog):
             await self.edit_embed_sb_normal(message=mess, user=interaction.user, tai_xiu=tai_xiu, so_tien=so_tien, loai_tien=loai_tien, profile=profile)
         return
     
+    @sb_normal_slash_command.error
+    async def sb_normal_slash_command_error(self, interaction: discord.Interaction, error):
+        if isinstance(error, discord.app_commands.CommandOnCooldown):
+            # Send a cooldown message to the user, formatted nicely
+            await interaction.response.send_message(f"⏳ Lệnh đang cooldown, vui lòng thực hiện lại trong vòng {error.retry_after:.2f}s tới.", ephemeral=True)
+        else:
+            # Handle any other errors that might occur
+            await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
+
+    
     
     async def edit_embed_sb_normal(self, message: discord.Message, user: discord.Member, tai_xiu: str, so_tien:int = None, loai_tien:str = None, profile: Profile = None):
         first_num, first_dice_emoji = self.get_random_dice()
@@ -118,7 +129,7 @@ class SicboCog(commands.Cog):
             gambling_text = f" **{so_tien}** {self.get_emoji_from_loai_tien(loai_tien=loai_tien)}"
         
         chinh_quyen_text = ""
-        if profile.is_authority == False:
+        if profile != None and profile.is_authority == False:
             chinh_quyen_text = "Chính quyền đã lấy một nửa số tiền cá cược để làm thuế!"
         if is_player_win == True:
             result_text = f"\n{user.mention} đã thắng{gambling_text}!"
@@ -126,7 +137,7 @@ class SicboCog(commands.Cog):
             result_text = f"\n{user.mention} đã thua{gambling_text}! {chinh_quyen_text}"
             if first_num == second_num == third_num:
                 result_text = f"\n{user.mention} đã thua{gambling_text} vì xúc xắc đều quay ra ba con giống nhau! {chinh_quyen_text}"
-        embed_updated = discord.Embed(title=f"", description=f"{user.mention} đã chơi tài xỉu và chọn **{tai_xiu}** với tiền cược là{gambling_text}.\nXúc xắc đã quay ra: {first_dice_emoji} | {second_dice_emoji} | {third_dice_emoji} |\n{result_text}", color=0x03F8FC)
+        embed_updated = discord.Embed(title=f"", description=f"{user.mention} đã chơi tài xỉu và chọn **{tai_xiu}**{gambling_text}.\nXúc xắc đã quay ra: {first_dice_emoji} | {second_dice_emoji} | {third_dice_emoji} |\n{result_text}", color=0x03F8FC)
         
         if so_tien != None and loai_tien!= None and profile != None:
             if loai_tien == "G": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, gold=so_tien)
@@ -148,13 +159,13 @@ class SicboCog(commands.Cog):
         if is_player_win:
             #Cộng user, trừ authority
             ProfileMongoManager.update_profile_money(guild_id=guild_int, guild_name=profile.guild_name, user_id=profile.user_id, user_name=profile.user_name, user_display_name=profile.user_display_name, gold=gold, silver=silver, copper=copper)
-            if profile.is_authority == False:
+            if profile != None and profile.is_authority == False:
                 ProfileMongoManager.update_money_authority(guild_id=guild_int, silver=-silver, copper=-copper, gold=-gold)
         else:
             ProfileMongoManager.update_profile_money(guild_id=guild_int, guild_name=profile.guild_name, user_id=profile.user_id, user_name=profile.user_name, user_display_name=profile.user_display_name, gold=-gold, silver=-silver, copper=-copper)
             #Authority chỉ ăn 50%
-            if profile.is_authority == False:
-                ProfileMongoManager.update_money_authority(guild_id=guild_int, silver=int(silver/2), copper=int(copper/2), gold=int(gold/2))
+            if profile != None and profile.is_authority == False:
+                ProfileMongoManager.update_money_authority(guild_id=guild_int, silver=int(silver/2) if int(silver/2)>0 else 1, copper=int(copper/2) if int(copper/2)>0 else 1, gold=int(gold/2) if int(gold/2)>0 else 1)
         
     
     async def police_in(self, message: discord.Message, user: discord.Member, so_tien:int = None, loai_tien:str = None, profile: Profile = None):
@@ -176,6 +187,7 @@ class SicboCog(commands.Cog):
     
     #region tài xỉu double
     @sb_group.command(name="double", description="Tài xỉu Double!")
+    @discord.app_commands.checks.cooldown(1, 5)
     @discord.app_commands.describe(number="Đoán con số xúc xắc sẽ xuất hiện hai lần.")
     @discord.app_commands.describe(so_tien="Chọn số tiền muốn cá cược.")
     @discord.app_commands.describe(loai_tien="Chọn loại tiền muốn cược.")
@@ -245,11 +257,28 @@ class SicboCog(commands.Cog):
         return
     
     
+    @sb_double_slash_command.error
+    async def sb_double_slash_command_error(self, interaction: discord.Interaction, error):
+        if isinstance(error, discord.app_commands.CommandOnCooldown):
+            # Send a cooldown message to the user, formatted nicely
+            await interaction.response.send_message(f"⏳ Lệnh đang cooldown, vui lòng thực hiện lại trong vòng {error.retry_after:.2f}s tới.", ephemeral=True)
+        else:
+            # Handle any other errors that might occur
+            await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
+
+    
     
     async def edit_embed_sb_double(self, message: discord.Message, user: discord.Member, number: int = None, so_tien:int = None, loai_tien:str = None, profile: Profile = None):
-        first_num, first_dice_emoji = self.get_random_dice()
-        second_num, second_dice_emoji = self.get_random_dice()
-        third_num, third_dice_emoji = self.get_random_dice()
+        
+        #70% thua ngay
+        lose_chance = self.get_chance(75)
+        if lose_chance == True:
+            first_num, first_dice_emoji, second_num, second_dice_emoji, third_num, third_dice_emoji = self.fixed_roll_dice_double_lose()
+        else:
+            first_num, first_dice_emoji = self.get_random_dice()
+            second_num, second_dice_emoji = self.get_random_dice()
+            third_num, third_dice_emoji = self.get_random_dice()
+        
         await asyncio.sleep(4)
         l_chance = self.get_chance(3)
         if l_chance:
@@ -265,7 +294,11 @@ class SicboCog(commands.Cog):
             count = sum(1 for x in (first_num, second_num, third_num) if x == number)
             if count >= 2:
                 is_player_win = True
-            
+        
+        #Triple là thua
+        if first_num == second_num == third_num:
+            is_player_win = False
+        print(f"At guild: {user.guild.name}, user {user.name} played Sic Bo Double and is_player_win = {is_player_win}, lose_chance: {lose_chance}")
         gambling_number_guess = ""
         if number != None:
             gambling_number_guess = f" và đặt cược vào số **{number}**"
@@ -280,13 +313,15 @@ class SicboCog(commands.Cog):
             gambling_text = f" **{so_tien}** {self.get_emoji_from_loai_tien(loai_tien=loai_tien)}"
         
         chinh_quyen_text = ""
-        if profile.is_authority == False:
+        if profile!= None and profile.is_authority == False and so_tien != None:
             chinh_quyen_text = "Chính quyền đã lấy một nửa số tiền cá cược để làm thuế!"
         
         if is_player_win == True:
             result_text = f"\n{user.mention} đã thắng{gambling_text}!"
         else:
             result_text = f"\n{user.mention} đã thua{gambling_text}! {chinh_quyen_text}"
+            if first_num == second_num == third_num:
+                result_text = f"\n{user.mention} đã thua{gambling_text} vì xúc xắc đều quay ra ba con giống nhau! {chinh_quyen_text}"
             
         embed_updated = discord.Embed(title=f"", description=f"{user.mention} đã chơi tài xỉu đôi{gambling_number_guess}.\nXúc xắc đã quay ra: {first_dice_emoji} | {second_dice_emoji} | {third_dice_emoji} |\n{result_text}", color=0x03F8FC)
         
@@ -300,6 +335,7 @@ class SicboCog(commands.Cog):
     
         #region tài xỉu triple
     @sb_group.command(name="triple", description="Tài xỉu Triple!")
+    @discord.app_commands.checks.cooldown(1, 5)
     @discord.app_commands.describe(number="Đoán con số xúc xắc sẽ xuất hiện ba lần.")
     @discord.app_commands.describe(so_tien="Chọn số tiền muốn cá cược.")
     @discord.app_commands.describe(loai_tien="Chọn loại tiền muốn cược.")
@@ -368,6 +404,16 @@ class SicboCog(commands.Cog):
             await self.edit_embed_sb_triple(message=mess, user=interaction.user, number=number, so_tien=so_tien, loai_tien=loai_tien, profile=profile)
         return
     
+    @sb_triple_slash_command.error
+    async def sb_triple_slash_command_error(self, interaction: discord.Interaction, error):
+        if isinstance(error, discord.app_commands.CommandOnCooldown):
+            # Send a cooldown message to the user, formatted nicely
+            await interaction.response.send_message(f"⏳ Lệnh đang cooldown, vui lòng thực hiện lại trong vòng {error.retry_after:.2f}s tới.", ephemeral=True)
+        else:
+            # Handle any other errors that might occur
+            await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
+
+    
     async def edit_embed_sb_triple(self, message: discord.Message, user: discord.Member, number: int = None, so_tien:int = None, loai_tien:str = None, profile: Profile = None):
         first_num, first_dice_emoji = self.get_random_dice()
         second_num, second_dice_emoji = self.get_random_dice()
@@ -401,7 +447,7 @@ class SicboCog(commands.Cog):
             gambling_text = f" **{so_tien}** {self.get_emoji_from_loai_tien(loai_tien=loai_tien)}"
         
         chinh_quyen_text = ""
-        if profile.is_authority == False:
+        if profile != None and profile.is_authority == False and so_tien != None:
             chinh_quyen_text = "Chính quyền đã lấy một nửa số tiền cá cược để làm thuế!"
         
         if is_player_win == True:
@@ -432,6 +478,39 @@ class SicboCog(commands.Cog):
         
         index = random.randint(0, 5)
         return list_dice_number[index], list_dice[index]
+    
+    def fixed_roll_dice_double_lose(self):
+        list_dice= [
+            EmojiCreation2.DICE_1.value, 
+            EmojiCreation2.DICE_2.value, 
+            EmojiCreation2.DICE_3.value, 
+            EmojiCreation2.DICE_4.value, 
+            EmojiCreation2.DICE_5.value, 
+            EmojiCreation2.DICE_6.value]
+        list_dice_number = [1,2,3,4,5,6]
+        
+        if random.random() < 0.5:
+            # 50% 3 dice bằng nhau
+                chosen_index = random.randint(0, 5)
+                chosen_value = list_dice_number[chosen_index]
+                chosen_emoji = list_dice[chosen_index]
+                rolls = [
+                    (chosen_value, chosen_emoji),
+                    (chosen_value, chosen_emoji),
+                    (chosen_value, chosen_emoji)
+                ]
+                (first_num, first_dice_emoji), (second_num, second_dice_emoji), (third_num, third_dice_emoji) = rolls
+                return first_num, first_dice_emoji, second_num, second_dice_emoji, third_num, third_dice_emoji
+        else:
+            # 50% ba dice khác nhau
+                chosen_indices = random.sample(range(6), 3)
+                rolls = [
+                    (list_dice_number[i], list_dice[i]) for i in chosen_indices
+                ]
+                (first_num, first_dice_emoji), (second_num, second_dice_emoji), (third_num, third_dice_emoji) = rolls
+                return first_num, first_dice_emoji, second_num, second_dice_emoji, third_num, third_dice_emoji
+
+        
         
     def get_emoji_from_loai_tien(self, loai_tien):
         if loai_tien == "G": return EmojiCreation2.GOLD.value

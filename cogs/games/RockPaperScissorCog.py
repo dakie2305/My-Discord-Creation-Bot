@@ -24,6 +24,7 @@ class RockPaperScissors(commands.Cog):
         self.games = {}
 
     #region keo_bua_bao command
+    @discord.app_commands.checks.cooldown(1, 5)
     @discord.app_commands.command(name="keo_bua_bao", description="Bắt đầu chơi game Kéo - Búa - Bao")
     @discord.app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
     @discord.app_commands.describe(user="Chọn user để chơi cùng. Không chọn tức là sẽ chơi với bot")
@@ -126,11 +127,16 @@ class RockPaperScissors(commands.Cog):
             quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
             m = await channel.send(embed=quest_embed, content= f"{interaction.user.mention}", view = view)
             view.message = m
-        
+    
+    @create_rps.error
+    async def leaderboard_slash_command_error(self, interaction: discord.Interaction, error):
+        if isinstance(error, discord.app_commands.CommandOnCooldown):
+            await interaction.response.send_message(f"⏳ Lệnh đang cooldown, vui lòng thực hiện lại trong vòng {error.retry_after:.2f}s tới.", ephemeral=True)
+        else:
+            await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
     
     #region bxh_rps command
     @discord.app_commands.command(name="bxh_rps", description="Xem xếp hạng Kéo - Búa - Bao")
-    @discord.app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
     @discord.app_commands.describe(user="Chọn user để xem thứ hạng thực", loai_xep_hang= "Xem xếp hạng điểm Huyền Thoại hoặc điểm Sỉ Nhục")
     @discord.app_commands.choices(loai_xep_hang=[
         Choice(name="Xếp hạng theo điểm Huyền Thoại", value="legendary"),

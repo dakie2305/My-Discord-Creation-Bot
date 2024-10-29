@@ -22,6 +22,7 @@ class CoinFlip(commands.Cog):
         self.bot = bot
 
     #region Coin flip
+    @discord.app_commands.checks.cooldown(1, 7)
     @discord.app_commands.command(name="cf", description="Tung đồng xu sấp/ngửa cho vui")
     @discord.app_commands.describe(sap_ngua="Chọn sấp ngửa.")
     @discord.app_commands.describe(so_tien="Chọn số tiền muốn cá cược.")
@@ -46,8 +47,7 @@ class CoinFlip(commands.Cog):
             view.message = mess
             return
         
-        if (sap_ngua != None and (so_tien == None or loai_tien == None)):
-            so_tien = 500
+        if (sap_ngua != None and (so_tien != None or loai_tien == None)):
             loai_tien = "C"
             
             
@@ -77,6 +77,13 @@ class CoinFlip(commands.Cog):
             else : sap_ngua_true_false = None
             await self.edit_embed_coin_flip(message=mess, user=interaction.user, sap_ngua=sap_ngua_true_false, so_tien=so_tien, loai_tien=loai_tien, profile=profile)
         return
+    
+    @coin_flip_slash_command.error
+    async def coin_flip_slash_command_error(self, interaction: discord.Interaction, error):
+        if isinstance(error, discord.app_commands.CommandOnCooldown):
+            await interaction.response.send_message(f"⏳ Lệnh đang cooldown, vui lòng thực hiện lại trong vòng {error.retry_after:.2f}s tới.", ephemeral=True)
+        else:
+            await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
     
     async def edit_embed_coin_flip(self, message: discord.Message, user: discord.Member, sap_ngua: bool = None, so_tien:int = None, loai_tien:str = None, profile: Profile = None):
         player_choice = 'sấp'
