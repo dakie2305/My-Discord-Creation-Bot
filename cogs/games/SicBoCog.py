@@ -474,7 +474,7 @@ class SicboCog(commands.Cog):
             elif loai_tien == "C": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, copper=so_tien)
         await message.edit(embed=embed_updated)
 
-        check_quest_message = QuestMongoManager.increase_sb_double_count(guild_id=user.guild.id, user_id=user.id)
+        check_quest_message = QuestMongoManager.increase_sb_triple_count(guild_id=user.guild.id, user_id=user.id)
         if check_quest_message == True:
             view = SelfDestructView(60)
             quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
