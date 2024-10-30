@@ -47,7 +47,7 @@ class CoinFlip(commands.Cog):
             view.message = mess
             return
         
-        if (sap_ngua != None and (so_tien != None or loai_tien == None)):
+        if (sap_ngua != None and so_tien != None and loai_tien == None):
             loai_tien = "C"
             
             
