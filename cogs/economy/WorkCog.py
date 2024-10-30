@@ -148,6 +148,7 @@ class WorkEconomy(commands.Cog):
                 text = self.get_bonus_message(True, user.guild.name, user.mention)
                 base_text += text
                 #Cộng thêm tiền dựa trên phần trăm của điểm dignity point
+                if dignity_point == 0: dignity_point = 1
                 bonus_money = int(base_money/dignity_point*10)
                 base_money += bonus_money
                 base_text += f"Bạn được cộng thêm {bonus_money} {EmojiCreation2.COPPER.value}! "
@@ -155,6 +156,7 @@ class WorkEconomy(commands.Cog):
                 text = self.get_bonus_message(False, user.guild.name, user.mention)
                 base_text += text
                 #Trừ tiền dựa trên phần trăm của điểm dignity point
+                if dignity_point == 0: dignity_point = 1
                 bonus_money = int(base_money/dignity_point*10)
                 base_money -= bonus_money
                 base_text += f"Bạn bị trừ {bonus_money} {EmojiCreation2.COPPER.value}! "
