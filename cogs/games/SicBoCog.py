@@ -106,7 +106,7 @@ class SicboCog(commands.Cog):
         count_all = first_num + second_num + third_num
         await asyncio.sleep(4)
         
-        l_chance = self.get_chance(3)
+        l_chance = self.get_chance(9)
         if l_chance:
             await self.police_in(message=message, user=user, so_tien=so_tien, loai_tien=loai_tien, profile=profile)
             return
@@ -161,6 +161,9 @@ class SicboCog(commands.Cog):
             ProfileMongoManager.update_profile_money(guild_id=guild_int, guild_name=profile.guild_name, user_id=profile.user_id, user_name=profile.user_name, user_display_name=profile.user_display_name, gold=gold, silver=silver, copper=copper)
             if profile != None and profile.is_authority == False:
                 ProfileMongoManager.update_money_authority(guild_id=guild_int, silver=-silver, copper=-copper, gold=-gold)
+            #Cộng kinh nghiệm nếu thắng
+            if gold == 0 and silver == 0 and copper < 10000: return
+            ProfileMongoManager.update_level_progressing(guild_id=guild_int, user_id=profile.user_id)
         else:
             ProfileMongoManager.update_profile_money(guild_id=guild_int, guild_name=profile.guild_name, user_id=profile.user_id, user_name=profile.user_name, user_display_name=profile.user_display_name, gold=-gold, silver=-silver, copper=-copper)
             #Authority chỉ ăn 50%
@@ -173,15 +176,15 @@ class SicboCog(commands.Cog):
             lost_money_text = ""
             if so_tien != None:
                 lost_money_text = f"{user.mention} cũng đã bị Chính Quyền tịch thu số tiền **{so_tien}** {self.get_emoji_from_loai_tien(loai_tien=loai_tien)}!"
-            lose_embed = discord.Embed(title=f"", description=f"Công an đã ập vào để bắt quả tang {user.mention} vì tổ chức chơi đánh bạc tài xỉu và bị giam 3 tiếng!\n{lost_money_text}", color=0x03F8FC)
+            lose_embed = discord.Embed(title=f"", description=f"Công an đã ập vào để bắt quả tang {user.mention} vì tổ chức chơi đánh bạc tài xỉu và bị giam 30 phút!\n{lost_money_text}", color=0x03F8FC)
             await message.edit(embed=lose_embed)
-            time_window = timedelta(hours=3)
+            time_window = timedelta(minutes=30)
             jail_time = datetime.now() + time_window
             ProfileMongoManager.update_jail_time(guild_id=user.guild.id, user_id=user.id, jail_time=jail_time)
             if so_tien != None and loai_tien!= None and profile != None:
-                if loai_tien == "G": self.update_player_money_and_authority_money(is_player_win=False, guild_int=user.guild.id, profile=profile, gold=so_tien)
-                elif loai_tien == "S": self.update_player_money_and_authority_money(is_player_win=False, guild_int=user.guild.id, profile=profile, silver=so_tien)
-                elif loai_tien == "C": self.update_player_money_and_authority_money(is_player_win=False, guild_int=user.guild.id, profile=profile, copper=so_tien)
+                if loai_tien == "G": self.update_player_money_and_authority_money(is_player_win=False, guild_int=user.guild.id, profile=profile, gold=so_tien*2)
+                elif loai_tien == "S": self.update_player_money_and_authority_money(is_player_win=False, guild_int=user.guild.id, profile=profile, silver=so_tien*2)
+                elif loai_tien == "C": self.update_player_money_and_authority_money(is_player_win=False, guild_int=user.guild.id, profile=profile, copper=so_tien*2)
             return
 
     
@@ -254,6 +257,7 @@ class SicboCog(commands.Cog):
         mess = await interaction.followup.send(embed=embed)
         if mess:
             await self.edit_embed_sb_double(message=mess, user=interaction.user, number=number, so_tien=so_tien, loai_tien=loai_tien, profile=profile)
+        
         return
     
     
@@ -280,7 +284,7 @@ class SicboCog(commands.Cog):
             third_num, third_dice_emoji = self.get_random_dice()
         
         await asyncio.sleep(4)
-        l_chance = self.get_chance(3)
+        l_chance = self.get_chance(9)
         if l_chance:
             await self.police_in(message=message, user=user, so_tien=so_tien, loai_tien=loai_tien, profile=profile)
             return
@@ -330,6 +334,13 @@ class SicboCog(commands.Cog):
             elif loai_tien == "S": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, silver=so_tien)
             elif loai_tien == "C": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, copper=so_tien)
         await message.edit(embed=embed_updated)
+
+        check_quest_message = QuestMongoManager.increase_sb_double_count(guild_id=user.guild.id, user_id=user.id)
+        if check_quest_message == True:
+            view = SelfDestructView(60)
+            quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
+            ms = await message.channel.send(embed=quest_embed, content=f"{user.mention}", view=view)
+            view.message = ms
         
         return
     
@@ -419,7 +430,7 @@ class SicboCog(commands.Cog):
         second_num, second_dice_emoji = self.get_random_dice()
         third_num, third_dice_emoji = self.get_random_dice()
         await asyncio.sleep(4)
-        l_chance = self.get_chance(3)
+        l_chance = self.get_chance(9)
         if l_chance:
             await self.police_in(message=message, user=user, so_tien=so_tien, loai_tien=loai_tien, profile=profile)
             return
@@ -462,6 +473,13 @@ class SicboCog(commands.Cog):
             elif loai_tien == "S": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, silver=so_tien)
             elif loai_tien == "C": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, copper=so_tien)
         await message.edit(embed=embed_updated)
+
+        check_quest_message = QuestMongoManager.increase_sb_double_count(guild_id=user.guild.id, user_id=user.id)
+        if check_quest_message == True:
+            view = SelfDestructView(60)
+            quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
+            ms = await message.channel.send(embed=quest_embed, content=f"{user.mention}", view=view)
+            view.message = ms
         
         return
     
