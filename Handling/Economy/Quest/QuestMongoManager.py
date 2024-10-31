@@ -40,18 +40,18 @@ def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_n
     if data_profile != None and data_profile.level != None:
         if data_profile.level >= 1 and data_profile.level < 15:
             # 5% 4, 20% 3, 30% 2
-            quest_difficult_rate = get_value(lengend=10, hard=20, avarage=30)
+            quest_difficult_rate = get_value(lengend=15, hard=25, avarage=45)
         elif data_profile.level >= 15 and data_profile.level < 30:
             # 5% 4, 20% 3, 40% 2
-            quest_difficult_rate = get_value(lengend=10, hard=30, avarage=40)
+            quest_difficult_rate = get_value(lengend=15, hard=40, avarage=45)
         elif data_profile.level >= 30 and data_profile.level < 50:
             # 5% 4, 35% 3, 35% 2
-            quest_difficult_rate = get_value(lengend=10, hard=35, avarage=35)
+            quest_difficult_rate = get_value(lengend=15, hard=35, avarage=35)
         elif data_profile.level >= 50 and data_profile.level < 75:
             # 10% 4, 35% 3, 35% 2
-            quest_difficult_rate = get_value(lengend=10, hard=35, avarage=35)
+            quest_difficult_rate = get_value(lengend=15, hard=35, avarage=35)
         elif data_profile.level >= 75 and data_profile.level < 99:
-            quest_difficult_rate = get_value(lengend=10, hard=50, avarage=10)
+            quest_difficult_rate = get_value(lengend=15, hard=50, avarage=10)
         elif data_profile.level >= 99:
             quest_difficult_rate = get_value(lengend=20, hard=55, avarage=25)
     reward_type = "C"
@@ -154,6 +154,30 @@ def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_n
         elif reward_type == "G":
             base_reward_amount = 1
         quest_title = f"Chơi **{base_amount}** trận game Tài Xỉu bình thường ({SlashCommand.SB_NORMAL.value})"
+        quest_des = f"**{base_reward_amount}**{emoji}"
+    elif quest_type == "sb_double_count":
+        base_amount = quest_difficult_rate * 20
+        rand_reward_amount = random.randint(1, 5)
+        base_reward_amount = 2000
+        if reward_type == "C":
+            base_reward_amount = 1000 * rand_reward_amount
+        elif reward_type == "S":
+            base_reward_amount = 1 * rand_reward_amount
+        elif reward_type == "G":
+            base_reward_amount = 1
+        quest_title = f"Chơi **{base_amount}** trận game Tài Xỉu Double ({SlashCommand.SB_DOUBLE.value})"
+        quest_des = f"**{base_reward_amount}**{emoji}"
+    elif quest_type == "sb_triple_count":
+        base_amount = quest_difficult_rate * 20
+        rand_reward_amount = random.randint(1, 5)
+        base_reward_amount = 2000
+        if reward_type == "C":
+            base_reward_amount = 1000 * rand_reward_amount
+        elif reward_type == "S":
+            base_reward_amount = 1 * rand_reward_amount
+        elif reward_type == "G":
+            base_reward_amount = 1
+        quest_title = f"Chơi **{base_amount}** trận game Tài Xỉu Triple ({SlashCommand.SB_TRIPLE.value})"
         quest_des = f"**{base_reward_amount}**{emoji}"
     
     quest_profile = QuestProfile(user_id=user_id, user_display_name=user_display_name, user_name=user_name, guild_name= guild_name, quest_type= quest_type, quest_channel=channel_id, channel_name= channel_name, quest_title=quest_title, quest_description=quest_des, quest_difficult_rate=quest_difficult_rate, quest_total_progress=base_amount, bonus_exp=bonus_exp)
@@ -288,6 +312,43 @@ def increase_sb_normal_count(guild_id: int, user_id: int):
         ProfileMongoManager.increase_quest_finished(guild_id=guild_id, user_id=user_id)
     return is_completed
 
+def increase_sb_double_count(guild_id: int, user_id: int):
+    collection = db_specific[f'quest_{guild_id}']
+    data = collection.find_one({"id": "quest", "user_id": user_id, "quest_type": "sb_double_count"})
+    if data == None: return False
+    existing_data = QuestProfile.from_dict(data)
+    if existing_data.quest_progress >= existing_data.quest_total_progress:
+        return True
+    existing_data.quest_progress += 1
+    
+    is_completed = False if existing_data.quest_progress < existing_data.quest_total_progress else True
+    collection.update_one({"id": "quest", "user_id": user_id}, {"$set": {
+                                                                            "quest_progress": existing_data.quest_progress,
+                                                                            "is_completed": is_completed,
+                                                                        }})
+    if is_completed:
+        ProfileMongoManager.increase_quest_finished(guild_id=guild_id, user_id=user_id)
+    return is_completed
+
+def increase_sb_triple_count(guild_id: int, user_id: int):
+    collection = db_specific[f'quest_{guild_id}']
+    data = collection.find_one({"id": "quest", "user_id": user_id, "quest_type": "sb_triple_count"})
+    if data == None: return False
+    existing_data = QuestProfile.from_dict(data)
+    if existing_data.quest_progress >= existing_data.quest_total_progress:
+        return True
+    existing_data.quest_progress += 1
+    
+    is_completed = False if existing_data.quest_progress < existing_data.quest_total_progress else True
+    collection.update_one({"id": "quest", "user_id": user_id}, {"$set": {
+                                                                            "quest_progress": existing_data.quest_progress,
+                                                                            "is_completed": is_completed,
+                                                                        }})
+    if is_completed:
+        ProfileMongoManager.increase_quest_finished(guild_id=guild_id, user_id=user_id)
+    return is_completed
+
+
 #region Kéo Búa Bao Count
 def increase_rps_count(guild_id: int, user_id: int):
     collection = db_specific[f'quest_{guild_id}']
@@ -335,4 +396,6 @@ list_quest_general_type = [
     "coin_flip_game_count",
     "rps_game_count",
     "sb_normal_count",
+    "sb_double_count",
+    "sb_triple_count",
     ]

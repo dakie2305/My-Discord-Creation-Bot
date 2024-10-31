@@ -155,10 +155,10 @@ class CrimeEconomy(commands.Cog):
                 user_win = self.get_chance(25)
             else:
                 if target_profile.is_authority == True:
-                    user_win = self.get_chance(10)
+                    user_win = self.get_chance(25)
                 else: user_win = self.get_chance(75)
         else:
-            user_win = self.get_chance(25)
+            user_win = self.get_chance(40)
         
         preloading_text = f"{user.mention} đang chuẩn bị cướp tiền của {target_user.mention}!"
         if user_profile.is_authority == False:
@@ -260,7 +260,7 @@ class CrimeEconomy(commands.Cog):
                     user_win_fight = self.get_chance(25)
                 else: user_win_fight = self.get_chance(75)
         else:
-            user_win_fight = self.get_chance(25)
+            user_win_fight = self.get_chance(40)
         
         preloading_text = f"{user.mention} đã lao đến đánh lộn với {target_user.mention}!"
         if user_profile.is_authority == False:
@@ -316,7 +316,7 @@ class CrimeEconomy(commands.Cog):
         if user_profile.is_authority == False:
             user_win = self.get_chance(75)
         else:
-            user_win = self.get_chance(25)
+            user_win = self.get_chance(40)
         
         preloading_text = f"{user.mention} đang chuẩn bị rửa tiền và trốn thuế!"
         if user_profile.is_authority == False:
@@ -384,7 +384,7 @@ class CrimeEconomy(commands.Cog):
         #Rửa tiền thì tuỳ vào xem có phải chính quyền không
         if user_profile.is_authority == False:
             user_win = self.get_chance(75)
-        else:user_win = self.get_chance(25)
+        else:user_win = self.get_chance(50)
         
         preloading_text = f"{user.mention} đang chuẩn bị buôn lậu hàng cấm!"
         if user_profile.is_authority == False:

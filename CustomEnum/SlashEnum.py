@@ -12,6 +12,11 @@ class SlashCommand(Enum):
     TRUTH_DARE = "</truth_dare:1293631694733053987>"
     COIN_FLIP = "</cf:1287456826744504392>"
     KEO_BUA_BAO = "</keo_bua_bao:1293631694733053985>"
-    SB_NORMAL = "</sb normal:1300146431126143057>"
-    
     CRIME = "</crime:1298332387134148651>"
+
+    SB_NORMAL = "</sb normal:1300146431126143057>"
+    SB_DOUBLE = "</sb double:1300146431126143057>"
+    SB_TRIPLE = "</sb triple:1300146431126143057>"
+    
+
+
