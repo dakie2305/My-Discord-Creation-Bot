@@ -20,6 +20,7 @@ class AuthorityInterceptView(discord.ui.View):
         self.target_profile = target_profile
         self.target_profile = target_profile
         self.authority_user = authority_user
+        self.interrupted = False
         
     @discord.ui.button(label="🚨 Chính Quyền Vào Cuộc 🚨", style=discord.ButtonStyle.red)
     async def yes_button(self, interaction: discord.Interaction, button: Button):
@@ -30,7 +31,7 @@ class AuthorityInterceptView(discord.ui.View):
         elif interaction.user.id != self.authority_user.user_id:
             await interaction.followup.send(f"Chỉ Chính Quyền <@{self.authority_user.user_id}> mới có thể giải quyết, vui lòng gọi Chính Quyền!", ephemeral=True)
             return
-        
+        self.interrupted = True
         if self.crime_type == "fight":
             if self.old_message != None: await self.old_message.delete()
             #Trừ tiền và trừ điểm nhân phẩm của người gây gỗ

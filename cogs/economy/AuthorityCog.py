@@ -132,12 +132,12 @@ class AuthorityEconomy(commands.Cog):
         await interaction.response.defer()
         
         # #Không cho dùng bot nếu không phải user
-        # if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
-        #     view = SelfDestructView(timeout=30)
-        #     embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
-        #     mess = await interaction.followup.send(embed=embed, view=view)
-        #     view.message = mess
-        #     return
+        if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view)
+            view.message = mess
+            return
         
         #Kiểm tra xem đây có phải là chính quyền không
         if ProfileMongoManager.is_authority(guild_id=interaction.guild_id, user_id=interaction.user.id) != None:
@@ -201,7 +201,7 @@ class AuthorityEconomy(commands.Cog):
         ProfileMongoManager.update_last_riot_now(guild_id=interaction.guild_id, user_id=interaction.user.id)
         #Trừ silver
         ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, silver=-money_for_riot)
-        timeout = 60 #Cho timeout giây để kết thúc
+        timeout = 20 #Cho timeout giây để kết thúc
         endtime = datetime.now() + timedelta(seconds=timeout)
         #Đưa ra embed bạo động
         embed = discord.Embed(title=f"Lời Kêu Gọi Bạo Động",description=f"{interaction.user.mention} đã kêu gọi mọi người đứng lên khởi nghĩa chống lại Chính Quyền Server <@{existed_authority.user_id}>!",color=discord.Color.red())

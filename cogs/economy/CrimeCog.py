@@ -176,6 +176,7 @@ class CrimeEconomy(commands.Cog):
         view.old_message = me
         #Đợi để xác định người thắng
         await asyncio.sleep(20)
+        if view.interrupted == True: return
         result_text =f""
         if user_win:
             dignity_point = 10
@@ -201,7 +202,7 @@ class CrimeEconomy(commands.Cog):
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name= interaction.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, copper=money)
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name= interaction.guild.name, user_id=target_user.id, user_name=target_user.name, user_display_name=target_user.display_name, copper=-money)
             #Cộng kinh nghiệm cho người thắng
-            ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=user.id)
+            ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=user.id, bonus_exp=10)
             #Trừ nhân phẩm vì cướp giật
             ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, dignity_point= -dignity_point)
         else:
@@ -279,6 +280,7 @@ class CrimeEconomy(commands.Cog):
         view.old_message = me
         #Đợi để xác định người thắng
         await asyncio.sleep(20)
+        if view.interrupted == True: return
         result_text =f""
         if user_win_fight:
             result_text = random.choice(win_lines)
@@ -289,7 +291,7 @@ class CrimeEconomy(commands.Cog):
             #Trừ nhân phẩm người thua
             ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target_user.id, user_name=target_user.name, user_display_name=target_user.display_name, dignity_point= -dignity_point)
             #Cộng kinh nghiệm cho người thắng
-            ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=user.id)
+            ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=user.id, bonus_exp=10)
             
         else:
             result_text = random.choice(lose_lines)
@@ -332,6 +334,7 @@ class CrimeEconomy(commands.Cog):
         view.old_message = me
         #Đợi để xác định người thắng
         await asyncio.sleep(20)
+        if view.interrupted == True: return
         result_text =f""
         if user_win:
             dignity_point = 15
@@ -361,7 +364,7 @@ class CrimeEconomy(commands.Cog):
                 if authority_user != None:
                     ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name= interaction.guild.name, user_id=authority_user.user_id, user_name=authority_user.user_name, user_display_name=authority_user.user_display_name, copper=-money)
             #Cộng kinh nghiệm cho người thắng
-            ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=user.id)
+            ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=user.id, bonus_exp=10)
             #Trừ nhân phẩm
             ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, dignity_point= -dignity_point)
         else:
@@ -399,6 +402,7 @@ class CrimeEconomy(commands.Cog):
         view.old_message = me
         #Đợi để xác định người thắng
         await asyncio.sleep(20)
+        if view.interrupted == True: return
         result_text =f""
         if user_win:
             dignity_point = 10
@@ -409,7 +413,7 @@ class CrimeEconomy(commands.Cog):
             #Cộng cho user_profile
             ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name= interaction.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, copper=money)
             #Cộng kinh nghiệm cho người thắng
-            ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=user.id)
+            ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=user.id, bonus_exp=10)
             #Trừ nhân phẩm
             ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, dignity_point= -dignity_point)
         else:
