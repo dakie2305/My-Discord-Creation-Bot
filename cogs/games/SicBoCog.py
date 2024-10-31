@@ -140,9 +140,9 @@ class SicboCog(commands.Cog):
         embed_updated = discord.Embed(title=f"", description=f"{user.mention} đã chơi tài xỉu và chọn **{tai_xiu}**{gambling_text}.\nXúc xắc đã quay ra: {first_dice_emoji} | {second_dice_emoji} | {third_dice_emoji} |\n{result_text}", color=0x03F8FC)
         
         if so_tien != None and loai_tien!= None and profile != None:
-            if loai_tien == "G": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, gold=so_tien)
-            elif loai_tien == "S": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, silver=so_tien)
-            elif loai_tien == "C": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, copper=so_tien)
+            if loai_tien == "G": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, gold=so_tien, loai_tien=loai_tien)
+            elif loai_tien == "S": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, silver=so_tien, loai_tien=loai_tien)
+            elif loai_tien == "C": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, copper=so_tien, loai_tien=loai_tien)
 
             
         await message.edit(embed=embed_updated)
@@ -154,18 +154,28 @@ class SicboCog(commands.Cog):
             view.message = ms
         return
     
-    def update_player_money_and_authority_money(self, is_player_win: bool, guild_int: int, profile: Profile, copper: int = 0, silver: int = 0, gold: int = 0):
+    def update_player_money_and_authority_money(self, is_player_win: bool, loai_tien: str, guild_int: int, profile: Profile, copper: int = 0, silver: int = 0, gold: int = 0):
         #Tính cộng trừ tiền cho player
         if is_player_win:
             #Cộng user, trừ authority
             ProfileMongoManager.update_profile_money(guild_id=guild_int, guild_name=profile.guild_name, user_id=profile.user_id, user_name=profile.user_name, user_display_name=profile.user_display_name, gold=gold, silver=silver, copper=copper)
             if profile != None and profile.is_authority == False:
                 ProfileMongoManager.update_money_authority(guild_id=guild_int, silver=-silver, copper=-copper, gold=-gold)
+            #Cộng exp
+            if loai_tien == "C" and copper < 10000: return
+            ProfileMongoManager.update_level_progressing(guild_id=guild_int, user_id=profile.user_id)
         else:
+            #trừ một điểm dignity point
+            ProfileMongoManager.update_dignity_point(guild_id=guild_int, guild_name=profile.guild_name, user_id=profile.user_id,user_name=profile.user_name, user_display_name=profile.user_display_name, dignity_point=-1)
             ProfileMongoManager.update_profile_money(guild_id=guild_int, guild_name=profile.guild_name, user_id=profile.user_id, user_name=profile.user_name, user_display_name=profile.user_display_name, gold=-gold, silver=-silver, copper=-copper)
             #Authority chỉ ăn 50%
             if profile != None and profile.is_authority == False:
-                ProfileMongoManager.update_money_authority(guild_id=guild_int, silver=int(silver/2) if int(silver/2)>0 else 1, copper=int(copper/2) if int(copper/2)>0 else 1, gold=int(gold/2) if int(gold/2)>0 else 1)
+                if loai_tien == "G":
+                    ProfileMongoManager.update_money_authority(guild_id=guild_int, gold=int(gold/2) if int(gold/2)>0 else 1)
+                elif loai_tien == "S":
+                    ProfileMongoManager.update_money_authority(guild_id=guild_int, silver=int(silver/2) if int(silver/2)>0 else 1)
+                elif loai_tien == "C":
+                    ProfileMongoManager.update_money_authority(guild_id=guild_int, copper=int(copper/2) if int(copper/2)>0 else 1)
         
     
     async def police_in(self, message: discord.Message, user: discord.Member, so_tien:int = None, loai_tien:str = None, profile: Profile = None):
@@ -179,9 +189,9 @@ class SicboCog(commands.Cog):
             jail_time = datetime.now() + time_window
             ProfileMongoManager.update_jail_time(guild_id=user.guild.id, user_id=user.id, jail_time=jail_time)
             if so_tien != None and loai_tien!= None and profile != None:
-                if loai_tien == "G": self.update_player_money_and_authority_money(is_player_win=False, guild_int=user.guild.id, profile=profile, gold=so_tien)
-                elif loai_tien == "S": self.update_player_money_and_authority_money(is_player_win=False, guild_int=user.guild.id, profile=profile, silver=so_tien)
-                elif loai_tien == "C": self.update_player_money_and_authority_money(is_player_win=False, guild_int=user.guild.id, profile=profile, copper=so_tien)
+                if loai_tien == "G": self.update_player_money_and_authority_money(is_player_win=False, guild_int=user.guild.id, profile=profile, gold=so_tien, loai_tien=loai_tien)
+                elif loai_tien == "S": self.update_player_money_and_authority_money(is_player_win=False, guild_int=user.guild.id, profile=profile, silver=so_tien, loai_tien=loai_tien)
+                elif loai_tien == "C": self.update_player_money_and_authority_money(is_player_win=False, guild_int=user.guild.id, profile=profile, copper=so_tien, loai_tien=loai_tien)
             return
 
     
@@ -326,9 +336,9 @@ class SicboCog(commands.Cog):
         embed_updated = discord.Embed(title=f"", description=f"{user.mention} đã chơi tài xỉu đôi{gambling_number_guess}.\nXúc xắc đã quay ra: {first_dice_emoji} | {second_dice_emoji} | {third_dice_emoji} |\n{result_text}", color=0x03F8FC)
         
         if so_tien != None and loai_tien!= None and profile != None:
-            if loai_tien == "G": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, gold=so_tien)
-            elif loai_tien == "S": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, silver=so_tien)
-            elif loai_tien == "C": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, copper=so_tien)
+            if loai_tien == "G": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, gold=so_tien, loai_tien=loai_tien)
+            elif loai_tien == "S": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, silver=so_tien, loai_tien=loai_tien)
+            elif loai_tien == "C": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, copper=so_tien, loai_tien=loai_tien)
         await message.edit(embed=embed_updated)
         
         return
@@ -458,9 +468,9 @@ class SicboCog(commands.Cog):
         embed_updated = discord.Embed(title=f"", description=f"{user.mention} đã chơi tài xỉu ba{gambling_number_guess}.\nXúc xắc đã quay ra: {first_dice_emoji} | {second_dice_emoji} | {third_dice_emoji} |\n{result_text}", color=0x03F8FC)
         
         if so_tien != None and loai_tien!= None and profile != None:
-            if loai_tien == "G": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, gold=so_tien)
-            elif loai_tien == "S": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, silver=so_tien)
-            elif loai_tien == "C": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, copper=so_tien)
+            if loai_tien == "G": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, gold=so_tien, loai_tien=loai_tien)
+            elif loai_tien == "S": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, silver=so_tien, loai_tien=loai_tien)
+            elif loai_tien == "C": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, copper=so_tien, loai_tien=loai_tien)
         await message.edit(embed=embed_updated)
         
         return

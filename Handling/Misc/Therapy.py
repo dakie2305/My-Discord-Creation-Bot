@@ -13,6 +13,7 @@ class TherapyHandling():
         self.model = model
 
     async def handling_therapy_ai(self, message: discord.Message):
+        bots_creation1_name = ["creation 1", "creation số 1", "creation no 1", "creation no. 1"]
         if message.reference is None or message.reference.resolved is None: return
         if CustomFunctions.contains_substring(message.content.lower(), bots_creation1_name) == False: return
         
@@ -24,7 +25,6 @@ class TherapyHandling():
         if flag != 0:
             await message.reply(mess)
             return
-        bots_creation1_name = ["creation 1", "creation số 1", "creation no 1", "creation no. 1"]
         ref_message: discord.Message = None
         
         async with message.channel.typing():
