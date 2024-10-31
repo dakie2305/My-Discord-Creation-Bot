@@ -23,7 +23,7 @@ class QuestEconomy(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    #region profile
+    #region quest
     @discord.app_commands.command(name="quest", description="Hiển thị nhiệm vụ trong server")
     @discord.app_commands.describe(user="Chọn user để xem nhiệm vụ của người đó.")
     async def show_quest_profile(self, interaction: discord.Interaction, user: Optional[discord.Member] = None):

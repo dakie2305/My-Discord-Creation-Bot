@@ -85,7 +85,7 @@ class WorkEconomy(commands.Cog):
             user_profile = ProfileMongoManager.create_profile(guild_id=user.guild.id, guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name)
         
         if user_profile != None and user_profile.last_work != None:
-            time_window = timedelta(hours=1, minutes=30)
+            time_window = timedelta(hours=1)
             check = self.check_if_within_time_delta(input=user_profile.last_work, time_window=time_window)
             if check:
                 #Lấy thời gian cũ để cộng vào 1h30 xem chừng nào mới làm việc được tiếp
