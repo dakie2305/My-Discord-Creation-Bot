@@ -456,12 +456,12 @@ class SicboCog(commands.Cog):
             gambling_number_guess = f" và đặt cược vào số **{number}**"
         gambling_text = ""
         if so_tien != None:
-            #Nếu thắng thì tỉ lệ ăn 1:8
-            #Nếu thắng cả đoán số thì tỉ lệ ăn 1:10
+            #Nếu thắng thì tỉ lệ ăn 1:6
+            #Nếu thắng cả đoán số thì tỉ lệ ăn 1:8
             if number == None and so_tien != None and is_player_win == True:
-                so_tien = so_tien*8
+                so_tien = so_tien*6
             elif number != None and so_tien != None and is_player_win == True:
-                so_tien = so_tien*10
+                so_tien = so_tien*8
             gambling_text = f" **{so_tien}** {self.get_emoji_from_loai_tien(loai_tien=loai_tien)}"
         
         chinh_quyen_text = ""

@@ -35,8 +35,11 @@ class AutoresponderHandling():
         dignity_help = ["tăng nhân phẩm", "điểm nhân phẩm", "nhân phẩm là gì", "nhân phẩm?"]
         dia_vi_help = ["tăng địa vị", "điểm địa vị", "địa vị là gì", "địa vị?"]
         
-        bbb_warning = ["bbb", "BBB"]
+        bbb_warning = ["bbb", "BBB", "bảo baby", "bảo babi"]
         
+        donate = ["donate"]
+        sb_help = ["sb help","cách chơi tài xỉu", "tài xỉu?", "tx help"]
+                
         flag = False
         if message.author.bot: return flag
         
@@ -90,6 +93,21 @@ class AutoresponderHandling():
             view = SelfDestructView(timeout=180)
             _mess = await message.channel.send(embed=embed, view=view)
             view.message= _mess
+        
+        elif CustomFunctions.contains_substring(message.content.lower(), sb_help):
+            flag = True
+            embed = discord.Embed(title=f"", description=f"Hướng dẫn chơi **tài xỉu**", color=0xc379e0)
+            embed.add_field(name="", value="-------------------------------------", inline=False)
+            embed.add_field(name="", value=f"- Tài xỉu bình thường ({SlashCommand.SB_NORMAL.value}) có tỷ lệ ăn 1:1 nếu thắng (tức đặt 1 {EmojiCreation2.GOLD.value} sẽ ăn 1 {EmojiCreation2.GOLD.value}), và cách tính thắng thua như sau:", inline=False)
+            embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} **Thắng**: nếu chọn **tài** và ba xúc xắc cộng lại bằng 11 -> 17, hoặc chọn **xỉu** và tổng ba xúc xắc bằng 4 -> 10.", inline=False)
+            embed.add_field(name="", value=f"- Tài xỉu double ({SlashCommand.SB_DOUBLE.value}) có tỷ lệ ăn 1:4, hoặc 1:6 nếu đoán số (tức đặt 1 {EmojiCreation2.GOLD.value} sẽ ăn 4 hoặc 6 {EmojiCreation2.GOLD.value}), và cách tính thắng thua như sau:", inline=False)
+            embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} **Thắng**: nếu không đoán số, và hai trên ba xúc xắc ra giống nhau sẽ thắng. Nếu đoán trúng hai số nào sẽ ra giống nhau sẽ thắng x6 lần số tiền đặt cược.", inline=False)
+            embed.add_field(name="", value=f"- Tài xỉu triple ({SlashCommand.SB_TRIPLE.value}) có tỷ lệ ăn 1:6, hoặc 1:8 nếu đoán số (tức đặt 1 {EmojiCreation2.GOLD.value} sẽ ăn 6 hoặc 8 {EmojiCreation2.GOLD.value}), và cách tính thắng thua như sau:", inline=False)
+            embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} **Thắng**: nếu không đoán số, và cả ba xúc xắc ra giống nhau sẽ thắng. Nếu đoán trúng số nào sẽ ra giống nhau sẽ thắng x8 lần số tiền đặt cược.", inline=False)
+            embed.add_field(name="", value="-------------------------------------", inline=False)
+            view = SelfDestructView(timeout=180)
+            _mess = await message.channel.send(embed=embed, view=view)
+            view.message= _mess
             
         elif CustomFunctions.contains_substring(message.content.lower(), dia_vi_help):
             flag = True
@@ -114,6 +132,23 @@ class AutoresponderHandling():
             view = SelfDestructView(timeout=30)
             _mess = await message.reply(content=f"Hey, <#1257002970529267774> <- ?", view=view)
             view.message= _mess
+        
+        elif message.guild.id != 1194106864582004849 and CustomFunctions.contains_substring(message.content.lower(), donate):
+            flag = True
+            embed = discord.Embed(title=f"**Donate Darkie**", description=f"Xin lỗi vì đã làm phiền nhé! Tin nhắn này sẽ biến mất chỉ sau 1-2 phút thôi nhé!", color=0xc379e0)
+            embed.set_image(url="https://i.imgur.com/Zsoel4d.png")
+            embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+            embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Nếu mọi người có chút lòng thành để ủng hộ và tạo động lực cho Darkie làm thêm chức năng mới, mini-game hoặc cải thiện bot, hoặc đẩy nhanh tiến độ dịch truyện, đăng truyện thì có thể donate một ít cafe nhé! Darkie **xin chân thành cảm ơn** rất rất nhiều!", inline=False)
+            embed.add_field(name="", value=f"> ACB: 9799317", inline=False)
+            embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+            embed.set_footer(text=f"Cảm ơn chân thành vì đã đọc, mong tin nhắn này không làm phiền mọi người.", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/8fd7278827dbc92713e315ee03e0b502.webp?size=32")
+            view = SelfDestructView(timeout=180)
+            _mess = await message.channel.send(embed=embed, view=view)
+            view.message= _mess
+            
+            
+            
+            
             
         return flag
     
