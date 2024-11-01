@@ -110,8 +110,51 @@ class ProfileEconomy(commands.Cog):
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
         embed.add_field(name=f"", value=f"**Quote**: \"{data.quote}\"", inline=False)
         embed.set_footer(text=f"Profile của {user.name}.", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/8fd7278827dbc92713e315ee03e0b502.webp?size=32")
+        
+        if user.guild.id == 1256987900277690470:
+            #Của true heaven
+            await self.update_rank_role(user= user, profile= data)
+        
         return embed
     
+    async def update_rank_role(self, user: discord.Member, profile: Profile):
+        if user.guild.id != 1256987900277690470: return
+        role_mappings = {
+        "Rank 10": range(10, 20),
+        "Rank 20": range(20, 30),
+        "Rank 30": range(30, 40),
+        "Rank 40": range(40, 50),
+        "Rank 50": range(50, 60),
+        "Rank 60": range(60, 70),
+        "Rank 70": range(70, 80),
+        "Rank 80": range(80, 90),
+        "Rank 90": range(90, 99),
+        "Rank 99": range(99, 100),
+        "Rank 100+ (Vô Hư Phá)": range(100, 600)
+        }
+        
+        target_role_name = None
+        for role_name, level_range in role_mappings.items():
+            if profile.level in level_range:
+                target_role_name = role_name
+                break
+        
+        if target_role_name == None: return
+        
+        current_rank_roles = [role for role in user.roles if role.name in role_mappings]
+        has_correct_role = any(role.name == target_role_name for role in current_rank_roles)
+        if has_correct_role:
+            return
+
+        #Xoá các rank cũ đi
+        for role in current_rank_roles:
+            if role.name != target_role_name:
+                await user.remove_roles(role)
+                
+        target_role = discord.utils.get(user.guild.roles, name=target_role_name)
+        if target_role:
+            await user.add_roles(target_role)
+
     def shortened_currency(self, number: int):
         if number >= 1000000000:
             suffix = int(number % 1000000000 // 1000000)
