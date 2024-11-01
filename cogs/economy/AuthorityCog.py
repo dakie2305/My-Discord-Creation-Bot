@@ -11,6 +11,9 @@ from CustomEnum.EmojiEnum import EmojiCreation2
 import CustomEnum.UserEnum as UserEnum
 from datetime import datetime, timedelta
 import CustomFunctions
+import db.DbMongoManager as db
+import random
+from Handling.Misc.RandomDropboxEconomyView import RandomDropboxEconomyView
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(AuthorityEconomy(bot=bot))
@@ -19,7 +22,7 @@ async def setup(bot: commands.Bot):
 class AuthorityEconomy(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.last_used: datetime = None
+        self.last_used_per_guild = {}
     
     # Define the parent command group for 'authority'
     authority_group = discord.app_commands.Group(name="authority", description="Các lệnh liên quan đến Chính Quyền của server!")
@@ -105,13 +108,13 @@ class AuthorityEconomy(commands.Cog):
         
         # Kiểm tra xem command có nằm trong giới hạn 15 phút không
         now = datetime.now()
-        if self.last_used and (now - self.last_used) < timedelta(minutes=15):
-            time_remaining = (self.last_used + timedelta(minutes=15) - now).seconds
+        if interaction.guild_id in self.last_used_per_guild and (now - self.last_used_per_guild[interaction.guild_id]) < timedelta(minutes=15):
+            time_remaining = (self.last_used_per_guild[interaction.guild_id] + timedelta(minutes=15) - now).seconds
             minutes, seconds = divmod(time_remaining, 60)
             await interaction.followup.send(f"Đã có người tiến hành bầu cử. Vui lòng thử lại lệnh sau {minutes} phút {seconds} giây.", ephemeral=True)
             return
         # Set the last used time to now
-        self.last_used = now
+        self.last_used_per_guild[interaction.guild_id] = now
         
         embed = discord.Embed(title=f"Chính Quyền Đương Cử",description=f"Bầu chọn cho **{interaction.user.mention}** làm Chính Quyền của server {interaction.guild.name}.",color=discord.Color.blue())
         if interaction.user.avatar != None:
@@ -130,7 +133,6 @@ class AuthorityEconomy(commands.Cog):
     @discord.app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
     async def riot_authority_slash(self, interaction: discord.Interaction):
         await interaction.response.defer()
-        
         # #Không cho dùng bot nếu không phải user
         if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
             view = SelfDestructView(timeout=30)
@@ -218,7 +220,7 @@ class AuthorityEconomy(commands.Cog):
         mes = await called_channel.send(embed=embed, view=view, content= authority_user.mention if authority_user != None else "", allowed_mentions=discord.AllowedMentions(users=True))
         view.message = mes
     
-    #region Authority riot
+    #region Authority overthrow
     @authority_group.command(name="overthrow", description="Lật đổ chính quyền đương nhiệm trong server!")
     async def riot_authority_slash(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
@@ -247,8 +249,8 @@ class AuthorityEconomy(commands.Cog):
     @discord.app_commands.describe(user="Chọn user cần thả tù treo.")
     @authority_group.command(name="unjail", description="Thả cầm tù dành cho những ai bị phạt tù!")
     async def unjail_authority_slash(self, interaction: discord.Interaction, user: discord.Member):
-        await interaction.response.defer(ephemeral=True)
-         #Kiểm tra xem server đã tồn tại ai là chính quyền chưa
+        await interaction.response.defer(ephemeral=False)
+        #Kiểm tra xem server đã tồn tại ai là chính quyền chưa
         existed_authority = ProfileMongoManager.get_authority(guild_id=interaction.guild_id)
         if existed_authority == None:
             await interaction.followup.send(content=f"Server không tồn tại Chính Quyền! Vui lòng dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", ephemeral=True)
@@ -261,8 +263,108 @@ class AuthorityEconomy(commands.Cog):
             await interaction.followup.send(content=f"Người này chưa dùng lệnh {SlashCommand.PROFILE.value}!", ephemeral=True)
             return
         ProfileMongoManager.update_jail_time(guild_id=interaction.guild_id, user_id=user.id, jail_time=None)
-        await interaction.followup.send(content=f"Đã thả giam lệnh cho {user.display_name}!", ephemeral=True)
+        await interaction.followup.send(content=f"Đã thả giam lệnh cho {user.display_name}!", ephemeral=False)
+    
+    #region Authority dropbox
+    @discord.app_commands.checks.cooldown(1, 1800)
+    @authority_group.command(name="dropbox", description="Kích hoạt thả hộp quà ngẫu nhiên!")
+    async def dropbox_authority_slash(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=False)
+        #Kiểm tra xem server đã tồn tại ai là chính quyền chưa
+        existed_authority = ProfileMongoManager.get_authority(guild_id=interaction.guild_id)
+        if existed_authority == None:
+            await interaction.followup.send(content=f"Server không tồn tại Chính Quyền! Vui lòng dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", ephemeral=True)
+            return
+        if interaction.user.id != existed_authority.user_id and interaction.user.id != interaction.guild.owner_id:
+            await interaction.followup.send(content=f"Chỉ chính quyền mới được quyền dùng lệnh này để kích hoạt hộp quà ngẫu nhiên!", ephemeral=True)
+            return
+        if existed_authority != None and existed_authority.gold <10:
+            await interaction.followup.send(content=f"Chính quyền cần 10 {EmojiCreation2.GOLD.value} thì mới tạo hộp quà ngẫu nhiên được!", ephemeral=True)
+            return
         
+        #Kiểm tra quest channel của server, nếu có thì mới chọn
+        guild_info = db.find_guild_extra_info_by_id(guild_id=interaction.guild.id)
+        if guild_info == None:
+            await interaction.followup.send(content=f"Server chưa có channel dành cho thực hiện quest. Vui lòng dùng lệnh {SlashCommand.QUEST_CHANNELS.value} trước!", ephemeral=True)
+            return
+        if guild_info.list_channels_quests == None or len(guild_info.list_channels_quests) <= 0: 
+            await interaction.followup.send(content=f"Server chưa có channel dành cho thực hiện quest. Vui lòng dùng lệnh {SlashCommand.QUEST_CHANNELS.value} trước!", ephemeral=True)
+            return
+        list_channels_quests = guild_info.list_channels_quests
+        random_quest_channel_id = random.choice(list_channels_quests)
+        quest_channel = interaction.guild.get_channel(random_quest_channel_id)
+        if quest_channel == None:
+            #Xoá channel_id lỗi
+            list_channels_quests.remove(random_quest_channel_id)
+            data_updated = {"list_channels_quests": list_channels_quests}
+            db.update_guild_extra_info(guild_id=interaction.guild.id, update_data= data_updated)
+            #Chọn channel khác không bị lỗi
+            while quest_channel == None:
+                random_quest_channel_id = random.choice(list_channels_quests)
+                quest_channel = interaction.guild.get_channel(random_quest_channel_id)
+        if quest_channel != None:
+            endtime = datetime.now() + timedelta(seconds=60)
+            embed = discord.Embed(title=f"", description=f"{EmojiCreation2.GOLDEN_GIFT_BOX.value} **Hộp Quà Thần Bí** {EmojiCreation2.GOLDEN_GIFT_BOX.value}", color=0x0ce7f2)
+            embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+            embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Một hộp quà thần bí đã xuất hiện tại đúng channel này!", inline=False)
+            embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Ai nhanh tay thì được nhé, vì hộp quà sẽ biến mất đúng sau: <t:{int(endtime.timestamp())}:R>", inline=False)
+            embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+            embed.set_footer(text=f"Hộp quà sẽ xuất hiện ngẫu nhiên, và khi thấy thì nhớ nhanh tay nhé!", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/8fd7278827dbc92713e315ee03e0b502.webp?size=32")
+            print(f"Created random dropbox at channel {quest_channel.name} in guild {interaction.guild.name}.")
+            await interaction.followup.send(content=f"Đã trừ **10** {EmojiCreation2.GOLD.value} của Chính Quyền để tạo hộp quà may mắn!", ephemeral=True)
+            ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, gold=-10)
+            view = RandomDropboxEconomyView()
+            m = await quest_channel.send(embed=embed, view=view)
+            view.old_message = m
+        else:
+            await interaction.followup.send(content=f"Server chưa có channel dành cho thực hiện quest. Vui lòng dùng lệnh {SlashCommand.QUEST_CHANNELS.value} trước!", ephemeral=True)
+            return
+    
+    @dropbox_authority_slash.error
+    async def dropbox_authority_slash_command_error(self, interaction: discord.Interaction, error):
+        if isinstance(error, discord.app_commands.CommandOnCooldown):
+            # Send a cooldown message to the user, formatted nicely
+            await interaction.response.send_message(f"⏳ Lệnh đang cooldown, vui lòng thực hiện lại trong vòng {error.retry_after:.2f}s tới.", ephemeral=True)
+        else:
+            # Handle any other errors that might occur
+            await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
+
+        
+    @discord.app_commands.checks.cooldown(1, 1800)
+    @authority_group.command(name="reset_rate", description="Reset tỷ lệ quy đổi của bank!")
+    async def reset_rate_authority_slash(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=False)
+        #Kiểm tra xem server đã tồn tại ai là chính quyền chưa
+        existed_authority = ProfileMongoManager.get_authority(guild_id=interaction.guild_id)
+        if existed_authority == None:
+            await interaction.followup.send(content=f"Server không tồn tại Chính Quyền! Vui lòng dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", ephemeral=True)
+            return
+        if interaction.user.id != existed_authority.user_id and interaction.user.id != interaction.guild.owner_id:
+            await interaction.followup.send(content=f"Chỉ chính quyền mới được quyền dùng lệnh này để kích hoạt hộp quà ngẫu nhiên!", ephemeral=True)
+            return
+        if existed_authority != None and existed_authority.gold < 100:
+            await interaction.followup.send(content=f"Chính quyền cần 100 {EmojiCreation2.GOLD.value} thì mới reset rate của bank được!", ephemeral=True)
+            return
+        rate_conver = ConversionRateMongoManager.find_conversion_rate_by_id(guild_id=interaction.guild_id)
+        if rate_conver == None:
+            await interaction.followup.send(content=f"Vui lòng dùng lệnh {SlashCommand.BANK.value} trước rồi thử lại sau!", ephemeral=True)
+            return
+        ConversionRateMongoManager.create_update_conversion_rate(guild_id=interaction.guild.id, rate=1.0)
+        ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, gold=-100)
+        await interaction.followup.send(content=f"Đã trừ **100** {EmojiCreation2.GOLD.value} của Chính Quyền để reset lại rate của bank!", ephemeral=True)
+    
+    @reset_rate_authority_slash.error
+    async def reset_rate_authority_slash_command_error(self, interaction: discord.Interaction, error):
+        if isinstance(error, discord.app_commands.CommandOnCooldown):
+            # Send a cooldown message to the user, formatted nicely
+            await interaction.response.send_message(f"⏳ Lệnh đang cooldown, vui lòng thực hiện lại trong vòng {error.retry_after:.2f}s tới.", ephemeral=True)
+        else:
+            # Handle any other errors that might occur
+            await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
+        
+        
+        
+    
     def get_nhan_pham(self, number):
         text = "Người Thường"
         if number >= 100:
