@@ -14,8 +14,9 @@ class TherapyHandling():
 
     async def handling_therapy_ai(self, message: discord.Message):
         bots_creation1_name = ["creation 1", "creation số 1", "creation no 1", "creation no. 1"]
-        if message.reference is None or message.reference.resolved is None: return
-        if CustomFunctions.contains_substring(message.content.lower(), bots_creation1_name) == False: return
+        if not (message.reference and message.reference.resolved and message.reference.resolved.author == self.bot.user) and not any(name in message.content.lower() for name in bots_creation1_name):
+            return
+
         
         if message.guild.id != 1256987900277690470 and message.guild.id != 1194106864582004849: #Chỉ True Heaven, học viện 2ten mới không bị dính
             if CustomFunctions.is_inside_working_time() == False:
@@ -26,7 +27,6 @@ class TherapyHandling():
             await message.reply(mess)
             return
         ref_message: discord.Message = None
-        
         async with message.channel.typing():
             if message.reference is not None and message.reference.resolved is not None:
                 if message.reference.resolved.author == self.bot.user or CustomFunctions.contains_substring(message.content.lower(), bots_creation1_name):

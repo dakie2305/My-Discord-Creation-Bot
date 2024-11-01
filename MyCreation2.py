@@ -291,14 +291,14 @@ async def random_dropbox():
                 random_quest_channel_id = random.choice(list_channels_quests)
                 quest_channel = guild.get_channel(random_quest_channel_id)
         if quest_channel != None:
-            endtime = datetime.now() + timedelta(seconds=30)
+            endtime = datetime.now() + timedelta(seconds=60)
             embed = discord.Embed(title=f"", description=f"{EmojiCreation2.GOLDEN_GIFT_BOX.value} **Hộp Quà Thần Bí** {EmojiCreation2.GOLDEN_GIFT_BOX.value}", color=0x0ce7f2)
             embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
             embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Một hộp quà thần bí đã xuất hiện tại đúng channel này!", inline=False)
             embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Ai nhanh tay thì được nhé, vì hộp quà sẽ biến mất đúng sau: <t:{int(endtime.timestamp())}:R>", inline=False)
             embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
             embed.set_footer(text=f"Hộp quà sẽ xuất hiện ngẫu nhiên, và khi thấy thì nhớ nhanh tay nhé!", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/8fd7278827dbc92713e315ee03e0b502.webp?size=32")
-            print(f"Created random dropbox at channel {quest_channel.name}.")
+            print(f"Created random dropbox at channel {quest_channel.name} in guild {guild.name}.")
             view = RandomDropboxEconomyView()
             m = await quest_channel.send(embed=embed, view=view)
             view.old_message = m

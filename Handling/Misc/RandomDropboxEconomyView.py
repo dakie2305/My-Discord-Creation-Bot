@@ -8,7 +8,7 @@ import random
 
 class RandomDropboxEconomyView(discord.ui.View):
     def __init__(self):
-        super().__init__(timeout=30)
+        super().__init__(timeout=60)
         self.old_message: discord.Message = None
         self.opened = False
         
@@ -33,14 +33,14 @@ class RandomDropboxEconomyView(discord.ui.View):
         gold_chance = self.get_chance(10)
         if gold_chance and flag == False: 
             emoji = EmojiCreation2.GOLD.value
-            amount = random.randint(1, 10)
+            amount = random.randint(1, 8)
             ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_display_name=interaction.user.display_name, user_name=interaction.user.name, gold=amount)
             flag = True
             
         silver_chance = self.get_chance(35)
         if silver_chance and flag == False: 
             emoji = EmojiCreation2.SILVER.value
-            amount = random.randint(5, 50)
+            amount = random.randint(5, 35)
             ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_display_name=interaction.user.display_name, user_name=interaction.user.name, silver=amount)
             flag = True
             
