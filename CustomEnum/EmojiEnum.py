@@ -28,7 +28,6 @@ class EmojiCreation2(Enum):
     GIFT_POCKY = "<a:gift_pocky:1302362153503691025>"
     GIFT_FLOWER = "<a:gift_flower:1302362252728471693>"
     GIFT_CHOCOLATE = "<a:gift_chocolate:1302362549060239441>"
-    GIFT_CHOCOLATE = "<a:gift_chocolate:1302362549060239441>"
     GIFT_DIAMOND_RING = "<:gift_diamond_ring:1302362648238620713>"
     GIFT_EARRING = "<:gift_earrings:1302362724285546549>"
     GIFT_GOLD_RING = "<a:gift_gold_ring:1302362803130204252>"
