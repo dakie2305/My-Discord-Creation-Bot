@@ -51,7 +51,7 @@ class TransferMoneyEconomy(commands.Cog):
                     emoji = f"{EmojiCreation2.GOLD.value}"
                     ProfileMongoManager.update_profile_money(guild_id=user.guild.id,guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, gold= amount)
                 elif loai_tien == "D" or loai_tien == "d":
-                    emoji = f"{EmojiCreation2.GOLD.value}"
+                    emoji = f"{EmojiCreation2.DARKIUM.value}"
                     ProfileMongoManager.update_profile_money(guild_id=user.guild.id,guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, darkium= amount)
                 else:
                     emoji = f"{EmojiCreation2.COPPER.value}"

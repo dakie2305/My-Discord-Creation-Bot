@@ -27,7 +27,6 @@ class AutoresponderHandling():
         self.bot = bot
 
     async def handling_auto_responder(self, message: discord.Message):
-        coin_flip = ["tung đồng xu", "sấp ngửa", "sấp hay ngửa", "ngửa hay sấp", "ngửa sấp", "tung xu"]
         conversion_rate = ["quy đổi coin", "quy đổi gold", "quy đổi silver", "quy đổi copper", "quy đổi darkium", "quy đổi tiền tệ"]
         quote = ["quote"]
         bank_help = ["bank help", "bank sao", "bank?"]
@@ -43,14 +42,6 @@ class AutoresponderHandling():
         flag = False
         if message.author.bot: return flag
         
-        if CustomFunctions.contains_substring(message.content.lower(), coin_flip):
-            #Tung đồng xu
-            embed = discord.Embed(title=f"", description=f"{message.author.mention} đã tung đồng xu. Đồng xu đang quay <a:doge_coin:1287452452827697276> ...", color=0x03F8FC)
-            mess_coin = await message.reply(embed=embed)
-            if mess_coin:
-                await self.edit_embed_coin_flip(message=mess_coin, user=message.author)
-            flag = True
-            
         elif CustomFunctions.contains_substring(message.content.lower(), conversion_rate):
             embed = discord.Embed(title=f"", description=f"**Đơn vị quy đổi chuẩn của Creation 2 rất đơn giản thôi!**", color=0xc379e0)
             embed.add_field(name="", value="-------------------------------------", inline=False)

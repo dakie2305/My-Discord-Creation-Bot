@@ -107,8 +107,8 @@ class DailyEconomy(commands.Cog):
         if user.guild.id == 1256987900277690470:
             for role in user.roles:
                 if role.id == TrueHeavenRoleId.MODERATOR.value:
-                    actual_money += 1000
-                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.MODERATOR.value}> : +**1000** {EmojiCreation2.COPPER.value}", inline=False)
+                    actual_money += 2000
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.MODERATOR.value}> : +**2000** {EmojiCreation2.COPPER.value}", inline=False)
                 if role.id == TrueHeavenRoleId.CHOSEN_ONE.value:
                     actual_money += 1000
                     embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.CHOSEN_ONE.value}> : +**1000** {EmojiCreation2.COPPER.value}", inline=False)
@@ -121,9 +121,39 @@ class DailyEconomy(commands.Cog):
                 if role.id == TrueHeavenRoleId.TOP_3_WORD_MATCHING.value or role.id == TrueHeavenRoleId.TOP_3_WORD_SORT.value:
                     actual_money += 1000
                     embed.add_field(name=f"", value=f"- Là <@&{role.id}> : +**1000** {EmojiCreation2.COPPER.value}", inline=False)
-                if role.id == TrueHeavenRoleId.BOOSTER.value:
+                if role.id == TrueHeavenRoleId.RANK_20.value:
+                    actual_money += 500
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.RANK_20.value}> : +**500** {EmojiCreation2.COPPER.value}", inline=False)
+                if role.id == TrueHeavenRoleId.RANK_30.value:
+                    actual_money += 1000
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.RANK_30.value}> : +**1000** {EmojiCreation2.COPPER.value}", inline=False)
+                if role.id == TrueHeavenRoleId.RANK_40.value:
+                    actual_money += 2000
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.RANK_40.value}> : +**2000** {EmojiCreation2.COPPER.value}", inline=False)
+                if role.id == TrueHeavenRoleId.RANK_50.value:
+                    actual_money += 5000
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.RANK_50.value}> : +**5000** {EmojiCreation2.COPPER.value}", inline=False)
+                if role.id == TrueHeavenRoleId.RANK_60.value:
+                    actual_money += 10000
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.RANK_60.value}> : +**10000** {EmojiCreation2.COPPER.value}", inline=False)
+                if role.id == TrueHeavenRoleId.RANK_70.value:
+                    actual_money += 20000
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.RANK_70.value}> : +**20000** {EmojiCreation2.COPPER.value}", inline=False)
+                if role.id == TrueHeavenRoleId.RANK_80.value:
+                    actual_money += 40000
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.RANK_80.value}> : +**40000** {EmojiCreation2.COPPER.value}", inline=False)
+                if role.id == TrueHeavenRoleId.RANK_90.value:
+                    actual_money += 50000
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.RANK_90.value}> : +**50000** {EmojiCreation2.COPPER.value}", inline=False)
+                if role.id == TrueHeavenRoleId.RANK_99.value:
                     actual_money += 65000
-                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.BOOSTER.value}> : +**65000** {EmojiCreation2.COPPER.value}", inline=False)
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.RANK_99.value}> : +**65000** {EmojiCreation2.COPPER.value}", inline=False)
+                if role.id == TrueHeavenRoleId.RANK_100.value:
+                    actual_money += 75000
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.RANK_100.value}> : +**75000** {EmojiCreation2.COPPER.value}", inline=False)
+                if role.id == TrueHeavenRoleId.BOOSTER.value:
+                    actual_money += 10000
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.BOOSTER.value}> : +**10000** {EmojiCreation2.COPPER.value}", inline=False)
         
         
         if actual_money == 0: actual_money = 200

@@ -29,13 +29,18 @@ SELECT_OPTIONS  = [
 
 class BankView(discord.ui.View):
     def __init__(self, authority: Profile, rate: float):
-        super().__init__(timeout=360)
+        super().__init__(timeout=20)
         self.authority = authority
         self.rate = rate
         self.message : discord.Message = None
         self.currency: str = None
 
     async def on_timeout(self):
+        #Delete
+        if self.message != None: 
+            await self.message.delete()
+            return
+        
         #Disable
         for item in self.children:
             if isinstance(item, discord.ui.Button):
