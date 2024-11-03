@@ -2,7 +2,8 @@ from typing import List
 from pymongo import MongoClient
 from datetime import datetime, timedelta
 from Handling.Economy.Profile.ProfileClass import Profile
-import Handling.Economy.ConversionRate.ConversionRateMongoManager as ConversionRateMongoManager 
+import Handling.Economy.ConversionRate.ConversionRateMongoManager as ConversionRateMongoManager
+from Handling.Economy.Inventory_Shop.ItemClass import Item, list_gift_items
 
 # Connect to the MongoDB server
 client = MongoClient("mongodb://localhost:27017/")
@@ -184,6 +185,14 @@ def update_last_attendance_now(guild_id:int, user_id: int):
                                                                                     }})
     return result
 
+#region gift
+def update_last_gift_now(guild_id:int, user_id: int):
+    collection = db_specific[f'profile_{guild_id}']
+    today = datetime.now()
+    result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"last_gift": today,
+                                                                                    }})
+    return result
+
 #region quest finished
 def increase_quest_finished(guild_id:int, user_id: int):
     collection = db_specific[f'profile_{guild_id}']
@@ -292,6 +301,43 @@ def update_dignity_point(guild_id: int, guild_name: str, user_id: int, user_name
     result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"dignity_point": existing_data.dignity_point,
                                                                                     }})
     return result
+
+#region Item
+def update_list_items_profile(guild_id: int, guild_name: str, user_id: int, user_name: str, user_display_name: str, item: Item, amount: int):
+    collection = db_specific[f'profile_{guild_id}']
+    existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
+    if existing_data == None:
+        existing_data = create_profile(guild_id=guild_id, user_id=user_id, user_display_name=user_display_name, user_name=user_name, guild_name= guild_name)
+    
+    list_items = existing_data.list_items
+    if list_items == None: list_items = []
+    
+    exist_flag = False
+    #Nếu đã có items trong list thì chỉnh quantity lại theo amount
+    for profile_item in list_items:
+        if profile_item.item_id == item.item_id:
+            profile_item.quantity += amount
+            if profile_item.quantity > 99: profile_item.quantity == 99
+            if profile_item.quantity <= 0: list_items.remove(profile_item)
+            exist_flag = True
+            break
+        if profile_item.quantity <= 0:
+            list_items.remove(profile_item)
+    #Nếu chưa có item trong list thì append, và chỉnh quantity lại theo amount
+    if exist_flag == False:
+        item.quantity = amount
+        list_items.append(item)
+    
+    if len(list_items) > 20:
+        list_items.pop()
+    
+    result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"list_items": [data.to_dict() for data in list_items],
+                                                                                    }})
+    return result
+    
+    
+    
+
 
 #region Authority
 

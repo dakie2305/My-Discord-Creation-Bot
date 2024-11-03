@@ -18,5 +18,6 @@ class SlashCommand(Enum):
     SB_DOUBLE = "</sb double:1300146431126143057>"
     SB_TRIPLE = "</sb triple:1300146431126143057>"
     
-
+    SHOP_GLOBAL = "</shop global:1302622680977248256>"
+    GIFT = "</gift:1302680680391639160>"
 

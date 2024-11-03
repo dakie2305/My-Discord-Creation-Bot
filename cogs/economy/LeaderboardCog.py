@@ -118,7 +118,7 @@ class LeaderboardEconomy(commands.Cog):
                         embed.add_field(name=f"", value=f"**Hạng {index+1}**: <@{profile.user_id}>", inline=False)
                         embed.add_field(name=f"", value=f"{text_money}", inline=False)
                     count+=1
-                    if count >= 15: break
+                    if count > 10: break
             else:
                 embed.add_field(name=f"", value=f"Xếp hạng của {user.mention}", inline=True)
                 embed.add_field(name=f"", value=f"_____________", inline=False)

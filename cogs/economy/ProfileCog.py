@@ -11,6 +11,7 @@ from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.EmojiEnum import EmojiCreation2
 import CustomFunctions
 import CustomEnum.UserEnum as UserEnum
+from Handling.Economy.Profile.InventoryBackToProfileView import ProfileToInventoryView, InventoryBackToProfileView
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(ProfileEconomy(bot=bot))
@@ -33,12 +34,17 @@ class ProfileEconomy(commands.Cog):
             mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
             view.message = mess
             return
-        
+        data = None
         if user == None:
-            embed = await self.procress_profile_embed(user=interaction.user)
+            embed, data = await self.procress_profile_embed(user=interaction.user)
         else:
-            embed = await self.procress_profile_embed(user=user)
-        await interaction.followup.send(embed=embed)
+            embed, data = await self.procress_profile_embed(user=user)
+        if data != None and data.list_items != None and len(data.list_items)>0:
+            view = ProfileToInventoryView(profile=data)
+            m = await interaction.followup.send(embed=embed, view = view)
+            view.message = m
+        else:
+            await interaction.followup.send(embed=embed)
         return
     
     
@@ -53,12 +59,18 @@ class ProfileEconomy(commands.Cog):
                 mess = await message.reply(embed=embed, view=view)
                 view.message = mess
                 return
-            
+            data = None
+            view = None
             if user == None:
-                embed = await self.procress_profile_embed(user=message.author)
+                embed, data = await self.procress_profile_embed(user=message.author)
             else:
-                embed = await self.procress_profile_embed(user=user)
-            await message.reply(embed=embed)
+                embed, data = await self.procress_profile_embed(user=user)
+            if data != None and data.list_items != None and len(data.list_items)>0:
+                view = ProfileToInventoryView(profile=data)
+                m = await message.reply(embed=embed, view= view)
+                view.message = m
+            else:
+                await message.reply(embed=embed)
     #Quote
     @commands.command()
     async def quote(self, ctx, *, quote: str = None):
@@ -77,7 +89,6 @@ class ProfileEconomy(commands.Cog):
         if data == None:
             data = ProfileMongoManager.create_profile(guild_id=user.guild.id, user_id=user.id, guild_name=user.guild.name, user_name=user.name, user_display_name=user.display_name)
         
-        
         if data.is_authority and ProfileMongoManager.is_in_debt(data= data, copper_threshold=100000):
             embed = discord.Embed(title=f"", description=f"Chính Quyền đã nợ nần quá nhiều và tự sụp đổ. Hãy dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", color=0xddede7)
             data.copper = -10000
@@ -87,7 +98,7 @@ class ProfileEconomy(commands.Cog):
             ProfileMongoManager.update_profile_money_fast(guild_id= user.guild.id, data=data)
             ProfileMongoManager.remove_authority_from_server(guild_id=user.guild.id)
             ProfileMongoManager.update_last_authority(guild_id=user.guild.id, user_id=data.user_id)
-            return embed
+            return embed, None
         
         embed = discord.Embed(title=f"", description=f"**Profile {user.mention}**", color=0xddede7)
         if user.avatar != None:
@@ -114,8 +125,7 @@ class ProfileEconomy(commands.Cog):
         if user.guild.id == 1256987900277690470:
             #Của true heaven
             await self.update_rank_role(user= user, profile= data)
-        
-        return embed
+        return embed, data
     
     async def update_rank_role(self, user: discord.Member, profile: Profile):
         if user.guild.id != 1256987900277690470: return
