@@ -137,8 +137,17 @@ class TextInputModal(discord.ui.Modal):
                 authority_profile.copper += tax
                 ProfileMongoManager.update_profile_money_fast(guild_id=interaction.guild_id, data=authority_profile)
             ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name= interaction.guild.name, user_id= interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, copper= -tax)
-        
-        await interaction.followup.send(f"**{profile_user.user_display_name}** đã đổi từ **{self.shortened_currency(amount)}** {from_emoji} -> **{self.shortened_currency(new_money_value)}** {to_emoji}. {tax_text}")
+        profile_user = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
+        extra_text = f""
+        if suffix == "C" or suffix == "c":
+            extra_text = f"Số {CurrencyEmoji.COPPER.value} còn lại: **{self.shortened_currency(profile_user.copper)}**"
+        if suffix == "S" or suffix == "s":
+            extra_text = f"Số {CurrencyEmoji.SILVER.value} còn lại: **{self.shortened_currency(profile_user.silver)}**"
+        if suffix == "G" or suffix == "g":
+            extra_text = f"Số {CurrencyEmoji.GOLD.value} còn lại: **{self.shortened_currency(profile_user.gold)}**"
+        if suffix == "D" or suffix == "d":
+            extra_text = f"Số {CurrencyEmoji.DARKIUM.value} còn lại: **{self.shortened_currency(profile_user.darkium)}**"
+        await interaction.followup.send(f"**{profile_user.user_display_name}** đã đổi từ **{self.shortened_currency(amount)}** {from_emoji} -> **{self.shortened_currency(new_money_value)}** {to_emoji}. {tax_text}\n{extra_text}")
         
     def add_or_remove_money(self, guild_int: int, profile: Profile, type: str, amount: int, is_add: bool = True):
         if type == "D":

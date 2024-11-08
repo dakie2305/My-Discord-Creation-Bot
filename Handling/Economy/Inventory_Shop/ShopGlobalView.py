@@ -29,10 +29,11 @@ class ShopGlobalView(discord.ui.View):
         items = self.list_all_shops[shop_name]
         self.current_list_item = items
         # Tạo embed cho shop
-        embed = discord.Embed(title=f"**{shop_name}**", description=f"▬▬▬▬▬▬▬▬▬▬▬▬▬▬", color=discord.Color.blue())
+        embed = discord.Embed(title=f"**{shop_name}**", description=f"Tỷ giá hiện tại: **{self.rate}**", color=discord.Color.blue())
+        embed.add_field(name=f"", value=f"▬▬▬▬▬▬▬▬▬▬▬▬▬▬",inline=False)
         count = 1
         for item in items:
-            embed.add_field(name=f"`{count}` {item.emoji} - {item.item_name}", value=f"{EmojiCreation2.SHINY_POINT.value} Giá: **{item.item_worth_amount}**{self.get_emoji_money_from_type(type=item.item_worth_type)}\n{EmojiCreation2.SHINY_POINT.value} {item.item_description}",inline=False)
+            embed.add_field(name=f"`{count}` {item.emoji} - {item.item_name}", value=f"{EmojiCreation2.SHINY_POINT.value} Giá: **{int(item.item_worth_amount*self.rate)}**{self.get_emoji_money_from_type(type=item.item_worth_type)}\n{EmojiCreation2.SHINY_POINT.value} {item.item_description}",inline=False)
             embed.add_field(name=f"", value=f"\n",inline=False)
             count+=1
         embed.set_footer(text=f"Trang {self.current_page + 1}/{self.total_pages}")

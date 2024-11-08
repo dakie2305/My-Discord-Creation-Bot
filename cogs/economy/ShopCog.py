@@ -87,10 +87,11 @@ class ShopEconomy(commands.Cog):
         
         keys = list(self.list_all_shops.keys())  # Shop names
         # Tạo embed cho shop
-        embed = discord.Embed(title=f"**Shop Quà Tặng Cuộc Sống**", description=f"▬▬▬▬▬▬▬▬▬▬▬▬▬▬", color=discord.Color.blue())
+        embed = discord.Embed(title=f"**Shop Quà Tặng Cuộc Sống**", description=f"Tỷ giá hiện tại: **{conversion_rate.shop_rate}**", color=discord.Color.blue())
+        embed.add_field(name=f"", value=f"▬▬▬▬▬▬▬▬▬▬▬▬▬▬",inline=False)
         count = 1
         for item in self.list_all_shops["Shop Quà Tặng Cuộc Sống"]:
-            embed.add_field(name=f"`{count}` {item.emoji} - {item.item_name}", value=f"{EmojiCreation2.SHINY_POINT.value} Giá: **{item.item_worth_amount}**{self.get_emoji_money_from_type(type=item.item_worth_type)}\n{EmojiCreation2.SHINY_POINT.value} {item.item_description}",inline=False)
+            embed.add_field(name=f"`{count}` {item.emoji} - {item.item_name}", value=f"{EmojiCreation2.SHINY_POINT.value} Giá: **{int(item.item_worth_amount*shop_rate)}**{self.get_emoji_money_from_type(type=item.item_worth_type)}\n{EmojiCreation2.SHINY_POINT.value} {item.item_description}",inline=False)
             embed.add_field(name=f"", value=f"\n",inline=False)
             count+=1
         embed.set_footer(text=f"Trang 1/{len(keys)}")

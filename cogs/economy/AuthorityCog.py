@@ -116,20 +116,20 @@ class AuthorityEconomy(commands.Cog):
         # Set the last used time to now
         self.last_used_per_guild[interaction.guild_id] = now
         
-        #Trừ 25% số tiền lớn nhất để tiến hành bầu cử
+        #Trừ 10% số tiền lớn nhất để tiến hành bầu cử
         money_to_vote = 0
         emoji = EmojiCreation2.COPPER.value
         if data.darkium > 0:
-            money_to_vote = int(data.darkium * 25 / 100)
+            money_to_vote = int(data.darkium * 10 / 100)
             emoji = EmojiCreation2.DARKIUM.value
         if data.gold > 0:
-            money_to_vote = int(data.gold * 25 / 100)
+            money_to_vote = int(data.gold * 10 / 100)
             emoji = EmojiCreation2.GOLD.value
         if data.silver > 0:
-            money_to_vote = int(data.silver * 25 / 100)
+            money_to_vote = int(data.silver * 10 / 100)
             emoji = EmojiCreation2.SILVER.value
         if data.copper > 0:
-            money_to_vote = int(data.copper * 25 / 100)
+            money_to_vote = int(data.copper * 10 / 100)
             emoji = EmojiCreation2.COPPER.value
         if money_to_vote == 0: money_to_vote = 1
         if emoji == EmojiCreation2.COPPER.value and money_to_vote < 500: money_to_vote = 500
