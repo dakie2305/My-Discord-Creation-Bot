@@ -215,19 +215,19 @@ class ProfileEconomy(commands.Cog):
     def get_dia_vi(self, data: Profile):
         text = "Hạ Đẳng"
         total_wealth = data.copper + data.silver *5000 + data.gold * 5000 * 5000 + data.darkium * 5000 * 5000 * 10000
-        if total_wealth > 2002502600:
+        if total_wealth > 20025026000:
             text= "Đỉnh Cấp Xã Hội"
-        elif total_wealth > 1602502600:
+        elif total_wealth > 16025026000:
             text= "Giới Tinh Anh"
-        elif total_wealth > 1102502600:
+        elif total_wealth > 11025026000:
             text= "Thượng Đẳng"
-        elif total_wealth > 552502600:
+        elif total_wealth > 8525026000:
             text= "Thượng Lưu"
-        elif total_wealth > 110502600:
+        elif total_wealth > 2205026000:
             text= "Thượng Lưu"
-        elif total_wealth > 7502600:
+        elif total_wealth > 75026000:
             text= "Trung Lưu"
-        elif total_wealth > 2000000:
+        elif total_wealth > 20000000:
             text= "Hạ Lưu"
         else:
             text = "Hạ Đẳng"

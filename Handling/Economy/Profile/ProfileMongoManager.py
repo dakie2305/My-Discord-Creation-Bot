@@ -250,6 +250,8 @@ def is_in_debt(data: Profile, darkium_threshold = 0, gold_threshold = 0, silver_
     existing_data = data
     if existing_data == None:
         return False
+    if data.is_authority == True and existing_data.gold <= 0 and existing_data.darkium <= 0:
+        return True
     if existing_data.copper <= copper_threshold and existing_data.silver <= silver_threshold and existing_data.gold <= gold_threshold and existing_data.darkium <= darkium_threshold:
         return True
     else:

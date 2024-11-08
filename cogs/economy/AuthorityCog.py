@@ -101,21 +101,41 @@ class AuthorityEconomy(commands.Cog):
             ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, copper=-500, guild_name= interaction.guild.name)
             return
         #Phải đủ tiền mới được vote
-        elif data.copper<500:
-            embed = discord.Embed(title=f"", description=f"Bạn phải có đủ **500** {EmojiCreation2.COPPER.value} trước đã!", color=0xc379e0)
+        elif data.silver<= 0 and data.gold<= 0 and data.darkium<= 0 and data.copper<500:
+            embed = discord.Embed(title=f"", description=f"Bạn phải có đủ ít nhất **500** {EmojiCreation2.COPPER.value} trước đã!", color=0xc379e0)
             await interaction.followup.send(embed=embed)
             return
         
         # Kiểm tra xem command có nằm trong giới hạn 15 phút không
         now = datetime.now()
         if interaction.guild_id in self.last_used_per_guild and (now - self.last_used_per_guild[interaction.guild_id]) < timedelta(minutes=15):
-            time_remaining = (self.last_used_per_guild[interaction.guild_id] + timedelta(minutes=15) - now).seconds
+            time_remaining = (self.last_used_per_guild[interaction.guild_id] + timedelta(minutes=10) - now).seconds
             minutes, seconds = divmod(time_remaining, 60)
             await interaction.followup.send(f"Đã có người tiến hành bầu cử. Vui lòng thử lại lệnh sau {minutes} phút {seconds} giây.", ephemeral=True)
             return
         # Set the last used time to now
         self.last_used_per_guild[interaction.guild_id] = now
         
+        #Trừ 25% số tiền lớn nhất để tiến hành bầu cử
+        money_to_vote = 0
+        emoji = EmojiCreation2.COPPER.value
+        if data.darkium > 0:
+            money_to_vote = int(data.darkium * 25 / 100)
+            emoji = EmojiCreation2.DARKIUM.value
+        if data.gold > 0:
+            money_to_vote = int(data.gold * 25 / 100)
+            emoji = EmojiCreation2.GOLD.value
+        if data.silver > 0:
+            money_to_vote = int(data.silver * 25 / 100)
+            emoji = EmojiCreation2.SILVER.value
+        if data.copper > 0:
+            money_to_vote = int(data.copper * 25 / 100)
+            emoji = EmojiCreation2.COPPER.value
+        if money_to_vote == 0: money_to_vote = 1
+        if emoji == EmojiCreation2.COPPER.value and money_to_vote < 500: money_to_vote = 500
+
+        await interaction.followup.send(content=f"{interaction.user.mention} đã bỏ **{money_to_vote}** {emoji} để vận động tranh cử chức Chính Quyền server!")
+        channel = interaction.channel
         embed = discord.Embed(title=f"Chính Quyền Đương Cử",description=f"Bầu chọn cho **{interaction.user.mention}** làm Chính Quyền của server {interaction.guild.name}.",color=discord.Color.blue())
         if interaction.user.avatar != None:
             embed.set_thumbnail(url=interaction.user.avatar.url)
@@ -123,7 +143,7 @@ class AuthorityEconomy(commands.Cog):
         embed.add_field(name=f"", value=f"> Rank: **{data.level}**", inline=False)
         embed.add_field(name=f"", value=f"> Nhân phẩm: **{self.get_nhan_pham(data.dignity_point)}** ({data.dignity_point})", inline=False)
         view = AuthorityView(user=interaction.user, data=data)
-        me = await interaction.followup.send(embed=embed, view=view)
+        me = await channel.send(embed=embed, view=view)
         view.message = me
         view.embed = embed
         return
