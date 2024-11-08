@@ -11,6 +11,8 @@ import CustomEnum.UserEnum as UserEnum
 from typing import List, Optional, Dict
 from Handling.Economy.Inventory_Shop.ItemClass import Item, list_gift_items
 from Handling.Economy.Inventory_Shop.ShopGlobalView import ShopGlobalView
+import Handling.Economy.ConversionRate.ConversionRateMongoManager as ConversionRateMongoManager
+import random
 
 
 async def setup(bot: commands.Bot):
@@ -35,11 +37,55 @@ class ShopEconomy(commands.Cog):
             mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
             view.message = mess
             return
+        
+        #Phải tồn tại chính quyền server thì mới có shop
+        authority = ProfileMongoManager.get_authority(guild_id=interaction.guild.id)
+        if authority == None:
+            embed = discord.Embed(title=f"", description=f"Server vẫn chưa tồn tại Chính Quyền. Vui lòng dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", color=0xddede7)
+            await interaction.followup.send(embed=embed)
+            return
+
+        authority_user = self.bot.get_guild(interaction.guild.id).get_member(authority.user_id)
+        # Nếu không get được tức là authority không trong server
+        if authority_user == None:
+            embed = discord.Embed(title=f"", description=f"Chính Quyền đã lưu vong khỏi server. Vui lòng dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", color=0xddede7)
+            ProfileMongoManager.remove_authority_from_server(guild_id=interaction.guild.id)
+            ProfileMongoManager.update_last_authority(guild_id=interaction.user.guild.id, user_id=authority.user_id)
+            await interaction.followup.send(embed=embed)
+            return
+        
+        #Kiểm xem chính quyền có mặc nợ không, có thì từ chức và phạt authority
+        if ProfileMongoManager.is_in_debt(data= authority, copper_threshold=100000):
+            embed = discord.Embed(title=f"", description=f"Chính Quyền đã nợ nần quá nhiều và tự sụp đổ. Hãy dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", color=0xddede7)
+            authority.copper = -10000
+            authority.silver = 0
+            authority.gold = 0
+            authority.darkium = 0
+            ProfileMongoManager.update_profile_money_fast(guild_id= interaction.user.guild.id, data=authority)
+            ProfileMongoManager.remove_authority_from_server(guild_id=interaction.user.guild.id)
+            ProfileMongoManager.update_last_authority(guild_id=interaction.user.guild.id, user_id=authority.user_id)
+            await interaction.followup.send(embed=embed)
+            return
+        
+        conversion_rate = ConversionRateMongoManager.find_conversion_rate_by_id(guild_id=interaction.guild_id)
+        if conversion_rate == None:
+            ConversionRateMongoManager.create_update_shop_rate(guild_id=interaction.guild_id, rate=1)
+            conversion_rate = ConversionRateMongoManager.find_conversion_rate_by_id(guild_id=interaction.guild_id)
+        elif conversion_rate != None and conversion_rate.last_reset != None and conversion_rate.last_reset.date() != datetime.now().date():
+            #Random tỷ lệ rate
+            allowed_values = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.5, 2.6]
+            new_rate = random.choice(allowed_values)
+            ConversionRateMongoManager.create_update_shop_rate(guild_id=interaction.guild_id, rate=new_rate)
+            conversion_rate = ConversionRateMongoManager.find_conversion_rate_by_id(guild_id=interaction.guild_id)
+        
+        shop_rate = 1.0
+        if conversion_rate != None:
+            shop_rate = conversion_rate.shop_rate
+
         #View đầu tiên luôn là gift shop
         self.list_all_shops["Shop Quà Tặng Cuộc Sống"] = list_gift_items
         
         keys = list(self.list_all_shops.keys())  # Shop names
-        
         # Tạo embed cho shop
         embed = discord.Embed(title=f"**Shop Quà Tặng Cuộc Sống**", description=f"▬▬▬▬▬▬▬▬▬▬▬▬▬▬", color=discord.Color.blue())
         count = 1
@@ -48,7 +94,7 @@ class ShopEconomy(commands.Cog):
             embed.add_field(name=f"", value=f"\n",inline=False)
             count+=1
         embed.set_footer(text=f"Trang 1/{len(keys)}")
-        view = ShopGlobalView(list_all_shops= self.list_all_shops)
+        view = ShopGlobalView(rate= shop_rate,list_all_shops= self.list_all_shops)
         view.current_list_item = self.list_all_shops["Shop Quà Tặng Cuộc Sống"]
         mess = await interaction.followup.send(embed=embed, view=view, ephemeral=False)
         view.message = mess

@@ -9,7 +9,7 @@ from typing import List, Optional, Dict
 from Handling.Economy.Inventory_Shop.ItemClass import Item, list_gift_items
 
 class ShopGlobalView(discord.ui.View):
-    def __init__(self, list_all_shops: Dict[str, List[Item]] = {}):
+    def __init__(self, rate: float = 1.0, list_all_shops: Dict[str, List[Item]] = {}):
         super().__init__(timeout=30)
         self.message: discord.Message = None
         self.list_all_shops = list_all_shops
@@ -17,6 +17,7 @@ class ShopGlobalView(discord.ui.View):
         self.current_page = 0
         self.total_pages = len(self.keys)
         self.current_list_item: List[Item] = None
+        self.rate = rate
         self.update_buttons()
 
     def update_buttons(self):
@@ -54,7 +55,7 @@ class ShopGlobalView(discord.ui.View):
     
     @discord.ui.button(label="Mua", style=discord.ButtonStyle.green)
     async def buy_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_modal(TextShopInputModal(rate=1.0, current_list_item=self.current_list_item))
+        await interaction.response.send_modal(TextShopInputModal(rate=self.rate, current_list_item=self.current_list_item))
         return
 
     @discord.ui.button(label="Sau", style=discord.ButtonStyle.primary)
@@ -128,18 +129,26 @@ class TextShopInputModal(discord.ui.Modal):
             
             if item.item_worth_type == "C":
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, copper=-cost_money)
-                ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, copper=cost_money)
+                if profile_user.is_authority != True:
+                    ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, copper=cost_money)
             elif item.item_worth_type == "S":
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, silver=-cost_money)
-                ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, silver=cost_money)
+                if profile_user.is_authority != True:
+                    ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, silver=cost_money)
             elif item.item_worth_type == "G":
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, gold=-cost_money)
-                ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, gold=cost_money)
+                if profile_user.is_authority != True:
+                    ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, gold=cost_money)
             elif item.item_worth_type == "D":
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, darkium=-cost_money)
-                ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, darkium=cost_money)
+                if profile_user.is_authority != True:
+                    ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, darkium=cost_money)
             ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, item=item, amount=amount)
-            await interaction.followup.send(f"{interaction.user.mention} đã chọn mua **{amount}** {item.emoji} với giá {cost_money} {self.get_emoji_money_from_type(item.item_worth_type)}!", ephemeral=False)
+
+            authority_text = f"Chính Quyền đã nhận toàn bộ số tiền trên!"
+            if profile_user.is_authority == True:
+                authority_text = ""
+            await interaction.followup.send(f"{interaction.user.mention} đã chọn mua **{amount}** {item.emoji} với giá {cost_money} {self.get_emoji_money_from_type(item.item_worth_type)}! {authority_text}", ephemeral=False)
         except ValueError:
             await interaction.followup.send(f"Chỉ nhập số hợp lệ!", ephemeral=True)
             return
