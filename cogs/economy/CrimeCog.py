@@ -53,6 +53,36 @@ class CrimeEconomy(commands.Cog):
             view.message = mess
             return
         
+        #Phải tồn tại chính quyền server thì mới được crime
+        authority = ProfileMongoManager.get_authority(guild_id=interaction.guild.id)
+        if authority == None:
+            embed = discord.Embed(title=f"", description=f"Server vẫn chưa tồn tại Chính Quyền. Vui lòng dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", color=0xddede7)
+            await interaction.followup.send(embed=embed)
+            return
+        
+        authority_user = self.bot.get_guild(interaction.guild.id).get_member(authority.user_id)
+        # Nếu không get được tức là authority không trong server
+        if authority_user == None:
+            embed = discord.Embed(title=f"", description=f"Chính Quyền đã lưu vong khỏi server. Vui lòng dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", color=0xddede7)
+            ProfileMongoManager.remove_authority_from_server(guild_id=interaction.guild.id)
+            ProfileMongoManager.update_last_authority(guild_id=interaction.user.guild.id, user_id=authority.user_id)
+            await interaction.followup.send(embed=embed)
+            return
+        
+        #Kiểm xem chính quyền có mặc nợ không, có thì từ chức và phạt authority
+        if ProfileMongoManager.is_in_debt(data= authority, copper_threshold=100000):
+            embed = discord.Embed(title=f"", description=f"Chính Quyền đã nợ nần quá nhiều và tự sụp đổ. Hãy dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", color=0xddede7)
+            authority.copper = -10000
+            authority.silver = 0
+            authority.gold = 0
+            authority.darkium = 0
+            ProfileMongoManager.update_profile_money_fast(guild_id= interaction.user.guild.id, data=authority)
+            ProfileMongoManager.remove_authority_from_server(guild_id=interaction.user.guild.id)
+            ProfileMongoManager.update_last_authority(guild_id=interaction.user.guild.id, user_id=authority.user_id)
+            await interaction.followup.send(embed=embed)
+            return
+        
+        
         if target_user.bot:
             view = SelfDestructView(30)
             embed = discord.Embed(title=f"", description=f"Không được chọn Bot!", color=0xe82517)

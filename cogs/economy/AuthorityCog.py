@@ -108,8 +108,8 @@ class AuthorityEconomy(commands.Cog):
         
         # Kiểm tra xem command có nằm trong giới hạn 15 phút không
         now = datetime.now()
-        if interaction.guild_id in self.last_used_per_guild and (now - self.last_used_per_guild[interaction.guild_id]) < timedelta(minutes=15):
-            time_remaining = (self.last_used_per_guild[interaction.guild_id] + timedelta(minutes=10) - now).seconds
+        if interaction.guild_id in self.last_used_per_guild and (now - self.last_used_per_guild[interaction.guild_id]) < timedelta(minutes=5):
+            time_remaining = (self.last_used_per_guild[interaction.guild_id] + timedelta(minutes=5) - now).seconds
             minutes, seconds = divmod(time_remaining, 60)
             await interaction.followup.send(f"Đã có người tiến hành bầu cử. Vui lòng thử lại lệnh sau {minutes} phút {seconds} giây.", ephemeral=True)
             return
