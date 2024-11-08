@@ -212,7 +212,7 @@ class TextInputModal(discord.ui.Modal):
             elif to_currency_type == "S": #Base 10000 * 5000
                 result = int(amount * (10000 * rate) * (5000 * rate))
             elif to_currency_type == "C": #Base 10000 * 5000 * 5000
-                result = int(amount * (10000 * rate) * (5000*rate) *  (500 * rate))
+                result = int(amount * (10000 * rate) * (5000*rate) *  (5000 * rate))
         elif from_currency_type == "G":
             if to_currency_type == "D": #Base 1/10000
                 result = int(amount / (10000 * rate))
