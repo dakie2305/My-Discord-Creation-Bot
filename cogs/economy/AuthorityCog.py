@@ -122,13 +122,13 @@ class AuthorityEconomy(commands.Cog):
         if data.darkium > 0:
             money_to_vote = int(data.darkium * 10 / 100)
             emoji = EmojiCreation2.DARKIUM.value
-        if data.gold > 0:
+        elif data.gold > 0:
             money_to_vote = int(data.gold * 10 / 100)
             emoji = EmojiCreation2.GOLD.value
-        if data.silver > 0:
+        elif data.silver > 0:
             money_to_vote = int(data.silver * 10 / 100)
             emoji = EmojiCreation2.SILVER.value
-        if data.copper > 0:
+        else:
             money_to_vote = int(data.copper * 10 / 100)
             emoji = EmojiCreation2.COPPER.value
         if money_to_vote == 0: money_to_vote = 1
