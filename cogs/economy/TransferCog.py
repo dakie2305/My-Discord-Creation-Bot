@@ -141,18 +141,44 @@ class TransferMoneyEconomy(commands.Cog):
             ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id,guild_name=interaction.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, darkium= amount)
         
         tax = 150
-        #Cộng tiền tax Copper cho chính quyền nếu user_profile không phải là chính quyền
+        tax_emoji = EmojiCreation2.COPPER.value
+        #Nếu quá giàu thì đánh tax những loại tiền lớn
+        if user_profile.darkium > 15:
+            tax = 1
+            tax_emoji = EmojiCreation2.DARKIUM.value
+        elif user_profile.gold > 200:
+            #mặc định 5%
+            tax = int(user_profile.gold * 5 / 100)
+            tax_emoji = EmojiCreation2.GOLD.value
+        elif user_profile.silver > 200:
+            #mặc định 10%
+            tax = int(user_profile.silver * 10 / 100)
+            tax_emoji = EmojiCreation2.SILVER.value
+        elif user_profile.copper > 50000:
+            #mặc định 10%
+            tax = int(user_profile.copper * 10 / 100)
+            tax_emoji = EmojiCreation2.COPPER.value
+            
+        #Cộng tiền tax cho chính quyền nếu user_profile không phải là chính quyền
         tax_text = ""
         extra_mess = ""
         if message != None:
-            extra_mess = f" với lời nhắn: *{message}*"
+            extra_mess = f" với lời nhắn: **{message}**"
         if user_profile.is_authority == False:
-            tax_text = f"Đương nhiên là bị trừ {tax} {EmojiCreation2.COPPER.value} để đóng thuế cho Chính Quyền!"
-            authority_profile = ProfileMongoManager.get_authority(guild_id=interaction.guild_id)
-            if authority_profile:
-                authority_profile.copper += int(tax * authority_profile.dignity_point/100)
-                ProfileMongoManager.update_profile_money_fast(guild_id=interaction.guild_id, data=authority_profile)
-            ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name= interaction.guild.name, user_id= interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, copper= -tax)
+            tax_text = f"Đương nhiên là bị trừ {tax} {tax_emoji} để đóng thuế cho Chính Quyền!"
+            if tax_emoji == EmojiCreation2.COPPER.value:
+                ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name= interaction.guild.name, user_id= interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, copper= -tax)
+                ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, copper=tax)
+            elif tax_emoji == EmojiCreation2.SILVER.value:
+                ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name= interaction.guild.name, user_id= interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, silver= -tax)
+                ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, silver=tax)
+            elif tax_emoji == EmojiCreation2.GOLD.value:
+                ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name= interaction.guild.name, user_id= interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, gold= -tax)
+                ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, gold=tax)
+            elif tax_emoji == EmojiCreation2.DARKIUM.value:
+                ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name= interaction.guild.name, user_id= interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, darkium= -tax)
+                ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, darkium=tax)
+            
         #Cập nhập level progressing, transfer chỉ được cộng 1 ít
         ProfileMongoManager.update_level_progressing(guild_id=user.guild.id, user_id= user.id, bonus_exp= -10)
         ProfileMongoManager.update_level_progressing(guild_id=user.guild.id, user_id= interaction.user.id, bonus_exp= -10)

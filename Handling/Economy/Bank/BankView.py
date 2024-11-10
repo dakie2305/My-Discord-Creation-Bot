@@ -8,6 +8,7 @@ from  Handling.Economy.ConversionRate.ConversionRateClass import ConversionRate
 import Handling.Economy.ConversionRate.ConversionRateMongoManager as ConversionRateMongoManager
 import re
 from enum import Enum
+from CustomEnum.EmojiEnum import EmojiCreation2
 
 
 class CurrencyEmoji(Enum):
@@ -127,17 +128,44 @@ class TextInputModal(discord.ui.Modal):
         from_emoji = self.get_emoji_from_type(input=suffix)
         to_emoji = self.get_emoji_from_type(input=self.selected_currency)
         
-        tax = 200
+        profile_user = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
+        tax = 250
+        tax_emoji = EmojiCreation2.COPPER.value
+        
+        #Chuyển đến loại tiền nào thì đánh thuế loại tiền đó
+        if profile_user.darkium > 15 and to_emoji == EmojiCreation2.DARKIUM.value:
+            tax = 1
+            tax_emoji = EmojiCreation2.DARKIUM.value
+            
+        elif to_emoji == EmojiCreation2.GOLD.value:
+            #mặc định 5% số tiền quy đổi
+            tax = int(new_money_value * 5 / 100)
+            tax_emoji = EmojiCreation2.GOLD.value
+            
+        elif to_emoji == EmojiCreation2.SILVER.value:
+            #mặc định 5%
+            tax = int(new_money_value * 5 / 100)
+            tax_emoji = EmojiCreation2.SILVER.value
+            
+        elif to_emoji == EmojiCreation2.COPPER.value:
+            #mặc định 10%
+            tax = int(new_money_value * 10 / 100)
+            tax_emoji = EmojiCreation2.COPPER.value
+            
         #Cộng tiền 200 Copper cho chính quyền nếu user_profile không phải là chính quyền
         tax_text = ""
         if profile_user.is_authority == False:
-            tax_text = f"Đương nhiên là bị trừ {tax} {CurrencyEmoji.COPPER.value} để đóng thuế cho Chính Quyền!"
-            authority_profile = ProfileMongoManager.get_authority(guild_id=interaction.guild_id)
-            if authority_profile:
-                authority_profile.copper += tax
-                ProfileMongoManager.update_profile_money_fast(guild_id=interaction.guild_id, data=authority_profile)
+            tax_text = f"Đương nhiên là bị trừ **{tax}** {tax_emoji} để đóng thuế cho Chính Quyền!"
+            if tax_emoji == EmojiCreation2.COPPER.value:
+                ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, copper=tax)
+            elif tax_emoji == EmojiCreation2.SILVER.value:
+                ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, silver=tax)
+            elif tax_emoji == EmojiCreation2.GOLD.value:
+                ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, gold=tax)
+            elif tax_emoji == EmojiCreation2.DARKIUM.value:
+                ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, darkium=tax)
+            
             ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name= interaction.guild.name, user_id= interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, copper= -tax)
-        profile_user = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
         extra_text = f""
         if suffix == "C" or suffix == "c":
             extra_text = f"Số {CurrencyEmoji.COPPER.value} còn lại: **{self.shortened_currency(profile_user.copper)}**"
@@ -178,19 +206,19 @@ class TextInputModal(discord.ui.Modal):
     
     def shortened_currency(self, number: int):
         if number >= 1000000000:
-            suffix =number % 1000000000 // 1000000
+            suffix = int(number % 1000000000 // 1000000)
             if suffix == 0: suffix = "" 
-            return f"{number // 1000000000}B{suffix}"
+            return f"{int(number // 1000000000)}B{suffix}"
         elif number >= 1000000:
-            suffix = number % 1000000 // 1000
+            suffix = int(number % 1000000 // 1000)
             if suffix == 0: suffix = "" 
-            return f"{number // 1000000}M{suffix}"
+            return f"{int(number // 1000000)}M{suffix}"
         elif number >= 10000:
-            suffix = number % 1000 // 100
+            suffix = int(number % 1000 // 100)
             if suffix == 0: suffix = ""
-            return f"{number // 1000}K{suffix}"  
+            return f"{int(number // 1000)}K{suffix}"  
         else:
-            return str(number)
+            return str(int(number))
     
     def get_emoji_from_type(self, input: str):
         if input == "D" or input == "D":
