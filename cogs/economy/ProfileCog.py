@@ -11,6 +11,7 @@ from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.EmojiEnum import EmojiCreation2
 import CustomFunctions
 import CustomEnum.UserEnum as UserEnum
+from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 from Handling.Economy.Profile.InventoryBackToProfileView import ProfileToInventoryView, InventoryBackToProfileView
 
 async def setup(bot: commands.Bot):
@@ -79,7 +80,7 @@ class ProfileEconomy(commands.Cog):
             if quote == None:
                 quote = "None"
             embed = discord.Embed(title=f"", description=f"Đã cập nhật quote thành công. Vui lòng dùng lệnh {SlashCommand.PROFILE.value} để xem profile.", color=0xddede7)
-            ProfileMongoManager.update_profile_quote(guild_name=message.guild.name,guild_id=message.guild.id, user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, quote=quote)
+            ProfileMongoManager.update_profile_quote(guild_name=message.guild.name, guild_id=message.guild.id, user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, quote=quote)
             view = SelfDestructView(timeout=30)
             message_sent = await message.reply(embed=embed, view=view)
             view.message = message_sent
@@ -105,17 +106,17 @@ class ProfileEconomy(commands.Cog):
             embed.set_thumbnail(url=user.avatar.url)
         if data.is_authority:
             embed.add_field(name=f"", value="**Chính Quyền Tối Cao**", inline=False)
-        embed.add_field(name=f"", value=f"Nhân phẩm: **{self.get_nhan_pham(data.dignity_point)}** ({data.dignity_point})", inline=True)
-        embed.add_field(name=f"", value=f"Địa Vị: **{self.get_dia_vi(data)}**", inline=True)
+        embed.add_field(name=f"", value=f"Nhân phẩm: **{UtilitiesFunctions.get_nhan_pham(data.dignity_point)}** ({data.dignity_point})", inline=True)
+        embed.add_field(name=f"", value=f"Địa Vị: **{UtilitiesFunctions.get_dia_vi(data)}**", inline=True)
         embed.add_field(name=f"", value=f"Rank: **{data.level}**", inline=False)
         bar_progress = self.progress_bar(input_value= data.level_progressing)
         embed.add_field(name=f"", value=f"{bar_progress}\n", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
         embed.add_field(name=f"", value=f"**Tổng tài sản**:", inline=False)
-        show_darkium = f"{EmojiCreation2.DARKIUM.value}: **{self.shortened_currency(data.darkium)}**\n"
+        show_darkium = f"{EmojiCreation2.DARKIUM.value}: **{UtilitiesFunctions.shortened_currency(data.darkium)}**\n"
         if data.darkium == 0:
             show_darkium = ""
-        embed.add_field(name=f"", value=f">>> {show_darkium}{EmojiCreation2.GOLD.value}: **{self.shortened_currency(data.gold)}**\n{EmojiCreation2.SILVER.value}: **{self.shortened_currency(data.silver)}**\n{EmojiCreation2.COPPER.value}: **{self.shortened_currency(data.copper)}**", inline=False)
+        embed.add_field(name=f"", value=f">>> {show_darkium}{EmojiCreation2.GOLD.value}: **{UtilitiesFunctions.shortened_currency(data.gold)}**\n{EmojiCreation2.SILVER.value}: **{UtilitiesFunctions.shortened_currency(data.silver)}**\n{EmojiCreation2.COPPER.value}: **{UtilitiesFunctions.shortened_currency(data.copper)}**", inline=False)
         #Quote
         embed.add_field(name=f"", value="\n", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
@@ -165,41 +166,6 @@ class ProfileEconomy(commands.Cog):
         if target_role:
             await user.add_roles(target_role)
 
-    def shortened_currency(self, number: int):
-        if number >= 1000000000:
-            suffix = int(number % 1000000000 // 1000000)
-            if suffix == 0: suffix = "" 
-            return f"{int(number // 1000000000)}B{suffix}"
-        elif number >= 1000000:
-            suffix = int(number % 1000000 // 1000)
-            if suffix == 0: suffix = "" 
-            return f"{int(number // 1000000)}M{suffix}"
-        elif number >= 10000:
-            suffix = int(number % 1000 // 100)
-            if suffix == 0: suffix = ""
-            return f"{int(number // 1000)}K{suffix}"  
-        else:
-            return str(int(number))
-    
-    def get_nhan_pham(self, number):
-        text = "Người Thường"
-        if number >= 100:
-            text = "Thánh Nhân"
-        elif number >= 75:
-            text = "Người Tốt"
-        elif number >= 60:
-            text = "Lành tính"
-        elif number >= 50:
-            text = "Người Thường"
-        elif number >= 40:
-            text = "Tiểu Nhân"
-        elif number >= 30:
-            text = "Quỷ Quyệt"
-        elif number >= 20:
-            text = "Tội Phạm"
-        else:
-            text = "Gian Thương Tà Đạo"
-        return text
     
     def progress_bar(self, input_value: int, total_progress: int = 1000, bar_length=15):
         # Calculate the percentage of progress
@@ -212,23 +178,3 @@ class ProfileEconomy(commands.Cog):
         return f'{bar} **{int(percentage)}%**'
 
     
-    def get_dia_vi(self, data: Profile):
-        text = "Hạ Đẳng"
-        total_wealth = data.copper + data.silver *5000 + data.gold * 5000 * 5000 + data.darkium * 5000 * 5000 * 10000
-        if total_wealth > 20025026000:
-            text= "Đỉnh Cấp Xã Hội"
-        elif total_wealth > 16025026000:
-            text= "Giới Tinh Anh"
-        elif total_wealth > 11025026000:
-            text= "Thượng Đẳng"
-        elif total_wealth > 8525026000:
-            text= "Thượng Lưu"
-        elif total_wealth > 2205026000:
-            text= "Thượng Lưu"
-        elif total_wealth > 75026000:
-            text= "Trung Lưu"
-        elif total_wealth > 20000000:
-            text= "Hạ Lưu"
-        else:
-            text = "Hạ Đẳng"
-        return text
