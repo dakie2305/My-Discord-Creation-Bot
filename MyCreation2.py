@@ -24,6 +24,7 @@ from Handling.Misc.SelfDestructView import SelfDestructView
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
 from Handling.Misc.RandomDropboxEconomyView import RandomDropboxEconomyView
+from Handling.Misc.AutoLevelupProfile import AutoLevelupProfileHandling
 
 load_dotenv()
 intents = discord.Intents.all()
@@ -477,6 +478,8 @@ async def on_message(message: discord.Message):
     await sub_function_ai_response(message=message, speakFlag=speakFlag)
     quest = QuestHandling(bot=bot)
     await quest.handling_quest_progress(message=message)
+    auto_level = AutoLevelupProfileHandling(bot=bot)
+    await auto_level.handling_auto_level_up(message=message)
     
     await bot.process_commands(message)
 
