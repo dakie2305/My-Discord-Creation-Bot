@@ -5,6 +5,7 @@ from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.EmojiEnum import EmojiCreation2
 from typing import List, Optional, Dict
 from Handling.Economy.Inventory_Shop.ItemClass import Item, list_gift_items
+from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 
 class ProfileToInventoryView(discord.ui.View):
     def __init__(self, profile: Profile):
@@ -38,7 +39,10 @@ class ProfileToInventoryView(discord.ui.View):
                     item.disabled = True
                 if isinstance(item, discord.ui.Select):
                     item.disabled = True
-            await self.message.edit(view=self)
+            try:
+                await self.message.edit(view=self)
+            except Exception:
+                return
         
 class InventoryBackToProfileView(discord.ui.View):
     def __init__(self, profile: Profile):
@@ -55,7 +59,10 @@ class InventoryBackToProfileView(discord.ui.View):
                     item.disabled = True
                 if isinstance(item, discord.ui.Select):
                     item.disabled = True
-            await self.message.edit(view=self)
+            try:
+                await self.message.edit(view=self)
+            except Exception:
+                return
     
     @discord.ui.button(label="Profile", style=discord.ButtonStyle.primary)
     async def profile_button(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -76,17 +83,17 @@ class InventoryBackToProfileView(discord.ui.View):
         embed = discord.Embed(title=f"", description=f"**Profile <@{self.profile.user_id}>**", color=0xddede7)
         if self.profile.is_authority:
             embed.add_field(name=f"", value="**Chính Quyền Tối Cao**", inline=False)
-        embed.add_field(name=f"", value=f"Nhân phẩm: **{self.get_nhan_pham(self.profile.dignity_point)}** ({self.profile.dignity_point})", inline=True)
-        embed.add_field(name=f"", value=f"Địa Vị: **{self.get_dia_vi(self.profile)}**", inline=True)
+        embed.add_field(name=f"", value=f"Nhân phẩm: **{UtilitiesFunctions.get_nhan_pham(self.profile.dignity_point)}** ({self.profile.dignity_point})", inline=True)
+        embed.add_field(name=f"", value=f"Địa Vị: **{UtilitiesFunctions.get_dia_vi(self.profile)}**", inline=True)
         embed.add_field(name=f"", value=f"Rank: **{self.profile.level}**", inline=False)
         bar_progress = self.progress_bar(input_value= self.profile.level_progressing)
         embed.add_field(name=f"", value=f"{bar_progress}\n", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
         embed.add_field(name=f"", value=f"**Tổng tài sản**:", inline=False)
-        show_darkium = f"{EmojiCreation2.DARKIUM.value}: **{self.shortened_currency(self.profile.darkium)}**\n"
+        show_darkium = f"{EmojiCreation2.DARKIUM.value}: **{UtilitiesFunctions.shortened_currency(self.profile.darkium)}**\n"
         if self.profile.darkium == 0:
             show_darkium = ""
-        embed.add_field(name=f"", value=f">>> {show_darkium}{EmojiCreation2.GOLD.value}: **{self.shortened_currency(self.profile.gold)}**\n{EmojiCreation2.SILVER.value}: **{self.shortened_currency(self.profile.silver)}**\n{EmojiCreation2.COPPER.value}: **{self.shortened_currency(self.profile.copper)}**", inline=False)
+        embed.add_field(name=f"", value=f">>> {show_darkium}{EmojiCreation2.GOLD.value}: **{UtilitiesFunctions.shortened_currency(self.profile.gold)}**\n{EmojiCreation2.SILVER.value}: **{UtilitiesFunctions.shortened_currency(self.profile.silver)}**\n{EmojiCreation2.COPPER.value}: **{UtilitiesFunctions.shortened_currency(self.profile.copper)}**", inline=False)
         #Quote
         embed.add_field(name=f"", value="\n", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
@@ -95,41 +102,6 @@ class InventoryBackToProfileView(discord.ui.View):
         await self.message.edit(embed=embed, view = None)
         await interaction.followup.send(f"Bạn đã chuyển sang chế độ Profile!", ephemeral=True)
         
-    def shortened_currency(self, number: int):
-        if number >= 1000000000:
-            suffix = int(number % 1000000000 // 1000000)
-            if suffix == 0: suffix = "" 
-            return f"{int(number // 1000000000)}B{suffix}"
-        elif number >= 1000000:
-            suffix = int(number % 1000000 // 1000)
-            if suffix == 0: suffix = "" 
-            return f"{int(number // 1000000)}M{suffix}"
-        elif number >= 10000:
-            suffix = int(number % 1000 // 100)
-            if suffix == 0: suffix = ""
-            return f"{int(number // 1000)}K{suffix}"  
-        else:
-            return str(int(number))
-    
-    def get_nhan_pham(self, number):
-        text = "Người Thường"
-        if number >= 100:
-            text = "Thánh Nhân"
-        elif number >= 75:
-            text = "Người Tốt"
-        elif number >= 60:
-            text = "Lành tính"
-        elif number >= 50:
-            text = "Người Thường"
-        elif number >= 40:
-            text = "Tiểu Nhân"
-        elif number >= 30:
-            text = "Quỷ Quyệt"
-        elif number >= 20:
-            text = "Tội Phạm"
-        else:
-            text = "Gian Thương Tà Đạo"
-        return text
     
     def progress_bar(self, input_value: int, total_progress: int = 1000, bar_length=15):
         # Calculate the percentage of progress
@@ -140,26 +112,3 @@ class InventoryBackToProfileView(discord.ui.View):
         bar = '█' * filled_length + '░' * (bar_length - filled_length)
         # Format the output with percentage
         return f'{bar} **{int(percentage)}%**'
-
-    
-    def get_dia_vi(self, data: Profile):
-        text = "Hạ Đẳng"
-        total_wealth = data.copper + data.silver *5000 + data.gold * 5000 * 5000 + data.darkium * 5000 * 5000 * 10000
-        if total_wealth > 2002502600:
-            text= "Đỉnh Cấp Xã Hội"
-        elif total_wealth > 1602502600:
-            text= "Giới Tinh Anh"
-        elif total_wealth > 1102502600:
-            text= "Thượng Đẳng"
-        elif total_wealth > 552502600:
-            text= "Thượng Lưu"
-        elif total_wealth > 110502600:
-            text= "Thượng Lưu"
-        elif total_wealth > 7502600:
-            text= "Trung Lưu"
-        elif total_wealth > 2000000:
-            text= "Hạ Lưu"
-        else:
-            text = "Hạ Đẳng"
-        return text
-    

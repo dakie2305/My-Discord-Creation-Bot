@@ -4,7 +4,7 @@ from datetime import datetime
 from CustomEnum.EmojiEnum import EmojiCreation2
 
 class Item:
-    def __init__(self, item_id: str, item_name: str, item_description: str, item_type: str, quantity: int, emoji: str, item_worth_amount: int = 5000, item_worth_type: str = "C", item_require_target: bool = False, is_self_usable = False, bonus_exp: int = 0, bonus_dignity: int = 0):
+    def __init__(self, item_id: str, item_name: str, item_description: str, item_type: str, quantity: int, emoji: str, item_worth_amount: int = 5000, item_worth_type: str = "C", item_require_target: bool = False, is_self_usable = False, bonus_exp: int = 0, bonus_dignity: int = 0, rank_required: int = 1):
         self.item_id = item_id
         self.item_name = item_name
         self.item_description = item_description
@@ -17,6 +17,7 @@ class Item:
         self.is_self_usable = is_self_usable
         self.bonus_exp = bonus_exp
         self.bonus_dignity = bonus_dignity
+        self.rank_required = rank_required
 
     def to_dict(self):
         return {
@@ -32,6 +33,7 @@ class Item:
             "is_self_usable": self.is_self_usable,
             "bonus_exp": self.bonus_exp,
             "bonus_dignity": self.bonus_dignity,
+            "rank_required": self.rank_required,
         }
 
     @staticmethod
@@ -51,6 +53,7 @@ class Item:
                 
                 bonus_exp=data.get("bonus_exp", 0),
                 bonus_dignity=data.get("bonus_dignity", 0),
+                rank_required=data.get("rank_required", 1),
             )
 
 #region list gift
@@ -68,6 +71,7 @@ list_gift_items = [
         is_self_usable = False,
         bonus_exp = 10,
         bonus_dignity = 0,
+        rank_required = 1,
     ),
     Item(
         item_id = "g_flower",
@@ -82,6 +86,7 @@ list_gift_items = [
         is_self_usable = False,
         bonus_exp = 10,
         bonus_dignity = 5,
+        rank_required = 5,
     ),
     Item(
         item_id = "g_chocolate",
@@ -96,6 +101,7 @@ list_gift_items = [
         is_self_usable = False,
         bonus_exp = 5,
         bonus_dignity = 10,
+        rank_required = 8,
     ),
     Item(
         item_id = "g_stcake",
@@ -110,6 +116,7 @@ list_gift_items = [
         is_self_usable = False,
         bonus_exp = 10,
         bonus_dignity = 10,
+        rank_required = 10,
     ),
     Item(
         item_id = "g_earring",
@@ -124,6 +131,7 @@ list_gift_items = [
         is_self_usable = False,
         bonus_exp = 15,
         bonus_dignity = 5,
+        rank_required = 20,
     ),
     Item(
         item_id = "g_sring",
@@ -138,6 +146,7 @@ list_gift_items = [
         is_self_usable = False,
         bonus_exp = 15,
         bonus_dignity = 10, 
+        rank_required = 25,
     ),
     Item(
         item_id = "g_gring",
@@ -151,7 +160,8 @@ list_gift_items = [
         item_require_target = True,
         is_self_usable = False,
         bonus_exp = 30,
-        bonus_dignity = 15, 
+        bonus_dignity = 15,
+        rank_required = 25,
     ),
     Item(
         item_id = "g_dring",
@@ -165,6 +175,7 @@ list_gift_items = [
         item_require_target = True,
         is_self_usable = False,
         bonus_exp = 30,
-        bonus_dignity = 20, 
+        bonus_dignity = 20,
+        rank_required = 35,
     ),
 ]
