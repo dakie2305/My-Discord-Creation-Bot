@@ -50,12 +50,12 @@ class AuthorityView(discord.ui.View):
         if len(self.yes_votes) > len(self.no_votes):
             result_message = f"**{self.target_user.display_name}** đã thắng bầu cử và trở thành Chính Quyền! Có **{len(self.yes_votes)}** người đã bầu ủng hộ! Đã cộng thêm tiền và của cải cho tân Chính Quyền đương nhiệm!"
             ProfileMongoManager.set_authority(guild_id=self.target_user.guild.id, guild_name=self.target_user.guild.name, user_id=self.target_user.id,user_name=self.target_user.name,user_display_name= self.target_user.display_name)
-            ProfileMongoManager.update_profile_money(guild_id=self.target_user.guild.id, guild_name=self.target_user.guild.name, user_id=self.target_user.id,user_name=self.target_user.name,user_display_name= self.target_user.display_name,darkium=1,copper=5000, gold=10,silver=3)
+            ProfileMongoManager.update_profile_money(guild_id=interaction.guild.id, guild_name=self.target_user.guild.name, user_id=self.target_user.id,user_name=self.target_user.name,user_display_name= self.target_user.display_name,darkium=1,copper=5000, gold=10,silver=3)
             #Cộng thêm kinh nghiệm nhiều
-            ProfileMongoManager.update_level_progressing(guild_id=self.target_user.guild.id, user_id= self.target_user.id, bonus_exp=200)
+            ProfileMongoManager.update_level_progressing(guild_id=interaction.guild.id, user_id= self.target_user.id, bonus_exp=200)
         else:
             result_message = f"**{self.target_user.display_name}** đã thua bầu cử! Đáng tiếc là chỉ có {len(self.yes_votes)} người bầu ủng hộ bạn! Đừng quên bạn cũng vừa bị trừ **500** <a:copper:1294615524918956052>!"
-            ProfileMongoManager.update_profile_money(guild_id=self.target_user.guild.id, guild_name=self.target_user.guild.name, user_id=self.target_user.id,user_name=self.target_user.name,user_display_name= self.target_user.display_name,copper=-500)
+            ProfileMongoManager.update_profile_money(guild_id=interaction.guild.id, guild_name=self.target_user.guild.name, user_id=self.target_user.id,user_name=self.target_user.name,user_display_name= self.target_user.display_name,copper=-500)
         
         embed = discord.Embed(title=f"Chính Quyền Đương Cử",description=f"{result_message}",color=discord.Color.blue())
         embed.add_field(name=f"", value="▬▬▬▬▬ι═══════════>", inline=False)

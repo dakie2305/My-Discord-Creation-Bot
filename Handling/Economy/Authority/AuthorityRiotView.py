@@ -73,15 +73,15 @@ class AuthorityRiotView(discord.ui.View):
         if riot_win == False:
             embed.set_thumbnail(url="https://miro.medium.com/v2/resize:fit:640/format:webp/1*svtb7AdUWnBGfuZfCJc8Og.gif")
             #Trừ tiền của phản động
-            ProfileMongoManager.update_profile_money(guild_id=self.target_user.guild.id, guild_name=self.target_user.guild.name, user_id=self.target_user.id, user_display_name= self.target_user.display_name, user_name=self.target_user.name, copper=-100000)
+            ProfileMongoManager.update_profile_money(guild_id=interaction.guild.id, guild_name=interaction.guild.name, user_id=self.target_user.id, user_display_name= self.target_user.display_name, user_name=self.target_user.name, copper=-100000)
             #Cộng nhân phẩm cho chính quyền
-            ProfileMongoManager.update_dignity_point(guild_id=self.target_user.guild.id, guild_name=self.target_user.guild.name, user_id=self.user_authority.user_id, user_name= self.user_authority.user_name, user_display_name=self.user_authority.user_display_name, dignity_point=15)
+            ProfileMongoManager.update_dignity_point(guild_id=interaction.guild.id, guild_name=interaction.guild.name, user_id=self.user_authority.user_id, user_name= self.user_authority.user_name, user_display_name=self.user_authority.user_display_name, dignity_point=15)
             ProfileMongoManager.update_level_progressing(guild_id=self.target_user.guild.id, user_id=self.user_authority.user_id, bonus_exp=10)
         else:
             #Cộng tiền cho phản động
-            ProfileMongoManager.update_profile_money(guild_id=self.target_user.guild.id, guild_name=self.target_user.guild.name, user_id=self.target_user.id, user_display_name= self.target_user.display_name, user_name=self.target_user.name, silver=300)
+            ProfileMongoManager.update_profile_money(guild_id=interaction.guild.id, guild_name=interaction.guild.name, user_id=self.target_user.id, user_display_name= self.target_user.display_name, user_name=self.target_user.name, silver=300)
             #Trừ tiền của chính quyền
-            ProfileMongoManager.update_profile_money(guild_id=self.target_user.guild.id, guild_name=self.target_user.guild.name, user_id=self.user_authority.user_id, user_display_name= self.user_authority.user_display_name, user_name=self.user_authority.user_name, silver=-1000)
+            ProfileMongoManager.update_profile_money(guild_id=interaction.guild.id, guild_name=interaction.guild.name, user_id=self.user_authority.user_id, user_display_name= self.user_authority.user_display_name, user_name=self.user_authority.user_name, silver=-1000)
             embed.set_thumbnail(url="https://img.freepik.com/premium-photo/violent-riot-street-fight-criminal-gangs-extremists-faces-shadows-black-clothes-hoods-fire-flames-background-looting_884546-10051.jpg")
         embed.add_field(name=f"", value="▬▬▬▬▬ι═════════>", inline=False)
         list_mention_yes = []

@@ -250,7 +250,7 @@ class CrimeEconomy(commands.Cog):
     async def process_fight_command(self, interaction: discord.Interaction, user: discord.Member, target_user: discord.Member, user_profile: Profile, target_profile: Profile):
         authority_user = ProfileMongoManager.get_authority(guild_id=user.guild.id)
         win_lines = [
-                    "{user_name} đã chọc vào móc {target_name} và đã thắng!",
+                    "{user_name} đã chọc vào mắt {target_name} và đã thắng!",
                      "{user_name} đã móc súng ra, và {target_name} đã chấp nhận hoà giải!",
                      "{user_name} đã nhanh chóng khống chế được {target_name}!",
                      "{user_name} đã ra đòn chí mạng, hạ con mẹ nó gục {target_name}!",
