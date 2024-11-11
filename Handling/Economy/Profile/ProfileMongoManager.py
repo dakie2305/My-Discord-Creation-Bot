@@ -243,7 +243,7 @@ def update_auto_level_progressing(guild_id:int, user_id: int):
     collection = db_specific[f'profile_{guild_id}']
     existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
     if existing_data == None: return
-    if existing_data.level > 25: return
+    if existing_data.level >= 25: return
     
     #Sẽ cộng 20 exp mỗi lần
     existing_data.level_progressing += 20
@@ -273,7 +273,7 @@ def is_in_debt(data: Profile, darkium_threshold = 0, gold_threshold = 0, silver_
     if existing_data == None:
         return False
     if data.is_authority == True:
-        if UtilitiesFunctions.get_dia_vi(data) == "Trung Lưu": return True
+        if UtilitiesFunctions.get_dia_vi(data) == "Trung Lưu" or UtilitiesFunctions.get_dia_vi(data) == "Hạ Lưu" or UtilitiesFunctions.get_dia_vi(data) == "Hạ Đẳng": return True
         total_wealth = int(data.darkium*10000*5000*5000 + data.gold*5000*5000 + data.silver*5000 + data.copper)
         if total_wealth < 85002505500:
             return True

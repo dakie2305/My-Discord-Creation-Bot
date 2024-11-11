@@ -37,6 +37,13 @@ class QuestEconomy(commands.Cog):
             view.message = mess
             return
         
+        if user!= None and user.bot:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Không được dùng cho bot!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
+        
         if user == None:
             embed = await self.procress_quest_embed(user=interaction.user)
         else:
@@ -46,6 +53,7 @@ class QuestEconomy(commands.Cog):
     
     @commands.command()
     async def quest(self, ctx, user: Optional[discord.Member] = None):
+        if user != None and user.bot: return
         message: discord.Message = ctx.message
         if message:
             #Không cho dùng bot nếu không phải user

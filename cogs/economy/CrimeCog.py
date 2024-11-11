@@ -185,7 +185,7 @@ class CrimeEconomy(commands.Cog):
                 user_win = self.get_chance(25)
             else:
                 if target_profile.is_authority == True:
-                    user_win = self.get_chance(25)
+                    user_win = self.get_chance(40)
                 else: user_win = self.get_chance(75)
         else:
             user_win = self.get_chance(40)
@@ -287,7 +287,7 @@ class CrimeEconomy(commands.Cog):
                 user_win_fight = self.get_chance(25)
             else:
                 if target_profile.is_authority == True:
-                    user_win_fight = self.get_chance(25)
+                    user_win_fight = self.get_chance(35)
                 else: user_win_fight = self.get_chance(75)
         else:
             user_win_fight = self.get_chance(40)

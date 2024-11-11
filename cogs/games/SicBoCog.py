@@ -282,7 +282,7 @@ class SicboCog(commands.Cog):
     async def edit_embed_sb_double(self, message: discord.Message, user: discord.Member, number: int = None, so_tien:int = None, loai_tien:str = None, profile: Profile = None):
         
         #70% thua ngay
-        lose_chance = self.get_chance(75)
+        lose_chance = self.get_chance(45)
         if lose_chance == True:
             first_num, first_dice_emoji, second_num, second_dice_emoji, third_num, third_dice_emoji = self.fixed_roll_dice_double_lose()
         else:

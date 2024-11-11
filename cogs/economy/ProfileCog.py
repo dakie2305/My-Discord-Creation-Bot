@@ -35,6 +35,14 @@ class ProfileEconomy(commands.Cog):
             mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
             view.message = mess
             return
+        
+        if user!= None and user.bot:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Không được dùng cho bot!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
+        
         data = None
         if user == None:
             embed, data = await self.procress_profile_embed(user=interaction.user)
@@ -51,6 +59,7 @@ class ProfileEconomy(commands.Cog):
     
     @commands.command()
     async def profile(self, ctx, user: Optional[discord.Member] = None):
+        if user != None and user.bot: return
         message: discord.Message = ctx.message
         if message:
             #Không cho dùng bot nếu không phải user

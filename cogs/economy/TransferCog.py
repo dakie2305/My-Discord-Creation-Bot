@@ -31,6 +31,7 @@ class TransferMoneyEconomy(commands.Cog):
     
     @commands.command()
     async def um(self, ctx, amount: int = None, user: discord.Member = None, loai_tien: str = None):
+        if user != None and user.bot: return
         #Chỉ dành owner hoặc Darkie
         message: discord.Message = ctx.message
         if message:
@@ -79,6 +80,13 @@ class TransferMoneyEconomy(commands.Cog):
         if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
             view = SelfDestructView(timeout=30)
             embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
+        
+        if user.bot:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Không được chuyển cho bot!",color=discord.Color.blue())
             mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
             view.message = mess
             return
@@ -150,16 +158,17 @@ class TransferMoneyEconomy(commands.Cog):
             #mặc định 5%
             tax = int(amount * 5 / 100)
             tax_emoji = EmojiCreation2.GOLD.value
-        elif loai_tien == "G":
+        elif loai_tien == "S":
             #mặc định 8%
             tax = int(amount * 8 / 100)
-            tax_emoji = EmojiCreation2.GOLD.value
+            tax_emoji = EmojiCreation2.SILVER.value
         else:
             #mặc định 10%
             tax = int(amount * 10 / 100)
             tax_emoji = EmojiCreation2.COPPER.value
             
         #Cộng tiền tax cho chính quyền nếu user_profile không phải là chính quyền
+        if tax <= 0: tax = 1
         tax_text = ""
         extra_mess = ""
         if message != None:
