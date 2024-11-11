@@ -152,25 +152,27 @@ class TextShopInputModal(discord.ui.Modal):
             ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, item=item, amount=amount)
 
             maintenance_text = ""
-            maintenance_money = 500
+            maintenance_money = 3500
             maintenance_emoji = EmojiCreation2.COPPER.value
-            if profile_user.darkium > 12:
+
+            if item.item_worth_type == "D" and profile_user.darkium > 30:
                 maintenance_money = 1
                 maintenance_emoji = EmojiCreation2.DARKIUM.value
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, darkium=-maintenance_money)
-            elif profile_user.gold > 200:
-                #mặc định 5%
-                maintenance_money = int(profile_user.gold * 5 / 100)
+            elif item.item_worth_type == "G" and profile_user.gold > 10000:
+                #mặc định 20% giá trị của item
+                maintenance_money = int(cost_money * 20 / 100)
                 maintenance_emoji = EmojiCreation2.GOLD.value
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, gold=-maintenance_money)
-            elif profile_user.silver > 250:
-                #mặc định 10%
-                maintenance_money = int(profile_user.silver * 10 / 100)
+            elif item.item_worth_type == "G" and profile_user.silver > 10000:
+                #mặc định 20% giá trị của item
+                maintenance_money = int(cost_money * 20 / 100)
                 maintenance_emoji = EmojiCreation2.SILVER.value
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, silver=-maintenance_money)
-            elif profile_user.copper > 50000:
-                #mặc định 10%
-                maintenance_money = int(profile_user.copper * 10 / 100)
+            else:
+                #mặc định copper
+                #mặc định 20% giá trị của item
+                maintenance_money = int(cost_money * 20 / 100)
                 maintenance_emoji = EmojiCreation2.COPPER.value
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, copper=-maintenance_money)
                 

@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from Handling.Economy.Profile.ProfileClass import Profile
 import Handling.Economy.ConversionRate.ConversionRateMongoManager as ConversionRateMongoManager
 from Handling.Economy.Inventory_Shop.ItemClass import Item, list_gift_items
+from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 
 # Connect to the MongoDB server
 client = MongoClient("mongodb://localhost:27017/")
@@ -271,8 +272,13 @@ def is_in_debt(data: Profile, darkium_threshold = 0, gold_threshold = 0, silver_
     existing_data = data
     if existing_data == None:
         return False
-    if data.is_authority == True and existing_data.gold <= 0 and existing_data.darkium <= 0:
-        return True
+    if data.is_authority == True:
+        if UtilitiesFunctions.get_dia_vi(data) == "Trung Lưu": return True
+        total_wealth = int(data.darkium*10000*5000*5000 + data.gold*5000*5000 + data.silver*5000 + data.copper)
+        if total_wealth < 85002505500:
+            return True
+        else:
+            return False
     if existing_data.copper <= copper_threshold and existing_data.silver <= silver_threshold and existing_data.gold <= gold_threshold and existing_data.darkium <= darkium_threshold:
         return True
     else:

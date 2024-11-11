@@ -67,6 +67,7 @@ class ShopEconomy(commands.Cog):
             await interaction.followup.send(embed=embed)
             return
         
+        shop_rate = 1.0
         conversion_rate = ConversionRateMongoManager.find_conversion_rate_by_id(guild_id=interaction.guild_id)
         if conversion_rate == None:
             ConversionRateMongoManager.create_update_shop_rate(guild_id=interaction.guild_id, rate=1)
@@ -78,8 +79,7 @@ class ShopEconomy(commands.Cog):
             ConversionRateMongoManager.create_update_shop_rate(guild_id=interaction.guild_id, rate=new_rate)
             conversion_rate = ConversionRateMongoManager.find_conversion_rate_by_id(guild_id=interaction.guild_id)
         
-        shop_rate = 1.0
-        if conversion_rate != None:
+        if conversion_rate:
             shop_rate = conversion_rate.shop_rate
 
         #View đầu tiên luôn là gift shop

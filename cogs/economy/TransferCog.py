@@ -142,21 +142,21 @@ class TransferMoneyEconomy(commands.Cog):
         
         tax = 150
         tax_emoji = EmojiCreation2.COPPER.value
-        #Nếu quá giàu thì đánh tax những loại tiền lớn
-        if user_profile.darkium > 15:
+        #Đánh tax dựa trên số tiền chuyển đi
+        if loai_tien == "D":
             tax = 1
             tax_emoji = EmojiCreation2.DARKIUM.value
-        elif user_profile.gold > 200:
+        elif loai_tien == "G":
             #mặc định 5%
-            tax = int(user_profile.gold * 5 / 100)
+            tax = int(amount * 5 / 100)
             tax_emoji = EmojiCreation2.GOLD.value
-        elif user_profile.silver > 200:
+        elif loai_tien == "G":
+            #mặc định 8%
+            tax = int(amount * 8 / 100)
+            tax_emoji = EmojiCreation2.GOLD.value
+        else:
             #mặc định 10%
-            tax = int(user_profile.silver * 10 / 100)
-            tax_emoji = EmojiCreation2.SILVER.value
-        elif user_profile.copper > 50000:
-            #mặc định 10%
-            tax = int(user_profile.copper * 10 / 100)
+            tax = int(amount * 10 / 100)
             tax_emoji = EmojiCreation2.COPPER.value
             
         #Cộng tiền tax cho chính quyền nếu user_profile không phải là chính quyền
