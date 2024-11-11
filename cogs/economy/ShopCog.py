@@ -72,13 +72,18 @@ class ShopEconomy(commands.Cog):
         if conversion_rate == None:
             ConversionRateMongoManager.create_update_shop_rate(guild_id=interaction.guild_id, rate=1)
             conversion_rate = ConversionRateMongoManager.find_conversion_rate_by_id(guild_id=interaction.guild_id)
-        elif conversion_rate != None and conversion_rate.last_reset != None and conversion_rate.last_reset.date() != datetime.now().date():
+        elif conversion_rate != None and conversion_rate.last_reset_shop_rate != None and conversion_rate.last_reset_shop_rate.date() != datetime.now().date():
             #Random tỷ lệ rate
             allowed_values = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.5, 2.6]
             new_rate = random.choice(allowed_values)
             ConversionRateMongoManager.create_update_shop_rate(guild_id=interaction.guild_id, rate=new_rate)
             conversion_rate = ConversionRateMongoManager.find_conversion_rate_by_id(guild_id=interaction.guild_id)
-        
+        elif conversion_rate != None and conversion_rate.last_reset_shop_rate == None:
+            #Random tỷ lệ rate
+            allowed_values = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.5, 2.6]
+            new_rate = random.choice(allowed_values)
+            ConversionRateMongoManager.create_update_shop_rate(guild_id=interaction.guild_id, rate=new_rate)
+            conversion_rate = ConversionRateMongoManager.find_conversion_rate_by_id(guild_id=interaction.guild_id)
         if conversion_rate:
             shop_rate = conversion_rate.shop_rate
 
