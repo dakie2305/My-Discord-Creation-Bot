@@ -579,6 +579,7 @@ init_extension = ["cogs.games.RockPaperScissorCog",
                   "cogs.economy.LeaderboardCog",
                   "cogs.economy.ShopCog",
                   "cogs.economy.GiftCog",
+                  "cogs.economy.InventoryCog",
                   ]
 
 bot_token = os.getenv("BOT_TOKEN_NO2")

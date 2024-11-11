@@ -34,4 +34,12 @@ class EmojiCreation2(Enum):
     GIFT_SILVER_RING = "<a:gift_silver_ring:1302362877994340412>"
     GIFT_STRAW_CAKE = "<a:gift_strawberry_cake:1302363047041564703>"
     
+    ARMOUR_1 = "<:armor_1:1305560051846479984>"
+    ARMOUR_2 = "<:armor_2:1305560061581463633>"
+    HELMET_1 = "<:helmet_1:1305560085157642321>"
+    HELMET_2 = "<:helmet_2:1305560094330847343>"
+    COLORFUL_PILL = "<a:colorful_pill:1305560071513702482>"
+    LOCKPICK = "<:lockpick:1305560110386380957>"
+    TICKET = "<:ticket:1305560125854978098>"
+    
     

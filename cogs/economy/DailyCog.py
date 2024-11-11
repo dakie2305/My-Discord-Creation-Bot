@@ -152,8 +152,8 @@ class DailyEconomy(commands.Cog):
                     actual_money += 75000
                     embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.RANK_100.value}> : +**75000** {EmojiCreation2.COPPER.value}", inline=False)
                 if role.id == TrueHeavenRoleId.BOOSTER.value:
-                    actual_money += 10000
-                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.BOOSTER.value}> : +**10000** {EmojiCreation2.COPPER.value}", inline=False)
+                    actual_money += 100000
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.BOOSTER.value}> : +**100000** {EmojiCreation2.COPPER.value}", inline=False)
         
         
         if actual_money == 0: actual_money = 200

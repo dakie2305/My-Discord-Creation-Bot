@@ -24,7 +24,9 @@ class GiftView(discord.ui.View):
 
     async def on_timeout(self):
         if self.message != None: 
-            await self.message.delete()
+            try:
+                await self.message.delete()
+            except Exception: return
             return
         
     async def gift_button_callback(self, interaction: discord.Interaction):
@@ -61,7 +63,7 @@ class ItemSelect(discord.ui.Select):
     def __init__(self, user: discord.Member, list_item: List[Item], view: "GiftView"):
         options = [
             discord.SelectOption(label=f"{item.item_name} (x{item.quantity})", description=item.item_description[:97] + '...', value=item.item_id)
-            for item in list_item
+            for item in list_item if item.item_type == "gift"
         ]
         super().__init__(placeholder="Chọn vật phẩm muốn tặng...", options=options)
         self.list_item = list_item
@@ -75,7 +77,3 @@ class ItemSelect(discord.ui.Select):
         selected_item = next(item for item in self.list_item if item.item_id == selected_item_id)
         self.parent_view.selected_item = selected_item
         await interaction.followup.send(f'Bạn đã chọn tặng vật phẩm {selected_item.emoji} - **{selected_item.item_name}**', ephemeral=True)
-        
-        
-        
-        
