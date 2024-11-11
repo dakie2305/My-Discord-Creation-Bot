@@ -3,8 +3,8 @@ from discord.ui import Button, View
 from Handling.Economy.Profile import ProfileMongoManager
 from Handling.Economy.Profile.ProfileClass import Profile
 from CustomEnum.EmojiEnum import EmojiCreation2
-from Handling.Misc.SelfDestructView import SelfDestructView
 import random
+from Handling.Economy.Inventory_Shop.ItemClass import Item, list_gift_items
 
 class RandomDropboxEconomyView(discord.ui.View):
     def __init__(self):
@@ -33,21 +33,28 @@ class RandomDropboxEconomyView(discord.ui.View):
         gold_chance = self.get_chance(10)
         if gold_chance and flag == False: 
             emoji = EmojiCreation2.GOLD.value
-            amount = random.randint(1, 8)
+            amount = random.randint(8, 64)
             ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_display_name=interaction.user.display_name, user_name=interaction.user.name, gold=amount)
             flag = True
             
         silver_chance = self.get_chance(35)
         if silver_chance and flag == False: 
             emoji = EmojiCreation2.SILVER.value
-            amount = random.randint(5, 35)
+            amount = random.randint(35, 100)
             ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_display_name=interaction.user.display_name, user_name=interaction.user.name, silver=amount)
             flag = True
-            
+        
+        giftitem_chance = self.get_chance(35)
+        if giftitem_chance and flag == False: 
+            amount = random.choice(list_gift_items)
+            emoji = amount.emoji
+            flag = True
+            ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_display_name=interaction.user.display_name, user_name=interaction.user.name, item=amount, amount=1)
+        
         exp_chance = self.get_chance(35)
         if exp_chance and flag == False: 
             emoji = "Điểm Kinh Nghiệm"
-            amount = random.randint(1, 30)
+            amount = random.randint(20, 60)
             flag = True
             ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=interaction.user.id, bonus_exp=amount)
             
@@ -58,6 +65,8 @@ class RandomDropboxEconomyView(discord.ui.View):
             amount = random.randint(5, 50)
             flag = True
             ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_display_name=interaction.user.display_name, user_name=interaction.user.name, dignity_point=amount)
+        
+        
         
         if flag == False:
             #Cộng copper
