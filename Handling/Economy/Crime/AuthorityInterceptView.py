@@ -203,7 +203,7 @@ class AuthorityInterceptView(discord.ui.View):
                         await actual_user.add_roles(jail_role)
                         
                         # Create embed object
-                        embed = discord.Embed(title="Đại Lao Thẳng Tiến", description=f"Kẻ tội đồ đã bị chính quyền bắt quả tang trong lúc thực hiện hành vi phạm tội và tống vào đại lao!", color=0x00FF00)  # Green color
+                        embed = discord.Embed(title="Đại Lao Thẳng Tiến", description=f"Kẻ tội đồ {self.user.mention} đã bị chính quyền <@{self.authority_user.user_id}> bắt quả tang trong lúc thực hiện hành vi phạm tội và tống vào đại lao!", color=0x00FF00)  # Green color
                         embed.add_field(name="Lý do bị tù đày:", value=user_info.reason, inline=False)  # Single-line field
                         embed.add_field(name="Thời gian ra đại lao:", value=f"{mordern_date_time_format}", inline=True)
                         embed.add_field(name="Ghi chú", value="Nếu quá thời hạn phạt tù mà chưa được ra tù thì hãy la làng lên nhé!", inline=False) 

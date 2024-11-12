@@ -106,7 +106,7 @@ class SicboCog(commands.Cog):
         count_all = first_num + second_num + third_num
         await asyncio.sleep(4)
         
-        l_chance = self.get_chance(9)
+        l_chance = self.get_chance(5)
         if l_chance:
             await self.police_in(message=message, user=user, so_tien=so_tien, loai_tien=loai_tien, profile=profile)
             return
@@ -291,7 +291,7 @@ class SicboCog(commands.Cog):
             third_num, third_dice_emoji = self.get_random_dice()
         
         await asyncio.sleep(4)
-        l_chance = self.get_chance(9)
+        l_chance = self.get_chance(5)
         if l_chance:
             await self.police_in(message=message, user=user, so_tien=so_tien, loai_tien=loai_tien, profile=profile)
             return
@@ -437,7 +437,7 @@ class SicboCog(commands.Cog):
         second_num, second_dice_emoji = self.get_random_dice()
         third_num, third_dice_emoji = self.get_random_dice()
         await asyncio.sleep(4)
-        l_chance = self.get_chance(9)
+        l_chance = self.get_chance(5)
         if l_chance:
             await self.police_in(message=message, user=user, so_tien=so_tien, loai_tien=loai_tien, profile=profile)
             return
