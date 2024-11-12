@@ -136,7 +136,6 @@ class TextInputModal(discord.ui.Modal):
         if profile_user.darkium > 15 and to_emoji == EmojiCreation2.DARKIUM.value:
             tax = 1
             tax_emoji = EmojiCreation2.DARKIUM.value
-            
         elif to_emoji == EmojiCreation2.GOLD.value:
             #mặc định 5% số tiền quy đổi
             tax = int(new_money_value * 5 / 100)

@@ -360,7 +360,7 @@ class AuthorityEconomy(commands.Cog):
             await interaction.followup.send(content=f"Server không tồn tại Chính Quyền! Vui lòng dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", ephemeral=True)
             return
         if interaction.user.id != existed_authority.user_id and interaction.user.id != interaction.guild.owner_id:
-            await interaction.followup.send(content=f"Chỉ chính quyền mới được quyền dùng lệnh này để kích hoạt hộp quà ngẫu nhiên!", ephemeral=True)
+            await interaction.followup.send(content=f"Chỉ chính quyền mới được quyền dùng lệnh này để reset rate của bank được!", ephemeral=True)
             return
         if existed_authority != None and existed_authority.gold < 2000:
             await interaction.followup.send(content=f"Chính quyền cần 2000 {EmojiCreation2.GOLD.value} thì mới reset rate của bank được!", ephemeral=True)
@@ -382,6 +382,38 @@ class AuthorityEconomy(commands.Cog):
             # Handle any other errors that might occur
             await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
         
+    #region Authority reset_rate
+    @discord.app_commands.checks.cooldown(1, 1800)
+    @authority_group.command(name="reset_shop_rate", description="Reset tỷ lệ quy đổi của shop!")
+    async def reset_shop_rate_authority_slash(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=False)
+        #Kiểm tra xem server đã tồn tại ai là chính quyền chưa
+        existed_authority = ProfileMongoManager.get_authority(guild_id=interaction.guild_id)
+        if existed_authority == None:
+            await interaction.followup.send(content=f"Server không tồn tại Chính Quyền! Vui lòng dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", ephemeral=True)
+            return
+        if interaction.user.id != existed_authority.user_id and interaction.user.id != interaction.guild.owner_id:
+            await interaction.followup.send(content=f"Chỉ chính quyền mới được quyền dùng lệnh này để reset rate của shop được!", ephemeral=True)
+            return
+        if existed_authority != None and existed_authority.gold < 3000:
+            await interaction.followup.send(content=f"Chính quyền cần 3000 {EmojiCreation2.GOLD.value} thì mới reset rate của shop được!", ephemeral=True)
+            return
+        rate_conver = ConversionRateMongoManager.find_conversion_rate_by_id(guild_id=interaction.guild_id)
+        if rate_conver == None:
+            await interaction.followup.send(content=f"Vui lòng dùng lệnh {SlashCommand.BANK.value} trước rồi thử lại sau!", ephemeral=True)
+            return
+        ConversionRateMongoManager.create_update_shop_rate(guild_id=interaction.guild.id, rate=1.0)
+        ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, gold=-3000)
+        await interaction.followup.send(content=f"Đã trừ **3000** {EmojiCreation2.GOLD.value} của Chính Quyền để reset lại rate của shop!", ephemeral=True)
+    
+    @reset_shop_rate_authority_slash.error
+    async def reset_shop_rate_authority_slash_error(self, interaction: discord.Interaction, error):
+        if isinstance(error, discord.app_commands.CommandOnCooldown):
+            # Send a cooldown message to the user, formatted nicely
+            await interaction.response.send_message(f"⏳ Lệnh đang cooldown, vui lòng thực hiện lại trong vòng {error.retry_after:.2f}s tới.", ephemeral=True)
+        else:
+            # Handle any other errors that might occur
+            await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
         
         
     

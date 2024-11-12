@@ -48,7 +48,7 @@ class RandomDropboxEconomyView(discord.ui.View):
         if giftitem_chance and flag == False:
             amount = 1
             random_item = random.choice(list_gift_items)
-            emoji = random_item.emoji
+            emoji = f"[{random_item.emoji} - **{random_item.item_name}**]"
             flag = True
             ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_display_name=interaction.user.display_name, user_name=interaction.user.name, item=random_item, amount=amount)
         
