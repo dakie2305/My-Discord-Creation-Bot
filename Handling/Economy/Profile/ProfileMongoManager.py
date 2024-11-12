@@ -189,8 +189,18 @@ def update_last_attendance_now(guild_id:int, user_id: int):
 #region gift
 def update_last_gift_now(guild_id:int, user_id: int):
     collection = db_specific[f'profile_{guild_id}']
+    existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
     today = datetime.now()
+    existing_data.gift_given += 1
     result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"last_gift": today,
+                                                                                    "gift_given": existing_data.gift_given,
+                                                                                    }})
+    return result
+
+def update_last_attack_item_now(guild_id:int, user_id: int):
+    collection = db_specific[f'profile_{guild_id}']
+    today = datetime.now()
+    result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"last_attack_item_used": today,
                                                                                     }})
     return result
 
@@ -257,7 +267,17 @@ def update_auto_level_progressing(guild_id:int, user_id: int):
                                                                                     "level": existing_data.level,
                                                                                     }})
     return result
+def add_one_level_and_reset_progress(guild_id:int, user_id: int):
+    collection = db_specific[f'profile_{guild_id}']
+    existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
+    if existing_data == None: return
     
+    existing_data.level += 1
+    existing_data.level_progressing = 0
+    result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"level_progressing": existing_data.level_progressing,
+                                                                                    "level": existing_data.level,
+                                                                                    }})
+    return result
 
 
 #region work
@@ -364,7 +384,25 @@ def update_list_items_profile(guild_id: int, guild_name: str, user_id: int, user
                                                                                     }})
     return result
     
+
+def update_protection_item_profile(guild_id: int, guild_name: str, user_id: int, user_name: str, user_display_name: str, item: Item, remove: bool = False):
+    collection = db_specific[f'profile_{guild_id}']
+    existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
+    if existing_data == None: return
     
+    if remove == False:
+        #Thêm thì sẽ gắn vào profile, và xoá một cái đi khỏi list item
+        result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"protection_item": item.to_dict(),
+                                                                                    }})
+        update_list_items_profile(guild_id=guild_id, guild_name=guild_name, user_id=user_id, user_name=user_name, user_display_name= user_display_name, item=item, amount=-1)
+    else:
+        #Gỡ ra thì sẽ trả lại vào list item trong profile
+        result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"protection_item": None,
+                                                                                    }})
+        update_list_items_profile(guild_id=guild_id, guild_name=guild_name, user_id=user_id, user_name=user_name, user_display_name= user_display_name, item=item, amount=1)
+    return result
+    
+
     
 
 

@@ -1,12 +1,12 @@
 import discord
 from Handling.Economy.Profile.ProfileClass import Profile
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
-from  Handling.Economy.ConversionRate.ConversionRateClass import ConversionRate
-import Handling.Economy.ConversionRate.ConversionRateMongoManager as ConversionRateMongoManager
 from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.EmojiEnum import EmojiCreation2
-from typing import List, Optional, Dict
+from typing import List
 from Handling.Economy.Inventory_Shop.ItemClass import Item, list_gift_items
+from Handling.Economy.Inventory_Shop.LockpickView import LockpickView
+import asyncio
 
 class InventoryUseView(discord.ui.View):
     def __init__(self, user_profile: Profile, target_profile: Profile, user: discord.Member, target_user: discord.Member):
@@ -33,9 +33,85 @@ class InventoryUseView(discord.ui.View):
         if self.selected_item == None: return
         if interaction.user.id != self.user.id: return
         await interaction.response.defer(ephemeral=True)
+        
+        #Kiểm tra xem item đó còn không
+        check_fail = True
+        for player_item in self.user_profile.list_items:
+            if player_item.item_id == self.selected_item.item_id and player_item.quantity > 0:
+                check_fail = False
+                break
+        if check_fail:
+            await interaction.followup.send(f'Vật phẩm {self.selected_item.emoji} - **{self.selected_item.item_name}** đã không còn trong túi đồ của bạn!', ephemeral=True)
+            return
+        
         await interaction.followup.send(f'Bạn đã dùng vật phẩm [{self.selected_item.emoji} - **{self.selected_item.item_name}**]', ephemeral=True)
         if self.message != None: 
             await self.message.delete()
+        
+        
+        #Thực hiện hiệu ứng của item
+        if self.selected_item.item_type == "self_protection":
+            await self.using_protection_item(interaction=interaction)
+        elif self.selected_item.item_type == "self_support":
+            await self.using_support_item(interaction=interaction)
+        else:
+            await interaction.followup.send(f'Darkie vẫn chưa code xong công dụng cho vật phẩm [{self.selected_item.emoji} - **{self.selected_item.item_name}**]', ephemeral=True)
+            return
+    
+    #region use protection item
+    async def using_protection_item(self, interaction: discord.Interaction):
+        channel = interaction.channel
+        if self.user_profile.protection_item == None:
+            #Gắn các vật phẩm vào bản thân
+            #-1 vật phẩm
+            ProfileMongoManager.update_protection_item_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, remove=False)
+            await channel.send(f'{interaction.user.mention} đã sử dụng vật phẩm [{self.selected_item.emoji} - **{self.selected_item.item_name}**] để bảo hộ bản thân!')
+        else:
+            #Gỡ vật phẩm cũ ra
+            ProfileMongoManager.update_protection_item_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.user_profile.protection_item, remove=True)
+            #Gắn vật phẩm mới vào
+            ProfileMongoManager.update_protection_item_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, remove=False)
+            await channel.send(f'{interaction.user.mention} đã gỡ [{self.user_profile.protection_item.emoji} - **{self.user_profile.protection_item.item_name}**] để dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**]')
+        return
+
+    #region use support item
+    async def using_support_item(self, interaction: discord.Interaction):
+        channel = interaction.channel
+        if self.selected_item.item_id == "rank_up_1":
+            #Xoá vật phẩm
+            ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, amount= -1)
+            #tăng một cấp
+            ProfileMongoManager.add_one_level_and_reset_progress(guild_id=interaction.guild_id, user_id=interaction.user.id)
+            await channel.send(f'{interaction.user.mention} đã nuốt [{self.selected_item.emoji} - **{self.selected_item.item_name}**] và đột phá cấp bậc lên cấp **{self.user_profile.level+ 1}**!')
+        elif self.selected_item.item_id == "out_jail_ticket":
+            #Xoá vật phẩm
+            ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, amount= -1)
+            #Reset jail
+            ProfileMongoManager.update_jail_time(guild_id=interaction.guild_id, user_id=interaction.user.id, jail_time= None)
+            await channel.send(f'{interaction.user.mention} đã móc [{self.selected_item.emoji} - **{self.selected_item.item_name}**] ra, và không còn bị giam lệnh nữa!')
+        elif self.selected_item.item_id == "lock_pick_jail":
+            #Xoá vật phẩm
+            ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, amount= -1)
+            #Tạo embed
+            preloading_text = f"{interaction.user.mention} đang sử dụng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] để chuẩn bị vượt ngục!"
+            if self.user_profile.is_authority == False:
+                preloading_text += "\nCó thể gọi Chính Quyền vào cuộc để ngăn chặn vượt ngục!"
+            embed = discord.Embed(title=f"", description=f"{preloading_text}", color=0xc379e0)
+            authority_user = ProfileMongoManager.get_authority(interaction.guild_id)
+            view = LockpickView(user=interaction.user, user_profile=self.user_profile, authority_user=authority_user)
+            m = await channel.send(embed=embed, view=view)
+            view.old_message = m
+            #Đợi để xác định có thoát được không
+            await asyncio.sleep(20)
+            if view.interrupted == True: return
+            embed = discord.Embed(title=f"", description=f"{interaction.user.mention} đã sử dụng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] và vượt ngục thành công!", color=0xc379e0)
+            #Reset jail
+            ProfileMongoManager.update_jail_time(guild_id=interaction.guild_id, user_id=interaction.user.id, jail_time= None)
+            await m.edit(embed=embed, view=None)
+            return
+        else:
+            await channel.send(f'Darkie vẫn chưa code xong công dụng cho vật phẩm [{self.selected_item.emoji} - **{self.selected_item.item_name}**]', ephemeral=True)
+        return
             
         
 class ItemSelect(discord.ui.Select):

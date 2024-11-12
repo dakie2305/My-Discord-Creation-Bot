@@ -21,8 +21,20 @@ class ShopGlobalView(discord.ui.View):
         self.update_buttons()
 
     def update_buttons(self):
-        self.next_button.disabled = self.current_page == self.total_pages - 1
-        self.prev_button.disabled = self.current_page == 0
+        if(self.total_pages == 1):
+            self.next_button.disabled = True
+            self.prev_button.disabled = True
+        elif self.current_page + 1 == self.total_pages:
+            #Trang cuối, ẩn nút next
+            self.next_button.disabled = True
+            self.prev_button.disabled = False
+        elif self.current_page == 0:
+            #Trang đầu, ẩn nút prev
+            self.next_button.disabled = False
+            self.prev_button.disabled = True
+        else:
+            self.next_button.disabled = False
+            self.prev_button.disabled = False
     
     def create_embed(self):
         shop_name = self.keys[self.current_page]
@@ -51,8 +63,8 @@ class ShopGlobalView(discord.ui.View):
     async def prev_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         if self.current_page > 0:
             self.current_page -= 1
-            await interaction.response.edit_message(embed=self.create_embed(), view=self)
             self.update_buttons()
+            await interaction.response.edit_message(embed=self.create_embed(), view=self)
     
     @discord.ui.button(label="Mua", style=discord.ButtonStyle.green)
     async def buy_button(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -63,8 +75,8 @@ class ShopGlobalView(discord.ui.View):
     async def next_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         if self.current_page < self.total_pages - 1:
             self.current_page += 1
-            await interaction.response.edit_message(embed=self.create_embed(), view=self)
             self.update_buttons()
+            await interaction.response.edit_message(embed=self.create_embed(), view=self)
         
     async def on_timeout(self):
         if self.message != None: 
@@ -159,29 +171,34 @@ class TextShopInputModal(discord.ui.Modal):
                 maintenance_money = 1
                 maintenance_emoji = EmojiCreation2.DARKIUM.value
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, darkium=-maintenance_money)
-            elif item.item_worth_type == "G" and profile_user.gold > 10000:
-                #mặc định 20% giá trị của item
-                maintenance_money = int(cost_money * 20 / 100)
+            elif item.item_worth_type == "D" and profile_user.darkium < 30:
+                #Sẽ lấy 500 gold
+                maintenance_money = 500
                 maintenance_emoji = EmojiCreation2.GOLD.value
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, gold=-maintenance_money)
-            elif item.item_worth_type == "G" and profile_user.silver > 10000:
-                #mặc định 20% giá trị của item
-                maintenance_money = int(cost_money * 20 / 100)
+            elif item.item_worth_type == "G" and profile_user.gold > 10000:
+                #mặc định 5% giá trị của item
+                maintenance_money = int(cost_money * 5 / 100)
+                maintenance_emoji = EmojiCreation2.GOLD.value
+                ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, gold=-maintenance_money)
+            elif item.item_worth_type == "S" and profile_user.silver > 10000:
+                #mặc định 10% giá trị của item
+                maintenance_money = int(cost_money * 10 / 100)
                 maintenance_emoji = EmojiCreation2.SILVER.value
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, silver=-maintenance_money)
             else:
                 #mặc định copper
                 #mặc định 20% giá trị của item
                 maintenance_money = int(cost_money * 20 / 100)
+                if maintenance_money < 3500: maintenance_money = 3500
                 maintenance_emoji = EmojiCreation2.COPPER.value
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, copper=-maintenance_money)
-                
-            maintenance_text = f"\nNgoài ra, {interaction.user.mention} phải đóng tùm lum chi phí phát sinh là **{maintenance_money}** {maintenance_emoji}!"
+            maintenance_text = f"\nNgoài ra, {interaction.user.mention} phải đóng thuế VAT là **{maintenance_money}** {maintenance_emoji}!"
             
             authority_text = f"Chính Quyền đã nhận toàn bộ số tiền trên!"
             if profile_user.is_authority == True:
                 authority_text = ""
-            await interaction.followup.send(f"{interaction.user.mention} đã chọn mua **{amount}** {item.emoji} với giá {cost_money} {self.get_emoji_money_from_type(item.item_worth_type)}! {authority_text}{maintenance_text}", ephemeral=False)
+            await interaction.followup.send(f"{interaction.user.mention} đã chọn mua **{amount}** [{item.emoji}- **{item.item_name}**] với giá {cost_money} {self.get_emoji_money_from_type(item.item_worth_type)}! {authority_text}{maintenance_text}", ephemeral=False)
         except ValueError:
             await interaction.followup.send(f"Chỉ nhập số hợp lệ!", ephemeral=True)
             return

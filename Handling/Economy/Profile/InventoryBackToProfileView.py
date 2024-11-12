@@ -23,7 +23,6 @@ class ProfileToInventoryView(discord.ui.View):
         for item in self.profile.list_items:
             embed.add_field(name=f"", value=f"{item.emoji} - {item.item_name} (x{item.quantity})", inline=True)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
-        embed.add_field(name=f"", value=f"**Quote**: \"{self.profile.quote}\"", inline=False)
         embed.set_footer(text=f"Đừng quên, bạn chỉ được giữ tối đa 20 vật phẩm, mỗi loại vật phẩm chỉ tối đa 99 cái thôi nhé!", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/8fd7278827dbc92713e315ee03e0b502.webp?size=32")
         view = InventoryBackToProfileView(profile=self.profile)
         m = await self.message.edit(embed=embed, view = view)
@@ -83,6 +82,8 @@ class InventoryBackToProfileView(discord.ui.View):
         embed = discord.Embed(title=f"", description=f"**Profile <@{self.profile.user_id}>**", color=0xddede7)
         if self.profile.is_authority:
             embed.add_field(name=f"", value="**Chính Quyền Tối Cao**", inline=False)
+        if self.profile.protection_item != None:
+            embed.add_field(name=f"", value=f"Bảo Hộ Vật: [{self.profile.protection_item.emoji} - **{self.profile.protection_item.item_name}**]", inline=False)
         embed.add_field(name=f"", value=f"Nhân phẩm: **{UtilitiesFunctions.get_nhan_pham(self.profile.dignity_point)}** ({self.profile.dignity_point})", inline=True)
         embed.add_field(name=f"", value=f"Địa Vị: **{UtilitiesFunctions.get_dia_vi(self.profile)}**", inline=True)
         embed.add_field(name=f"", value=f"Rank: **{self.profile.level}**", inline=False)
