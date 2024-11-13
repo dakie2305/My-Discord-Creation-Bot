@@ -205,6 +205,7 @@ class TextShopInputModal(discord.ui.Modal):
         
     def is_valid_index(self, value: int, lst: list) -> bool:
         return 0 <= value < len(lst)
+    
     def get_emoji_money_from_type(self, type: str):
         if type == "C": return EmojiCreation2.COPPER.value
         if type == "S": return EmojiCreation2.SILVER.value

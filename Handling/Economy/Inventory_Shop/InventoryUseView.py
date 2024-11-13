@@ -9,13 +9,11 @@ from Handling.Economy.Inventory_Shop.LockpickView import LockpickView
 import asyncio
 
 class InventoryUseView(discord.ui.View):
-    def __init__(self, user_profile: Profile, target_profile: Profile, user: discord.Member, target_user: discord.Member):
+    def __init__(self, user_profile: Profile, user: discord.Member):
         super().__init__(timeout=30)
         self.message: discord.Message = None
         self.user_profile = user_profile
-        self.target_profile = target_profile
         self.user = user
-        self.target_user = target_user
         self.add_item(ItemSelect(user, user_profile.list_items, self))
         self.selected_item: Item = None
         self.use_button = discord.ui.Button(label="🖲️ Sử Dụng Vật Phẩm", style=discord.ButtonStyle.green)
@@ -64,13 +62,13 @@ class InventoryUseView(discord.ui.View):
         if self.user_profile.protection_item == None:
             #Gắn các vật phẩm vào bản thân
             #-1 vật phẩm
-            ProfileMongoManager.update_protection_item_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, remove=False)
+            ProfileMongoManager.equip_protection_item_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, unequip=False)
             await channel.send(f'{interaction.user.mention} đã sử dụng vật phẩm [{self.selected_item.emoji} - **{self.selected_item.item_name}**] để bảo hộ bản thân!')
         else:
             #Gỡ vật phẩm cũ ra
-            ProfileMongoManager.update_protection_item_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.user_profile.protection_item, remove=True)
+            ProfileMongoManager.equip_protection_item_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.user_profile.protection_item, unequip=True)
             #Gắn vật phẩm mới vào
-            ProfileMongoManager.update_protection_item_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, remove=False)
+            ProfileMongoManager.equip_protection_item_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, unequip=False)
             await channel.send(f'{interaction.user.mention} đã gỡ [{self.user_profile.protection_item.emoji} - **{self.user_profile.protection_item.item_name}**] để dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**]')
         return
 

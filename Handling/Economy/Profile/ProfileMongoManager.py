@@ -385,12 +385,12 @@ def update_list_items_profile(guild_id: int, guild_name: str, user_id: int, user
     return result
     
 
-def update_protection_item_profile(guild_id: int, guild_name: str, user_id: int, user_name: str, user_display_name: str, item: Item, remove: bool = False):
+def equip_protection_item_profile(guild_id: int, guild_name: str, user_id: int, user_name: str, user_display_name: str, item: Item, unequip: bool = False):
     collection = db_specific[f'profile_{guild_id}']
     existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
     if existing_data == None: return
     
-    if remove == False:
+    if unequip == False:
         #Thêm thì sẽ gắn vào profile, và xoá một cái đi khỏi list item
         result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"protection_item": item.to_dict(),
                                                                                     }})
@@ -402,7 +402,13 @@ def update_protection_item_profile(guild_id: int, guild_name: str, user_id: int,
         update_list_items_profile(guild_id=guild_id, guild_name=guild_name, user_id=user_id, user_name=user_name, user_display_name= user_display_name, item=item, amount=1)
     return result
     
-
+def remove_current_protection_item_profile(guild_id: int, user_id: int):
+    collection = db_specific[f'profile_{guild_id}']
+    existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
+    if existing_data == None: return
+    result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"protection_item": None,
+                                                                                    }})
+    return result
     
 
 
