@@ -280,8 +280,7 @@ class SicboCog(commands.Cog):
     
     
     async def edit_embed_sb_double(self, message: discord.Message, user: discord.Member, number: int = None, so_tien:int = None, loai_tien:str = None, profile: Profile = None):
-        
-        #70% thua ngay
+        #65% thua ngay
         lose_chance = self.get_chance(45)
         if lose_chance == True:
             first_num, first_dice_emoji, second_num, second_dice_emoji, third_num, third_dice_emoji = self.fixed_roll_dice_double_lose()
@@ -315,12 +314,12 @@ class SicboCog(commands.Cog):
             gambling_number_guess = f" và đặt cược vào số **{number}**"
         gambling_text = ""
         if so_tien != None:
-            #Nếu thắng thì tỉ lệ ăn 1:4
-            #Nếu thắng cả đoán số thì tỉ lệ ăn 1:6
+            #Nếu thắng thì tỉ lệ ăn 1:2
+            #Nếu thắng cả đoán số thì tỉ lệ ăn 1:4
             if number == None and so_tien != None and is_player_win == True:
-                so_tien = so_tien*4
+                so_tien = so_tien*2
             elif number != None and so_tien != None and is_player_win == True:
-                so_tien = so_tien*6
+                so_tien = so_tien*4
             gambling_text = f" **{so_tien}** {self.get_emoji_from_loai_tien(loai_tien=loai_tien)}"
         
         chinh_quyen_text = ""
