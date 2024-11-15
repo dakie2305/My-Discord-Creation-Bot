@@ -350,7 +350,7 @@ class SicboCog(commands.Cog):
         
         return
     
-        #region tài xỉu triple
+    #region tài xỉu triple
     @sb_group.command(name="triple", description="Tài xỉu Triple!")
     @discord.app_commands.checks.cooldown(1, 5)
     @discord.app_commands.describe(number="Đoán con số xúc xắc sẽ xuất hiện ba lần.")
@@ -489,6 +489,171 @@ class SicboCog(commands.Cog):
         
         return
     
+    #region Slot Machine
+    @sb_group.command(name="slot_machine", description="Quay ô nổ hủ may mắn!")
+    @discord.app_commands.checks.cooldown(1, 8)
+    @discord.app_commands.describe(choice="Chọn ô để đặt cược.")
+    @discord.app_commands.choices(choice=[
+        Choice(name="Trái tim", value="heart"),
+        Choice(name="Cà tím", value="patlcan"),
+        Choice(name="Cherry", value="cherry"),
+        Choice(name="Cam", value="orange"),
+        Choice(name="Đào", value="peach"),
+    ])
+    @discord.app_commands.describe(so_tien="Chọn số tiền muốn cá cược.")
+    @discord.app_commands.describe(loai_tien="Chọn loại tiền muốn cược.")
+    @discord.app_commands.choices(loai_tien=[
+        Choice(name="Gold", value="G"),
+        Choice(name="Silver", value="S"),
+        Choice(name="Copper", value="C"),
+    ])
+    async def sb_slot_machine_command(self, interaction: discord.Interaction, choice: str, so_tien:int = None, loai_tien:str = None):
+        await interaction.response.defer(ephemeral=False)
+        #Không cho dùng bot nếu không phải user
+        if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
+        
+        if (so_tien != None and loai_tien == None):
+            loai_tien = "C"
+            
+        if (so_tien == None and loai_tien != None):
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Đã chọn loại tiền thì vui lòng chọn giá tiền cần cá cược!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
+            
+        profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
+        if so_tien != None and profile == None:
+            await interaction.followup.send(f"Để cá cược thì bạn phải thực hiện lệnh {SlashCommand.PROFILE.value} trước đã!")
+            return
+        elif so_tien != None and profile != None:
+            if loai_tien == "C" and profile.copper < so_tien:
+                await interaction.followup.send(f"Bạn không có đủ {EmojiCreation2.COPPER.value} để cá cược!")
+                return
+            elif loai_tien == "S" and profile.silver < so_tien:
+                await interaction.followup.send(f"Bạn không có đủ {EmojiCreation2.SILVER.value} để cá cược!")
+                return
+            elif loai_tien == "G" and profile.gold < so_tien:
+                await interaction.followup.send(f"Bạn không có đủ {EmojiCreation2.GOLD.value} để cá cược!")
+                return
+        if so_tien != None and so_tien <= 0:
+            await interaction.followup.send(f"Số tiền nhập không hợp lệ!")
+            return
+        
+        gambling_money_text = ""
+        if so_tien != None and loai_tien != None:
+            emoji = self.get_emoji_from_loai_tien(loai_tien=loai_tien)
+            gambling_money_text = f" với tiền cược là **{so_tien}**{emoji}"
+        
+        embed = discord.Embed(title=f"", description=f"{EmojiCreation2.SLOT_MACHINE_SPINNING.value} **Nổ Hủ May Mắn** {EmojiCreation2.SLOT_MACHINE_SPINNING.value}", color=0x03F8FC)
+        embed.add_field(name=f"", value="▬▬▬▬ι═══════>", inline=False)
+        embed.add_field(name=f"", value=f"{interaction.user.mention} đã chọn {self.get_emoji_from_slot_machine_choice(choice=choice)}{gambling_money_text}!", inline=False)
+        embed.add_field(name=f"", value=f"\n", inline=False)
+        embed.add_field(name=f"", value=f"> │ {EmojiCreation2.SLOT_SPINNING.value} │ {EmojiCreation2.SLOT_SPINNING.value} │ {EmojiCreation2.SLOT_SPINNING.value} │", inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬ι═══════>", inline=False)
+        
+        mess = await interaction.followup.send(embed=embed)
+        if mess:
+            await self.edit_embed_slot_machine(message=mess, user=interaction.user, choice=choice, so_tien=so_tien,loai_tien=loai_tien,profile=profile)
+        return
+    
+    async def edit_embed_slot_machine(self, message: discord.Message, user: discord.Member, choice: str, so_tien:int = None, loai_tien:str = None, profile: Profile = None):
+        #10% là cả ba ô quay trúng
+        #40% là chỉ trúng hai ô
+        #60% là không trúng
+        list_result = self.fixed_slot_machine(choice=choice)
+        
+        first_slot = list_result[0]
+        first_slot_emoji = self.get_emoji_from_slot_machine_choice(first_slot)
+        
+        second_slot = list_result[1]
+        second_slot_emoji = self.get_emoji_from_slot_machine_choice(second_slot)
+        
+        third_slot = list_result[2]
+        third_slot_emoji = self.get_emoji_from_slot_machine_choice(third_slot)
+        
+
+        
+        gambling_money_text = ""
+        if so_tien != None and loai_tien != None:
+            emoji = self.get_emoji_from_loai_tien(loai_tien=loai_tien)
+            gambling_money_text = f" với tiền cược là **{so_tien}**{emoji}"
+            
+        await asyncio.sleep(2)
+        embed = discord.Embed(title=f"", description=f"{EmojiCreation2.SLOT_MACHINE_SPINNING.value} **Nổ Hủ May Mắn** {EmojiCreation2.SLOT_MACHINE_SPINNING.value}", color=0x03F8FC)
+        embed.add_field(name=f"", value="▬▬▬▬ι═══════>", inline=False)
+        embed.add_field(name=f"", value=f"{user.mention} đã chọn {self.get_emoji_from_slot_machine_choice(choice=choice)}{gambling_money_text}!", inline=False)
+        embed.add_field(name=f"", value=f"\n", inline=False)
+        embed.add_field(name=f"", value=f"> │ {first_slot_emoji} │ {EmojiCreation2.SLOT_SPINNING.value} │ {EmojiCreation2.SLOT_SPINNING.value} │", inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬ι═══════>", inline=False)
+        await message.edit(embed=embed)
+        
+        await asyncio.sleep(2)
+        embed = discord.Embed(title=f"", description=f"{EmojiCreation2.SLOT_MACHINE_SPINNING.value} **Nổ Hủ May Mắn** {EmojiCreation2.SLOT_MACHINE_SPINNING.value}", color=0x03F8FC)
+        embed.add_field(name=f"", value="▬▬▬▬ι═══════>", inline=False)
+        embed.add_field(name=f"", value=f"{user.mention} đã chọn {self.get_emoji_from_slot_machine_choice(choice=choice)}{gambling_money_text}!", inline=False)
+        embed.add_field(name=f"", value=f"\n", inline=False)
+        embed.add_field(name=f"", value=f"> │ {first_slot_emoji} │ {second_slot_emoji} │ {EmojiCreation2.SLOT_SPINNING.value} │", inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬ι═══════>", inline=False)
+        await message.edit(embed=embed)
+        
+        await asyncio.sleep(3)
+        is_player_win = False
+        if choice == first_slot and choice == second_slot and choice == third_slot:
+            is_player_win = True
+            if so_tien: so_tien*=2
+        elif (choice == first_slot and choice == second_slot) or (choice == second_slot and second_slot == third_slot) or ( choice == first_slot and first_slot == third_slot):
+            is_player_win= True
+        
+        new_result_gambling = ""
+        if so_tien != None and loai_tien != None:
+            new_result_gambling = f" **{so_tien}** {self.get_emoji_from_loai_tien(loai_tien=loai_tien)}"
+        
+        #Chốt kết quả
+        chinh_quyen_text = ""
+        if profile != None and profile.is_authority == False and so_tien != None:
+            chinh_quyen_text = "Chính quyền đã lấy một nửa số tiền cá cược để làm thuế!"
+        
+        if is_player_win == True:
+            result_text = f"\n{user.mention} đã thắng{new_result_gambling}!"
+        else:
+            result_text = f"\n{user.mention} đã thua! {chinh_quyen_text}"
+        
+        
+        embed = discord.Embed(title=f"", description=f"{EmojiCreation2.SLOT_MACHINE_SPINNING.value} **Nổ Hủ May Mắn** {EmojiCreation2.SLOT_MACHINE_SPINNING.value}", color=0x03F8FC)
+        embed.add_field(name=f"", value="▬▬▬▬ι═══════>", inline=False)
+        embed.add_field(name=f"", value=f"{user.mention} đã chọn {self.get_emoji_from_slot_machine_choice(choice=choice)}{gambling_money_text}!", inline=False)
+        embed.add_field(name=f"", value=f"\n", inline=False)
+        embed.add_field(name=f"", value=f"> │ {first_slot_emoji} │ {second_slot_emoji} │ {third_slot_emoji} │", inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬ι═══════>", inline=False)
+        embed.add_field(name=f"", value=f"\n", inline=False)
+        embed.add_field(name=f"", value=f"{result_text}", inline=False)
+        
+        if so_tien != None and loai_tien!= None and profile != None:
+            if loai_tien == "G": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, gold=so_tien, loai_tien=loai_tien)
+            elif loai_tien == "S": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, silver=so_tien, loai_tien=loai_tien)
+            elif loai_tien == "C": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, copper=so_tien, loai_tien=loai_tien)
+        
+        await message.edit(embed=embed)
+        
+        return
+        
+    @sb_slot_machine_command.error
+    async def sb_slot_machine_command_error(self, interaction: discord.Interaction, error):
+        if isinstance(error, discord.app_commands.CommandOnCooldown):
+            # Send a cooldown message to the user, formatted nicely
+            await interaction.response.send_message(f"⏳ Lệnh đang cooldown, vui lòng thực hiện lại trong vòng {error.retry_after:.2f}s tới.", ephemeral=True)
+        else:
+            # Handle any other errors that might occur
+            await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
+
+    
+        
     
     def get_random_dice(self):
         list_dice= [
@@ -534,13 +699,43 @@ class SicboCog(commands.Cog):
                 (first_num, first_dice_emoji), (second_num, second_dice_emoji), (third_num, third_dice_emoji) = rolls
                 return first_num, first_dice_emoji, second_num, second_dice_emoji, third_num, third_dice_emoji
 
+    def fixed_slot_machine(self, choice: str):
+        list_slot_value= [
+            "peach", 
+            "cherry", 
+            "orange", 
+            "heart", 
+            "patlcan"]
         
+        chance = random.random()
+        if chance < 0.1:
+            chosen_value = random.choice(list_slot_value)
+            return [chosen_value, chosen_value, chosen_value]
+        
+        elif chance < 0.4:
+            # Chọn 2 cái giống, 1 cái khác
+            chosen_value = choice
+            other_value = random.choice([value for value in list_slot_value if value != chosen_value])
+            result = [chosen_value, chosen_value, other_value]
+            # Đảo thứ thự của lựa chọn
+            random.shuffle(result)
+            return result
+        else:
+            result = random.sample(list_slot_value, 3)  # lấy ra ba lựa chọn khác nhau
+            return result
         
     def get_emoji_from_loai_tien(self, loai_tien):
         if loai_tien == "G": return EmojiCreation2.GOLD.value
         if loai_tien == "S": return EmojiCreation2.SILVER.value
         return EmojiCreation2.COPPER.value
-        
+    
+    def get_emoji_from_slot_machine_choice(self, choice: str):
+        if choice == "heart": return EmojiCreation2.SLOT_HEART.value
+        if choice == "cherry": return EmojiCreation2.SLOT_CHERRY.value
+        if choice == "peach": return EmojiCreation2.SLOT_PEACH.value
+        if choice == "patlcan": return EmojiCreation2.SLOT_PATLCAN.value
+        return EmojiCreation2.SLOT_ORANGE.value
+    
     def get_chance(self, chance: int):
         rand_num = random.randint(0, 100)
         if rand_num < chance:

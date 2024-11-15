@@ -42,4 +42,11 @@ class EmojiCreation2(Enum):
     LOCKPICK = "<:lockpick:1305560110386380957>"
     TICKET = "<:ticket:1305560125854978098>"
     
+    SLOT_MACHINE_SPINNING = "<a:slot_machine:1307066075522928650>"
+    SLOT_PATLCAN = "<:slot_patlcan:1307066083135590511>"
+    SLOT_PEACH = "<:slot_peach:1307066102333046845>"
+    SLOT_HEART = "<:slot_heart:1307066113439567905>"
+    SLOT_CHERRY = "<:slot_cherry:1307066130015322223>"
+    SLOT_ORANGE = "<:slot_orange:1307066170628767764>"
+    SLOT_SPINNING = "<a:slot_spinning:1307066198210642031>"
     

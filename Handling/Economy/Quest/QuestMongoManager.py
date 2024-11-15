@@ -40,20 +40,20 @@ def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_n
     if data_profile != None and data_profile.level != None:
         if data_profile.level >= 1 and data_profile.level < 15:
             # 5% 4, 20% 3, 30% 2
-            quest_difficult_rate = get_value(lengend=15, hard=25, avarage=45)
+            quest_difficult_rate = get_value(lengend=20, hard=35, avarage=35)
         elif data_profile.level >= 15 and data_profile.level < 30:
             # 5% 4, 20% 3, 40% 2
-            quest_difficult_rate = get_value(lengend=15, hard=40, avarage=45)
+            quest_difficult_rate = get_value(lengend=20, hard=40, avarage=45)
         elif data_profile.level >= 30 and data_profile.level < 50:
             # 5% 4, 35% 3, 35% 2
-            quest_difficult_rate = get_value(lengend=15, hard=35, avarage=35)
+            quest_difficult_rate = get_value(lengend=20, hard=35, avarage=35)
         elif data_profile.level >= 50 and data_profile.level < 75:
             # 10% 4, 35% 3, 35% 2
-            quest_difficult_rate = get_value(lengend=15, hard=35, avarage=35)
+            quest_difficult_rate = get_value(lengend=20, hard=35, avarage=35)
         elif data_profile.level >= 75 and data_profile.level < 99:
-            quest_difficult_rate = get_value(lengend=15, hard=50, avarage=10)
+            quest_difficult_rate = get_value(lengend=20, hard=50, avarage=10)
         elif data_profile.level >= 99:
-            quest_difficult_rate = get_value(lengend=20, hard=55, avarage=25)
+            quest_difficult_rate = get_value(lengend=30, hard=55, avarage=10)
     reward_type = "C"
     bonus_exp = 0
     emoji = EmojiCreation2.COPPER.value
@@ -68,25 +68,25 @@ def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_n
     base_amount = 1
     quest_title = ""
     quest_des = ""
-    base_reward_amount = 2000
+    base_reward_amount = 4500
     if quest_type == "emoji_reaction_count":
         base_amount = quest_difficult_rate * 120
         rand_reward_amount = random.randint(1, 5)
-        base_reward_amount = 1800
+        base_reward_amount = 4500
         if reward_type == "C":
-            base_reward_amount = 2000 * rand_reward_amount
+            base_reward_amount = 4500 * rand_reward_amount
         elif reward_type == "S":
             base_reward_amount = 100 * rand_reward_amount
         elif reward_type == "G":
-            base_reward_amount = 1 * rand_reward_amount
+            base_reward_amount = 2 * rand_reward_amount
         quest_title = f"Thả **{base_amount}** reactions bất kỳ tại kênh <#{channel_id}>"
         quest_des = f"**{base_reward_amount}**{emoji}"
     elif quest_type == "message_count":
         base_amount = quest_difficult_rate * 80
         rand_reward_amount = random.randint(1, 5)
-        base_reward_amount = 3000
+        base_reward_amount = 4500
         if reward_type == "C":
-            base_reward_amount = 3000 * rand_reward_amount
+            base_reward_amount = 4500 * rand_reward_amount
         elif reward_type == "S":
             base_reward_amount = 200 * rand_reward_amount
         elif reward_type == "G":
@@ -96,11 +96,11 @@ def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_n
     elif quest_type == "attachments_count":
         base_amount = quest_difficult_rate * 10
         rand_reward_amount = random.randint(1, 5)
-        base_reward_amount = 500
+        base_reward_amount = 3000
         if reward_type == "C":
-            base_reward_amount = 500 * rand_reward_amount
+            base_reward_amount = 3000 * rand_reward_amount
         elif reward_type == "S":
-            base_reward_amount = 1 * rand_reward_amount
+            base_reward_amount = 2 * rand_reward_amount
         elif reward_type == "G":
             base_reward_amount = 1
         quest_title = f"Thả **{base_amount}** ảnh, video bất kỳ vào kênh <#{channel_id}>"
