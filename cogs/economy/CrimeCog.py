@@ -224,14 +224,18 @@ class CrimeEconomy(commands.Cog):
                 emoji = EmojiCreation2.COPPER.value
                 if silver_chance and target_profile != None and target_profile.silver >= 5:
                     #Trừ 10% silver
-                    money = int(target_profile.silver*0.1)
+                    money = int(user_profile.silver*0.1)
+                    if money <= 0: money = 1000
+                    if money > 10000: money = 10000
                     emoji = EmojiCreation2.SILVER.value
                     ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name= interaction.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, silver=-money)
                 else:
                     #Trừ 30% copper
-                    money = int(target_profile.copper*0.3)
+                    money = int(user_profile.copper*0.3)
+                    if money <= 0: money = 10000
+                    if money > 100000: money = 100000
                     emoji = EmojiCreation2.COPPER.value
-                    ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name= interaction.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, copper=-money)
+                    ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name= interaction.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, copper=- money)
                 embed = discord.Embed(title=f"", description=f"{user.mention} đang chuẩn bị cướp tiền của {target_user.mention}!", color=0xc379e0)
                 embed.add_field(name=f"", value=f"{target_user.mention} đã mặc sẵn [{target_profile.protection_item.emoji} - **{target_profile.protection_item.item_name}**]!", inline=False)
                 embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} {user.mention} đã mất **{money}** {emoji}!", inline=False)
@@ -239,7 +243,6 @@ class CrimeEconomy(commands.Cog):
                 ProfileMongoManager.remove_current_protection_item_profile(guild_id=interaction.guild_id, user_id=target_user.id)
                 await me.edit(embed=embed, view=None, content=f"{target_user.mention}")
                 return
-        
         
         result_text =f""
         if user_win:
@@ -251,11 +254,15 @@ class CrimeEconomy(commands.Cog):
             if silver_chance and target_profile != None and target_profile.silver >= 5:
                 #Trừ 10% silver
                 money = int(target_profile.silver*0.1)
+                if money == 0: money = 1000
+                if money > 50000: money = 50000
                 emoji = EmojiCreation2.SILVER.value
             else:
                 #Trừ 30% copper
                 money = int(target_profile.copper*0.3)
                 emoji = EmojiCreation2.COPPER.value
+                if money == 0: money = 20000
+                if money > 1500000: money = 1500000
             if user_profile.is_authority == True: money = money *2
             result_text = f"{user.mention} đã thành công cướp được **{money}** {emoji} của {target_user.mention}!\nVì hành vi trộm cắp nên {user.mention} đã mất **{dignity_point} nhân phẩm**!"
             #Trừ tiền target_profile, cộng cho user_profile
@@ -358,9 +365,9 @@ class CrimeEconomy(commands.Cog):
             elif target_profile.protection_item.item_id == "hat_fight_2":
                 embed = discord.Embed(title=f"", description=f"{user.mention} đã lao đến đánh lộn với {target_user.mention}!", color=0xc379e0)
                 embed.add_field(name=f"", value=f"{target_user.mention} đã mặc sẵn [{target_profile.protection_item.emoji} - **{target_profile.protection_item.item_name}**]!", inline=False)
-                embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} {user.mention} đã bị đấm ngược lại, và mất **25** nhân phẩm!", inline=False)
+                embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} {user.mention} đã bị đấm ngược lại, và mất **20** nhân phẩm!", inline=False)
                 #Trừ nhân phẩm user 
-                ProfileMongoManager.update_dignity_point(guild_id=interaction.guild.id, guild_name=interaction.guild.name, user_id= user.id, user_name=user.name, user_display_name=user.display_name, dignity_point=-25)
+                ProfileMongoManager.update_dignity_point(guild_id=interaction.guild.id, guild_name=interaction.guild.name, user_id= user.id, user_name=user.name, user_display_name=user.display_name, dignity_point=-20)
                 #Gỡ phòng hộ bản thân
                 ProfileMongoManager.remove_current_protection_item_profile(guild_id=interaction.guild_id, user_id=target_user.id)
                 await me.edit(embed=embed, view=None, content=f"{target_user.mention}")

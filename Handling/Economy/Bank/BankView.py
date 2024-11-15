@@ -140,16 +140,22 @@ class TextInputModal(discord.ui.Modal):
             #mặc định 5% số tiền quy đổi
             tax = int(new_money_value * 5 / 100)
             tax_emoji = EmojiCreation2.GOLD.value
+            if tax <= 0: tax = 10
+            if tax > 10000: tax = 10000
             
         elif to_emoji == EmojiCreation2.SILVER.value:
             #mặc định 5%
             tax = int(new_money_value * 5 / 100)
             tax_emoji = EmojiCreation2.SILVER.value
+            if tax <= 0: tax = 10000
+            if tax > 100000: tax = 100000
             
         elif to_emoji == EmojiCreation2.COPPER.value:
             #mặc định 10%
             tax = int(new_money_value * 10 / 100)
             tax_emoji = EmojiCreation2.COPPER.value
+            if tax <= 0: tax = 100000
+            if tax > 10000000: tax = 10000000
             
         #Cộng tiền 200 Copper cho chính quyền nếu user_profile không phải là chính quyền
         tax_text = ""

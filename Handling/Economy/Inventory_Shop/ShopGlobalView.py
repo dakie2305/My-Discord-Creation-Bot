@@ -130,7 +130,7 @@ class TextShopInputModal(discord.ui.Modal):
                 await interaction.followup.send(f"Bạn phải nâng rank mình lên trên **{item.rank_required}** để mua vật phẩm {item.emoji}!", ephemeral=True)
                 return
             
-            cost_money = int(amount * self.rate * item.item_worth_amount)
+            cost_money = int(int(amount * self.rate) * item.item_worth_amount)
             
             if item.item_worth_type == "C" and profile_user.copper < cost_money:
                 await interaction.followup.send(f"Bạn không đủ {EmojiCreation2.COPPER.value}!", ephemeral=True)
@@ -145,22 +145,25 @@ class TextShopInputModal(discord.ui.Modal):
                 await interaction.followup.send(f"Bạn không đủ {EmojiCreation2.DARKIUM.value}!", ephemeral=True)
                 return
             
+            money_for_authority = int(cost_money/2)
+            if money_for_authority == 0: money_for_authority = 1
+            
             if item.item_worth_type == "C":
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, copper=-cost_money)
                 if profile_user.is_authority != True:
-                    ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, copper=cost_money)
+                    ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, copper=money_for_authority)
             elif item.item_worth_type == "S":
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, silver=-cost_money)
                 if profile_user.is_authority != True:
-                    ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, silver=cost_money)
+                    ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, silver=money_for_authority)
             elif item.item_worth_type == "G":
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, gold=-cost_money)
                 if profile_user.is_authority != True:
-                    ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, gold=cost_money)
+                    ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, gold=money_for_authority)
             elif item.item_worth_type == "D":
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, darkium=-cost_money)
                 if profile_user.is_authority != True:
-                    ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, darkium=cost_money)
+                    ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, darkium=money_for_authority)
             ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, item=item, amount=amount)
 
             maintenance_text = ""
@@ -176,26 +179,32 @@ class TextShopInputModal(discord.ui.Modal):
                 maintenance_money = 500
                 maintenance_emoji = EmojiCreation2.GOLD.value
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, gold=-maintenance_money)
-            elif item.item_worth_type == "G" and profile_user.gold > 10000:
+            elif item.item_worth_type == "G":
                 #mặc định 5% giá trị của item
                 maintenance_money = int(cost_money * 5 / 100)
                 maintenance_emoji = EmojiCreation2.GOLD.value
+                if maintenance_money <= 0: maintenance_money = 100
+                if maintenance_money > 10000: maintenance_money = 10000
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, gold=-maintenance_money)
-            elif item.item_worth_type == "S" and profile_user.silver > 10000:
+            elif item.item_worth_type == "S":
                 #mặc định 10% giá trị của item
                 maintenance_money = int(cost_money * 10 / 100)
                 maintenance_emoji = EmojiCreation2.SILVER.value
+                if maintenance_money <= 0: maintenance_money = 10000
+                if maintenance_money > 80000: maintenance_money = 80000
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, silver=-maintenance_money)
             else:
                 #mặc định copper
                 #mặc định 20% giá trị của item
                 maintenance_money = int(cost_money * 20 / 100)
                 if maintenance_money < 3500: maintenance_money = 3500
+                if maintenance_money == 0: maintenance_money = 10000
+                if maintenance_money > 200000: maintenance_money = 200000
                 maintenance_emoji = EmojiCreation2.COPPER.value
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, copper=-maintenance_money)
             maintenance_text = f"\nNgoài ra, {interaction.user.mention} phải đóng thuế VAT là **{maintenance_money}** {maintenance_emoji}!"
             
-            authority_text = f"Chính Quyền đã nhận toàn bộ số tiền trên!"
+            authority_text = f"Chính Quyền đã nhận được **{money_for_authority}** {self.get_emoji_money_from_type(item.item_worth_type)}!"
             if profile_user.is_authority == True:
                 authority_text = ""
             await interaction.followup.send(f"{interaction.user.mention} đã chọn mua **{amount}** [{item.emoji}- **{item.item_name}**] với giá {cost_money} {self.get_emoji_money_from_type(item.item_worth_type)}! {authority_text}{maintenance_text}", ephemeral=False)
