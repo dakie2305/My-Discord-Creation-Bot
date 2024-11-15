@@ -158,14 +158,20 @@ class TransferMoneyEconomy(commands.Cog):
             #mặc định 5%
             tax = int(amount * 5 / 100)
             tax_emoji = EmojiCreation2.GOLD.value
+            if tax <= 0: tax = 1
+            if tax > 10000: tax = 10000
         elif loai_tien == "S":
             #mặc định 8%
             tax = int(amount * 8 / 100)
             tax_emoji = EmojiCreation2.SILVER.value
+            if tax <= 0: tax = 1
+            if tax > 50000: tax = 50000
         else:
             #mặc định 10%
             tax = int(amount * 10 / 100)
             tax_emoji = EmojiCreation2.COPPER.value
+            if tax <= 0: tax = 100
+            if tax > 500000: tax = 500000
             
         #Cộng tiền tax cho chính quyền nếu user_profile không phải là chính quyền
         if tax <= 0: tax = 1

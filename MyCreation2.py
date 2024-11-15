@@ -488,7 +488,7 @@ async def on_message_delete(message):
     message: discord.Message = message
     if message == None: return
     if message.guild == None: return
-    if message.author.bot: return
+    
     channel_where_message_deleted = message.channel
     if message.guild.id == 1256987900277690470 and message.attachments != None and len(message.attachments)>0:
         #Áp dụng log images cho server true Heavens
@@ -503,7 +503,7 @@ async def on_message_delete(message):
             file = await CustomFunctions.get_attachment_file_from_url(url=attachment.url, content_type=attachment.content_type)
             if file != None: temp_files.append(file)
         await log_image_channel.send(embed=embed, files=temp_files)
-    if message.guild:
+    if message.guild and message.author.bot != True:
         #Kiểm tra coi có attachments không
         user_attachments = []
         if message.attachments:
