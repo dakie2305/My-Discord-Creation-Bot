@@ -1626,7 +1626,37 @@ async def on_ready():
     #Load extension
     for ext in init_extension:
         await bot.load_extension(ext)
-        
+
+@bot.event
+async def on_member_update(before: discord.Member, after: discord.Member):
+    #Tạm thời không cần chạy trong server khác
+    if before.guild.id != 1256987900277690470: return
+    
+    model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
+    channel = bot.get_channel(1259392446987632661)
+    await CustomFunctions.thanking_for_boost(bot_name="creation 1", before=before, after=after, model=model, channel=channel)
+    
+    # Get roles trước và sau khi update
+    before_roles = set(before.roles)
+    after_roles = set(after.roles)
+    # Tìm role mới thêm vào
+    new_roles = after_roles - before_roles
+    # Nếu có role đáy xã hội thì xoá hết những role mới
+    target_role_name = "Đáy Xã Hội"
+    target_role = discord.utils.get(after.guild.roles, name=target_role_name)
+    if target_role in after_roles:
+        # Xoá role mới
+        roles_to_remove = new_roles
+        if roles_to_remove:
+            try:
+                for role in roles_to_remove:
+                    await after.remove_roles(role)
+                    print(f"Removed role '{role.name}' from {after.name} due to 'Đáy Xã Hội' restriction.")
+            except discord.Forbidden:
+                print(f"Failed to update roles for {after.name}: Missing permissions.")
+            except discord.HTTPException as e:
+                print(f"Failed to update roles for {after.name}: {e}")
+
 @bot.event
 async def on_message(message: discord.Message):
     if message.author == bot.user:
@@ -1649,6 +1679,7 @@ async def on_message(message: discord.Message):
     await sub_function_ai_response(message=message, speakFlag=speakFlag)
     asyncio.create_task(word_matching(message=message))
     await bot.process_commands(message)
+
 
 
 bot_token = os.getenv("BOT_TOKENN")

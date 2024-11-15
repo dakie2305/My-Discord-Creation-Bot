@@ -201,7 +201,7 @@ def get_special_relationship_custom(message: discord.Message, bot_name: str):
     
     #nếu đối phương là Long
     elif message.author.id ==1152891269048193095:
-        relationship = f"**Đối phương tên thật là Long, giới tính nam, đây là thầy giáo đặc biệt và rất ấn tượng của cả hai Creation. Luôn luôn xưng là em, và gọi đối phương là thầy! Hãy nói chuyện vui vẻ bình thường**\n"    
+        relationship = f"**Đối phương tên thật là Long, giới tính nam, đây là thầy giáo đặc biệt và rất ấn tượng của cả hai Creation 1 và 2. Ngươi hãy luôn luôn xưng là em, và gọi đối phương là thầy! Hãy nói chuyện vui vẻ bình thường**\n"    
         
     #nếu đang là Creation 1, và đối phương là HuyGold
     elif message.author.id ==892983281488912405  and bot_name.lower() == "creation 1":
@@ -276,6 +276,35 @@ async def get_therapy_prompt(message: discord.Message,  extra_message: discord.M
     final_prompt = f"{initial_instruction} {therapy_background_creation_1} {relationship} {roleplay_ele}\nHãy trả lời nội dung sau với tính cách trên, và không lặp lại những gì mà đối phương đã từng nói.\n\"{message.author.display_name}\" vừa nói: '{formated_content}'"
     return final_prompt
 
+
+async def thanking_for_boost(bot_name: str, before: discord.Member, after: discord.Member, model, channel: discord.TextChannel):
+    if before.premium_since is None and after.premium_since is not None:
+        print(f"{after.name} has started boosting the server!")
+        thank_message = get_thank_prompt_for_boosting_server(bot_name=bot_name, user=after)
+        
+        response = model.generate_content(f"{thank_message}")
+        bot_response = remove_creation_name_prefix(f"{response.text}")
+        #Kiểm tra xem bot reponse có nhiều emoji không, nếu nhiều quá thì remove emoji
+        if count_emojis_in_text(bot_response) > 4:
+            bot_response = remove_emojis_from_text(bot_response)
+        await channel.send(f"🎉{after.mention} {bot_response}")
+    
+    return
+
+def get_thank_prompt_for_boosting_server(bot_name: str, user: discord.Member):
+    background = ""
+    xung_ho = "**Hãy tự xưng là em cho lễ phép.**\n"
+    if bot_name.lower() == "creation 1":
+        background = background_creation_1
+    else:
+        background = background_creation_2
+    
+    background += shared_background
+    background += xung_ho
+    thank_message = f"User {user.mention}, với tên hiển thị trong server là {user.display_name} đã cho server một boost, và giúp server phát triển hơn. Hãy cảm ơn họ thật nồng nhiệt vì đã giúp đỡ server!"
+    final_prompt = f"{initial_instruction} {background} **{thank_message}**"
+    return final_prompt
+    
 
 
 def count_words(input_string: str) -> int:
