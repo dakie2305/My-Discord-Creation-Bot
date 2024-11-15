@@ -124,7 +124,8 @@ class QuestEconomy(commands.Cog):
             #Tạo random quest
             quest = QuestMongoManager.create_new_random_quest(guild_id=user.guild.id, guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, channel_id=quest_channel.id, channel_name=quest_channel.name)
         embed = discord.Embed(title=f"", description=f"**Nhiệm vụ dành cho {user.mention}**", color=0xe9f5ec)
-        embed.set_thumbnail(url=user.avatar.url)
+        if user.avatar!=None:
+            embed.set_thumbnail(url=user.avatar.url)
         if quest.reset_date != None:
             embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Thời gian reset nhiệm vụ: <t:{int(quest.reset_date.timestamp())}:D> ", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Cấp độ nhiệm vụ: **{self.get_cap_do_quest(quest.quest_difficult_rate)}**", inline=False)
