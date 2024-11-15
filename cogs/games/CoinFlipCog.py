@@ -114,7 +114,7 @@ class CoinFlip(commands.Cog):
         else:
             is_player_win = False
         gambling_text = ""
-        if sap_ngua!= None:
+        if sap_ngua!= None and so_tien != None and loai_tien != None:
             if is_player_win == True:
                 gambling_text = f'\n{user.mention} đã chọn **`{player_choice}`** và thắng được **{so_tien}**{currency_emoji} từ Chính Quyền!'
             else:
@@ -137,7 +137,7 @@ class CoinFlip(commands.Cog):
             else:
                 is_player_win = False
             gambling_text = ""
-            if sap_ngua!= None:
+            if sap_ngua!= None and so_tien != None and loai_tien != None:
                 if is_player_win == True:
                     gambling_text = f'\n{user.mention} đã chọn **`{player_choice}`** và thắng **{so_tien}**{currency_emoji} từ Chính Quyền!'
                 else:

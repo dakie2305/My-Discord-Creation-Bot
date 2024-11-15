@@ -488,6 +488,7 @@ async def on_message_delete(message):
     message: discord.Message = message
     if message == None: return
     if message.guild == None: return
+    if message.author.bot: return
     channel_where_message_deleted = message.channel
     if message.guild.id == 1256987900277690470 and message.attachments != None and len(message.attachments)>0:
         #Áp dụng log images cho server true Heavens
