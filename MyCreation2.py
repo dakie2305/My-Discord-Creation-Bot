@@ -79,6 +79,29 @@ async def help(ctx):
         text= help_command()
         await message.reply(text)    
 
+@bot.command()
+async def cuu_gia(ctx):
+    message: discord.Message = ctx.message
+    if message:
+        role: discord.Role = discord.utils.get(ctx.guild.roles, name="Cửu Gia")
+        if role is None: return
+        members = role.members
+        
+        embed = discord.Embed(title=f"", description=f"**Cửu Gia Đại Nhất Tộc**", color=0x03F8FC)
+        embed.add_field(name=f"", value=f"Thượng Cổ Thiên Tôn: <@865429551614001153>", inline=False)
+        embed.add_field(name=f"", value=f"Sĩ số: **{len(members)}**", inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬ι═══════>", inline=False)
+        count = 1
+        for member in members:
+            if member.id == 865429551614001153: continue #Không cần hiện
+            embed.add_field(name=f"", value=f"- {member.mention}!", inline=False)
+            count += 1
+            if count > 20:
+                embed.add_field(name=f"", value=f"Và còn nhiều thành viên khác nữa!", inline=False)
+                break
+        embed.add_field(name=f"", value="▬▬▬▬ι═══════>", inline=False)
+        await message.reply(embed=embed)    
+
 
 #endregion
 
