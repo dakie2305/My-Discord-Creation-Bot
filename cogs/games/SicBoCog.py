@@ -13,6 +13,8 @@ from discord.app_commands import Choice
 import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
 from Handling.Economy.Profile.ProfileClass import Profile
 from datetime import datetime, timedelta
+from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
+from Handling.MiniGame.BaCao.BaCaoView import BaCaoView
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(SicboCog(bot=bot))
@@ -652,6 +654,68 @@ class SicboCog(commands.Cog):
             # Handle any other errors that might occur
             await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
 
+    
+    #region Bài cào
+    @sb_group.command(name="bai_cao", description="Tạo game bài cào để chơi cùng mọi người! Bạn sẽ làm nhà cái và chung tiền, hoặc ăn tiền nếu có!")
+    @discord.app_commands.checks.cooldown(1, 8)
+    @discord.app_commands.describe(so_tien="Chọn số tiền muốn cá cược.")
+    @discord.app_commands.describe(loai_tien="Chọn loại tiền muốn cược.")
+    @discord.app_commands.choices(loai_tien=[
+        Choice(name="Gold", value="G"),
+        Choice(name="Silver", value="S"),
+        Choice(name="Copper", value="C"),
+    ])
+    async def sb_slot_machine_command(self, interaction: discord.Interaction, so_tien:int = None, loai_tien:str = None):
+        await interaction.response.defer(ephemeral=False)
+        #Không cho dùng bot nếu không phải user
+        if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
+        
+        if (so_tien != None and loai_tien == None):
+            loai_tien = "C"
+            
+        if (so_tien == None and loai_tien != None):
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Đã chọn loại tiền thì vui lòng chọn giá tiền cần cá cược!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
+            
+        profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
+        if so_tien != None and profile == None:
+            await interaction.followup.send(f"Để cá cược tiền thì bạn phải thực hiện lệnh {SlashCommand.PROFILE.value} trước đã!")
+            return
+        elif so_tien != None and profile != None:
+            if loai_tien == "C" and profile.copper < so_tien:
+                await interaction.followup.send(f"Bạn không có đủ {EmojiCreation2.COPPER.value} để cá cược!")
+                return
+            elif loai_tien == "S" and profile.silver < so_tien:
+                await interaction.followup.send(f"Bạn không có đủ {EmojiCreation2.SILVER.value} để cá cược!")
+                return
+            elif loai_tien == "G" and profile.gold < so_tien:
+                await interaction.followup.send(f"Bạn không có đủ {EmojiCreation2.GOLD.value} để cá cược!")
+                return
+        if so_tien != None and so_tien <= 0:
+            await interaction.followup.send(f"Số tiền nhập không hợp lệ!")
+            return
+        
+        gambling_money_text = ""
+        if so_tien != None and loai_tien != None:
+            emoji = self.get_emoji_from_loai_tien(loai_tien=loai_tien)
+            gambling_money_text = f" với tiền cược là **{so_tien}**{emoji}"
+        
+        embed = discord.Embed(title=f"", description=f"**Sòng Bài Cào**", color=0x03F8FC)
+        embed.add_field(name=f"", value="▬▬▬▬ι═══════>", inline=False)
+        embed.add_field(name=f"", value=f"{interaction.user.mention} đã mở sòng Bài Cào{gambling_money_text}!", inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬ι═══════>", inline=False)
+        view = BaCaoView(user=interaction.user, user_profile=profile, so_tien=so_tien, loai_tien=loai_tien)
+        mess = await interaction.followup.send(embed=embed, view=view)
+        view.message = mess
+        await view.start_countdown()
     
         
     

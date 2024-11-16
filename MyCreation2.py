@@ -523,8 +523,6 @@ async def on_message_delete(message):
         else:
             #Cập nhật snipe_messages của SnipeChannelInfo ấy
             result = db.update_or_insert_snipe_message_info(guild_id=message.guild.id, channel_id=channel_where_message_deleted.id, snipe_message=snipe_message)
-    else:
-        print("Message deleted in a private message.")
     return
 
 @bot.event
