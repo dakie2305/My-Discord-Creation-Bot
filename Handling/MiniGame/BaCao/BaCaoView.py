@@ -7,6 +7,7 @@ from typing import List, Optional, Dict
 import random
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 import asyncio
+from datetime import datetime, timedelta
 
 
 class PlayerCardInfo:
@@ -102,19 +103,28 @@ class BaCaoView(discord.ui.View):
     
     async def trigger_result(self):
         if self.message == None: return
+        
+        
         #Nếu ít hơn hai người thì coi như không ai chịu chơi
         try:
             if len(self.player_list) < 1:
-                await self.message.edit(embed=None,view= None, content= f"{self.user.mention} có lẽ không ai muốn chơi cùng bạn rồi. Đừng quên, nếu bạn mà đặt tiền cá cược thì coi như mất luôn.")
+                await self.message.edit(embed=None,view= None, content= f"{self.user.mention} có lẽ không ai muốn chơi cùng bạn rồi. Đừng quên, bạn mất một nửa số tiền đã đặt.")
+                lost_money = int(self.so_tien/2)
+                if lost_money == 0: lost_money = 1
+                if self.loai_tien == "C": self.update_host_and_player_money(player=None, is_player_win=True, copper=lost_money)
+                if self.loai_tien == "S": self.update_host_and_player_money(player=None, is_player_win=True, silver=lost_money)
+                if self.loai_tien == "G": self.update_host_and_player_money(player=None, is_player_win=True, gold=lost_money)
+                return
+            elif self.host_card == None:
+                await self.message.edit(embed=None,view= None, content= f"Nhà cái {self.user.mention} đã sủi ván bài. Số tiền đặt cược của nhà cái coi như sẽ mất hết.")
                 if self.loai_tien == "C": self.update_host_and_player_money(player=None, is_player_win=True, copper=self.so_tien)
                 if self.loai_tien == "S": self.update_host_and_player_money(player=None, is_player_win=True, silver=self.so_tien)
                 if self.loai_tien == "G": self.update_host_and_player_money(player=None, is_player_win=True, gold=self.so_tien)
                 return
-            elif self.host_card == None:
-                await self.message.edit(embed=None,view= None, content= f"Nhà cái {self.user.mention} đã sủi ván bài. Mọi số tiền đặt cược coi như sẽ mất hết.")
-                if self.loai_tien == "C": self.update_host_and_player_money(player=None, is_player_win=True, copper=self.so_tien)
-                if self.loai_tien == "S": self.update_host_and_player_money(player=None, is_player_win=True, silver=self.so_tien)
-                if self.loai_tien == "G": self.update_host_and_player_money(player=None, is_player_win=True, gold=self.so_tien)
+            
+            l_chance = UtilitiesFunctions.get_chance(5)
+            if l_chance:
+                await self.police_in()
                 return
             
             gambling_money_text = ""
@@ -126,11 +136,10 @@ class BaCaoView(discord.ui.View):
             embed.add_field(name=f"", value="▬▬▬▬ι═══════>", inline=False)
             embed.add_field(name=f"", value=f"{self.user.mention} đã mở sòng Bài Cào{gambling_money_text}!", inline=False)
             embed.add_field(name=f"", value="▬▬▬▬ι═══════>", inline=False)
-            count = 1
             
             host_number = self.calculate_player_value(data=self.host_card)
             embed.add_field(name=f"", value=f"**Nhà cái** {self.user.mention}:\n{UtilitiesFunctions.get_emoji_from_card_type(card_type=self.host_card.first_card)} | {UtilitiesFunctions.get_emoji_from_card_type(card_type=self.host_card.second_card)} |{UtilitiesFunctions.get_emoji_from_card_type(card_type=self.host_card.third_card)}\nTổng số nút: **{host_number}**", inline=False)
-            
+            money_to_pay_by_host = 0
             for player in self.player_list:
                 is_player_win = None
                 player_number = self.calculate_player_value(data=player)
@@ -138,9 +147,11 @@ class BaCaoView(discord.ui.View):
                 if player_number > host_number:
                     is_player_win = True
                     player_result_text += " ▬ι═> Thắng!"
+                    money_to_pay_by_host -= self.so_tien
                 elif player_number < host_number:
                     is_player_win = False
                     player_result_text += " ▬ι═> Thua!"
+                    money_to_pay_by_host += self.so_tien
                 elif player_number == host_number:
                     is_player_win = None
                     player_result_text += " ▬ι═> Huề!"
@@ -149,6 +160,14 @@ class BaCaoView(discord.ui.View):
                     if self.loai_tien == "C": self.update_host_and_player_money(player=player, is_player_win=is_player_win, copper=self.so_tien)
                     if self.loai_tien == "S": self.update_host_and_player_money(player=player, is_player_win=is_player_win, silver=self.so_tien)
                     if self.loai_tien == "G": self.update_host_and_player_money(player=player, is_player_win=is_player_win, gold=self.so_tien)
+            
+            add_text = ""
+            if money_to_pay_by_host > 0:
+                add_text = f"**Nhà cái** {self.user.mention} đã lời được **{money_to_pay_by_host}** {UtilitiesFunctions.get_emoji_from_loai_tien(self.loai_tien)} từ sòng bạc này!"
+            else:
+                add_text = f"**Nhà cái** {self.user.mention} đã lỗ mất **{money_to_pay_by_host*(-1)}** {UtilitiesFunctions.get_emoji_from_loai_tien(self.loai_tien)} từ sòng bạc này!"
+            
+            embed.add_field(name=f"", value=add_text, inline=False)
             await self.message.edit(embed=embed, view=None)
             return
         except Exception:
@@ -168,6 +187,53 @@ class BaCaoView(discord.ui.View):
                 ProfileMongoManager.update_dignity_point(guild_id=self.user.guild.id, guild_name="", user_id=player.user.id, user_name=player.user.name, user_display_name=player.user.display_name, dignity_point=-1)
             ProfileMongoManager.update_profile_money(guild_id=self.user.guild.id, guild_name="", user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, gold=gold, silver=silver, copper=copper)
         return
+    
+    async def police_in(self):
+        #Công an ập vào
+            lost_money_text = ""
+            if self.so_tien != None and self.loai_tien != None:
+                lost_money_text = f"Chính Quyền tịch thu số tiền **{self.so_tien}** {UtilitiesFunctions.get_emoji_from_loai_tien(loai_tien=self.loai_tien)} của tất cả đối tượng tham gia! Những đối tượng bị tịch thu tiền: "
+            else:
+                lost_money_text = f"Những đối tượng bị tống giam: "
+            lose_embed = discord.Embed(title=f"", description=f"Công an đã ập vào để bắt quả tang {self.user.mention} vì tổ chức chơi đánh bạc sát phạt! Tất cả đối tượng đều bị giam 30 phút!", color=0x03F8FC)
+            lose_embed.add_field(name=f"", value=lost_money_text, inline=False)
+            time_window = timedelta(minutes=30)
+            jail_time = datetime.now() + time_window
+            for player in self.player_list:
+                lose_embed.add_field(name=f"", value=f"- {player.user.mention}", inline=False)
+                ProfileMongoManager.update_jail_time(guild_id=self.user.guild.id, user_id=player.user.id, jail_time=jail_time)
+                if self.loai_tien != None and self.so_tien != None:
+                    if self.loai_tien == "G":
+                        ProfileMongoManager.update_profile_money(guild_id=self.user.guild.id, guild_name="", user_id=player.user.id, user_name=player.user.name, user_display_name=player.user.display_name, gold=-self.so_tien)
+                        if self.user_profile.is_authority != True:
+                            ProfileMongoManager.update_money_authority(guild_id=self.user.guild.id, gold=self.so_tien)
+                    elif self.loai_tien == "S":
+                        ProfileMongoManager.update_profile_money(guild_id=self.user.guild.id, guild_name="", user_id=player.user.id, user_name=player.user.name, user_display_name=player.user.display_name, silver=-self.so_tien)
+                        if self.user_profile.is_authority != True:
+                            ProfileMongoManager.update_money_authority(guild_id=self.user.guild.id, silver=self.so_tien)
+                    elif self.loai_tien == "C":
+                        ProfileMongoManager.update_profile_money(guild_id=self.user.guild.id, guild_name="", user_id=player.user.id, user_name=player.user.name, user_display_name=player.user.display_name, copper=-self.so_tien)
+                        if self.user_profile.is_authority != True:
+                            ProfileMongoManager.update_money_authority(guild_id=self.user.guild.id, copper=self.so_tien)
+            
+            #Trừ tiền host
+            if self.loai_tien == "G":
+                ProfileMongoManager.update_profile_money(guild_id=self.user.guild.id, guild_name="", user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, gold=-self.so_tien)
+                if self.user_profile.is_authority != True:
+                            ProfileMongoManager.update_money_authority(guild_id=self.user.guild.id, gold=self.so_tien)
+            if self.loai_tien == "S":
+                ProfileMongoManager.update_profile_money(guild_id=self.user.guild.id, guild_name="", user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, silver=-self.so_tien)
+                if self.user_profile.is_authority != True:
+                            ProfileMongoManager.update_money_authority(guild_id=self.user.guild.id, silver=self.so_tien)
+            if self.loai_tien == "C":
+                ProfileMongoManager.update_profile_money(guild_id=self.user.guild.id, guild_name="", user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, copper=-self.so_tien)
+                if self.user_profile.is_authority != True:
+                            ProfileMongoManager.update_money_authority(guild_id=self.user.guild.id, copper=self.so_tien)
+            #jail host chung luôn
+            ProfileMongoManager.update_jail_time(guild_id=self.user.guild.id, user_id=self.user.id, jail_time=jail_time)
+            await self.message.edit(embed=lose_embed, view= None)
+            return
+
     
     def calculate_card_value(self, card: str) -> int:
         value = card[:-1]  # Lấy phần số trong bài (VD: "2" trong "2C")
