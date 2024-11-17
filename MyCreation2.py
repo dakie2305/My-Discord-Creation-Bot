@@ -87,7 +87,7 @@ async def cuu_gia(ctx):
         if role is None: return
         members = role.members
         
-        embed = discord.Embed(title=f"", description=f"**Cửu Gia Đại Nhất Tộc**", color=0x03F8FC)
+        embed = discord.Embed(title=f"", description=f"**Cửu Gia Đệ Nhất Tộc**", color=0x03F8FC)
         embed.add_field(name=f"", value=f"Thượng Cổ Thiên Tôn: <@865429551614001153>", inline=False)
         embed.add_field(name=f"", value=f"Sĩ số: **{len(members)}**", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι═══════>", inline=False)
@@ -608,8 +608,12 @@ async def on_member_update(before: discord.Member, after: discord.Member):
         if roles_to_remove:
             try:
                 for role in roles_to_remove:
-                    await after.remove_roles(role)
-                    print(f"Removed role '{role.name}' from {after.name} due to 'Đáy Xã Hội' restriction.")
+                    if role.is_premium_subscriber: continue
+                    if role.name == "Đáy Xã Hội": continue
+                    try:
+                        await after.remove_roles(role)
+                        print(f"Removed role '{role.name}' from {after.name} due to 'Đáy Xã Hội' restriction.")
+                    except Exception: continue
             except discord.Forbidden:
                 print(f"Failed to update roles for {after.name}: Missing permissions.")
             except discord.HTTPException as e:
