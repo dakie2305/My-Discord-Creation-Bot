@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 from Handling.Misc.SelfDestructView import SelfDestructView
-from enum import Enum
+from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.EmojiEnum import EmojiCreation2
 import CustomEnum.UserEnum as UserEnum
@@ -98,17 +98,35 @@ class CoinFlip(commands.Cog):
         
         await asyncio.sleep(3)
         choice = random.randint(0,10)
-        emoji_state = EmojiCreation2.COIN_NGUA.value
-        state = 'ngửa'
-        if choice > 0 and choice <=5:
-            state = 'sấp'
-            emoji_state = EmojiCreation2.COIN_SAP.value
-        elif choice == 10:
+        if choice == 10:
             #Troll player
             response = CustomFunctions.get_random_response("OnCoinFlip.txt")
             embed_updated = discord.Embed(title=f"", description=f"{user.mention} đã tung đồng xu. {response}", color=0x03F8FC)
             await message.edit(embed=embed_updated)
             return
+        lose_chance = UtilitiesFunctions.get_chance(55)
+        emoji_state = EmojiCreation2.COIN_NGUA.value
+        state = 'ngửa'
+        if lose_chance:
+            #Player thua
+            state = 'sấp'
+            emoji_state = EmojiCreation2.COIN_SAP.value
+            if player_choice != None and player_choice == 'sấp':
+                state = 'ngửa'
+                emoji_state = EmojiCreation2.COIN_NGUA.value
+            elif player_choice != None and player_choice == 'ngửa':
+                state = 'sấp'
+                emoji_state = EmojiCreation2.COIN_SAP.value
+        else:
+            #Player thắng
+            state = 'ngửa'
+            emoji_state = EmojiCreation2.COIN_NGUA.value
+            if player_choice != None and player_choice == 'sấp':
+                state = 'sấp'
+                emoji_state = EmojiCreation2.COIN_SAP.value
+            elif player_choice != None and player_choice == 'ngửa':
+                state = 'ngửa'
+                emoji_state = EmojiCreation2.COIN_NGUA.value
         if sap_ngua != None and player_choice == state:
             is_player_win = True
         else:
