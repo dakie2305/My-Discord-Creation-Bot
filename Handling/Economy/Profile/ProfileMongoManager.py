@@ -181,8 +181,18 @@ def update_profile_money_fast(guild_id:int, data: Profile):
 #region daily
 def update_last_attendance_now(guild_id:int, user_id: int):
     collection = db_specific[f'profile_{guild_id}']
+    existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
+    if existing_data == None: return
+    
     today = datetime.now()
+    yesterday = today - timedelta(days=1)
+    if existing_data.last_attendance != None and yesterday.date() == existing_data.last_attendance.date():
+        existing_data.daily_streak_count += 1
+    else:
+        existing_data.daily_streak_count = 0 
+
     result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"last_attendance": today,
+                                                                                    "daily_streak_count": existing_data.daily_streak_count
                                                                                     }})
     return result
 
@@ -546,7 +556,11 @@ def remove_authority_from_server(guild_id: int):
 
 def update_last_authority(guild_id: int, user_id: int):
     collection = db_specific[f'profile_{guild_id}']
-    result = collection.update_one({"id": "conversion_rate"}, {"$set": {"last_authority":user_id}})
+    today = datetime.now()
+    result = collection.update_one({"id": "conversion_rate"}, {"$set": {"last_authority":user_id,
+                                                                        "last_authority_date":today
+                                                                        
+                                                                        }})
     
     
 def update_last_riot_now(guild_id:int, user_id: int):

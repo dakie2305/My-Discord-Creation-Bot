@@ -3,7 +3,7 @@ from datetime import datetime
 from Handling.Economy.Inventory_Shop.ItemClass import Item
 
 class Profile:
-    def __init__(self, user_id: int, user_name: str, user_display_name: str, guild_name: str, copper: int = 500, silver: int = 0, gold: int = 0, darkium: int = 0, is_authority: bool = False, last_attendance: datetime= None, last_work: datetime = None, level: int = 1, dignity_point: int = 50, quest_finished: int = 0, quote: str = None, level_progressing: int = 0, jail_time: datetime = None, last_crime: datetime = None, last_riot: datetime = None, last_gift: datetime = None, last_attack_item_used: datetime = None, gift_given: int = 0, list_items : Optional[List['Item']] = None, protection_item: Item = None):
+    def __init__(self, user_id: int, user_name: str, user_display_name: str, guild_name: str, copper: int = 500, silver: int = 0, gold: int = 0, darkium: int = 0, is_authority: bool = False, last_attendance: datetime= None, last_work: datetime = None, level: int = 1, dignity_point: int = 50, quest_finished: int = 0, quote: str = None, level_progressing: int = 0, jail_time: datetime = None, last_crime: datetime = None, last_riot: datetime = None, last_gift: datetime = None, last_attack_item_used: datetime = None, gift_given: int = 0, list_items : Optional[List['Item']] = None, protection_item: Item = None, daily_streak_count: int = 0):
         self.id = "profile"
         self.user_id = user_id
         self.user_name = user_name
@@ -18,6 +18,7 @@ class Profile:
         self.last_work = last_work
         self.level = level
         self.dignity_point = dignity_point
+        self.daily_streak_count = daily_streak_count
         self.quest_finished = quest_finished
         self.quote = quote
         self.level_progressing = level_progressing
@@ -57,6 +58,7 @@ class Profile:
             "quote": self.quote,
             "level_progressing": self.level_progressing,
             "gift_given": self.gift_given,
+            "daily_streak_count": self.daily_streak_count,
             
             "protection_item": self.protection_item.to_dict() if self.protection_item else None,
             
@@ -87,6 +89,7 @@ class Profile:
                 quest_finished=data.get("quest_finished", 0),
                 level_progressing=data.get("level_progressing", 0),
                 gift_given=data.get("gift_given", 0),
+                daily_streak_count=data.get("daily_streak_count", 0),
                 quote=data.get("quote", None),
                 
                 protection_item = Item.from_dict(data.get("protection_item", None)) if data.get("protection_item") else None,

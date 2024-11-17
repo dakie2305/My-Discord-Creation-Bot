@@ -78,6 +78,10 @@ class DailyEconomy(commands.Cog):
             if user_profile.last_attendance != None and user_profile.last_attendance.date() == yesterday:
                 consecutive_date = True
         
+        #Cập nhật last_attendance
+        ProfileMongoManager.update_last_attendance_now(guild_id=user.guild.id, user_id=user.id)
+        user_profile = ProfileMongoManager.find_profile_by_id(guild_id=user.guild.id, user_id=user.id)
+        
         embed = discord.Embed(title=f"", description=f"**Điểm danh ngày thành công!**", color=0xc379e0)
         if user.avatar:
             embed.set_thumbnail(url=user.avatar.url)
@@ -92,7 +96,7 @@ class DailyEconomy(commands.Cog):
             actual_money = base_money + int(base_money*dignity_point/100)
             embed.add_field(name=f"", value=f"- Điểm nhân phẩm {dignity_point}: +**{int(base_money*dignity_point/100)}** {EmojiCreation2.COPPER.value}", inline=False)
         else:
-            rate = base_money*dignity_point/100
+            rate = int(base_money*dignity_point/100)
             if rate == 0: rate = 400
             actual_money = base_money - rate
             embed.add_field(name=f"", value=f"- Điểm nhân phẩm {dignity_point}: -**{rate}** {EmojiCreation2.COPPER.value}", inline=False)
@@ -102,6 +106,11 @@ class DailyEconomy(commands.Cog):
         if user_profile != None and user_profile.is_authority:
             actual_money += 3000
             embed.add_field(name=f"", value=f"- Là chính quyền tối cao: +**3000** {EmojiCreation2.COPPER.value}", inline=False)
+        if user_profile != None and user_profile.daily_streak_count != None and user_profile.daily_streak_count > 0:
+            #Mỗi một ngày daily là cộng 1000
+            bonus_streak = 1000 * user_profile.daily_streak_count
+            actual_money += bonus_streak
+            embed.add_field(name=f"", value=f"- Đã điểm danh liên tiếp **{user_profile.daily_streak_count}** ngày liền: **{bonus_streak}** {EmojiCreation2.COPPER.value}", inline=False)
         
         #Đặc quyền server tổng
         if user.guild.id == 1256987900277690470:
@@ -166,8 +175,6 @@ class DailyEconomy(commands.Cog):
         #Nếu không phải chính quyền thì trừ tiền của chính quyền
         if user_profile!= None and user_profile.is_authority == False:
             ProfileMongoManager.update_money_authority(guild_id=user.guild.id, copper= -actual_money)
-        #Cập nhật last_attendance
-        ProfileMongoManager.update_last_attendance_now(guild_id=user.guild.id, user_id=user.id)
         
         #cộng 5 điểm dignity point
         ProfileMongoManager.update_dignity_point(guild_id=user.guild.id, guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name= user.display_name, dignity_point=5)
