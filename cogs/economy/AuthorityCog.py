@@ -495,15 +495,84 @@ class AuthorityEconomy(commands.Cog):
             # Handle any other errors that might occur
             await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
     
+    #region Authority resign
+    @discord.app_commands.checks.cooldown(1, 30)
+    @authority_group.command(name="resign", description="Cho phép chính quyền từ chức bình yên chỉ tốn cực kỳ ít tiền!")
+    async def authority_resign_slash(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=False)
+        #Kiểm tra xem server đã tồn tại ai là chính quyền chưa
+        existed_authority = ProfileMongoManager.get_authority(guild_id=interaction.guild_id)
+        if existed_authority == None:
+            await interaction.followup.send(content=f"Server không tồn tại Chính Quyền! Vui lòng dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", ephemeral=True)
+            return
+        if interaction.user.id != existed_authority.user_id and interaction.user.id != interaction.guild.owner_id:
+            await interaction.followup.send(content=f"Chỉ chính quyền mới được quyền dùng lệnh này!", ephemeral=True)
+            return
+        
+        rate_conver = ConversionRateMongoManager.find_conversion_rate_by_id(guild_id=interaction.guild_id)
+        if rate_conver == None:
+            await interaction.followup.send(content=f"Vui lòng dùng lệnh {SlashCommand.BANK.value} trước rồi thử lại sau!", ephemeral=True)
+            return
+        if rate_conver.last_authority_date == None:
+            #Cập nhật lại bằng thời gian hiện tại
+            rate_conver.last_authority_date = datetime.now()
+            ConversionRateMongoManager.update_last_authority_date(guild_id=interaction.guild_id, date=datetime.now())
+        #Miễn là đủ 2 tuần thì sẽ được quyền từ chức
+        if self.is_past_two_weeks(rate_conver.last_authority_date) == False:
+            target = datetime.today() + timedelta(weeks=2)
+            unix_time = int(target.timestamp())
+            await interaction.followup.send(content=f"Chính quyền phải làm việc ít nhất hai tuần mới được từ chức! Vui lòng đợi đến <t:{unix_time}:D> !", ephemeral=True)
+            return
+        
+        #Trừ % tiền lớn nhất
+        rate_percent = 15
+        money = 0
+        money_emoji = EmojiCreation2.COPPER.value
+        if existed_authority.darkium > 5:
+            money = int(existed_authority.darkium *rate_percent/100)
+            if money == 0: money = 1
+            money_emoji = EmojiCreation2.DARKIUM.value
+            ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, darkium=-money)
+        elif existed_authority.gold > 0:
+            money = int(existed_authority.gold*rate_percent/100)
+            if money == 0: money = 1
+            money_emoji = EmojiCreation2.GOLD.value
+            ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, gold=-money)
+        elif existed_authority.silver > 0:
+            money = int(existed_authority.silver*rate_percent/100)
+            if money == 0: money = 1
+            money_emoji = EmojiCreation2.SILVER.value
+            ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, gold=-money)
+        else:
+            money = int(existed_authority.copper*rate_percent/100)
+            if money == 0: money = 10000
+            money_emoji = EmojiCreation2.COPPER.value
+            ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, copper=-money)
+        
+        ProfileMongoManager.remove_authority_from_server(guild_id=interaction.guild_id)
+        ProfileMongoManager.update_last_authority(guild_id=interaction.guild_id, user_id=existed_authority.user_id)
+        await interaction.followup.send(content=f"Chính quyền đã từ chức và mất **{money}** {money_emoji}! Vui lòng dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới", ephemeral=False)
+    
+    @authority_resign_slash.error
+    async def authority_resign_slash_error(self, interaction: discord.Interaction, error):
+        if isinstance(error, discord.app_commands.CommandOnCooldown):
+            # Send a cooldown message to the user, formatted nicely
+            await interaction.response.send_message(f"⏳ Lệnh đang cooldown, vui lòng thực hiện lại trong vòng {error.retry_after:.2f}s tới.", ephemeral=True)
+        else:
+            # Handle any other errors that might occur
+            await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
+    
+    
+    
     
     def is_within_one_hour(self, past_time: datetime) -> bool:
         now = datetime.now()
-        # Define the time range
         one_hour_after = past_time + timedelta(hours=1)
-        # Check if current time is within the range
         return past_time <= now <= one_hour_after
 
-        
+    def is_past_two_weeks(self, input_datetime) -> bool:
+        two_weeks_ago = datetime.now() - timedelta(weeks=2)
+        return input_datetime < two_weeks_ago
         
     
     def get_nhan_pham(self, number):

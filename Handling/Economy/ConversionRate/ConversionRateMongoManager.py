@@ -40,3 +40,10 @@ def create_update_shop_rate(guild_id: int, rate: float):
         existing_data.last_reset_shop_rate = datetime.now()
         result = collection.update_one({"id": "conversion_rate"}, {"$set": existing_data.to_dict()})
     return result
+
+def update_last_authority_date(guild_id: int, date: datetime = None):
+    collection = db_specific[f'profile_{guild_id}']
+    existing_data = find_conversion_rate_by_id(guild_id=guild_id)
+    if existing_data == None: return
+    existing_data.last_authority_date = date
+    result = collection.update_one({"id": "conversion_rate"}, {"$set": existing_data.to_dict()})
