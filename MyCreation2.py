@@ -24,7 +24,9 @@ from Handling.Misc.SelfDestructView import SelfDestructView
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
 from Handling.Misc.RandomDropboxEconomyView import RandomDropboxEconomyView
+from Handling.MiniGame.RandomQuizz.RandomQuizzView import RandomQuizzView, random_quizzes
 from Handling.Misc.AutoLevelupProfile import AutoLevelupProfileHandling
+import asyncio
 
 load_dotenv()
 intents = discord.Intents.all()
@@ -327,7 +329,43 @@ async def random_dropbox():
             m = await quest_channel.send(embed=embed, view=view)
             view.old_message = m
             
-        
+@tasks.loop(hours=1, minutes = 10)
+async def random_quizz_embed():
+    guilds = bot.guilds
+    for guild in guilds:
+        await asyncio.sleep(5)
+        #Kiểm tra quest channel của server, nếu có thì mới chọn
+        guild_info = db.find_guild_extra_info_by_id(guild_id=guild.id)
+        if guild_info == None: continue
+        if guild_info.list_channels_quests == None or len(guild_info.list_channels_quests) <= 0: continue
+        list_channels_quests = guild_info.list_channels_quests
+        random_quest_channel_id = random.choice(list_channels_quests)
+        quest_channel = guild.get_channel(random_quest_channel_id)
+        if quest_channel == None:
+            #Xoá channel_id lỗi
+            list_channels_quests.remove(random_quest_channel_id)
+            data_updated = {"list_channels_quests": list_channels_quests}
+            db.update_guild_extra_info(guild_id=guild.id, update_data= data_updated)
+            #Chọn channel khác không bị lỗi
+            while quest_channel == None:
+                random_quest_channel_id = random.choice(list_channels_quests)
+                quest_channel = guild.get_channel(random_quest_channel_id)
+        if quest_channel != None:
+            
+            random_quizz = random.choice(random_quizzes)
+            view = RandomQuizzView(quizz=random_quizz)
+            endtime = datetime.now() + timedelta(seconds=120)
+            embed = discord.Embed(title=f"", description=f"{EmojiCreation2.QUESTION_MARK.value} **Hỏi Nhanh Có Thưởng** {EmojiCreation2.QUESTION_MARK.value}", color=0x0ce7f2)
+            embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
+            embed.add_field(name=f"", value=f"**Câu hỏi**: {random_quizz.question}", inline=False)
+            for key, value in view.option_mapping.items():
+                embed.add_field(name=f"", value=f"**{key}**. {value}", inline=False)
+            embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
+            embed.add_field(name=f"", value=f"Nhanh tay lên nhé, vì câu hỏi sẽ biến mất sau: <t:{int(endtime.timestamp())}:R>", inline=False)
+            embed.set_footer(text=f"Hỏi Nhanh Có Thưởng sẽ xuất hiện ngẫu nhiên, và khi thấy thì nhớ trả lời đúng nhé!", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/8fd7278827dbc92713e315ee03e0b502.webp?size=32")
+            print(f"Created random quizz at channel {quest_channel.name} in guild {guild.name}.")
+            m = await quest_channel.send(embed=embed, view=view)
+            view.old_message = m
         
 
 async def sub_function_ai_response(message: discord.Message, speakFlag: bool = True):
@@ -482,8 +520,8 @@ async def on_ready():
     if CustomFunctions.check_if_dev_mode()==False:
         automatic_speak_randomly.start()
         random_dropbox.start()
+    random_quizz_embed.start()
     remove_old_conversation.start()
-    
     #Load extension
     for ext in init_extension:
         await bot.load_extension(ext)
