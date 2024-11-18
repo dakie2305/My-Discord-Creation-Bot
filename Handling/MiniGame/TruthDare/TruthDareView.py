@@ -29,7 +29,8 @@ class TruthDareView(discord.ui.View):
         embed = discord.Embed(title=f"", description=f"*Loại trò chơi: Sự Thật*", color=0x03F8FC)
         embed.add_field(name=f"", value="___________________", inline=False)
         embed.add_field(name=f"", value=content, inline=False)
-        embed.set_footer(text=f"{interaction.user.name}", icon_url=interaction.user.avatar.url)
+        if interaction.user.avatar != None:
+            embed.set_footer(text=f"{interaction.user.name}", icon_url=interaction.user.avatar.url)
         view = TruthDareView()
         await interaction.followup.send(f"Bạn đã chọn Sự Thật.", ephemeral=True)
         message = await channel.send(embed=embed, view= view)
@@ -55,7 +56,8 @@ class TruthDareView(discord.ui.View):
         embed = discord.Embed(title=f"", description=f"*Loại trò chơi: Thử Thách*", color=0x03F8FC)
         embed.add_field(name=f"", value="___________________", inline=False)
         embed.add_field(name=f"", value=content, inline=False)
-        embed.set_footer(text=f"{interaction.user.name}", icon_url=interaction.user.avatar.url)
+        if interaction.user.avatar != None:
+            embed.set_footer(text=f"{interaction.user.name}", icon_url=interaction.user.avatar.url)
         view = TruthDareView()
         await interaction.followup.send(f"Bạn đã chọn Thách Thức.", ephemeral=True)
         message= await channel.send(embed=embed, view= view)

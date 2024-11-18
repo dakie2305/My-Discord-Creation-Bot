@@ -179,6 +179,8 @@ class BaCaoView(discord.ui.View):
         if is_player_win == True:
             if player != None:
                 ProfileMongoManager.update_profile_money(guild_id=self.user.guild.id, guild_name="", user_id=player.user.id, user_name=player.user.name, user_display_name=player.user.display_name, gold=gold, silver=silver, copper=copper)
+                #Cộng kinh nghiệm
+                ProfileMongoManager.update_level_progressing(guild_id=self.user.guild.id, user_id=player.user.id)
             ProfileMongoManager.update_profile_money(guild_id=self.user.guild.id, guild_name="", user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, gold=-gold, silver=-silver, copper=-copper)
         else:
             if player != None:
@@ -186,6 +188,8 @@ class BaCaoView(discord.ui.View):
                 #Trừ nhân phẩm người chơi nếu thua
                 ProfileMongoManager.update_dignity_point(guild_id=self.user.guild.id, guild_name="", user_id=player.user.id, user_name=player.user.name, user_display_name=player.user.display_name, dignity_point=-1)
             ProfileMongoManager.update_profile_money(guild_id=self.user.guild.id, guild_name="", user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, gold=gold, silver=silver, copper=copper)
+            #Cộng kinh nghiệm
+            ProfileMongoManager.update_level_progressing(guild_id=self.user.guild.id, user_id=self.user.id)
         return
     
     async def police_in(self):
