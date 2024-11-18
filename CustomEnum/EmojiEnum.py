@@ -102,3 +102,5 @@ class EmojiCreation2(Enum):
     CARD_Q_D = "<:q_diamonds:1307393220468146317>"
     CARD_Q_H = "<:q_hearts:1307393234309480539>"
     CARD_Q_S = "<:q_spades:1307393248200753152>"
+    
+    QUESTION_MARK = "<a:question_mark:1308085284147036312>"

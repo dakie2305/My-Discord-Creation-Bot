@@ -263,7 +263,7 @@ def update_auto_level_progressing(guild_id:int, user_id: int):
     collection = db_specific[f'profile_{guild_id}']
     existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
     if existing_data == None: return
-    if existing_data.level >= 25: return
+    if existing_data.level >= 50: return
     
     #Sẽ cộng 20 exp mỗi lần
     existing_data.level_progressing += 20

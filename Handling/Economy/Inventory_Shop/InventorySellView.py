@@ -51,7 +51,7 @@ class ItemSelect(discord.ui.Select):
         selected_item_id = self.values[0]
         selected_item = next(item for item in self.list_item if item.item_id == selected_item_id)
         self.parent_view.selected_item = selected_item
-        await interaction.followup.send(f'Bạn đã chọn chọn vật phẩm {selected_item.emoji} - **{selected_item.item_name}**', ephemeral=True)
+        await interaction.followup.send(f'Bạn đã chọn vật phẩm {selected_item.emoji} - **{selected_item.item_name}**', ephemeral=True)
 
 # Create a custom modal for text input
 class TextSellInventoryInputModal(discord.ui.Modal):
