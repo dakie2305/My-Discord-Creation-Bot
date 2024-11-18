@@ -109,6 +109,7 @@ class DailyEconomy(commands.Cog):
         if user_profile != None and user_profile.daily_streak_count != None and user_profile.daily_streak_count > 0:
             #Mỗi một ngày daily là cộng 1000
             bonus_streak = 1000 * user_profile.daily_streak_count
+            if bonus_streak > 60000: bonus_streak = 60000
             actual_money += bonus_streak
             embed.add_field(name=f"", value=f"- Đã điểm danh liên tiếp **{user_profile.daily_streak_count}** ngày liền: **{bonus_streak}** {EmojiCreation2.COPPER.value}", inline=False)
         

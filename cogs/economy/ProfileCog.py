@@ -88,6 +88,9 @@ class ProfileEconomy(commands.Cog):
         if message:
             if quote == None:
                 quote = "None"
+            if len(quote.split()) > 20:
+                await message.reply(content="Độ dài quá ký tự cho phép")
+                return
             embed = discord.Embed(title=f"", description=f"Đã cập nhật quote thành công. Vui lòng dùng lệnh {SlashCommand.PROFILE.value} để xem profile.", color=0xddede7)
             ProfileMongoManager.update_profile_quote(guild_name=message.guild.name, guild_id=message.guild.id, user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, quote=quote)
             view = SelfDestructView(timeout=30)
@@ -119,7 +122,10 @@ class ProfileEconomy(commands.Cog):
             embed.add_field(name=f"", value=f"Bảo Hộ Vật: [{data.protection_item.emoji} - **{data.protection_item.item_name}**]", inline=False)
         embed.add_field(name=f"", value=f"Nhân phẩm: **{UtilitiesFunctions.get_nhan_pham(data.dignity_point)}** ({data.dignity_point})", inline=True)
         embed.add_field(name=f"", value=f"Địa Vị: **{UtilitiesFunctions.get_dia_vi(data)}**", inline=True)
-        embed.add_field(name=f"", value=f"Rank: **{data.level}**", inline=False)
+        if data.level > 100:
+            embed.add_field(name=f"", value=f"Rank: **{data.level} (Vô Hư Phá)**", inline=False)
+        else:
+            embed.add_field(name=f"", value=f"Rank: **{data.level}**", inline=False)
         bar_progress = self.progress_bar(input_value= data.level_progressing)
         embed.add_field(name=f"", value=f"{bar_progress}\n", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)

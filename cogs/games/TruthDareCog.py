@@ -45,7 +45,8 @@ class TruthDare(commands.Cog):
         embed = discord.Embed(title=f"", description=f"*Loại trò chơi: {question_type}*", color=0x03F8FC)
         embed.add_field(name=f"", value="___________________", inline=False)
         embed.add_field(name=f"", value=content, inline=False)
-        embed.set_footer(text=f"{interaction.user.name}", icon_url=interaction.user.avatar.url)
+        if interaction.user.avatar != None:
+            embed.set_footer(text=f"{interaction.user.name}", icon_url=interaction.user.avatar.url)
         view = TruthDareView()
         await interaction.followup.send(f"Bạn đã chọn {question_type}.", ephemeral=True)
         message= await channel.send(embed=embed, view= view)
