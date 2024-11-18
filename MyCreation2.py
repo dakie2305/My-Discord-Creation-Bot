@@ -520,7 +520,7 @@ async def on_ready():
     if CustomFunctions.check_if_dev_mode()==False:
         automatic_speak_randomly.start()
         random_dropbox.start()
-    random_quizz_embed.start()
+        random_quizz_embed.start()
     remove_old_conversation.start()
     #Load extension
     for ext in init_extension:
