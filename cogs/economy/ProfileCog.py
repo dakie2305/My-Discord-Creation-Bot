@@ -91,6 +91,9 @@ class ProfileEconomy(commands.Cog):
             if len(quote.split()) > 20:
                 await message.reply(content="Độ dài quá ký tự cho phép")
                 return
+            if len(quote) > 600:
+                await message.reply(content="Độ dài quá ký tự cho phép")
+                return
             embed = discord.Embed(title=f"", description=f"Đã cập nhật quote thành công. Vui lòng dùng lệnh {SlashCommand.PROFILE.value} để xem profile.", color=0xddede7)
             ProfileMongoManager.update_profile_quote(guild_name=message.guild.name, guild_id=message.guild.id, user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, quote=quote)
             view = SelfDestructView(timeout=30)

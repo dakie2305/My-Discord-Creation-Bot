@@ -9,7 +9,7 @@ from enum import Enum
 import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
 from CustomEnum.SlashEnum import SlashCommand 
 from CustomEnum.EmojiEnum import EmojiCreation2 
-
+import string
 
 class CurrencyEmoji(Enum):
         DARKIUM = "<a:darkium:1294615481701105734>"
@@ -52,7 +52,7 @@ class AutoresponderHandling():
             _mess = await message.channel.send(embed=embed, view=view)
             view.message= _mess
             flag = True
-        elif CustomFunctions.contains_substring(message.content.lower(), quote):
+        elif CustomFunctions.contains_substring(message.content.lower(), quote) and message.content[0] not in string.punctuation and message.content[0] != ":":
             flag = True
             embed = discord.Embed(title=f"", description=f"Để thay đổi **Quote** trong lệnh </profile:1294699979058970656> thì hãy dùng lệnh:\n!quote \"Ghi quote vào đây\"", color=0xc379e0)
             view = SelfDestructView(timeout=60)
