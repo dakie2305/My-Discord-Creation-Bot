@@ -8,8 +8,7 @@ from  Handling.Economy.ConversionRate.ConversionRateClass import ConversionRate
 import Handling.Economy.ConversionRate.ConversionRateMongoManager as ConversionRateMongoManager
 from Handling.Economy.Bank.BankView import BankView
 from Handling.Misc.SelfDestructView import SelfDestructView
-from enum import Enum
-from datetime import datetime
+from datetime import datetime, time
 import random
 import CustomFunctions
 import CustomEnum.UserEnum as UserEnum
@@ -37,6 +36,12 @@ class BankEconomy(commands.Cog):
             view.message = mess
             return
         
+        if self.is_within_time_range():
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Hệ thống bank đang trong giai đoạn bổ sung tiền! Vui lòng đợi 10' nhé!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
         
         self_delete_view = SelfDestructView(timeout=120)
         embed, bank_view = await self.get_bank_embed(user=interaction.user)
@@ -56,6 +61,13 @@ class BankEconomy(commands.Cog):
             if CustomFunctions.check_if_dev_mode() == True and message.author.id != UserEnum.UserId.DARKIE.value:
                 view = SelfDestructView(timeout=30)
                 embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
+                mess = await message.reply(embed=embed, view=view)
+                view.message = mess
+                return
+            
+            if self.is_within_time_range():
+                view = SelfDestructView(timeout=30)
+                embed = discord.Embed(title=f"Hệ thống bank đang trong giai đoạn bổ sung tiền! Vui lòng đợi 10' nhé!",color=discord.Color.blue())
                 mess = await message.reply(embed=embed, view=view)
                 view.message = mess
                 return
@@ -129,5 +141,12 @@ class BankEconomy(commands.Cog):
         return embed, bank_view
         
         
-    
+    def is_within_time_range(self):
+        now = datetime.now().time()
+        start_time = time(23, 55)
+        end_time = time(0, 5)
+        # midnight
+        if start_time <= now or now <= end_time:
+            return True
+        return False
     
