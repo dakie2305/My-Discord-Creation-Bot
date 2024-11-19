@@ -49,10 +49,18 @@ class UtilitiesFunctions():
     def get_dia_vi(data: Profile):
         text = "Hạ Đẳng"
         total_wealth = data.copper + data.silver *5000 + data.gold * 5000 * 5000 + data.darkium * 5000 * 5000 * 10000
-        if total_wealth > 20025026000:
+        if total_wealth > 200025026000:
             text= "Đỉnh Cấp Xã Hội"
-        elif total_wealth > 16025026000:
+        elif total_wealth > 160250260000:
             text= "Giới Tinh Anh"
+        elif total_wealth > 101025026000:
+            text= "Phú Hào"
+        elif total_wealth > 61025026000:
+            text= "Giàu Nứt Vách"
+        elif total_wealth > 41025026000:
+            text= "Nhất Quan"
+        elif total_wealth > 21025026000:
+            text= "Quý Tộc"
         elif total_wealth > 11025026000:
             text= "Thượng Đẳng"
         elif total_wealth > 8525026000:

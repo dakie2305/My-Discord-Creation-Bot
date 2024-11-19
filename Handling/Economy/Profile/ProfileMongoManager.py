@@ -127,6 +127,10 @@ def update_profile_money(guild_id: int, guild_name: str, user_id: int, user_name
             existing_data.darkium += 1
         else: break
     
+    if existing_data.copper > 9999999999999: existing_data.copper = 9999999999999
+    if existing_data.silver > 9999999999999: existing_data.silver = 9999999999999
+    if existing_data.gold > 9999999999999: existing_data.gold = 9999999999999
+    if existing_data.darkium > 9999999999999: existing_data.darkium = 9999999999999
     
     result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"copper": existing_data.copper,
                                                                                     "gold": existing_data.gold,
@@ -172,6 +176,10 @@ def convert_currency(amount: int, rate: float, from_currency_type: str, to_curre
 
 def update_profile_money_fast(guild_id:int, data: Profile):
     collection = db_specific[f'profile_{guild_id}']
+    if data.copper > 9999999999999: data.copper = 9999999999999
+    if data.silver > 9999999999999: data.silver = 9999999999999
+    if data.gold > 9999999999999: data.gold = 9999999999999
+    if data.darkium > 9999999999999: data.darkium = 9999999999999
     result = collection.update_one({"id": "profile", "user_id": data.user_id}, {"$set": {"copper": data.copper,
                                                                                     "gold": data.gold,
                                                                                     "silver": data.silver,
@@ -511,6 +519,11 @@ def update_money_authority(guild_id: int, gold: int= 0, silver: int = 0, copper:
             existing_data.gold -=gold_needed_for_one_darkium
             existing_data.darkium += 1
         else: break
+        
+    if existing_data.copper > 9999999999999: existing_data.copper = 9999999999999
+    if existing_data.silver > 9999999999999: existing_data.silver = 9999999999999
+    if existing_data.gold > 9999999999999: existing_data.gold = 9999999999999
+    if existing_data.darkium > 9999999999999: existing_data.darkium = 9999999999999
     
     result = collection.update_one({"id": "profile", "user_id": existing_data.user_id}, {"$set": {"copper": existing_data.copper,
                                                                                         "gold": existing_data.gold,
