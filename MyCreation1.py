@@ -55,8 +55,7 @@ async def global_sync_creation_1(ctx):
 async def help(ctx):
     message: discord.Message = ctx.message
     if message:
-        text = get_help_text()
-        await message.channel.send(text)  
+        await message.channel.send("Vui lòng dùng lệnh /help")  
 
 @bot.command()
 @app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
@@ -72,7 +71,7 @@ async def sync(ctx):
 #region Nối Từ Commands
 @bot.command()
 @app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
-async def bat_dau_noi_tu_english(ctx):
+async def start_wm_en(ctx):
     message: discord.Message = ctx.message
     if message:
         #Kiểm tra xem đã tồn tại WordMatchingClass cho channel này chưa
@@ -90,7 +89,7 @@ async def bat_dau_noi_tu_english(ctx):
 
 @bot.command()
 @app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
-async def bat_dau_noi_tu_vn(ctx):
+async def start_wm_vn(ctx):
     message: discord.Message = ctx.message
     if message:
         #Kiểm tra xem đã tồn tại WordMatchingClass cho channel này chưa
@@ -110,7 +109,7 @@ async def bat_dau_noi_tu_vn(ctx):
 #region Reset nối từ
 @bot.command()
 @app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
-async def reset_noi_tu(ctx):
+async def reset_wm(ctx):
     message: discord.Message = ctx.message
     if message:
         req_roles = ['Supervisor', 'Server Master', 'Moderator', 'Ultimate Admins']
@@ -154,7 +153,7 @@ async def process_reset_word_matching(message: discord.Message, word_matching_ch
 #region Give skill
 @bot.command()
 @app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
-async def give_skill(ctx, item_id: str = None, user: Optional[discord.Member] = None):
+async def wm_give_skill(ctx, item_id: str = None, user: Optional[discord.Member] = None):
     message: discord.Message = ctx.message
     called_channel = message.channel
     req_roles = ['Cai Ngục', 'Server Master']
@@ -199,7 +198,7 @@ async def give_skill(ctx, item_id: str = None, user: Optional[discord.Member] = 
 #region Give ban skill
 @bot.command()
 @app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
-async def give_ban(ctx, user: discord.Member, ban_amount: int):
+async def wm_give_ban(ctx, user: discord.Member, ban_amount: int):
     message: discord.Message = ctx.message
     called_channel = message.channel
     req_roles = ['Cai Ngục', 'Server Master']
@@ -229,7 +228,7 @@ async def give_ban(ctx, user: discord.Member, ban_amount: int):
 #region remove skill
 @bot.command()
 @app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
-async def remove_skill(ctx, item_id: str = None, user: Optional[discord.Member] = None):
+async def wm_remove_skill(ctx, item_id: str = None, user: Optional[discord.Member] = None):
     message: discord.Message = ctx.message
     called_channel = message.channel
     req_roles = ['Cai Ngục', 'Moderator','Server Master']
@@ -1278,47 +1277,6 @@ def get_bxh_noi_tu(interaction: discord.Interaction,lan: str, word_matching_chan
     return embed     
 #endregion
 
-#region Help
-@bot.tree.command(name="help", description="Hiện tất cả commands và hướng dẫn sử dụng bot.")
-async def help_command_slash(interaction: discord.Interaction):
-    await interaction.response.defer(ephemeral=False)
-    text = get_help_text()
-    await interaction.followup.send(content=f"{text}")
-
-
-def get_help_text():
-    #Trả về text hướng dẫn command
-    text = """**-= Lệnh của Creations 1 =-**
-    **Lệnh trong trò chơi nối từ:**
-    `!bat_dau_noi_tu_english:` bắt đầu một game nối từ tiếng anh trong channel hiện tại. Dùng thêm một lần nữa để xoá trò chơi nối từ khỏi channel đó.
-    `!bat_dau_noi_tu_vn:` bắt đầu một game nối từ tiếng anh trong channel hiện tại. Dùng thêm một lần nữa để xoá trò chơi nối từ khỏi channel đó.
-    `!reset_noi_tu:`: reset channel nối từ để bắt đầu lại từ đầu.
-    `!give_skill <id_skill> <@user>` : chỉ dành cho chủ Server. Lệnh dùng để đưa kỹ năng đặc biệt cho player trong channel nối từ.
-    `!remove_skill <id_skill|all|random> <@user>`: chỉ dành cho chủ Server. Lệnh dùng để xoá kỹ năng đặc biệt cho user trong channel nối từ. (Có thể dùng all, random để xoá tất cả hoặc xoá ngẫu nhiên kỹ năng của player) 
-    `!use_skill`: Lệnh dùng để hiển thị bảng kỹ năng đặc biệt của player trong channel nối từ và cách dùng kỹ năng đó.
-    `/bxh_noi_tu`: Lệnh dùng để hiển thị bảng xếp hạng điểm của các player trong channel nối từ.
-
-    **Lệnh trong trò chơi đoán từ (Sort Word):**
-    `!start_sw_en:` bắt đầu một game đoán từ tiếng Anh trong channel hiện tại. Dùng thêm một lần nữa để xoá trò chơi khỏi channel đó.
-    `!start_sw_vn:` bắt đầu một game đoán từ tiếng Việt trong channel hiện tại. Dùng thêm một lần nữa để xoá trò chơi khỏi channel đó.
-    `!reset_sw:`: reset channel game đoán từ hiện tại để bắt đầu lại từ đầu.
-    `!sws_give_skill <id_skill> <@user>` : chỉ dành cho chủ Server. Lệnh dùng để đưa kỹ năng đặc biệt cho player trong channel đoán từ.
-    `!sws`: Lệnh dùng để hiển thị bảng kỹ năng đặc biệt của player trong channel đoán từ và cách dùng kỹ năng đó.
-    `/bxh_sw`: Lệnh dùng để hiển thị bảng xếp hạng điểm của các player trong channel game đoán từ.
-
-    **Lệnh trong trò chơi Kéo - Búa - Bao:**
-    `/keo_bua_bao [@user]`: Lệnh dùng để chơi kéo búa bao. Nếu không chọn người chơi thì sẽ chơi với bot. 
-    `/bxh_rps [@user]`: Lệnh dùng để xem xếp hạng Kéo - Búa - Bao. Có thể xem thứ hạng của player khác và xếp hạng theo nhiều mục khác nhau.
-
-    **Lệnh lặt vặt:**
-    `/say`: Lệnh dùng để gửi tin nhắn, hình ảnh ần danh.
-    `/truth_dare`: Lệnh dùng để gửi tạo mới trò chơi Truth Or Dare.
-    `/snipe`: Lệnh dùng để hiển thị lại 7 tin nhắn bị xoá gần nhất trong channel dùng lệnh.
-    `/therapy`: Lệnh dùng để thiết lập channel dùng để tâm sự cùng bot.
-    """
-    return "Darkie đang làm lại lệnh help sau."
-    
-
 
 #endregion
 
@@ -1679,6 +1637,7 @@ init_extension = [
                   "cogs.games.TruthDareCog",
                   "cogs.misc.TherapyAICog",
                   "cogs.misc.TrueHeavenRuleCog",
+                  "cogs.misc.HelpCog",
                   ]
 bot.tree.add_command(delete_message_context)
 bot.run(bot_token)

@@ -78,8 +78,7 @@ async def guild_extra_info(ctx):
 async def help(ctx):
     message: discord.Message = ctx.message
     if message:
-        text= help_command()
-        await message.reply(text)    
+        await message.reply("Vui lòng dùng lệnh /help")    
 
 @bot.command()
 async def cuu_gia(ctx):
@@ -229,38 +228,7 @@ async def random_ai_talk(interaction: discord.Interaction):
         await interaction.followup.send(f"Đã tạo Guild Extra Info. Bot lâu lâu sẽ nói chuyện trong channel này.", ephemeral= True)
 #endregion
 
-#region Help Command
-@bot.tree.command(name="help", description="Hiện tất cả commands và hướng dẫn sử dụng bot.")
-async def help_s_command(interaction: discord.Interaction):
-    await interaction.response.defer(ephemeral=False)
-    text = help_command()
-    await interaction.followup.send(content=f"{text}")
 
-
-def help_command():
-    #Trả về text hướng dẫn command
-    
-    
-    text = """**-= Lệnh của Creations 2 =-**
-
-**Lệnh trong trò chơi Kéo - Búa - Bao:**
-`/keo_bua_bao [@user]`: Lệnh dùng để chơi kéo búa bao với người chơi khác. Nếu không chọn người chơi thì sẽ chơi với bot. 
-`/bxh_rps [@user] [legendary|humiliate|lose|draw]`: Lệnh dùng để xem xếp hạng Kéo - Búa - Bao. Có thể xem thứ hạng của player khác và xếp hạng theo nhiều mục khác nhau.    
-
-**Lệnh liên quan đến hệ thống tiền tệ:**
-`/profile [@user]`: Lệnh dùng để hiển thị profile của user trong server.
-`/bank `: Lệnh dùng để Gọi ngân hàng chính quyền để đổi tiền trong server.
-`/vote_authority `: Bầu chọn bản thân làm Chính Quyền, sẽ tốn 500C mỗi lần làm.
-
-**Lệnh lặt vặt:**
-`/random_ai_talk`: Lệnh để bật / tắt khả năng lâu lâu bot nói chuyện xàm xí trong channel.
-`/say`: Lệnh dùng để gửi tin nhắn, hình ảnh ần danh.
-`/truth_dare`: Lệnh dùng để gửi tạo mới trò chơi Truth Or Dare.
-`/snipe`: Lệnh dùng để hiển thị lại 7 tin nhắn bị xoá gần nhất trong channel dùng lệnh.
-`/cf`: Lệnh dùng để tạo một tin nhắn tung đồng xu sấp/ngửa.
-    """
-    return text
-    
 #endregion
 
 # Task: Nói chuyện tự động
@@ -676,6 +644,8 @@ init_extension = ["cogs.games.RockPaperScissorCog",
                   "cogs.economy.ShopCog",
                   "cogs.economy.GiftCog",
                   "cogs.economy.InventoryCog",
+                  
+                  "cogs.misc.HelpCog",
                   ]
 
 bot_token = os.getenv("BOT_TOKEN_NO2")
