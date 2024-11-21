@@ -88,10 +88,10 @@ class ProfileEconomy(commands.Cog):
         if message:
             if quote == None:
                 quote = "None"
-            if len(quote.split()) > 20:
+            if len(quote.split()) > 50:
                 await message.reply(content="Độ dài quá ký tự cho phép")
                 return
-            if len(quote) > 600:
+            if len(quote) > 800:
                 await message.reply(content="Độ dài quá ký tự cho phép")
                 return
             embed = discord.Embed(title=f"", description=f"Đã cập nhật quote thành công. Vui lòng dùng lệnh {SlashCommand.PROFILE.value} để xem profile.", color=0xddede7)
