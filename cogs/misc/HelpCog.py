@@ -33,7 +33,7 @@ class Help(commands.Cog):
         mess = await interaction.followup.send(embed=first_embed, view=view, ephemeral=False)
         view.message = mess
     
-    
+    #region creation 1
     def get_list_help_creation_1(self):
         list_embed = []
         
@@ -97,6 +97,7 @@ class Help(commands.Cog):
         
         return list_embed
     
+    #region creation 2
     def get_list_help_creation_2(self):
         
         list_embed = []
@@ -116,7 +117,6 @@ class Help(commands.Cog):
         count+=1
         embed.add_field(name=f"", value=f"- **Trang {count}**: Tổng hợp thông tin về Chính Quyền.", inline=False)
         count+=1
-        
         embed.add_field(name=f"", value=f"- **Trang {count}**: Những thông tin hữu ích về bot Creation 2", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
         list_embed.append(embed)
@@ -158,7 +158,7 @@ class Help(commands.Cog):
         embed.add_field(name=f"", value=f"*Nếu không hiểu cơ chế bank hoạt động thì nhắn câu \"bank help\" nhé!*", inline=False)
         list_embed.append(embed)
         
-        #Bank
+        #Shop
         embed = discord.Embed(title=f"Lệnh mua đồ và dùng đồ", description=f"Các lệnh về shop, inventory...", color=0xddede7)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value}`/shop global`: dùng tiền {EmojiCreation2.COPPER.value} | {EmojiCreation2.SILVER.value} | {EmojiCreation2.GOLD.value} | {EmojiCreation2.DARKIUM.value} để mua vật phẩm đặc biệt, với giá thay đổi hằng ngày!", inline=False)
@@ -178,6 +178,7 @@ class Help(commands.Cog):
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value}`/authority overthrow`: lật đổ Chính Quyền hiện tại! Chỉ dành cho chủ server hoặc Chính Quyền hiện tại! Phạt tiền cực nặng!", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value}`/authority investigate`: điều tra hành vi phạm tội của user khác! Nếu user đó đã dùng lệnh `/crime` trong một tiếng đổ lại thì người đó coi như sẽ bị bắt!", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value}`/authority resign`: cho phép bỏ 10% tiền để từ chức trong yên bình sau khi nhậm chức hai tuần, vẫn sẽ giữ được mọi của cải!", inline=False)
+        list_embed.append(embed)
         
         #Authority
         embed = discord.Embed(title=f"Thông tin về Chính Quyền", description=f"Đặc quyền cực mạnh dành cho Chính Quyền", color=0xddede7)
