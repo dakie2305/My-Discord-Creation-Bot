@@ -18,10 +18,11 @@ class PlayerCardInfo:
         self.third_card = third_card
 
 class BaCaoView(discord.ui.View):
-    def __init__(self, user: discord.Member, user_profile: Profile = None, so_tien:int = None, loai_tien: int = None, timeout: int = 30,):
+    def __init__(self, user: discord.Member, bot: discord.Member, user_profile: Profile = None, so_tien:int = None, loai_tien: int = None, timeout: int = 30):
         super().__init__(timeout=timeout)
         self.message: discord.Message = None
         self.user = user
+        self.bot = bot
         self.user_profile = user_profile
         self.so_tien = so_tien
         self.loai_tien = loai_tien
@@ -50,7 +51,7 @@ class BaCaoView(discord.ui.View):
     async def prev_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.defer(ephemeral=True)
         
-        if len(self.player_list) >= 6:
+        if len(self.player_list) >= 8:
             await interaction.followup.send(content="Sòng này đã đủ số lượng người chơi! Bạn hãy tự tạo hoặc tham gia sòng bài khác!", ephemeral=True)
             return
         
@@ -103,18 +104,22 @@ class BaCaoView(discord.ui.View):
     
     async def trigger_result(self):
         if self.message == None: return
-        
-        
         #Nếu ít hơn hai người thì coi như không ai chịu chơi
         try:
             if len(self.player_list) < 1:
-                await self.message.edit(embed=None,view= None, content= f"{self.user.mention} có lẽ không ai muốn chơi cùng bạn rồi. Đừng quên, bạn mất một nửa số tiền đã đặt.")
-                lost_money = int(self.so_tien/2)
-                if lost_money == 0: lost_money = 1
-                if self.loai_tien == "C": self.update_host_and_player_money(player=None, is_player_win=True, copper=lost_money)
-                if self.loai_tien == "S": self.update_host_and_player_money(player=None, is_player_win=True, silver=lost_money)
-                if self.loai_tien == "G": self.update_host_and_player_money(player=None, is_player_win=True, gold=lost_money)
-                return
+                #Rút random ba lá bài cho bot chơi
+                first_card = self.get_random_card()
+                second_card = self.get_random_card()
+                third_card = self.get_random_card()
+                player = PlayerCardInfo(user=self.bot,first_card=first_card, second_card=second_card, third_card=third_card)
+                self.player_list.append(player)
+                # await self.message.edit(embed=None,view= None, content= f"{self.user.mention} có lẽ không ai muốn chơi cùng bạn rồi. Đừng quên, bạn mất một nửa số tiền đã đặt.")
+                # lost_money = int(self.so_tien/2)
+                # if lost_money == 0: lost_money = 1
+                # if self.loai_tien == "C": self.update_host_and_player_money(player=None, is_player_win=True, copper=lost_money)
+                # if self.loai_tien == "S": self.update_host_and_player_money(player=None, is_player_win=True, silver=lost_money)
+                # if self.loai_tien == "G": self.update_host_and_player_money(player=None, is_player_win=True, gold=lost_money)
+                # return
             elif self.host_card == None:
                 await self.message.edit(embed=None,view= None, content= f"Nhà cái {self.user.mention} đã sủi ván bài. Số tiền đặt cược của nhà cái coi như sẽ mất hết.")
                 if self.loai_tien == "C": self.update_host_and_player_money(player=None, is_player_win=True, copper=self.so_tien)
@@ -143,15 +148,18 @@ class BaCaoView(discord.ui.View):
             for player in self.player_list:
                 is_player_win = None
                 player_number = self.calculate_player_value(data=player)
-                player_result_text = f"\nTổng số nút: **{player_number}**"
+                if player_number != 0:
+                    player_result_text = f"\nTổng số nút: **{player_number}**"
+                else:
+                    player_result_text = f"\nTổng số nút: **Bù**"
                 if player_number > host_number:
                     is_player_win = True
                     player_result_text += " ▬ι═> Thắng!"
-                    money_to_pay_by_host -= self.so_tien
+                    if self.so_tien != None: money_to_pay_by_host -= self.so_tien
                 elif player_number < host_number:
                     is_player_win = False
                     player_result_text += " ▬ι═> Thua!"
-                    money_to_pay_by_host += self.so_tien
+                    if self.so_tien != None: money_to_pay_by_host += self.so_tien
                 elif player_number == host_number:
                     is_player_win = None
                     player_result_text += " ▬ι═> Huề!"
@@ -161,10 +169,24 @@ class BaCaoView(discord.ui.View):
                     if self.loai_tien == "S": self.update_host_and_player_money(player=player, is_player_win=is_player_win, silver=self.so_tien)
                     if self.loai_tien == "G": self.update_host_and_player_money(player=player, is_player_win=is_player_win, gold=self.so_tien)
             
+            #Trừ 10% số tiền từ game
+            text_tax = ""
+            if self.so_tien != None:
+                tax_money = int(self.so_tien*5/100)
+                if tax_money <= 0: 
+                    tax_money = 1
+                if self.so_tien != None and self.loai_tien != None:
+                    if self.loai_tien == "C": 
+                        ProfileMongoManager.update_profile_money(guild_id=self.user.guild.id, guild_name="", user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, copper=-tax_money)
+                    if self.loai_tien == "S": 
+                        ProfileMongoManager.update_profile_money(guild_id=self.user.guild.id, guild_name="", user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, silver=-tax_money)
+                    if self.loai_tien == "G":
+                        ProfileMongoManager.update_profile_money(guild_id=self.user.guild.id, guild_name="", user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, gold=-tax_money)
+                text_tax = f"\nNgoài ra, chủ sòng đã tốn thêm **{tax_money}** {UtilitiesFunctions.get_emoji_from_loai_tien(self.loai_tien)} để đóng phí bảo kê sòng bạc!"
             add_text = ""
-            if money_to_pay_by_host > 0:
-                add_text = f"**Nhà cái** {self.user.mention} đã lời được **{money_to_pay_by_host}** {UtilitiesFunctions.get_emoji_from_loai_tien(self.loai_tien)} từ sòng bạc này!"
-            else:
+            if money_to_pay_by_host!= None and money_to_pay_by_host > 0:
+                add_text = f"**Nhà cái** {self.user.mention} đã lời được **{money_to_pay_by_host}** {UtilitiesFunctions.get_emoji_from_loai_tien(self.loai_tien)} từ sòng bạc này!{text_tax}"
+            elif money_to_pay_by_host!= None and money_to_pay_by_host < 0:
                 add_text = f"**Nhà cái** {self.user.mention} đã lỗ mất **{money_to_pay_by_host*(-1)}** {UtilitiesFunctions.get_emoji_from_loai_tien(self.loai_tien)} từ sòng bạc này!"
             
             embed.add_field(name=f"", value=add_text, inline=False)
@@ -175,6 +197,7 @@ class BaCaoView(discord.ui.View):
 
     def update_host_and_player_money(self, player: PlayerCardInfo = None, is_player_win = None, gold: int = 0, silver:int = 0, copper: int = 0):
         if is_player_win == None: return
+        if player.user.id == 1257713292445618239: return #Này là bot creation 2
         #Nếu thắng thì trừ tiền của host, và cộng tiền cho player
         if is_player_win == True:
             if player != None:

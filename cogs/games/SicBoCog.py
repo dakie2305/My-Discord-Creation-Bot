@@ -665,7 +665,7 @@ class SicboCog(commands.Cog):
         Choice(name="Silver", value="S"),
         Choice(name="Copper", value="C"),
     ])
-    async def sb_slot_machine_command(self, interaction: discord.Interaction, so_tien:int = None, loai_tien:str = None):
+    async def sb_bai_cao_command(self, interaction: discord.Interaction, so_tien:int = None, loai_tien:str = None):
         await interaction.response.defer(ephemeral=False)
         #Không cho dùng bot nếu không phải user
         if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
@@ -712,12 +712,20 @@ class SicboCog(commands.Cog):
         embed.add_field(name=f"", value="▬▬▬▬ι═══════>", inline=False)
         embed.add_field(name=f"", value=f"{interaction.user.mention} đã mở sòng Bài Cào{gambling_money_text}!", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι═══════>", inline=False)
-        view = BaCaoView(user=interaction.user, user_profile=profile, so_tien=so_tien, loai_tien=loai_tien)
+        view = BaCaoView(user=interaction.user, bot= self.bot.user, user_profile=profile, so_tien=so_tien, loai_tien=loai_tien)
         mess = await interaction.followup.send(embed=embed, view=view)
         view.message = mess
         await view.start_countdown()
     
-        
+    @sb_bai_cao_command.error
+    async def sb_bai_cao_command_error(self, interaction: discord.Interaction, error):
+        if isinstance(error, discord.app_commands.CommandOnCooldown):
+            # Send a cooldown message to the user, formatted nicely
+            await interaction.response.send_message(f"⏳ Lệnh đang cooldown, vui lòng thực hiện lại trong vòng {error.retry_after:.2f}s tới.", ephemeral=True)
+        else:
+            # Handle any other errors that might occur
+            await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
+    
     
     def get_random_dice(self):
         list_dice= [
