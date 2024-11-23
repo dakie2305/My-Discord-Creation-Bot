@@ -134,7 +134,7 @@ class BankEconomy(commands.Cog):
         embed.add_field(name="", value=f">>> 1 {EmojiCreation2.SILVER.value} = **{int(5000 * conversion_rate.rate)}** {EmojiCreation2.COPPER.value}", inline=False)
         
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
-        embed.set_footer(text=f"Để hiểu rõ hơn về cách ngân hàng hoạt động hãy dùng nhắn câu:\nbank help", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/8fd7278827dbc92713e315ee03e0b502.webp?size=32")
+        embed.set_footer(text=f"Để hiểu rõ hơn về cách ngân hàng hoạt động hãy dùng nhắn câu:\nbank help", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/9e8749a5a47cae53211484d7aee42040.webp?size=100&quot")
         
         bank_view = BankView(authority=authority, rate=conversion_rate.rate)
         

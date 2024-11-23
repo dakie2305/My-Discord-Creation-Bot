@@ -137,7 +137,7 @@ class QuestEconomy(commands.Cog):
         if quest.bonus_exp != None and quest.bonus_exp != 0:
             embed.add_field(name=f"", value=f"{EmojiCreation2.GOLDEN_GIFT_BOX.value} Điểm thưởng: +**{quest.bonus_exp}** Kinh Nghiệm", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
-        embed.set_footer(text=f"Nhớ đừng quên tuân theo đúng luật server khi làm quest! Khó quá thì dùng lệnh /quests reset!", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/8fd7278827dbc92713e315ee03e0b502.webp?size=32")
+        embed.set_footer(text=f"Nhớ đừng quên tuân theo đúng luật server khi làm quest! Khó quá thì dùng lệnh /quests reset!", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/9e8749a5a47cae53211484d7aee42040.webp?size=100&quot")
         return embed
     
     quest_group = discord.app_commands.Group(name="quests", description="Các lệnh liên quan đến Nhiệm Vụ của server!")

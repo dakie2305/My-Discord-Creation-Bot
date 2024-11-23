@@ -86,6 +86,22 @@ def update_love_progressing(guild_id:int, user_id: int, bonus_exp: int = 0):
                                                                                     }})
     return result
 
+#region love point
+def update_love_point(guild_id: int, user_id: int, love_point: int):
+    collection = db_specific[f'profile_{guild_id}']
+    existing_data = find_couple_by_id(guild_id=guild_id, user_id=user_id)
+    if existing_data == None: return
+    existing_data.love_point += love_point
+    if existing_data.love_point <= 0:
+        existing_data.love_point = 0
+    elif existing_data.love_point >= 100:
+        existing_data.love_point = 100
+    result = collection.update_one({"$or": [{"first_user_id": user_id},{"second_user_id": user_id}]}, {"$set": {"love_point": existing_data.love_point,
+                                                                                    }})
+    return result
+
+
+
 def update_auto_love_progressing(guild_id:int, user_id: int):
     collection = db_specific[f'couple_{guild_id}']
     existing_data = find_couple_by_id(guild_id=guild_id, user_id=user_id)

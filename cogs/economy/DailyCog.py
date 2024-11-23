@@ -169,7 +169,7 @@ class DailyEconomy(commands.Cog):
         if actual_money == 0: actual_money = 200
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
         embed.add_field(name=f"", value=f"> Tổng tiền nhận từ điểm danh {SlashCommand.DAILY.value} hôm nay:   **+{int(actual_money)} {EmojiCreation2.COPPER.value} **", inline=False)
-        embed.set_footer(text=f"{user.name} điểm danh.", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/8fd7278827dbc92713e315ee03e0b502.webp?size=32")
+        embed.set_footer(text=f"{user.name} điểm danh.", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/9e8749a5a47cae53211484d7aee42040.webp?size=100&quot")
         #Cộng tiền cho user
         ProfileMongoManager.update_profile_money(guild_id=user.guild.id, guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name= user.display_name, copper=actual_money)
         
