@@ -1,12 +1,11 @@
 import discord
 from Handling.Economy.Profile.ProfileClass import Profile
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
-from  Handling.Economy.ConversionRate.ConversionRateClass import ConversionRate
-import Handling.Economy.ConversionRate.ConversionRateMongoManager as ConversionRateMongoManager
 from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.EmojiEnum import EmojiCreation2
 from typing import List
 from Handling.Economy.Inventory_Shop.ItemClass import Item
+import Handling.Economy.Couple.CoupleMongoManager as CoupleMongoManager
 
 class GiftView(discord.ui.View):
     def __init__(self, user_profile: Profile, target_profile: Profile, user: discord.Member, target_user: discord.Member):
@@ -36,6 +35,9 @@ class GiftView(discord.ui.View):
         await interaction.followup.send(f'Bạn đã tặng quà cho {self.target_user.mention}', ephemeral=True)
         if self.message != None: 
             await self.message.delete()
+        couple = CoupleMongoManager.find_couple_by_id(guild_id=interaction.guild_id, user_id=self.target_user.id)
+        if couple != None and couple.first_user_id != self.user.id and couple.second_user_id != self.user.id:
+            couple = None
         channel = interaction.channel
         embed = discord.Embed(title=f"", description=f"**{interaction.user.mention} đã tặng quà {self.selected_item.emoji} cho {self.target_user.mention}**", color=0xddede7)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
@@ -46,6 +48,13 @@ class GiftView(discord.ui.View):
         if self.selected_item.bonus_dignity != 0:
             embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} {self.selected_item.bonus_dignity} Nhân Phẩm", inline=False)
             ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.target_user.id, user_name=self.target_user.name, user_display_name=self.target_user.display_name, dignity_point=self.selected_item.bonus_dignity)
+        if couple != None:
+            bonus_exp_love = int((self.selected_item.bonus_exp + self.selected_item.bonus_dignity)/2)
+            love_point = 10
+            embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} **{bonus_exp_love}** Tỉ lệ thăng hoa cảm xúc", inline=False)
+            embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} **{love_point}** Điểm thân mật", inline=False)
+            CoupleMongoManager.update_love_progressing(guild_id=interaction.guild_id,user_id=self.target_user.id, bonus_exp=bonus_exp_love)
+            CoupleMongoManager.update_love_point(guild_id=interaction.guild_id,user_id=self.target_user.id, love_point=love_point)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
         
         #Cộng cho người đã tặng luôn
