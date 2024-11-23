@@ -6,13 +6,13 @@ from Handling.Economy.Profile.ProfileClass import Profile
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 from Handling.Misc.SelfDestructView import SelfDestructView
 from Handling.Economy.Authority.AuthorityView import AuthorityView
-from enum import Enum
 from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.EmojiEnum import EmojiCreation2
 import CustomFunctions
 import CustomEnum.UserEnum as UserEnum
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 from Handling.Economy.Profile.InventoryBackToProfileView import ProfileToInventoryView, InventoryBackToProfileView
+import Handling.Economy.Couple.CoupleMongoManager as CoupleMongoManager
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(ProfileEconomy(bot=bot))
@@ -69,6 +69,38 @@ class ProfileEconomy(commands.Cog):
                 mess = await message.reply(embed=embed, view=view)
                 view.message = mess
                 return
+            if user.id == 315835396305059840:
+                user_profile = ProfileMongoManager.find_profile_by_id(guild_id=message.guild.id, user_id=message.author.id)
+                if user_profile == None:
+                    user_profile = ProfileMongoManager.create_profile(guild_id=message.author.id, guild_name=message.author.guild.name, user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name)
+                #Trừ 50% số tiền lớn nhất
+                money_cost = 1000
+                emoji = EmojiCreation2.COPPER.value
+                if user_profile.darkium > 0:
+                    money_cost = int(user_profile.darkium * 50 / 100)
+                    emoji = EmojiCreation2.DARKIUM.value
+                elif user_profile.gold > 0:
+                    money_cost = int(user_profile.gold * 50 / 100)
+                    emoji = EmojiCreation2.GOLD.value
+                elif user_profile.silver > 0:
+                    money_cost = int(user_profile.silver * 50 / 100)
+                    emoji = EmojiCreation2.SILVER.value
+                else:
+                    money_cost = int(user_profile.copper * 50 / 100)
+                    emoji = EmojiCreation2.COPPER.value
+                if money_cost == 0: money_cost = 1000
+                if emoji == EmojiCreation2.COPPER.value and money_cost < 500: money_cost = 500
+                if emoji == EmojiCreation2.COPPER.value:
+                    ProfileMongoManager.update_profile_money(guild_id=message.guild.id, guild_name=message.author.guild.name, user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, copper=-money_cost)
+                elif emoji == EmojiCreation2.SILVER.value:
+                    ProfileMongoManager.update_profile_money(guild_id=message.guild.id, guild_name=message.author.guild.name, user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, silver=-money_cost)
+                elif emoji == EmojiCreation2.GOLD.value:
+                    ProfileMongoManager.update_profile_money(guild_id=message.guild.id, guild_name=message.author.guild.name, user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, gold=-money_cost)
+                else:
+                    ProfileMongoManager.update_profile_money(guild_id=message.guild.id, guild_name=message.author.guild.name, user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, darkium=-money_cost)
+                embed = discord.Embed(title=f"Đã bảo là không tag t nữa!", description=f"Vì đã quay vào ô mất lượt nên {message.author.mention} đã mất **{money_cost}** {emoji}!",color=discord.Color.blue())
+                mess = await message.reply(embed=embed)
+                return
             data = None
             view = None
             if user == None:
@@ -116,6 +148,8 @@ class ProfileEconomy(commands.Cog):
             ProfileMongoManager.update_last_authority(guild_id=user.guild.id, user_id=data.user_id)
             return embed, None
         
+        couple_info = CoupleMongoManager.find_couple_by_id(guild_id=user.guild.id, user_id=user.id)
+        
         embed = discord.Embed(title=f"", description=f"**Profile {user.mention}**", color=0xddede7)
         if user.avatar != None:
             embed.set_thumbnail(url=user.avatar.url)
@@ -131,6 +165,13 @@ class ProfileEconomy(commands.Cog):
             embed.add_field(name=f"", value=f"Rank: **{data.level}**", inline=False)
         bar_progress = self.progress_bar(input_value= data.level_progressing)
         embed.add_field(name=f"", value=f"{bar_progress}\n", inline=False)
+        if couple_info!= None:
+            embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+            embed.add_field(name=f"", value=f"Tình trạng cặp đôi: **{UtilitiesFunctions.get_text_on_love_rank(couple_info.love_rank)}** (**{couple_info.love_rank}**)", inline=False)
+            embed.add_field(name=f"", value=f"<@{couple_info.first_user_id}> -`{UtilitiesFunctions.get_heart_emoji_on_rank(couple_info.love_rank)}´- <@{couple_info.second_user_id}>", inline=False)
+            embed.add_field(name=f"", value=f"Điểm thân mật: **{couple_info.love_point}**", inline=False)
+            embed.add_field(name=f"", value=f"Tỉ lệ thăng hoa cảm xúc: **{int(couple_info.love_progressing/1000*100)}%**", inline=False)
+        
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
         embed.add_field(name=f"", value=f"**Tổng tài sản**:", inline=False)
         show_darkium = f"{EmojiCreation2.DARKIUM.value}: **{UtilitiesFunctions.shortened_currency(data.darkium)}**\n"

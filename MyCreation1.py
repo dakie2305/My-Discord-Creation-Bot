@@ -55,7 +55,7 @@ async def global_sync_creation_1(ctx):
 async def help(ctx):
     message: discord.Message = ctx.message
     if message:
-        await message.channel.send("Vui lòng dùng lệnh /help")  
+        await message.channel.send("Vui lòng dùng lệnh /help")
 
 @bot.command()
 @app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s

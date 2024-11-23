@@ -644,6 +644,7 @@ init_extension = ["cogs.games.RockPaperScissorCog",
                   "cogs.economy.ShopCog",
                   "cogs.economy.GiftCog",
                   "cogs.economy.InventoryCog",
+                  "cogs.economy.CoupleCog",
                   
                   "cogs.misc.HelpCog",
                   ]

@@ -1,10 +1,9 @@
 
-import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
-import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 from CustomEnum.SlashEnum import SlashCommand 
 from CustomEnum.EmojiEnum import EmojiCreation2
 from Handling.Economy.Profile.ProfileClass import Profile
 import random
+from datetime import datetime, timedelta
 
 class UtilitiesFunctions():
     @staticmethod
@@ -152,3 +151,81 @@ class UtilitiesFunctions():
         if loai_tien == "G": return EmojiCreation2.GOLD.value
         if loai_tien == "S": return EmojiCreation2.SILVER.value
         return EmojiCreation2.COPPER.value
+    
+    def check_if_within_time_delta(input: datetime, time_window: timedelta):
+        now = datetime.now()
+        if now - time_window <= input <= now + time_window:
+            return True
+        else:
+            return False
+    
+    
+    @staticmethod
+    def get_heart_emoji_on_rank(rank: int):
+        text = "💘"
+        if rank >= 20:
+            text= "❤️‍🔥"
+        elif rank == 19:
+            text= "💝"
+        elif rank == 18:
+            text= "💓"
+        elif rank == 17:
+            text= "💗"
+        elif rank == 16:
+            text= "💞"
+        elif rank == 15:
+            text= "💕"
+        elif rank == 14:
+            text= "💖"
+        elif rank == 13:
+            text= "❣️"
+        elif rank == 12:
+            text= "❤️"
+        elif rank == 11:
+            text= "🩷"
+        elif rank == 10:
+            text= "🧡"
+        elif rank == 9:
+            text= "💛"
+        elif rank == 8:
+            text= "💚"
+        elif rank == 7:
+            text= "🩵"
+        elif rank == 6:
+            text= "💙"
+        elif rank == 5:
+            text= "💜"
+        elif rank == 4:
+            text= "🤍"
+        elif rank == 3:
+            text= "🩶"
+        elif rank == 2:
+            text= "🖤"
+        elif rank == 1:
+            text= "💘"
+        return text
+    
+    @staticmethod
+    def get_text_on_love_rank(rank: int):
+        text = "Mới Quen"
+        if rank >= 20:
+            text= "Bạn Đời Vĩnh Cữu"
+        elif rank >= 19:
+            text= "Đôi Tri Kỉ"
+        elif rank >= 16:
+            text= "Đôi Uyên Ương"
+        elif rank >= 12:
+            text= "Tri Kỷ Tâm Giao"
+        elif rank >= 10:
+            text= "Nửa Kia Hoàn Hảo"
+        elif rank >= 10:
+            text= "Tâm Đầu Ý Hợp"
+        elif rank >= 8:
+            text= "Nhạc Sĩ Mộng Mơ Và Nàng Thơ"
+        elif rank >= 6:
+            text= "Người Yêu"
+        elif rank >= 4:
+            text= "Người Tình"
+        elif rank >= 2:
+            text= "Tình Chớm Nở"
+        return text
