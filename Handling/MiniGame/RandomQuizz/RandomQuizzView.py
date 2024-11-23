@@ -206,4 +206,64 @@ random_quizzes = [
                 options=["Pháp", "Anh", "Ý"],
                 correct_answer="Anh"
             ),
+            Quizz(
+                question="Loại nước giải khát nào chứa sắt và canxi?",
+                options=["Cafe", "Nước cam", "Nước dừa"],
+                correct_answer="Cafe"
+            ),
+            Quizz(
+                question="1 năm có bao nhiêu tháng có ngày 28?",
+                options=["1", "6", "12"],
+                correct_answer="12"
+            ),
+            Quizz(
+                question="Loại rượu nào đặc trưng của một số dân tộc mà khi uống phải dùng cần tre hoặc trúc uốn cong để hút rượu?",
+                options=["Rượu đế", "Rượu cần", "Rượu bàu đá"],
+                correct_answer="Rượu cần"
+            ),
+            Quizz(
+                question="Maria Sharapova là vận động viên nổi tiếng ở môn thể thao nào?",
+                options=["Điền kinh", "Quần vợt", "Bơi lội"],
+                correct_answer="Quần vợt"
+            ),
+            Quizz(
+                question="Maria Sharapova là vận động viên nổi tiếng ở môn thể thao nào?",
+                options=["Điền kinh", "Quần vợt", "Bơi lội"],
+                correct_answer="Quần vợt"
+            ),
+            Quizz(
+                question="Một trong những quốc gia có vai trò quan trọng trong quá trình hình thành Liên hợp quốc là?",
+                options=["Liên Xô", "Anh", "Pháp"],
+                correct_answer="Liên Xô"
+            ),
+            Quizz(
+                question="Trong giai đoạn cuối của Chiến tranh thế giới thứ hai, một trong những vấn đề cấp bách đặt ra là?",
+                options=["Thành lập một tổ chức quốc tế nhằm duy trì hòa bình và trật tự thế giới mới", "Thành lập một liên minh giữa Liên Xô và Mĩ để thiết lập trật tự thế giới mới sau chiến tranh", "Thành lập một ủy ban giúp đỡ các nước phát xít"],
+                correct_answer="Thành lập một tổ chức quốc tế nhằm duy trì hòa bình và trật tự thế giới mới"
+            ),
+            Quizz(
+                question="Vị vua nào có nhiều vợ nhất nhưng lại không có người con nào?",
+                options=["Hàm Nghi", "Lê Thần Tông", "Tự Đức"],
+                correct_answer="Tự Đức"
+            ),
+            Quizz(
+                question="Ai là vị trạng nguyên trẻ tuổi nhất nước Nam?",
+                options=["Mạc Đĩnh Chi", "Nguyễn Bỉnh Khiêm", "Nguyễn Hiền"],
+                correct_answer="Nguyễn Hiền"
+            ),
+            Quizz(
+                question="Văn miếu Quốc Tử Giám, trường đại học đầu tiên của Việt Nam được xây dựng dưới triều đại nào?",
+                options=["Lý", "Trần", "Lê"],
+                correct_answer="Lý"
+            ),
+            Quizz(
+                question="Lệ Chi Viên là khu vườn trồng loại cây gì?",
+                options=["Táo", "Vải", "Cam"],
+                correct_answer="Vải"
+            ),
+            Quizz(
+                question="Hoàng đế Bảo Đại tên thật là gì?",
+                options=["Nguyễn Phúc Vĩnh Thụy", "Nguyễn Phúc Bảo Long", "Nguyễn Phúc Vĩnh Thụy"],
+                correct_answer="Nguyễn Phúc Vĩnh Thụy"
+            ),
         ]

@@ -136,20 +136,24 @@ class TextInputModal(discord.ui.Modal):
         if profile_user.darkium > 15 and to_emoji == EmojiCreation2.DARKIUM.value:
             tax = 1
             tax_emoji = EmojiCreation2.DARKIUM.value
+        if profile_user.darkium < 15 and to_emoji == EmojiCreation2.DARKIUM.value:
+            #mặc định 5% số tiền quy đổi Gold
+            tax = int(new_money_value * 5 / 100)
+            tax_emoji = EmojiCreation2.GOLD.value
+            if tax <= 0: tax = 10
+            if tax > 10000: tax = 10000
         elif to_emoji == EmojiCreation2.GOLD.value:
             #mặc định 5% số tiền quy đổi
             tax = int(new_money_value * 5 / 100)
             tax_emoji = EmojiCreation2.GOLD.value
             if tax <= 0: tax = 10
             if tax > 10000: tax = 10000
-            
         elif to_emoji == EmojiCreation2.SILVER.value:
             #mặc định 5%
             tax = int(new_money_value * 5 / 100)
             tax_emoji = EmojiCreation2.SILVER.value
-            if tax <= 0: tax = 10000
+            if tax <= 0: tax = 100
             if tax > 100000: tax = 100000
-            
         elif to_emoji == EmojiCreation2.COPPER.value:
             #mặc định 10%
             tax = int(new_money_value * 10 / 100)
