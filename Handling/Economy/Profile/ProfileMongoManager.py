@@ -285,6 +285,7 @@ def update_auto_level_progressing(guild_id:int, user_id: int):
                                                                                     "level": existing_data.level,
                                                                                     }})
     return result
+
 def add_one_level_and_reset_progress(guild_id:int, user_id: int):
     collection = db_specific[f'profile_{guild_id}']
     existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
@@ -580,5 +581,12 @@ def update_last_riot_now(guild_id:int, user_id: int):
     collection = db_specific[f'profile_{guild_id}']
     today = datetime.now()
     result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"last_riot": today,
+                                                                                    }})
+    return result
+
+def update_last_breakup_now(guild_id:int, user_id: int):
+    collection = db_specific[f'profile_{guild_id}']
+    today = datetime.now()
+    result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"last_breakup": today,
                                                                                     }})
     return result
