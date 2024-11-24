@@ -107,6 +107,12 @@ class InventoryUseView(discord.ui.View):
             ProfileMongoManager.update_jail_time(guild_id=interaction.guild_id, user_id=interaction.user.id, jail_time= None)
             await m.edit(embed=embed, view=None)
             return
+        elif self.selected_item.item_id == "forget_flower":
+            #Xoá vật phẩm
+            ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, amount= -1)
+            #Reset last_breakup
+            ProfileMongoManager.update_breakup_time(guild_id=interaction.guild_id, user_id=interaction.user.id, last_breakup= None)
+            await channel.send(f'{interaction.user.mention} đã ngửi [{self.selected_item.emoji} - **{self.selected_item.item_name}**] và không còn nhớ nhung gì người xưa nữa!')
         else:
             await channel.send(f'Darkie vẫn chưa code xong công dụng cho vật phẩm [{self.selected_item.emoji} - **{self.selected_item.item_name}**]', ephemeral=True)
         return
