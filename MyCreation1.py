@@ -1031,6 +1031,8 @@ async def delete_message(interaction: discord.Interaction, reason : str, message
                     await interaction.followup.send("Không thể xoá tin nhắn của admin/moderator. Vui lòng liên hệ <@315835396305059840>.")
                     return
             # Create embed object
+            if len(mess_to_delete.content) > 1000:
+                mess_to_delete.content = mess_to_delete.content[:1000] + "..."
             embed = discord.Embed(title="Một tin nhắn đã bị xoá", description=f"User {interaction.user.mention} đã xoá một tin nhắn của {mess_to_delete.author.mention} đăng tại <#{mess_to_delete.channel.id}>!", color=0xFC0345)
             embed.add_field(name="Lý do xoá tin nhắn:", value=reason, inline=False)  # Single-line field
             embed.add_field(name="Nội dung tin nhắn bị xoá:", value=mess_to_delete.content, inline=False)
@@ -1074,6 +1076,8 @@ async def delete_message_context(interaction: discord.Interaction, message: disc
                 if is_user_admin and interaction.user.id != 315835396305059840:        #Chỉ Darkie mới được quyền xoá tin nhắn của admin, moderator
                     await interaction.followup.send("Không thể xoá tin nhắn của admin/moderator. Vui lòng liên hệ <@315835396305059840>.")
                     return
+            if len(message.content) > 1000:
+                message.content = message.content[:1000] + "..."
             # Create embed object
             embed = discord.Embed(title="Một tin nhắn đã bị xoá", description=f"User {interaction.user.mention} đã xoá một tin nhắn của {message.author.mention} đăng tại <#{message.channel.id}>!", color=0xFC0345)
             embed.add_field(name="Lý do xoá tin nhắn:", value="Không có. Hình thức xoá thông qua context menu", inline=False)
