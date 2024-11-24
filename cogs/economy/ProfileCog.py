@@ -69,7 +69,7 @@ class ProfileEconomy(commands.Cog):
                 mess = await message.reply(embed=embed, view=view)
                 view.message = mess
                 return
-            if user.id == 315835396305059840:
+            if user!= None and user.id == 315835396305059840:
                 user_profile = ProfileMongoManager.find_profile_by_id(guild_id=message.guild.id, user_id=message.author.id)
                 if user_profile == None:
                     user_profile = ProfileMongoManager.create_profile(guild_id=message.author.id, guild_name=message.author.guild.name, user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name)
@@ -149,6 +149,10 @@ class ProfileEconomy(commands.Cog):
             return embed, None
         
         couple_info = CoupleMongoManager.find_couple_by_id(guild_id=user.guild.id, user_id=user.id)
+        if couple_info!= None and couple_info.first_user_id == couple_info.second_user_id:
+            #Nếu ai tạo trùng thì xoá
+            couple_info = None
+            CoupleMongoManager.delete_couple_by_id(guild_id=user.guild.id, user_id=user.id)
         
         embed = discord.Embed(title=f"", description=f"**Profile {user.mention}**", color=0xddede7)
         if user.avatar != None:

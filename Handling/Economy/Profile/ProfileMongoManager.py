@@ -349,6 +349,14 @@ def update_jail_time(guild_id:int, user_id: int, jail_time: datetime = None):
                                                                                     }})
     return result
 
+def update_breakup_time(guild_id:int, user_id: int, last_breakup: datetime = None):
+    collection = db_specific[f'profile_{guild_id}']
+    existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
+    if existing_data == None: return
+    result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"last_breakup": last_breakup,
+                                                                                    }})
+    return result
+
 def delete_profile(guild_id: int, user_id: int):
     collection = db_specific[f'profile_{guild_id}']
     result = collection.delete_one({"id": "profile", "user_id": user_id})

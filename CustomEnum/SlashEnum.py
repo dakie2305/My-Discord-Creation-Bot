@@ -20,4 +20,7 @@ class SlashCommand(Enum):
     
     SHOP_GLOBAL = "</shop global:1302622680977248256>"
     GIFT = "</gift:1302680680391639160>"
+    
+    COUPLE_INTIMATE = "</couple intimate:1309954230894985386>"
+    COUPLE_FIGHT = "</couple fight:1309954230894985386>"
 

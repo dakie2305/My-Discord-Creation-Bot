@@ -104,6 +104,7 @@ class EmojiCreation2(Enum):
     CARD_Q_S = "<:q_spades:1307393248200753152>"
     
     QUESTION_MARK = "<a:question_mark:1308085284147036312>"
+    PURPLE_FLOWER = "<a:purple_flower:1310295721215266856>"
     
 class EmojiCreation1(Enum):
     SHINY_POINT = "<a:shiny_point:1309193656887935036>"
