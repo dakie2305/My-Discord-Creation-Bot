@@ -335,6 +335,46 @@ async def random_quizz_embed():
             print(f"Created random quizz at channel {quest_channel.name} in guild {guild.name}.")
             m = await quest_channel.send(embed=embed, view=view)
             view.old_message = m
+
+@tasks.loop(hours=12)
+async def love_point_rank_reducing_task():
+    guilds = bot.guilds
+    for guild in guilds:
+        await asyncio.sleep(5)
+        #Kiểm tra couple info của server, nếu có thì mới chọn
+        couples_in_guild = CoupleMongoManager.find_all_couples(guild_id=guild.id)
+        if couples_in_guild == None: continue
+        for couple in couples_in_guild:
+            if couple.love_point <= 0:
+                old_love_progressing = couple.love_progressing
+                calculated_love_progressing = int(old_love_progressing*15/100)
+                if calculated_love_progressing <= 0: calculated_love_progressing =  0
+                CoupleMongoManager.set_love_progressing_value(guild_id=guild.id, user_id=couple.first_user_id, love_progressing=calculated_love_progressing)
+            elif couple.love_point <= 50:
+                old_love_progressing = couple.love_progressing
+                calculated_love_progressing = int(old_love_progressing*10/100)
+                if calculated_love_progressing <= 0: calculated_love_progressing =  0
+                CoupleMongoManager.set_love_progressing_value(guild_id=guild.id, user_id=couple.first_user_id, love_progressing=calculated_love_progressing)
+            elif couple.love_point < 90:
+                old_love_progressing = couple.love_progressing
+                calculated_love_progressing = int(old_love_progressing*5/100)
+                if calculated_love_progressing <= 0: calculated_love_progressing =  0
+                CoupleMongoManager.set_love_progressing_value(guild_id=guild.id, user_id=couple.first_user_id, love_progressing=calculated_love_progressing)
+            couple.love_point -= 10
+            CoupleMongoManager.set_love_point_value(guild_id=guild.id, user_id=couple.first_user_id, love_point=couple.love_point)
+            two_weeks_ago = datetime.now() - timedelta(weeks=2)
+            two_weeks_after = datetime.now() + timedelta(weeks=2)
+            delete_check = 0
+            if couple.last_fight_action == None and couple.last_love_action == None: delete_check +=1
+            if couple.last_fight_action != None and couple.last_fight_action < two_weeks_ago: delete_check +=1
+            if couple.last_love_action != None and couple.last_love_action < two_weeks_ago: delete_check +=1
+            if couple.love_point == 0: delete_check +=1
+            if couple.date_created < two_weeks_after: delete_check -=1
+            if couple.love_rank == 20: delete_check = -99
+            #Nếu đạt trên ba tiêu chí trên thì xoá
+            if delete_check >= 3:
+                CoupleMongoManager.delete_couple_by_id(guild_id=guild.id, user_id=couple.first_user_id)
+                print(f"Check delete for couple id {couple.first_user_id} reached. Is deleted")
         
 
 async def sub_function_ai_response(message: discord.Message, speakFlag: bool = True):
@@ -455,6 +495,7 @@ async def on_ready():
         random_dropbox.start()
         random_quizz_embed.start()
     remove_old_conversation.start()
+    love_point_rank_reducing_task.start()
     #Load extension
     for ext in init_extension:
         await bot.load_extension(ext)
