@@ -70,6 +70,7 @@ def update_love_progressing(guild_id:int, user_id: int, bonus_exp: int = 0):
     #Nếu rank 19 thì không tăng love_progressing, giữ nguyên love_progressing không cho tăng lên 20
     if existing_data.love_rank == 19 and existing_data.love_progressing > 995:
         existing_data.love_progressing = 995
+        existing_data.is_ready_to_marry = True
     
     if existing_data.love_progressing >= 1000:
         lp = existing_data.love_progressing
@@ -83,12 +84,26 @@ def update_love_progressing(guild_id:int, user_id: int, bonus_exp: int = 0):
     
     result = collection.update_one({"$or": [{"first_user_id": user_id},{"second_user_id": user_id}]}, {"$set": {"love_progressing": existing_data.love_progressing,
                                                                                                                 "love_rank": existing_data.love_rank,
+                                                                                                                "is_ready_to_marry": existing_data.is_ready_to_marry,
                                                                                     }})
     return result
 
+def set_love_progressing_value(guild_id:int, user_id: int, love_progressing: int):
+    collection = db_specific[f'couple_{guild_id}']
+    result = collection.update_one({"$or": [{"first_user_id": user_id},{"second_user_id": user_id}]}, {"$set": {"love_progressing": love_progressing,
+                                                                                    }})
+    return result
+
+
+def set_love_point_value(guild_id:int, user_id: int, love_point: int):
+    collection = db_specific[f'couple_{guild_id}']
+    result = collection.update_one({"$or": [{"first_user_id": user_id},{"second_user_id": user_id}]}, {"$set": {"love_point": love_point,
+                                                                                    }})
+    return result  
+
 #region love point
 def update_love_point(guild_id: int, user_id: int, love_point: int):
-    collection = db_specific[f'profile_{guild_id}']
+    collection = db_specific[f'couple_{guild_id}']
     existing_data = find_couple_by_id(guild_id=guild_id, user_id=user_id)
     if existing_data == None: return
     existing_data.love_point += love_point
@@ -107,7 +122,6 @@ def update_auto_love_progressing(guild_id:int, user_id: int):
     existing_data = find_couple_by_id(guild_id=guild_id, user_id=user_id)
     if existing_data == None: return
     if existing_data.love_rank >= 15: return
-    
     #Sẽ cộng 20 exp mỗi lần
     existing_data.love_progressing += 20
     

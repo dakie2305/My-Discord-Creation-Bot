@@ -307,7 +307,6 @@ class CoupleCog(commands.Cog):
         if is_success == False:
             result = random.choice(random_fail_message)
             bonus_love_point = bonus_love_point*(-1)
-            bonus_love_rank_exp = bonus_love_rank_exp*(-1)
         result = result.replace("{first_person}", interaction.user.mention)
         result = result.replace("{second_person}", f"<@{target_id}>")
         
@@ -317,7 +316,7 @@ class CoupleCog(commands.Cog):
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
         embed.add_field(name=f"", value=f"{text}", inline=False)
         embed.add_field(name=f"", value=f"**Kết quả buổi hẹn:**", inline=False)
-        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} **{bonus_love_rank_exp}** Tỉ lệ thăng hoa cảm xúc", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} **{bonus_love_rank_exp}** Điểm thăng hoa cảm xúc", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} **{bonus_love_point}** Điểm thân mật", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
         
@@ -481,10 +480,8 @@ class CoupleCog(commands.Cog):
         bonus_love_point = 30
         bonus_love_rank_exp = random.randint(50, 100)
         if is_success == False:
-            bonus_love_rank_exp = random.randint(10, 50)
             result = random.choice(random_fail_message)
             bonus_love_point = bonus_love_point*(-1)
-            bonus_love_rank_exp = bonus_love_rank_exp*(-1)
         hard_feeling = hard_feeling.replace("{first_person}", interaction.user.mention)
         hard_feeling = hard_feeling.replace("{second_person}", f"<@{target_id}>")
         decision_message = decision_message.replace("{first_person}", interaction.user.mention)
