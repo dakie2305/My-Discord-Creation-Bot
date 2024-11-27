@@ -302,7 +302,6 @@ async def random_dropbox():
 async def random_quizz_embed():
     guilds = bot.guilds
     for guild in guilds:
-        await asyncio.sleep(5)
         #Kiểm tra quest channel của server, nếu có thì mới chọn
         guild_info = db.find_guild_extra_info_by_id(guild_id=guild.id)
         if guild_info == None: continue
