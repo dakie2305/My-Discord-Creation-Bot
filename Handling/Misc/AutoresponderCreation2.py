@@ -52,6 +52,14 @@ class AutoresponderHandling():
             _mess = await message.channel.send(embed=embed, view=view)
             view.message= _mess
             flag = True
+        
+        elif message.content and message.content[0] == "=" and message.content != "=":
+            flag = True
+            options = [item.strip() for item in message.content[1:].split(",") if item.strip()]
+            if len(options) >1:
+                random_choice = random.choice(options)
+                await message.reply(content=f"{random_choice}")
+        
         elif CustomFunctions.contains_substring(message.content.lower(), quote) and message.content[0] not in string.punctuation and message.content[0] != ":":
             flag = True
             embed = discord.Embed(title=f"", description=f"Để thay đổi **Quote** trong lệnh </profile:1294699979058970656> thì hãy dùng lệnh:\n!quote \"Ghi quote vào đây\"", color=0xc379e0)
@@ -137,7 +145,7 @@ class AutoresponderHandling():
             _mess = await message.channel.send(embed=embed, view=view)
             view.message= _mess
             
-            
+        
             
             
             

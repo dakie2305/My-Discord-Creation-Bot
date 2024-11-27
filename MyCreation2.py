@@ -361,6 +361,7 @@ async def love_point_rank_reducing_task():
                 if calculated_love_progressing <= 0: calculated_love_progressing =  0
                 CoupleMongoManager.set_love_progressing_value(guild_id=guild.id, user_id=couple.first_user_id, love_progressing=calculated_love_progressing)
             couple.love_point -= 10
+            if couple.love_point <= 0: couple.love_point = 0
             CoupleMongoManager.set_love_point_value(guild_id=guild.id, user_id=couple.first_user_id, love_point=couple.love_point)
             two_weeks_ago = datetime.now() - timedelta(weeks=2)
             two_weeks_after = datetime.now() + timedelta(weeks=2)
@@ -504,7 +505,6 @@ async def on_ready():
 async def on_message(message: discord.Message):
     if message.author == bot.user:
         return
-    # await steal_content_from_2tai(message=message)
     speakFlag = True
     auto_rep = AutoresponderHandling(bot=bot)
     if await auto_rep.handling_auto_responder(message=message):
