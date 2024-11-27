@@ -178,6 +178,10 @@ class ProfileEconomy(commands.Cog):
             date_created = couple_info.date_created
             unix_time = int(date_created.timestamp())
             embed.add_field(name=f"", value=f"Ngày đầu quen nhau: <t:{unix_time}:D>", inline=False)
+            if couple_info.date_married != None:
+                date_married = couple_info.date_married
+                unix_time_m = int(date_married.timestamp())
+                embed.add_field(name=f"", value=f"Ngày cưới nhau: <t:{unix_time_m}:D>", inline=False)
         
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
         embed.add_field(name=f"", value=f"**Tổng tài sản**:", inline=False)

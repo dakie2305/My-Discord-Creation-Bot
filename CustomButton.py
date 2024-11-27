@@ -89,7 +89,8 @@ class PaginationView(discord.ui.View):
             modern_time = message.deleted_date.strftime(f"%d/%m/%Y %H:%M")
             user = interaction.guild.get_member(message.author_id)
             new_embed = discord.Embed(title="Snipe Messages", description=f"", color=0x03F8FC)
-            new_embed.set_thumbnail(url=user.avatar.url)
+            if user.avatar!= None:
+                new_embed.set_thumbnail(url=user.avatar.url)
             new_embed.add_field(name=f"", value=f"**Channel {interaction.channel.mention}. Tin nhắn của user: {user.mention}, username: {user.name}**", inline=False)
             file = None
             self.list_attachtment = []
