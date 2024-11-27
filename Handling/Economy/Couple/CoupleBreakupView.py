@@ -18,14 +18,14 @@ class CoupleBreakupView(discord.ui.View):
         self.target_id = target_id
     
     async def on_timeout(self):
-        await self.old_message.edit(view=None, content=f"Rất tiếc, <@{self.couple.second_user_id}> đã không trả lời bạn, có lẽ người ấy vẫn chưa sẵn sàng!")
+        if self.old_message:
+            await self.old_message.edit(view=None, content=f"Rất tiếc, <@{self.couple.second_user_id}> đã không trả lời bạn, có lẽ người ấy vẫn chưa sẵn sàng!", embed=None)
         return
         
     @discord.ui.button(label="💔 Chấp nhận rời xa", style=discord.ButtonStyle.red)
-    async def yes_button(self, interaction: discord.Interaction, button: Button):
+    async def breakup_button(self, interaction: discord.Interaction, button: Button):
         if interaction.user.id != self.couple.first_user_id and interaction.user.id != self.couple.second_user_id: return
         if interaction.user.id != self.target_id: return
-        
         await interaction.response.defer(ephemeral=True)
         CoupleMongoManager.delete_couple_by_id(guild_id=interaction.guild_id, user_id=self.user.id)
         ProfileMongoManager.update_last_breakup_now(guild_id=interaction.guild_id, user_id=self.user.id)

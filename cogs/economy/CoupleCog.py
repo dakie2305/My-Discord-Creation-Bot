@@ -8,6 +8,7 @@ from CustomEnum.EmojiEnum import EmojiCreation2
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 from Handling.Economy.Couple.CouplePairView import CouplePairView
 from Handling.Economy.Couple.CoupleBreakupView import CoupleBreakupView
+from Handling.Economy.Couple.CoupleMarryView import CoupleMarryView
 import CustomFunctions
 import CustomEnum.UserEnum as UserEnum
 import Handling.Economy.Couple.CoupleMongoManager as CoupleMongoManager
@@ -160,12 +161,12 @@ class CoupleCog(commands.Cog):
     async def couple_breakup_slash_command(self, interaction: discord.Interaction, force: bool = None):
         await interaction.response.defer(ephemeral=True)
         #Không cho dùng bot nếu không phải user
-        if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
-            view = SelfDestructView(timeout=30)
-            embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
-            mess = await interaction.followup.send(embed=embed, view=view)
-            view.message = mess
-            return
+        # if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
+        #     view = SelfDestructView(timeout=30)
+        #     embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
+        #     mess = await interaction.followup.send(embed=embed, view=view)
+        #     view.message = mess
+        #     return
         
         couple  = CoupleMongoManager.find_couple_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
         if couple == None:
@@ -180,13 +181,13 @@ class CoupleCog(commands.Cog):
         else:
             target_id = couple.first_user_id
         if force == None or force == False:
-            await interaction.followup.send(content=f"Bạn đã quyết định chia tay với cặp đôi của mình!")
             channel = interaction.channel
             #Hiện embed cho đối phương trả lời
             embed = discord.Embed(title=f"", description=f"{interaction.user.mention} muốn chia tay với bạn", color=0xddede7)
             view = CoupleBreakupView(user=interaction.user, couple=couple, target_id=target_id)
             mess = await channel.send(embed=embed, view=view, content= f"<@{couple.first_user_id}> <@{couple.second_user_id}>")
             view.old_message = mess
+            await interaction.followup.send(content=f"Bạn đã quyết định chia tay với cặp đôi của mình!")
         else:
             await interaction.followup.send(content=f"Bạn đã lạnh lùng chia tay với cặp đôi của mình!")
             channel = interaction.channel
@@ -469,9 +470,8 @@ class CoupleCog(commands.Cog):
             "{first_person} và {second_person} đã không thể hàn gắn mối quan hệ",
             "{second_person} trong cơn tức giận đã ném đồ đạc",
             "{second_person} đã bỏ đi mà không thèm chịu nghe giải thích",
-            "{second_person} chỉ xin lỗi hời hợt cho có, và cảm thấy mệt mỏi với mối quan hệ này",
+            "{second_person} chỉ xin lỗi hời hợt cho có, và {first_person} cảm thấy mệt mỏi với mối quan hệ này",
             "{second_person} đã cố tình làm tổn thương {first_person} bằng cách nhắc lại những lỗi lầm trong quá khứ",
-            
         ]
         hard_feeling = random.choice(random_hard_feeling)
         decision_message = random.choice(random_decision_message)
@@ -481,6 +481,7 @@ class CoupleCog(commands.Cog):
         bonus_love_rank_exp = random.randint(50, 100)
         if is_success == False:
             result = random.choice(random_fail_message)
+            bonus_love_point = 20
             bonus_love_point = bonus_love_point*(-1)
         hard_feeling = hard_feeling.replace("{first_person}", interaction.user.mention)
         hard_feeling = hard_feeling.replace("{second_person}", f"<@{target_id}>")
@@ -514,6 +515,127 @@ class CoupleCog(commands.Cog):
         else:
             # Handle any other errors that might occur
             await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
+    
+    #region marry
+    @couple_group.command(name="marry", description="Cưới cặp đôi của mình!")
+    @discord.app_commands.checks.cooldown(1, 30)
+    async def couple_marry_slash_command(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=False)
+        #Không cho dùng bot nếu không phải user
+        if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view)
+            view.message = mess
+            return
+        
+        user_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
+        if user_profile == None:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view)
+            view.message = mess
+            return
+        
+        #Không cho thực hiện nếu còn jail_time
+        if user_profile != None and user_profile.jail_time != None:
+            if user_profile.jail_time > datetime.now():
+                unix_time = int(user_profile.jail_time.timestamp())
+                view = SelfDestructView(timeout=30)
+                embed = discord.Embed(title=f"", description=f"⛓️ Bạn đã bị chính quyền bắt giữ rồi, vui lòng đợi đến <t:{unix_time}:t> !", color=0xc379e0)
+                mess = await interaction.followup.send(embed=embed, view=view)
+                view.message = mess
+                return
+            else:
+                ProfileMongoManager.update_jail_time(guild_id=interaction.guild_id, user_id=interaction.user.id, jail_time=None)
+        
+        if user_profile.list_items == None or len(user_profile.list_items) == 0:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Vui lòng dùng lệnh {SlashCommand.SHOP_GLOBAL.value} để mua Nhẫn Kim Cương!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view)
+            view.message = mess
+            return
+        
+        couple  = CoupleMongoManager.find_couple_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
+        if couple == None:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Bạn làm gì có người yêu đâu?!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view)
+            view.message = mess
+            return
+        
+        elif couple.date_married != None:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Bạn đã làm đám cưới rồi mà?!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view)
+            view.message = mess
+            return
+        
+        chosen_item = None
+        #Cần phải có nhẫn kim cương để cưới nhau
+        for item in user_profile.list_items:
+            if item.item_id == "g_dring":
+                chosen_item = item
+                break
+        if chosen_item == None:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Vui lòng dùng lệnh {SlashCommand.SHOP_GLOBAL.value} để mua Nhẫn Kim Cương!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view)
+            view.message = mess
+            return
+        
+        if couple.love_rank == 19 and couple.love_progressing >= 990 and couple.love_point >= 90:
+            gif_links = [
+            "https://i.pinimg.com/originals/10/d9/d3/10d9d362a1532da2e7916ed4da2cec46.gif",
+            "https://i.pinimg.com/originals/3f/4d/5f/3f4d5f06e024ccce77a9249ff30db093.gif",
+            "https://i.pinimg.com/originals/65/0c/3b/650c3bf600925ca4458ece0b464ca204.gif",
+            "https://i.pinimg.com/originals/81/c2/7e/81c27e549a30d9d006464a21d038a2c6.gif",
+            "https://i.pinimg.com/originals/a1/9d/78/a19d784a8f8cb7d832d5e50a86bfbf1a.gif",
+            "https://i.pinimg.com/originals/d1/56/ea/d156ea8eb781ef680e91ea8764e3eaca.gif",
+        ]
+            gif = random.choice(gif_links)
+        
+            date_created = couple.date_created
+            unix_time = int(date_created.timestamp())
+            #Tạo embed cưới nhau
+            embed = discord.Embed(title=f"Đám Cưới Tân Uyên Ương",color=discord.Color.blue())
+            embed.add_field(name=f"", value=f"Cặp đôi uyên ương <@{couple.first_user_id}> -`{UtilitiesFunctions.get_heart_emoji_on_rank(couple.love_rank)}´- <@{couple.second_user_id}> đã về chung một nhà!", inline=False)
+            embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+            embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Ngày lành quen nhau: <t:{unix_time}:D>", inline=False)
+            embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Điểm thân mật **{couple.love_point}**", inline=False)
+            embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+            embed.set_image(url=gif)
+            CoupleMongoManager.update_married_time_now(guild_id=interaction.guild_id, user_id=interaction.user.id)
+            view = CoupleMarryView(couple=couple, gif=gif, timeout=60)
+            mess = await interaction.followup.send(embed=embed, view = view)
+            view.old_message = mess
+            view.guild = interaction.guild
+            await view.start_countdown()
+            return
+        else:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Không đủ điều kiện để cưới",color=discord.Color.blue())
+            embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+            embed.add_field(name=f"", value=f"Cặp đôi cần phải đạt hết điều kiện dưới đây mới có thể cưới nhau:", inline=False)
+            embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Tình trạng cặp đôi cần phải đạt **19**", inline=False)
+            embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Tỉ lệ thăng hoa cảm xúc phải **99%**", inline=False)
+            embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Điểm thân mật cũng phải đạt trên **90**", inline=False)
+            embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+            mess = await interaction.followup.send(embed=embed, view=view)
+            view.message = mess
+            return
+        
+    @couple_marry_slash_command.error
+    async def couple_marry_slash_command_error(self, interaction: discord.Interaction, error):
+        if isinstance(error, discord.app_commands.CommandOnCooldown):
+            # Send a cooldown message to the user, formatted nicely
+            await interaction.response.send_message(f"⏳ Lệnh đang cooldown, vui lòng thực hiện lại trong vòng {error.retry_after:.2f}s tới.", ephemeral=True)
+        else:
+            # Handle any other errors that might occur
+            await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
+    
+        
+    
     
     def get_most_expensive_item(self, items):
         type_multiplier = {

@@ -94,6 +94,11 @@ def set_love_progressing_value(guild_id:int, user_id: int, love_progressing: int
                                                                                     }})
     return result
 
+def set_love_rank_value(guild_id:int, user_id: int, love_rank: int):
+    collection = db_specific[f'couple_{guild_id}']
+    result = collection.update_one({"$or": [{"first_user_id": user_id},{"second_user_id": user_id}]}, {"$set": {"love_rank": love_rank,
+                                                                                    }})
+    return result
 
 def set_love_point_value(guild_id:int, user_id: int, love_point: int):
     collection = db_specific[f'couple_{guild_id}']
