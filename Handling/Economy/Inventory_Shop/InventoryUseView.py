@@ -82,7 +82,7 @@ class InventoryUseView(discord.ui.View):
             ProfileMongoManager.add_one_level_and_reset_progress(guild_id=interaction.guild_id, user_id=interaction.user.id)
             text = ""
             #30% bị công an ập vào túm cổ và phạt 5% gold, tối đa 2000 gold
-            police_chance = UtilitiesFunctions.get_chance(100)
+            police_chance = UtilitiesFunctions.get_chance(30)
             if police_chance:
                 money_lost = int(self.user_profile.gold*10/100)
                 if money_lost > 2000: money_lost = 2000
