@@ -113,13 +113,6 @@ class BaCaoView(discord.ui.View):
                 third_card = self.get_random_card()
                 player = PlayerCardInfo(user=self.bot,first_card=first_card, second_card=second_card, third_card=third_card)
                 self.player_list.append(player)
-                # await self.message.edit(embed=None,view= None, content= f"{self.user.mention} có lẽ không ai muốn chơi cùng bạn rồi. Đừng quên, bạn mất một nửa số tiền đã đặt.")
-                # lost_money = int(self.so_tien/2)
-                # if lost_money == 0: lost_money = 1
-                # if self.loai_tien == "C": self.update_host_and_player_money(player=None, is_player_win=True, copper=lost_money)
-                # if self.loai_tien == "S": self.update_host_and_player_money(player=None, is_player_win=True, silver=lost_money)
-                # if self.loai_tien == "G": self.update_host_and_player_money(player=None, is_player_win=True, gold=lost_money)
-                # return
             elif self.host_card == None:
                 await self.message.edit(embed=None,view= None, content= f"Nhà cái {self.user.mention} đã sủi ván bài. Số tiền đặt cược của nhà cái coi như sẽ mất hết.")
                 if self.loai_tien == "C": self.update_host_and_player_money(player=None, is_player_win=True, copper=self.so_tien)
@@ -197,7 +190,20 @@ class BaCaoView(discord.ui.View):
 
     def update_host_and_player_money(self, player: PlayerCardInfo = None, is_player_win = None, gold: int = 0, silver:int = 0, copper: int = 0):
         if is_player_win == None: return
-        if player.user.id == 1257713292445618239: return #Này là bot creation 2
+        if player.user.id == 1257713292445618239:
+            #Này là bot creation 2
+            if self.so_tien == None: return
+            if is_player_win == True:
+                #Trừ tiền player, cộng 50% cho authority
+                ProfileMongoManager.update_profile_money(guild_id=self.user.guild.id, guild_name="", user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, gold=-gold, silver=-silver, copper=-copper)
+                if self.user_profile.is_authority== False:
+                    ProfileMongoManager.update_money_authority(guild_id=self.user.guild.id, gold=int(-gold/2), silver=int(-silver/2), copper=int(-copper/2))
+            else:
+                #Trừ tiền authority, cộng 100% cho player
+                ProfileMongoManager.update_profile_money(guild_id=self.user.guild.id, guild_name="", user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, gold=gold, silver=silver, copper=copper)
+                if self.user_profile.is_authority== False:
+                    ProfileMongoManager.update_money_authority(guild_id=self.user.guild.id, gold=-gold, silver=-silver, copper=-copper)
+            return 
         #Nếu thắng thì trừ tiền của host, và cộng tiền cho player
         if is_player_win == True:
             if player != None:
