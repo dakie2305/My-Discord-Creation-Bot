@@ -1,12 +1,12 @@
 import discord
 from Handling.Economy.Profile.ProfileClass import Profile
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
-from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.EmojiEnum import EmojiCreation2
 from typing import List
 from Handling.Economy.Inventory_Shop.ItemClass import Item, list_gift_items
 from Handling.Economy.Inventory_Shop.LockpickView import LockpickView
 import asyncio
+from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 
 class InventoryUseView(discord.ui.View):
     def __init__(self, user_profile: Profile, user: discord.Member):
@@ -80,7 +80,16 @@ class InventoryUseView(discord.ui.View):
             ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, amount= -1)
             #tăng một cấp
             ProfileMongoManager.add_one_level_and_reset_progress(guild_id=interaction.guild_id, user_id=interaction.user.id)
-            await channel.send(f'{interaction.user.mention} đã nuốt [{self.selected_item.emoji} - **{self.selected_item.item_name}**] và đột phá cấp bậc lên cấp **{self.user_profile.level+ 1}**!')
+            text = ""
+            #30% bị công an ập vào túm cổ và phạt 5% gold, tối đa 2000 gold
+            police_chance = UtilitiesFunctions.get_chance(100)
+            if police_chance:
+                money_lost = int(self.user_profile.gold*10/100)
+                if money_lost > 2000: money_lost = 2000
+                text = f"\nNhưng công an đã ập vào bắt quả tang {interaction.user.mention} tội chơi thuốc! {interaction.user.mention} đã mất **{money_lost}** {EmojiCreation2.GOLD.value}!"
+                ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name="", user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, gold=-money_lost)
+            await channel.send(f'{interaction.user.mention} đã nuốt [{self.selected_item.emoji} - **{self.selected_item.item_name}**] và đột phá cấp bậc lên cấp **{self.user_profile.level+ 1}**!{text}')
+            
         elif self.selected_item.item_id == "out_jail_ticket":
             #Xoá vật phẩm
             ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, amount= -1)
