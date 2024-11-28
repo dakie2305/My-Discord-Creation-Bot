@@ -29,12 +29,13 @@ SELECT_OPTIONS  = [
         ]
 
 class BankView(discord.ui.View):
-    def __init__(self, authority: Profile, rate: float):
+    def __init__(self, authority: Profile, rate: float, user: discord.Member):
         super().__init__(timeout=20)
         self.authority = authority
         self.rate = rate
         self.message : discord.Message = None
         self.currency: str = None
+        self.user: discord.Member = user
 
     async def on_timeout(self):
         #Delete
@@ -53,6 +54,9 @@ class BankView(discord.ui.View):
     @discord.ui.select(placeholder='Chọn đơn vị tiền cần quy đổi',min_values=1, max_values=1, options= SELECT_OPTIONS)
     async def select_callback(self, interaction: discord.Interaction, select: discord.ui.Select):
         await interaction.response.defer(ephemeral=True)
+        if interaction.user.id != self.user.id:
+            await interaction.followup.send(f'Đây là ngân hàng do người khác tạo, bạn không được phép thay đổi! Vui lòng tự dùng lệnh `/bank`', ephemeral=True)
+            return
         selected_option = select.values[0]
         self.currency = selected_option
         if selected_option == "D":
@@ -140,25 +144,30 @@ class TextInputModal(discord.ui.Modal):
             #mặc định 5% số tiền quy đổi Gold
             tax = int(new_money_value * 5 / 100)
             tax_emoji = EmojiCreation2.GOLD.value
-            if tax <= 0: tax = 10
+            if tax <= 0 and profile_user.gold > 100: 
+                tax = 10
+            else: tax = 1
             if tax > 10000: tax = 10000
         elif to_emoji == EmojiCreation2.GOLD.value:
             #mặc định 5% số tiền quy đổi
             tax = int(new_money_value * 5 / 100)
             tax_emoji = EmojiCreation2.GOLD.value
-            if tax <= 0: tax = 10
+            if tax <= 0 and profile_user.gold > 100: tax = 10
+            else: tax = 1
             if tax > 10000: tax = 10000
         elif to_emoji == EmojiCreation2.SILVER.value:
             #mặc định 5%
             tax = int(new_money_value * 5 / 100)
             tax_emoji = EmojiCreation2.SILVER.value
-            if tax <= 0: tax = 100
+            if tax <= 0 and profile_user.silver > 1000: tax = 100
+            else: tax = 1
             if tax > 100000: tax = 100000
         elif to_emoji == EmojiCreation2.COPPER.value:
             #mặc định 10%
             tax = int(new_money_value * 10 / 100)
             tax_emoji = EmojiCreation2.COPPER.value
-            if tax <= 0: tax = 100000
+            if tax <= 0 and profile_user.copper > 50000: tax = 10000
+            else: tax = 1
             if tax > 10000000: tax = 10000000
             
         #Cộng tiền 200 Copper cho chính quyền nếu user_profile không phải là chính quyền
