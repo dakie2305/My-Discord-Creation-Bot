@@ -126,12 +126,6 @@ class AutoresponderHandling():
             view.message= _mess
             await message.delete()
         
-        elif message.guild.id == 1256987900277690470 and len(message.author.roles) == 1 and message.author.roles[0].is_default():
-            flag = True
-            view = SelfDestructView(timeout=30)
-            _mess = await message.reply(content=f"Hey, <#1257002970529267774> <- ?", view=view)
-            view.message= _mess
-        
         elif message.guild.id != 1194106864582004849 and CustomFunctions.contains_substring(message.content.lower(), donate):
             flag = True
             embed = discord.Embed(title=f"**Donate Darkie**", description=f"Xin lỗi vì đã làm phiền nhé! Tin nhắn này sẽ biến mất chỉ sau 1-2 phút thôi nhé!", color=0xc379e0)
