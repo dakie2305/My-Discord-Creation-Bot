@@ -1343,7 +1343,7 @@ async def automatic_speak_randomly():
             random_channel_id = random.choice(guild_extra_info.list_channels_ai_talk)
             actual_channel = guild.get_channel(random_channel_id)
             if actual_channel:
-                model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
+                model = genai.GenerativeModel('gemini-1.5-pro', CustomFunctions.safety_settings)
                 prompt = CustomFunctions.get_automatically_talk_prompt("Creation 1", guild, actual_channel)
                 response = model.generate_content(f"{prompt}")
                 print(f"{bot.user} started talking on its own at {guild_extra_info.guild_name}, channel {actual_channel.name}.")
@@ -1386,7 +1386,7 @@ async def sub_function_ai_response(message: discord.Message, speakFlag = True):
             referenced_message = await message.channel.fetch_message(message.reference.message_id)
             if referenced_message.embeds: return
             async with message.channel.typing():
-                model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
+                model = genai.GenerativeModel('gemini-1.5-pro', CustomFunctions.safety_settings)
                 prompt = await CustomFunctions.get_proper_prompt(message,"Creation 1", referenced_message)
                 print(f"Prompt generated from {bot.user}: {prompt}")
                 file_image_path = None
@@ -1427,7 +1427,7 @@ async def sub_function_ai_response(message: discord.Message, speakFlag = True):
                 interaction_logger.info(f"Username {message.author.name}, Display user name {message.author.display_name} violated chat when talking to {bot.user}")
                 interaction_logger.info(f"Username {message.author.name} violated chat {message.content} when talking to {bot.user}")
             else:
-                model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
+                model = genai.GenerativeModel('gemini-1.5-pro', CustomFunctions.safety_settings)
                 prompt = await CustomFunctions.get_proper_prompt(message,"Creation 1")
                 print(f"Prompt generated from {bot.user}: {prompt}")
                 file_image_path = None
@@ -1603,7 +1603,7 @@ async def on_member_update(before: discord.Member, after: discord.Member):
     #Tạm thời không cần chạy trong server khác
     if before.guild.id != 1256987900277690470: return
     
-    model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
+    model = genai.GenerativeModel('gemini-1.5-pro', CustomFunctions.safety_settings)
     channel = bot.get_channel(1259392446987632661)
     await CustomFunctions.thanking_for_boost(bot_name="creation 1", before=before, after=after, model=model, channel=channel)
     
@@ -1623,7 +1623,7 @@ async def on_message(message: discord.Message):
     guild_extra_info = db.find_guild_extra_info_by_id(guild_id=message.guild.id)
     if guild_extra_info != None and message.channel.id == guild_extra_info.therapy_channel and message.author.bot == False:
         #Xử lý therapy
-        model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
+        model = genai.GenerativeModel('gemini-1.5-pro', CustomFunctions.safety_settings)
         asyncio.create_task(TherapyHandling(bot=bot, model=model).handling_therapy_ai(message=message))
         speakFlag = False
 

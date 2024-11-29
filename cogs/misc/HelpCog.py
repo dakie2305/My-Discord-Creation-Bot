@@ -59,6 +59,7 @@ class Help(commands.Cog):
         embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value}`!wm_give_skill <id_skill> <@user>` chỉ dành cho chủ Server. Lệnh dùng để đưa kỹ năng đặc biệt cho player trong channel nối từ.", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value}`!wm_remove_skill <id_skill|all|random> <@user>`: chỉ dành cho chủ Server. Lệnh dùng để xoá kỹ năng đặc biệt cho user trong channel nối từ. (Có thể dùng all, random để xoá tất cả hoặc xoá ngẫu nhiên kỹ năng của player)", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value}`!wm_use_skill`: Lệnh dùng để hiển thị bảng kỹ năng đặc biệt của player trong channel nối từ và cách dùng kỹ năng đó.", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value}`!wm_give_ban <@user> 1`: Lệnh dùng để cấm một player không được chơi trong một round.", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value}`/bxh_noi_tu`: Lệnh dùng để hiển thị bảng xếp hạng điểm của các player trong channel nối từ.", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
         list_embed.append(embed)
@@ -116,6 +117,8 @@ class Help(commands.Cog):
         embed.add_field(name=f"", value=f"- **Trang {count}**: Tổng hợp lệnh Chính Quyền.", inline=False)
         count+=1
         embed.add_field(name=f"", value=f"- **Trang {count}**: Tổng hợp thông tin về Chính Quyền.", inline=False)
+        count+=1
+        embed.add_field(name=f"", value=f"- **Trang {count}**: Tổng hợp thông tin về hệ thống Cặp Đôi.", inline=False)
         count+=1
         embed.add_field(name=f"", value=f"- **Trang {count}**: Những thông tin hữu ích về bot Creation 2", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
@@ -195,6 +198,17 @@ class Help(commands.Cog):
         embed.add_field(name=f"", value=f"- Sẽ tự động sụp đổ khi Địa Vị xuống Trung Cấp, và phạt tiền cực nặng!", inline=False)
         embed.add_field(name=f"", value=f"- Chơi cờ bạc nếu thua sẽ mất trắng tiền!", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
+        list_embed.append(embed)
+        
+        #Couple
+        embed = discord.Embed(title=f"Thông tin về Couple", description=f"", color=0xddede7)
+        embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Cặp đôi có ba thông số cần quan tâm là **Điểm thân mật**, **Tình trạng cặp đôi**, **Tỉ lệ thăng hoa cảm xúc**!", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} **Điểm thân mật** và **Tỉ lệ thăng hoa cảm xúc** có thể tăng bằng lệnh `/couple fight` hoặc `/couple intimate` hoặc dùng lệnh `/gift` để tặng!", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Khi **Tỉ lệ thăng hoa cảm xúc** đặt 100% thì sẽ tăng cấp của Tình trạng cặp đôi", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Khi **Tình trạng cặp đôi** đạt lên cấp 19 có thể dùng lệnh `/couple marry` để cưới nhau!", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} **Điểm thân mật**, **Tỉ lệ thăng hoa cảm xúc** sẽ trừ sau mỗi 12 tiếng!", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} **Quan trọng**: sẽ xoá cặp đôi nếu không tương tác, tăng điểm thân mật hoặc điểm tỉ lệ thăng hoa cảm xúc trong vòng 2 tuần!", inline=False)
         list_embed.append(embed)
         
         #Information
