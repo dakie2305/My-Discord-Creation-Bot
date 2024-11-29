@@ -50,6 +50,8 @@ class InventoryUseView(discord.ui.View):
         #Thực hiện hiệu ứng của item
         if self.selected_item.item_type == "self_protection":
             await self.using_protection_item(interaction=interaction)
+        elif self.selected_item.item_type == "attack":
+            await self.using_attack_item(interaction=interaction)
         elif self.selected_item.item_type == "self_support":
             await self.using_support_item(interaction=interaction)
         else:
@@ -70,6 +72,22 @@ class InventoryUseView(discord.ui.View):
             #Gắn vật phẩm mới vào
             ProfileMongoManager.equip_protection_item_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, unequip=False)
             await channel.send(f'{interaction.user.mention} đã gỡ [{self.user_profile.protection_item.emoji} - **{self.user_profile.protection_item.item_name}**] để dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**]')
+        return
+    
+    #region equip attack item
+    async def using_attack_item(self, interaction: discord.Interaction):
+        channel = interaction.channel
+        if self.user_profile.attack_item == None:
+            #Gắn các vật phẩm vào bản thân
+            #-1 vật phẩm
+            ProfileMongoManager.equip_attack_item_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, unequip=False)
+            await channel.send(f'{interaction.user.mention} đã mang theo vũ khí [{self.selected_item.emoji} - **{self.selected_item.item_name}**] theo bản thân!')
+        else:
+            #Gỡ vật phẩm cũ ra
+            ProfileMongoManager.equip_attack_item_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.user_profile.attack_item, unequip=True)
+            #Gắn vật phẩm mới vào
+            ProfileMongoManager.equip_attack_item_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, unequip=False)
+            await channel.send(f'{interaction.user.mention} đã cất vũ khí [{self.user_profile.attack_item.emoji} - **{self.user_profile.attack_item.item_name}**] đi, và cầm theo [{self.selected_item.emoji} - **{self.selected_item.item_name}**]')
         return
 
     #region use support item

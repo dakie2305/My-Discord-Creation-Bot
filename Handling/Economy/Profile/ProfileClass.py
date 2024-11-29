@@ -3,7 +3,7 @@ from datetime import datetime
 from Handling.Economy.Inventory_Shop.ItemClass import Item
 
 class Profile:
-    def __init__(self, user_id: int, user_name: str, user_display_name: str, guild_name: str, copper: int = 500, silver: int = 0, gold: int = 0, darkium: int = 0, is_authority: bool = False, last_attendance: datetime= None, last_work: datetime = None, level: int = 1, dignity_point: int = 50, quest_finished: int = 0, quote: str = None, level_progressing: int = 0, jail_time: datetime = None, last_crime: datetime = None, last_riot: datetime = None, last_gift: datetime = None, last_attack_item_used: datetime = None, gift_given: int = 0, list_items : Optional[List['Item']] = None, protection_item: Item = None, daily_streak_count: int = 0, last_breakup: datetime = None):
+    def __init__(self, user_id: int, user_name: str, user_display_name: str, guild_name: str, copper: int = 500, silver: int = 0, gold: int = 0, darkium: int = 0, is_authority: bool = False, last_attendance: datetime= None, last_work: datetime = None, level: int = 1, dignity_point: int = 50, quest_finished: int = 0, quote: str = None, level_progressing: int = 0, jail_time: datetime = None, last_crime: datetime = None, last_riot: datetime = None, last_gift: datetime = None, last_attack_item_used: datetime = None, gift_given: int = 0, list_items : Optional[List['Item']] = None, protection_item: Item = None, daily_streak_count: int = 0, last_breakup: datetime = None, attack_item: Item = None):
         self.id = "profile"
         self.user_id = user_id
         self.user_name = user_name
@@ -31,6 +31,7 @@ class Profile:
         self.last_breakup = last_breakup
         
         self.protection_item = protection_item if protection_item else None
+        self.attack_item = attack_item if attack_item else None
         
         self.list_items: List[Item] = list_items if list_items else []
     
@@ -63,6 +64,7 @@ class Profile:
             "daily_streak_count": self.daily_streak_count,
             
             "protection_item": self.protection_item.to_dict() if self.protection_item else None,
+            "attack_item": self.attack_item.to_dict() if self.attack_item else None,
             
             "list_items": [data.to_dict() for data in self.list_items],
         }
@@ -96,6 +98,7 @@ class Profile:
                 quote=data.get("quote", None),
                 
                 protection_item = Item.from_dict(data.get("protection_item", None)) if data.get("protection_item") else None,
+                attack_item = Item.from_dict(data.get("attack_item", None)) if data.get("attack_item") else None,
                 
                 list_items = [Item.from_dict(item) for item in data.get("list_items", [])],
             )

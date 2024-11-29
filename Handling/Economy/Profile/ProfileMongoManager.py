@@ -267,6 +267,21 @@ def update_level_progressing(guild_id:int, user_id: int, bonus_exp: int = 0):
                                                                                     }})
     return result
 
+def set_level_progressing(guild_id:int, user_id: int, level_progressing: int, level_reduction_point: int = 0):
+    collection = db_specific[f'profile_{guild_id}']
+    existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
+    if existing_data == None: return
+    
+    existing_data.level_progressing = level_progressing
+    existing_data.level -= level_reduction_point
+    
+    
+    result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"level_progressing": existing_data.level_progressing,
+                                                                                    "level": existing_data.level,
+                                                                                    }})
+    return result
+
+
 def update_auto_level_progressing(guild_id:int, user_id: int):
     collection = db_specific[f'profile_{guild_id}']
     existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
@@ -390,19 +405,20 @@ def update_list_items_profile(guild_id: int, guild_name: str, user_id: int, user
     
     exist_flag = False
     #Nếu đã có items trong list thì chỉnh quantity lại theo amount
-    for profile_item in list_items:
-        if profile_item.item_id == item.item_id:
-            profile_item.quantity += amount
-            if profile_item.quantity > 99: profile_item.quantity == 99
-            if profile_item.quantity <= 0: list_items.remove(profile_item)
-            exist_flag = True
-            break
-        if profile_item.quantity <= 0:
-            list_items.remove(profile_item)
+    if len(list_items)>1:
+        for profile_item in list_items:
+            if profile_item.item_id == item.item_id:
+                profile_item.quantity += amount
+                if profile_item.quantity > 99: profile_item.quantity == 99
+                if profile_item.quantity <= 0: list_items.remove(profile_item)
+                exist_flag = True
+                break
+            if profile_item.quantity <= 0:
+                list_items.remove(profile_item)
     #Nếu chưa có item trong list thì append, và chỉnh quantity lại theo amount
     if exist_flag == False:
         item.quantity = amount
-        list_items.append(item)
+        if item.quantity > 0: list_items.append(item)
     
     if len(list_items) > 20:
         list_items.pop()
@@ -438,6 +454,30 @@ def remove_current_protection_item_profile(guild_id: int, user_id: int):
     return result
     
 
+def equip_attack_item_profile(guild_id: int, guild_name: str, user_id: int, user_name: str, user_display_name: str, item: Item, unequip: bool = False):
+    collection = db_specific[f'profile_{guild_id}']
+    existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
+    if existing_data == None: return
+    
+    if unequip == False:
+        #Thêm thì sẽ gắn vào profile, và xoá một cái đi khỏi list item
+        result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"attack_item": item.to_dict(),
+                                                                                    }})
+        update_list_items_profile(guild_id=guild_id, guild_name=guild_name, user_id=user_id, user_name=user_name, user_display_name= user_display_name, item=item, amount=-1)
+    else:
+        #Gỡ ra thì sẽ trả lại vào list item trong profile
+        result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"attack_item": None,
+                                                                                    }})
+        update_list_items_profile(guild_id=guild_id, guild_name=guild_name, user_id=user_id, user_name=user_name, user_display_name= user_display_name, item=item, amount=1)
+    return result
+    
+def remove_current_attack_item_profile(guild_id: int, user_id: int):
+    collection = db_specific[f'profile_{guild_id}']
+    existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
+    if existing_data == None: return
+    result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"attack_item": None,
+                                                                                    }})
+    return result
 
 #region Authority
 

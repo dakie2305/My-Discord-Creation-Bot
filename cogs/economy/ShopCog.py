@@ -9,7 +9,7 @@ import CustomFunctions
 from Handling.Misc.SelfDestructView import SelfDestructView
 import CustomEnum.UserEnum as UserEnum
 from typing import List, Optional, Dict
-from Handling.Economy.Inventory_Shop.ItemClass import Item, list_gift_items, list_protection_items, list_support_items
+from Handling.Economy.Inventory_Shop.ItemClass import Item, list_gift_items, list_protection_items, list_support_items, list_attack_items
 from Handling.Economy.Inventory_Shop.ShopGlobalView import ShopGlobalView
 import Handling.Economy.ConversionRate.ConversionRateMongoManager as ConversionRateMongoManager
 import random
@@ -91,6 +91,7 @@ class ShopEconomy(commands.Cog):
         self.list_all_shops["Shop Quà Tặng Cuộc Sống"] = list_gift_items
         self.list_all_shops["Shop Hàng Bổ Trợ"] = list_support_items
         self.list_all_shops["Shop Bảo Hộ"] = list_protection_items
+        self.list_all_shops["Shop Vũ Khí"] = list_attack_items
         
         keys = list(self.list_all_shops.keys())  # Shop names
         # Tạo embed cho shop

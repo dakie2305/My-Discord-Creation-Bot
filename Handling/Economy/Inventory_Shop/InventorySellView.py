@@ -89,6 +89,10 @@ class TextSellInventoryInputModal(discord.ui.Modal):
             await interaction.followup.send(f'Vật phẩm {self.current_item.emoji} - **{self.current_item.item_name}** đã không còn trong túi đồ của bạn!')
             return
         
+        if self.current_item.item_id == "crime_evident":
+            #Đảo ngược giá tiền thành âm
+            self.current_item.item_worth_amount = self.current_item.item_worth_amount * (-1)
+        
         #Nhận 50% giá trị * rate hiện tại của shop
         input_amount_field = self.input_amount_field.value
         try:
@@ -120,7 +124,10 @@ class TextSellInventoryInputModal(discord.ui.Modal):
             #Xoá khỏi inventory
             ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, item=self.current_item, amount=-amount)
             
-            await interaction.followup.send(f"{interaction.user.mention} đã bán x{amount} [{self.current_item.emoji} - **{self.current_item.item_name}**] và nhận được **{sell_money}** {self.get_emoji_money_from_type(self.current_item.item_worth_type)}", ephemeral=False)
+            if self.current_item.item_id != "crime_evident":
+                await interaction.followup.send(f"{interaction.user.mention} đã bán x{amount} [{self.current_item.emoji} - **{self.current_item.item_name}**] và nhận được **{sell_money}** {self.get_emoji_money_from_type(self.current_item.item_worth_type)}", ephemeral=False)
+            else:
+                await interaction.followup.send(f"{interaction.user.mention} đã tẩu tán x{amount} [{self.current_item.emoji} - **{self.current_item.item_name}**] và mất **{sell_money*(-1)}** {self.get_emoji_money_from_type(self.current_item.item_worth_type)}", ephemeral=False)
             return
             
             

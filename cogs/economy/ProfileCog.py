@@ -154,13 +154,16 @@ class ProfileEconomy(commands.Cog):
             couple_info = None
             CoupleMongoManager.delete_couple_by_id(guild_id=user.guild.id, user_id=user.id)
         
-        embed = discord.Embed(title=f"", description=f"**Profile {user.mention}**", color=0xddede7)
+        cq = ""
+        if data.is_authority:
+            cq = "Chính Quyền Tối Cao"
+        embed = discord.Embed(title=cq, description=f"**Profile {user.mention}**", color=0xddede7)
         if user.avatar != None:
             embed.set_thumbnail(url=user.avatar.url)
-        if data.is_authority:
-            embed.add_field(name=f"", value="**Chính Quyền Tối Cao**", inline=False)
         if data.protection_item != None:
             embed.add_field(name=f"", value=f"Bảo Hộ Vật: [{data.protection_item.emoji} - **{data.protection_item.item_name}**]", inline=False)
+        if data.attack_item != None:
+            embed.add_field(name=f"", value=f"Vũ Khí: [{data.attack_item.emoji} - **{data.attack_item.item_name}**]", inline=False)
         embed.add_field(name=f"", value=f"Nhân phẩm: **{UtilitiesFunctions.get_nhan_pham(data.dignity_point)}** ({data.dignity_point})", inline=True)
         embed.add_field(name=f"", value=f"Địa Vị: **{UtilitiesFunctions.get_dia_vi(data)}**", inline=True)
         if data.level > 100:

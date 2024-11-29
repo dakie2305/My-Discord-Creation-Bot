@@ -78,12 +78,14 @@ class InventoryBackToProfileView(discord.ui.View):
             await self.message.edit(embed=embed)
             await interaction.followup.send(f"Bạn đã chuyển sang chế độ Profile!", ephemeral=True)
             return
-        
-        embed = discord.Embed(title=f"", description=f"**Profile <@{self.profile.user_id}>**", color=0xddede7)
+        cq = ""
         if self.profile.is_authority:
-            embed.add_field(name=f"", value="**Chính Quyền Tối Cao**", inline=False)
+            cq = "Chính Quyền Tối Cao"
+        embed = discord.Embed(title=cq, description=f"**Profile <@{self.profile.user_id}>**", color=0xddede7)
         if self.profile.protection_item != None:
             embed.add_field(name=f"", value=f"Bảo Hộ Vật: [{self.profile.protection_item.emoji} - **{self.profile.protection_item.item_name}**]", inline=False)
+        if self.profile.attack_item != None:
+            embed.add_field(name=f"", value=f"Vũ Khí: [{self.profile.attack_item.emoji} - **{self.profile.attack_item.item_name}**]", inline=False)
         embed.add_field(name=f"", value=f"Nhân phẩm: **{UtilitiesFunctions.get_nhan_pham(self.profile.dignity_point)}** ({self.profile.dignity_point})", inline=True)
         embed.add_field(name=f"", value=f"Địa Vị: **{UtilitiesFunctions.get_dia_vi(self.profile)}**", inline=True)
         embed.add_field(name=f"", value=f"Rank: **{self.profile.level}**", inline=False)
