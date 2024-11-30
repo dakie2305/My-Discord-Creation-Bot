@@ -480,9 +480,17 @@ class AuthorityEconomy(commands.Cog):
             await interaction.followup.send(content=f"Đối tượng {user.display_name} hoàn toàn vô tội vì chưa từng phạm pháp! Chính quyền đã mất **{cost_money}** {EmojiCreation2.GOLD.value}!", ephemeral=True)
             ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, gold=-cost_money)
             return
+        
+        #Kiểm tra xem có hàng cấm trong người không
+        item = None
+        if target_profile.list_items!= None and len(target_profile.list_items)>1:
+            for target_item in target_profile.list_items:
+                if target_item.item_id == "crime_evident":
+                    item = target_item
+                    break
         mess: discord.Message = await interaction.followup.send(content=f"Chính Quyền đã tiến hành điều tra hành vi phạm tội của {user.mention}...")
         await asyncio.sleep(10)
-        if self.is_within_one_hour(target_profile.last_crime):
+        if self.is_within_one_hour(target_profile.last_crime) or item != None:
             dignity_point = 15
             #chỉ trừ 10% copper
             fine_money = int(target_profile.copper * 10 / 100)
@@ -491,13 +499,17 @@ class AuthorityEconomy(commands.Cog):
             if fine_money <= 0: fine_money = 10000
             cost_money = 50
             embed = discord.Embed(title=f"", description=f"CQ đã chi **{cost_money}** {EmojiCreation2.GOLD.value} để điều tra!", color=0xc379e0)
-            embed.add_field(name=f"", value=f"{user.mention} đã bị Chính Quyền <@{existed_authority.user_id}> điều tra được hành vi phạm tội!", inline=False)
+            if self.is_within_one_hour(target_profile.last_crime):
+                embed.add_field(name=f"", value=f"{user.mention} đã bị Chính Quyền <@{existed_authority.user_id}> điều tra được hành vi phạm tội!", inline=False)
+            if item != None:
+                embed.add_field(name=f"", value=f"{user.mention} đã bị Chính Quyền <@{existed_authority.user_id}> phát hiện tàng trữ hàng cấm: x{item.quantity} [{item.emoji}-**{item.item_name}**]", inline=False)
             embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Trừ **{fine_money}** {EmojiCreation2.COPPER.value}", inline=False)
             embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Trừ **{dignity_point}** điểm nhân phẩm!", inline=False)
+            if item != None: embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Tịch thụ toàn bộ hàng cấm!", inline=False)
             embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Tống vào tù trong 1 tiếng!", inline=False)
             if mess != None:
                 #Reset crime
-                ProfileMongoManager.update_last_crime_now(guild_id=interaction.guild_id, user_id=user.id)
+                ProfileMongoManager.update_last_crime(guild_id=interaction.guild_id, user_id=user.id)
                 #Trừ dignity point của người bị điều tra
                 ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=user.id, user_display_name=user.display_name, user_name=user.name, dignity_point=-dignity_point)
                 #Trừ tiền người điều tra lẫn chính quyền
@@ -509,6 +521,9 @@ class AuthorityEconomy(commands.Cog):
                 ProfileMongoManager.update_jail_time(guild_id=interaction.guild_id, user_id=user.id, jail_time=jail_time)
                 #Cộng exp cho chính quyền
                 ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=user.id)
+                if item != None:
+                    #Xoá hết
+                    ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, item=item, amount= -100)
                 await mess.edit(embed=embed)
                 return
         else:
