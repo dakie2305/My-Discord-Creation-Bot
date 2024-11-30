@@ -124,13 +124,16 @@ class TextShopInputModal(discord.ui.Modal):
                 await interaction.followup.send(f"Id sản phẩm nhập vào không hợp lệ!", ephemeral=True)
                 return
             item = self.current_list_item[item_id]
+            if item.item_id == "cuff" and profile_user.is_authority == False:
+                await interaction.followup.send(f"Chỉ có Chính Quyền mới được mua còng tay!", ephemeral=True)
+                return
             
             #rank phải đủ như tối thiểu
             if profile_user.level < item.rank_required:
                 await interaction.followup.send(f"Bạn phải nâng rank mình lên trên **{item.rank_required}** để mua vật phẩm {item.emoji}!", ephemeral=True)
                 return
             
-            cost_money = int(int(amount * self.rate) * item.item_worth_amount)
+            cost_money = int(amount * int(item.item_worth_amount*self.rate))
             
             if item.item_worth_type == "C" and profile_user.copper < cost_money:
                 await interaction.followup.send(f"Bạn không đủ {EmojiCreation2.COPPER.value}!", ephemeral=True)

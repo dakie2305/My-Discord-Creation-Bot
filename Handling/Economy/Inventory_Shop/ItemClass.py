@@ -305,7 +305,7 @@ list_protection_items = [
     Item(
         item_id = "armor_protection_5",
         item_name = "Giáp Hạng Nặng",
-        item_description = f"Giáp hộ vệ chống vũ khí và trừ tiền {EmojiCreation2.SILVER.value} hoặc 5% tỉ lệ tăng rank của kẻ tấn công!",
+        item_description = f"Giáp hộ vệ chống vũ khí và trừ tiền {EmojiCreation2.SILVER.value} hoặc 10% tỉ lệ tăng rank của kẻ tấn công!",
         item_type = "self_protection",
         quantity = 1,
         emoji = EmojiCreation2.ARMOUR_PROTECTION_5.value,
@@ -447,7 +447,7 @@ list_attack_items = [
     Item(
         item_id = "sword_3",
         item_name = "Kiếm Sắt",
-        item_description = f"Một thanh kiếm sắt bình thường có thể chém bay tiền {EmojiCreation2.COPPER.value} hoặc điểm nhân phẩm của đối thủ!",
+        item_description = f"Một thanh kiếm sắt bình thường có thể chém bay tiền Copper hoặc điểm nhân phẩm của đối thủ!",
         item_type = "attack",
         quantity = 1,
         emoji = EmojiCreation2.SWORD_3.value,
@@ -462,7 +462,7 @@ list_attack_items = [
     Item(
         item_id = "sword_4",
         item_name = "Kiếm Bạc",
-        item_description = f"Một thanh kiếm bạc đắt giá có thể chém bay tiền {EmojiCreation2.SILVER.value} hoặc 10% tăng rank của đối thủ!",
+        item_description = f"Một thanh kiếm bạc đắt giá có thể chém bay tiền Copper hoặc 10% tăng rank của đối thủ!",
         item_type = "attack",
         quantity = 1,
         emoji = EmojiCreation2.SWORD_4.value,
@@ -477,7 +477,7 @@ list_attack_items = [
     Item(
         item_id = "sword_5",
         item_name = "Kiếm Vàng",
-        item_description = f"Một thanh kiếm bạc đắt giá có thể chém bay tiền {EmojiCreation2.SILVER.value} hoặc 15% tăng rank của đối thủ!",
+        item_description = f"Một thanh kiếm bạc đắt giá có thể chém bay tiền Silver hoặc 15% tăng rank của đối thủ!",
         item_type = "attack",
         quantity = 1,
         emoji = EmojiCreation2.SWORD_5.value,
@@ -492,7 +492,7 @@ list_attack_items = [
     Item(
         item_id = "crime_knife",
         item_name = "Dao Ẩn",
-        item_description = f"Một lưỡi dao ẩn có thể chém đứt khả năng phạm tội của đối phương!",
+        item_description = f"Một lưỡi dao ẩn có thể chém đứt khả năng phạm tội của đối phương trong một tiếng!",
         item_type = "attack",
         quantity = 1,
         emoji = EmojiCreation2.KNIFE.value,
