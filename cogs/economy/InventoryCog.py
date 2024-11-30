@@ -33,12 +33,12 @@ class InventoryEconomy(commands.Cog):
     async def inventory_use_slash_command(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=False)
         # #Không cho dùng bot nếu không phải user
-        # if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
-        #     view = SelfDestructView(timeout=30)
-        #     embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
-        #     mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
-        #     view.message = mess
-        #     return
+        if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
         
         user_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
         if user_profile == None:
@@ -205,7 +205,7 @@ class InventoryEconomy(commands.Cog):
             return
         elif user_profile.last_attack_item_used != None:
             time_window = timedelta(hours=1)
-            check = UtilitiesFunctions.check_if_within_time_delta(input=user_profile.last_work, time_window=time_window)
+            check = UtilitiesFunctions.check_if_within_time_delta(input=user_profile.last_attack_item_used, time_window=time_window)
             if check:
                 #Lấy thời gian cũ để cộng vào timedelta xem chừng nào mới làm tiếp được
                 work_next_time = user_profile.last_attack_item_used + time_window
@@ -285,13 +285,15 @@ class InventoryEconomy(commands.Cog):
         await asyncio.sleep(20)
         if view.interrupted == True: return
         embed.add_field(name=f"", value="▬▬▬ι═════>", inline=False)
+        destroy_armor = True
+        success = True
         #region crime_evident
         if user_profile.attack_item.item_id == "crime_evident":
             text = f"{interaction.user.mention} đã gài **{user_profile.attack_item.item_name}** lên người {target.mention}!"
             result = f"{target.mention} đã không kịp trở tay, và nó đã lọt vào túi đồ của mình!"
             success = True
             if target_profile.protection_item != None:
-                result, success = self.target_profile_protection(interaction=interaction, target=target, user_profile=user_profile, target_profile=target_profile, authority=authority)
+                result, success, destroy_armor = self.target_profile_protection(interaction=interaction, target=target, user_profile=user_profile, target_profile=target_profile, authority=authority, result=result)
             if success:
                 #Thêm crime_evident cho target
                 ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, item=user_profile.attack_item, amount= 1)
@@ -306,7 +308,7 @@ class InventoryEconomy(commands.Cog):
             result = f"{target.mention} đã bị roi quất nhừ tử, và mất 10 nhân phẩm!"
             success = True
             if target_profile.protection_item != None:
-                result, success = self.target_profile_protection(interaction=interaction, target=target, user_profile=user_profile, target_profile=target_profile, authority=authority)
+                result, success, destroy_armor = self.target_profile_protection(interaction=interaction, target=target, user_profile=user_profile, target_profile=target_profile, authority=authority, result=result)
             if success:
                 #trừ 10 nhân phẩm cho target
                 ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, dignity_point= -10)
@@ -321,7 +323,7 @@ class InventoryEconomy(commands.Cog):
             result = f"{target.mention} đã bị đánh lên bờ xuống ruộng, và mất 25 nhân phẩm!"
             success = True
             if target_profile.protection_item != None:
-                result, success = self.target_profile_protection(interaction=interaction, target=target, user_profile=user_profile, target_profile=target_profile, authority=authority)
+                result, success, destroy_armor = self.target_profile_protection(interaction=interaction, target=target, user_profile=user_profile, target_profile=target_profile, authority=authority, result=result)
             if success:
                 #trừ 25 nhân phẩm cho target
                 ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, dignity_point= -25)
@@ -337,7 +339,7 @@ class InventoryEconomy(commands.Cog):
             result = f"{target.mention} đã bị chém gần chết, và làm rớt **{UtilitiesFunctions.shortened_currency(lost_money)}** {EmojiCreation2.COPPER.value}!"
             success = True
             if target_profile.protection_item != None:
-                result, success = self.target_profile_protection(interaction=interaction, target=target, user_profile=user_profile, target_profile=target_profile, authority=authority)
+                result, success, destroy_armor = self.target_profile_protection(interaction=interaction, target=target, user_profile=user_profile, target_profile=target_profile, authority=authority, result=result)
             if success:
                 #trừ tiền copper cho target
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, copper= -lost_money)
@@ -361,7 +363,7 @@ class InventoryEconomy(commands.Cog):
             text = f"Thanh kiếm **{user_profile.attack_item.item_name}** của {interaction.user.mention} vút lên, lưỡi thép sáng loáng cắt ngang không khí, mang theo một tiếng rít lạnh lẽo lia thẳng vào đầu của {target.mention}!"
             success = True
             if target_profile.protection_item != None:
-                result, success = self.target_profile_protection(interaction=interaction, target=target, user_profile=user_profile, target_profile=target_profile, authority=authority)
+                result, success, destroy_armor = self.target_profile_protection(interaction=interaction, target=target, user_profile=user_profile, target_profile=target_profile, authority=authority, result=result)
             if success:
                 if dice:
                     #trừ tiền copper cho target
@@ -389,7 +391,7 @@ class InventoryEconomy(commands.Cog):
             text = f"Thanh kiếm **{user_profile.attack_item.item_name}** của {interaction.user.mention} vung vun vút như vũ bão, với sát khí chết người nhắm thẳng vào {target.mention}!"
             success = True
             if target_profile.protection_item != None:
-                result, success = self.target_profile_protection(interaction=interaction, target=target, user_profile=user_profile, target_profile=target_profile, authority=authority)
+                result, success, destroy_armor = self.target_profile_protection(interaction=interaction, target=target, user_profile=user_profile, target_profile=target_profile, authority=authority, result=result)
             if success:
                 if dice:
                     #trừ tiền copper cho target
@@ -423,7 +425,7 @@ class InventoryEconomy(commands.Cog):
             text = f"Thanh kiếm **{user_profile.attack_item.item_name}** của {interaction.user.mention} cong vút và lao thẳng vào {target.mention} với tốc độ vượt trội!"
             success = True
             if target_profile.protection_item != None:
-                result, success = self.target_profile_protection(interaction=interaction, target=target, user_profile=user_profile, target_profile=target_profile, authority=authority)
+                result, success, destroy_armor = self.target_profile_protection(interaction=interaction, target=target, user_profile=user_profile, target_profile=target_profile, authority=authority, result=result)
             if success:
                 if dice:
                     #trừ tiền silver cho target
@@ -445,7 +447,7 @@ class InventoryEconomy(commands.Cog):
             result = f"{target.mention} đã bị chém trúng tay, suýt rớt bốn ngón tay và không thể phạm tội trong một giờ tới!"
             success = True
             if target_profile.protection_item != None:
-                result, success = self.target_profile_protection(interaction=interaction, target=target, user_profile=user_profile, target_profile=target_profile, authority=authority)
+                result, success, destroy_armor = self.target_profile_protection(interaction=interaction, target=target, user_profile=user_profile, target_profile=target_profile, authority=authority, result=result)
             if success:
                 #Update crime
                 ProfileMongoManager.update_last_crime(guild_id=interaction.guild_id, user_id=target.id)
@@ -457,7 +459,7 @@ class InventoryEconomy(commands.Cog):
             result = f"{target.mention} đã bị còng tay và giam lệnh trong hai giờ tới!"
             success = True
             if target_profile.protection_item != None:
-                result, success = self.target_profile_protection(interaction=interaction, target=target, user_profile=user_profile, target_profile=target_profile, authority=authority)
+                result, success, destroy_armor = self.target_profile_protection(interaction=interaction, target=target, user_profile=user_profile, target_profile=target_profile, authority=authority, result=result)
             if success:
                 #Update jail
                 value = datetime.now() + timedelta(hours=2)
@@ -470,7 +472,7 @@ class InventoryEconomy(commands.Cog):
             return
         
         #Xoá amour của target
-        if target_profile.protection_item != None:
+        if target_profile.protection_item != None and destroy_armor:
             #gỡ giáp
             ProfileMongoManager.equip_protection_item_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, item=target_profile.protection_item, unequip= True)
             #xoá giáp
@@ -494,8 +496,11 @@ class InventoryEconomy(commands.Cog):
     
     
     
-    def target_profile_protection(self, interaction: discord.Interaction, target: discord.Member, user_profile: Profile, target_profile: Profile, authority: Profile):
+    def target_profile_protection(self, interaction: discord.Interaction, target: discord.Member, user_profile: Profile, target_profile: Profile, authority: Profile, result: str):
+        result = result
         #Nếu là armor_protection_1 thì 50% success
+        success = True
+        destroy_armor = True
         if target_profile.protection_item.item_id == "armor_protection_1":
             dice = UtilitiesFunctions.get_chance(50)
             if dice == False:
@@ -540,6 +545,16 @@ class InventoryEconomy(commands.Cog):
                     level_reduction = 1
                     calculated_new_progressing = 990
                 ProfileMongoManager.set_level_progressing(guild_id=interaction.guild_id, user_id=interaction.user.id, level_progressing=calculated_new_progressing, level_reduction_point=level_reduction)
-        return result, success
+        else:
+            #10% success nếu là giáp khác
+            dice = UtilitiesFunctions.get_chance(10)
+            if dice:
+                success = False
+                result = f"May là {target.mention} đã mặc sẵn [{target_profile.protection_item.emoji} - **{target_profile.protection_item.item_name}**] nên kịp thời chạy đi!"
+            else:
+                success = True
+                result = result
+                destroy_armor = False
+        return result, success, destroy_armor
 
     
