@@ -272,11 +272,10 @@ def set_level_progressing(guild_id:int, user_id: int, level_progressing: int, le
     existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
     if existing_data == None: return
     
-    existing_data.level_progressing = level_progressing
     existing_data.level -= level_reduction_point
     
     
-    result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"level_progressing": existing_data.level_progressing,
+    result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"level_progressing": level_progressing,
                                                                                     "level": existing_data.level,
                                                                                     }})
     return result
@@ -339,10 +338,12 @@ def is_in_debt(data: Profile, darkium_threshold = 0, gold_threshold = 0, silver_
         return False
 
 #region crime
-def update_last_crime_now(guild_id:int, user_id: int):
+def update_last_crime(guild_id:int, user_id: int, last_crime: datetime = None):
     collection = db_specific[f'profile_{guild_id}']
-    today = datetime.now()
-    result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"last_crime": today,
+    value = datetime.now()
+    if last_crime != None:
+        value = last_crime
+    result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"last_crime": value,
                                                                                     }})
     return result
 
