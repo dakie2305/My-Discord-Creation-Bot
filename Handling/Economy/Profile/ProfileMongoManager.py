@@ -419,6 +419,7 @@ def update_list_items_profile(guild_id: int, guild_name: str, user_id: int, user
     #Nếu chưa có item trong list thì append, và chỉnh quantity lại theo amount
     if exist_flag == False:
         item.quantity = amount
+        if item.quantity > 99: item.quantity = 99
         if item.quantity > 0: list_items.append(item)
     
     if len(list_items) > 20:

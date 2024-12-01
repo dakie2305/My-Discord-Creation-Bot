@@ -346,22 +346,23 @@ async def love_point_rank_reducing_task():
         for couple in couples_in_guild:
             if couple.love_point <= 0:
                 old_love_progressing = couple.love_progressing
-                calculated_love_progressing = old_love_progressing - int(old_love_progressing*15/100)
+                calculated_love_progressing = old_love_progressing - 150
                 if calculated_love_progressing <= 0: calculated_love_progressing =  0
                 CoupleMongoManager.set_love_progressing_value(guild_id=guild.id, user_id=couple.first_user_id, love_progressing=calculated_love_progressing)
             elif couple.love_point <= 50:
                 old_love_progressing = couple.love_progressing
-                calculated_love_progressing = old_love_progressing - int(old_love_progressing*10/100)
+                calculated_love_progressing = old_love_progressing - 100
                 if calculated_love_progressing <= 0: calculated_love_progressing =  0
                 CoupleMongoManager.set_love_progressing_value(guild_id=guild.id, user_id=couple.first_user_id, love_progressing=calculated_love_progressing)
             elif couple.love_point < 90:
                 old_love_progressing = couple.love_progressing
-                calculated_love_progressing = old_love_progressing - int(old_love_progressing*5/100)
+                calculated_love_progressing = old_love_progressing - 50
                 if calculated_love_progressing <= 0: calculated_love_progressing =  0
                 CoupleMongoManager.set_love_progressing_value(guild_id=guild.id, user_id=couple.first_user_id, love_progressing=calculated_love_progressing)
             couple.love_point -= 10
             if couple.love_point <= 0: couple.love_point = 0
             CoupleMongoManager.set_love_point_value(guild_id=guild.id, user_id=couple.first_user_id, love_point=couple.love_point)
+            if couple.love_rank == 20: continue
             two_weeks_ago = datetime.now() - timedelta(weeks=2)
             two_weeks_after = datetime.now() + timedelta(weeks=2)
             delete_check = 0

@@ -505,6 +505,7 @@ class CoupleCog(commands.Cog):
         CoupleMongoManager.update_love_progressing(guild_id=interaction.guild_id,user_id=interaction.user.id, bonus_exp=bonus_love_rank_exp)
         ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=interaction.user.id)
         ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=target_id)
+        ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id, user_id=target_id, guild_name="", user_name="", user_display_name="", dignity_point=5)
         await interaction.followup.send(embed=embed)
     
     @couple_fight_slash_command.error
