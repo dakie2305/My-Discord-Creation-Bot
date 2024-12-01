@@ -53,7 +53,7 @@ class InventoryEconomy(commands.Cog):
             mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
             view.message = mess
             return
-        elif all(item.item_type == "gift" for item in user_profile.list_items) or any(item.item_type == "attack" for item in user_profile.list_items) == False:
+        elif self.contains_specific_item_types(user_profile.list_items) == False:
             view = SelfDestructView(timeout=30)
             embed = discord.Embed(title=f"Bạn không có vật phẩm phù hợp để dùng!",color=discord.Color.blue())
             mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
@@ -69,7 +69,14 @@ class InventoryEconomy(commands.Cog):
         mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
         view.message = mess
         return
-        
+    
+    def contains_specific_item_types(self, items):
+        target_types = ["self_protection", "self_support", "attack"]
+        for item in items:
+            if item.item_type in target_types:
+                return True
+        return False
+    
     @inventory_use_slash_command.error
     async def inventory_use_slash_command_error(self, interaction: discord.Interaction, error):
         if isinstance(error, discord.app_commands.CommandOnCooldown):
@@ -280,7 +287,10 @@ class InventoryEconomy(commands.Cog):
         channel = interaction.channel
         view = InventoryAttackAuthorityInterceptView(user=interaction.user, user_profile=user_profile, target=target, target_profile=target_profile, authority_user=authority)
         embed = discord.Embed(title=f"", description=f"{interaction.user.mention} đã cầm [{user_profile.attack_item.emoji} - **{user_profile.attack_item.item_name}**] và lao đến {target.mention}!", color=0xc379e0)
-        message = await channel.send(embed=embed, view=view, content=f"{target.mention}")
+        if user_profile.is_authority == False:
+            message = await channel.send(embed=embed, view=view, content=f"{target.mention}")
+        else:
+            message = await channel.send(embed=embed, view=None, content=f"{target.mention}")
         view.message = message
         await asyncio.sleep(20)
         if view.interrupted == True: return
