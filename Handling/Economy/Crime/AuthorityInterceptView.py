@@ -32,6 +32,9 @@ class AuthorityInterceptView(discord.ui.View):
             await interaction.followup.send(f"Chỉ Chính Quyền <@{self.authority_user.user_id}> mới có thể giải quyết, vui lòng gọi Chính Quyền!", ephemeral=True)
             return
         self.interrupted = True
+        #Cộng nhân phẩm và cộng exp CQ
+        ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id, guild_name="",user_id=interaction.user.id, user_display_name="", user_name="",dignity_point=5)
+        ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=interaction.user.id, bonus_exp=10)
         if self.crime_type == "fight":
             if self.old_message != None: await self.old_message.delete()
             #Trừ tiền và trừ điểm nhân phẩm của người gây gỗ

@@ -60,6 +60,10 @@ class AuthorityRiotPreventView(discord.ui.View):
         embed.add_field(name=f"Danh sách thành phần bạo động", value=f"{result_y}", inline=False)
         embed.add_field(name=f"Danh sách ủng hộ chính quyền", value=f"{result_n}", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬▬ι═════════>", inline=False)
+        
+        #Cộng nhân phẩm và cộng exp CQ
+        ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id, guild_name="",user_id=interaction.user.id, user_display_name="", user_name="",dignity_point=5)
+        ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=interaction.user.id, bonus_exp=10)
         if interaction:
             await interaction.followup.send(embed=embed, ephemeral=False)
         

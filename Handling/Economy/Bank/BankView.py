@@ -159,7 +159,7 @@ class TextInputModal(discord.ui.Modal):
             #mặc định 5%
             tax = int(new_money_value * 5 / 100)
             tax_emoji = EmojiCreation2.SILVER.value
-            if tax <= 0 and profile_user.silver > 1000: tax = 100
+            if tax <= 0 and profile_user.silver > 100: tax = 100
             else: tax = 1
             if tax > 100000: tax = 100000
         elif to_emoji == EmojiCreation2.COPPER.value:
