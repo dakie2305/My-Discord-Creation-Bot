@@ -5,6 +5,7 @@ from Handling.Economy.Profile.ProfileClass import Profile
 import Handling.Economy.ConversionRate.ConversionRateMongoManager as ConversionRateMongoManager
 from Handling.Economy.Inventory_Shop.ItemClass import Item, list_gift_items
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
+from bson.int64 import Int64
 
 # Connect to the MongoDB server
 client = MongoClient("mongodb://localhost:27017/")
@@ -14,7 +15,7 @@ db_specific = client["economy_database"]
 #region Profile
 def find_profile_by_id(guild_id: int, user_id: int):
     collection = db_specific[f'profile_{guild_id}']
-    data = collection.find_one({"id": "profile", "user_id": user_id})
+    data = collection.find_one({"id": "profile", "user_id": Int64(user_id)})
     if data:
         return Profile.from_dict(data)
     return None
@@ -32,10 +33,10 @@ def drop_profile_collection(guild_id: int):
 def create_profile(guild_id: int, guild_name: str, user_id: int, user_name: str, user_display_name: str):
     #Mỗi server là một collection, chia theo server id
     collection = db_specific[f'profile_{guild_id}']
-    existing_data = collection.find_one({"id": "profile", "user_id": user_id})
+    existing_data = collection.find_one({"id": "profile", "user_id": Int64(user_id)})
     if existing_data:
         return None
-    data = Profile(user_id=user_id, user_display_name=user_display_name, user_name=user_name, guild_name= guild_name)
+    data = Profile(user_id=Int64(user_id), user_display_name=user_display_name, user_name=user_name, guild_name= guild_name)
     result = collection.insert_one(data.to_dict())
     return data
 
