@@ -183,7 +183,7 @@ class RockPaperScissors(commands.Cog):
                 if user != None and (profile.win_point!= 0):
                     embed.add_field(name=f"", value=f"**Hạng {count}.** {user.mention}: Thắng: **{profile.win_point}**. Thua: **{profile.lose_point}**. Hoà: **{profile.draw_point}**. Huyền Thoại: **{profile.legendary_point}**. Sỉ Nhục: **{profile.humiliated_point}**.", inline=False)
                     count+=1
-                if count >= 25: break
+                if count >= 15: break
         else:
             matched = False
             for index, profile in enumerate(list_player_profile):

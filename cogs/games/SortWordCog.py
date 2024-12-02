@@ -253,9 +253,6 @@ class SortWords(commands.Cog):
                             break
                     # Nếu player không có kỹ năng hint thì có thể đổi 3 điểm để tạo hint 
                     if matched == False and item_id == "hint":
-                        if player.point< 3:
-                            await message.reply(f"{message.author.mention} Bạn phải có ít nhất 3 điểm mới dùng gợi ý được.")
-                            return
                         # Get the current epoch time (in seconds)
                         start_time = datetime.now()
                         end_time = start_time + timedelta(seconds=30)  # 30 seconds from now
