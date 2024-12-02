@@ -9,6 +9,9 @@ import random
 from Handling.Misc.SelfDestructView import SelfDestructView
 import CustomEnum.UserEnum as UserEnum
 import CustomFunctions
+import asyncio
+from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
+from Handling.Economy.Inventory_Shop.ItemClass import Item, list_small_copper_fish,list_gold_fish, list_silver_fish, list_gift_items, list_trash
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(WorkEconomy(bot=bot))
@@ -60,8 +63,10 @@ class WorkEconomy(commands.Cog):
                 view.message = mes
             return
     
+    work_group = discord.app_commands.Group(name="work", description="Các lệnh liên quan đến làm việc kiếm tiền!")
+    
     #region work
-    @discord.app_commands.command(name="work", description="Lệnh lao động trong server!")
+    @work_group.command(name="normal", description="Lệnh lao động trong server!")
     async def work_slash_command(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=False)
         #Không cho dùng bot nếu không phải user
@@ -192,8 +197,100 @@ class WorkEconomy(commands.Cog):
         
         embed = discord.Embed(title=f"", description=f"{base_text}", color=0x1ae8e8)
         return embed, None
+    
+    @work_group.command(name="fishing", description="Dùng cần câu để câu cá")
+    @discord.app_commands.checks.cooldown(1, 10)
+    async def work_fising_slash_command(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=False)
+        # #Không cho dùng bot nếu không phải user
+        if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
+        user_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
+        if user_profile == None:
+            user_profile = ProfileMongoManager.create_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name)
         
+        if user_profile != None and user_profile.last_fishing != None:
+            time_window = timedelta(hours=1)
+            check = self.check_if_within_time_delta(input=user_profile.last_fishing, time_window=time_window)
+            if check:
+                #Lấy thời gian cũ để cộng vào xem chừng nào mới làm được tiếp
+                work_next_time = user_profile.last_fishing + time_window
+                unix_time = int(work_next_time.timestamp())
+                embed = discord.Embed(title=f"", description=f"🚫 Bạn đã câu cá rồi. Vui lòng thực hiện lại lệnh vào lúc <t:{unix_time}:t> !", color=0xc379e0)
+                view = SelfDestructView(timeout=120)
+                mess = await interaction.followup.send(embed=embed, view=view, ephemeral=False)
+                view.message = mess
+                return
         
+        #Không cho thực hiện nếu còn jail_time
+        if user_profile != None and user_profile.jail_time != None:
+            if user_profile.jail_time > datetime.now():
+                unix_time = int(user_profile.jail_time.timestamp())
+                embed = discord.Embed(title=f"", description=f"⛓️ Bạn đã bị chính quyền bắt giữ rồi, vui lòng đợi đến <t:{unix_time}:t> !", color=0xc379e0)
+                view = SelfDestructView(timeout=120)
+                mess = await interaction.followup.send(embed=embed, view=view, ephemeral=False)
+                view.message = mess
+                return
+            else:
+                ProfileMongoManager.update_jail_time(guild_id=interaction.guild_id, user_id=interaction.user.id, jail_time=None)
+        
+        #Kiểm tra có cần câu không
+        if user_profile.list_items == None or len(user_profile.list_items) == 0:
+            embed = discord.Embed(title=f"", description=f"🚫 Bạn không có cần câu, vui lòng dùng lệnh {SlashCommand.SHOP_GLOBAL.value} để mua cần câu!", color=0xc379e0)
+            view = SelfDestructView(timeout=120)
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=False)
+            view.message = mess
+            return
+        flag = False
+        for item in user_profile.list_items:
+            if "fish_rod" in item.item_id:
+                flag = True
+                break
+        if flag == False:
+            embed = discord.Embed(title=f"", description=f"🚫 Bạn không có cần câu, vui lòng dùng lệnh {SlashCommand.SHOP_GLOBAL.value} để mua cần câu!", color=0xc379e0)
+            view = SelfDestructView(timeout=120)
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=False)
+            view.message = mess
+            return
+        
+        fish_rod = self.get_most_expensive_fishing_rod(items=user_profile.list_items)
+        embed = discord.Embed(title=f"", description=f"{interaction.user.mention} đã dùng [{fish_rod.emoji} - **{fish_rod.item_name}**] để câu cá]",color=discord.Color.blue())
+        mess = await interaction.followup.send(embed=embed)
+        await asyncio.sleep(10)
+        fishup_item = self.get_fished_up_item(fish_rod = fish_rod)
+        embed.add_field(name=f"", value="▬▬▬▬ι═══════>", inline=False)
+        embed.add_field(name=f"", value=f"- {interaction.user.mention} đã câu lên được: [{fishup_item.emoji} - **{fishup_item.item_name}**]!", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Mô tả: {fishup_item.item_description}", inline=False)
+        text = f"{EmojiCreation2.SHINY_POINT.value} {interaction.user.mention} nhận được: "
+        if fishup_item.bonus_dignity != 0:
+            text += f"**{fishup_item.bonus_dignity}** Nhân Phẩm. "
+        if fishup_item.bonus_exp != 0:
+            text += f"**{fishup_item.bonus_exp}** Điểm Kinh Nghiệm. "
+        embed.add_field(name=f"", value=f"{text}", inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬ι═══════>", inline=False)
+        #Thêm item cho player
+        ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, item=fishup_item, amount= 1)
+        #Trừ 1 cần câu
+        ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, item=fish_rod, amount= -1)
+        #Cập nhật fishing time
+        ProfileMongoManager.update_last_fishing_now(guild_id=interaction.guild_id, user_id=interaction.user.id)
+        await mess.edit(embed=embed)
+            
+        
+    
+    @work_fising_slash_command.error
+    async def work_fising_slash_command_error(self, interaction: discord.Interaction, error):
+        if isinstance(error, discord.app_commands.CommandOnCooldown):
+            # Send a cooldown message to the user, formatted nicely
+            await interaction.response.send_message(f"⏳ Lệnh đang cooldown, vui lòng thực hiện lại trong vòng {error.retry_after:.2f}s tới.", ephemeral=True)
+        else:
+            # Handle any other errors that might occur
+            await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
+    
     def check_if_within_time_delta(self, input: datetime, time_window: timedelta):
         now = datetime.now()
         if now - time_window <= input <= now + time_window:
@@ -213,4 +310,47 @@ class WorkEconomy(commands.Cog):
         text = text.replace("{server_name}", server_name)
         text = text.replace("{user_name}", user_name)
         return text
-        
+    
+    def get_most_expensive_fishing_rod(self, items):
+        type_multiplier = {
+            "C": 1,
+            "S": 100,
+            "G": 10000,
+            "D": 1000000
+        }
+        items.sort(key=lambda item: "fish_rod" in item.item_id and item.item_worth_amount * type_multiplier[item.item_worth_type])
+        return items[-1]
+    
+    def get_fished_up_item(self, fish_rod: Item):
+        if fish_rod.item_id == "fish_rod_1":
+            dice_trash = UtilitiesFunctions.get_chance(20)
+            if dice_trash: return random.choice(list_trash)
+            
+            dice_fish_silver = UtilitiesFunctions.get_chance(10)
+            if dice_fish_silver: return random.choice(list_silver_fish)
+            else: return random.choice(list_small_copper_fish)
+        elif fish_rod.item_id == "fish_rod_2":
+            dice_trash = UtilitiesFunctions.get_chance(10)
+            if dice_trash: return random.choice(list_trash)
+            
+            dice_fish_silver = UtilitiesFunctions.get_chance(45)
+            if dice_fish_silver: return random.choice(list_silver_fish)
+            else: return random.choice(list_small_copper_fish)
+        elif fish_rod.item_id == "fish_rod_3":
+            dice_trash = UtilitiesFunctions.get_chance(6)
+            if dice_trash: return random.choice(list_trash)
+            
+            dice_fish_gold = UtilitiesFunctions.get_chance(30)
+            if dice_fish_gold: return random.choice(list_gold_fish)
+            else: return random.choice(list_silver_fish)
+            
+        elif fish_rod.item_id == "fish_rod_4":
+            dice_trash = UtilitiesFunctions.get_chance(5)
+            if dice_trash: return random.choice(list_trash)
+            dice_gift = UtilitiesFunctions.get_chance(10)
+            if dice_gift: return random.choice(list_gift_items)
+            dice_fish_gold = UtilitiesFunctions.get_chance(80)
+            if dice_fish_gold: return random.choice(list_gold_fish)
+            else: return random.choice(list_silver_fish)
+        else:
+            return random.choice(list_trash)

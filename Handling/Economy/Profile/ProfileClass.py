@@ -3,7 +3,7 @@ from datetime import datetime
 from Handling.Economy.Inventory_Shop.ItemClass import Item
 
 class Profile:
-    def __init__(self, user_id: int, user_name: str, user_display_name: str, guild_name: str, copper: int = 500, silver: int = 0, gold: int = 0, darkium: int = 0, is_authority: bool = False, last_attendance: datetime= None, last_work: datetime = None, level: int = 1, dignity_point: int = 50, quest_finished: int = 0, quote: str = None, level_progressing: int = 0, jail_time: datetime = None, last_crime: datetime = None, last_riot: datetime = None, last_gift: datetime = None, last_attack_item_used: datetime = None, gift_given: int = 0, list_items : Optional[List['Item']] = None, protection_item: Item = None, daily_streak_count: int = 0, last_breakup: datetime = None, attack_item: Item = None):
+    def __init__(self, user_id: int, user_name: str, user_display_name: str, guild_name: str, copper: int = 500, silver: int = 0, gold: int = 0, darkium: int = 0, is_authority: bool = False, last_attendance: datetime= None, last_work: datetime = None, level: int = 1, dignity_point: int = 50, quest_finished: int = 0, quote: str = None, level_progressing: int = 0, jail_time: datetime = None, last_crime: datetime = None, last_riot: datetime = None, last_gift: datetime = None, last_attack_item_used: datetime = None, gift_given: int = 0, list_items : Optional[List['Item']] = None, protection_item: Item = None, daily_streak_count: int = 0, last_breakup: datetime = None, attack_item: Item = None, last_fishing: datetime = None):
         self.id = "profile"
         self.user_id = user_id
         self.user_name = user_name
@@ -29,6 +29,7 @@ class Profile:
         self.last_gift = last_gift
         self.last_attack_item_used = last_attack_item_used
         self.last_breakup = last_breakup
+        self.last_fishing = last_fishing
         
         self.protection_item = protection_item if protection_item else None
         self.attack_item = attack_item if attack_item else None
@@ -55,6 +56,7 @@ class Profile:
             "last_gift": self.last_gift if self.last_gift else None,
             "last_attack_item_used": self.last_attack_item_used if self.last_attack_item_used else None,
             "last_breakup": self.last_breakup if self.last_breakup else None,
+            "last_fishing": self.last_fishing if self.last_fishing else None,
             "level": self.level,
             "dignity_point": self.dignity_point,
             "quest_finished": self.quest_finished,
@@ -89,6 +91,7 @@ class Profile:
                 last_gift=data.get("last_gift", None),
                 last_attack_item_used=data.get("last_attack_item_used", None),
                 last_breakup=data.get("last_breakup", None),
+                last_fishing=data.get("last_fishing", None),
                 level=data.get("level", 1),
                 dignity_point=data.get("dignity_point", 50),
                 quest_finished=data.get("quest_finished", 0),

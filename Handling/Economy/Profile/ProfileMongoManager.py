@@ -641,3 +641,10 @@ def update_last_breakup_now(guild_id:int, user_id: int):
     result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"last_breakup": today,
                                                                                     }})
     return result
+
+def update_last_fishing_now(guild_id:int, user_id: int):
+    collection = db_specific[f'profile_{guild_id}']
+    today = datetime.now()
+    result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"last_fishing": today,
+                                                                                    }})
+    return result
