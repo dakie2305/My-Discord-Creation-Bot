@@ -45,9 +45,9 @@ class ProfileEconomy(commands.Cog):
         
         data = None
         if user == None:
-            embed, data = await self.procress_profile_embed(user=interaction.user)
+            embed, data = await self.procress_profile_embed(user=interaction.user, guild_id=interaction.guild_id)
         else:
-            embed, data = await self.procress_profile_embed(user=user)
+            embed, data = await self.procress_profile_embed(user=user, guild_id=interaction.guild_id)
         if data != None and data.list_items != None and len(data.list_items)>0:
             view = ProfileToInventoryView(profile=data)
             m = await interaction.followup.send(embed=embed, view = view)
@@ -104,9 +104,9 @@ class ProfileEconomy(commands.Cog):
             data = None
             view = None
             if user == None:
-                embed, data = await self.procress_profile_embed(user=message.author)
+                embed, data = await self.procress_profile_embed(user=message.author, guild_id=message.guild.id)
             else:
-                embed, data = await self.procress_profile_embed(user=user)
+                embed, data = await self.procress_profile_embed(user=user, guild_id=message.guild.id)
             if data != None and data.list_items != None and len(data.list_items)>0:
                 view = ProfileToInventoryView(profile=data)
                 m = await message.reply(embed=embed, view= view)
@@ -132,10 +132,10 @@ class ProfileEconomy(commands.Cog):
             message_sent = await message.reply(embed=embed, view=view)
             view.message = message_sent
     
-    async def procress_profile_embed(self, user: discord.Member):
-        data = ProfileMongoManager.find_profile_by_id(guild_id=user.guild.id, user_id=user.id)
+    async def procress_profile_embed(self, user: discord.Member, guild_id: int):
+        data = ProfileMongoManager.find_profile_by_id(guild_id=guild_id, user_id=user.id)
         if data == None:
-            data = ProfileMongoManager.create_profile(guild_id=user.guild.id, user_id=user.id, guild_name=user.guild.name, user_name=user.name, user_display_name=user.display_name)
+            data = ProfileMongoManager.create_profile(guild_id=guild_id, user_id=user.id, guild_name=user.guild.name, user_name=user.name, user_display_name=user.display_name)
         
         if data.is_authority and ProfileMongoManager.is_in_debt(data= data, copper_threshold=100000):
             embed = discord.Embed(title=f"", description=f"Chính Quyền đã nợ nần quá nhiều và tự sụp đổ. Hãy dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", color=0xddede7)
@@ -143,16 +143,16 @@ class ProfileEconomy(commands.Cog):
             data.silver = 0
             data.gold = 0
             data.darkium = 0
-            ProfileMongoManager.update_profile_money_fast(guild_id= user.guild.id, data=data)
-            ProfileMongoManager.remove_authority_from_server(guild_id=user.guild.id)
-            ProfileMongoManager.update_last_authority(guild_id=user.guild.id, user_id=data.user_id)
+            ProfileMongoManager.update_profile_money_fast(guild_id= guild_id, data=data)
+            ProfileMongoManager.remove_authority_from_server(guild_id=guild_id)
+            ProfileMongoManager.update_last_authority(guild_id=guild_id, user_id=data.user_id)
             return embed, None
         
-        couple_info = CoupleMongoManager.find_couple_by_id(guild_id=user.guild.id, user_id=user.id)
+        couple_info = CoupleMongoManager.find_couple_by_id(guild_id=guild_id, user_id=user.id)
         if couple_info!= None and couple_info.first_user_id == couple_info.second_user_id:
             #Nếu ai tạo trùng thì xoá
             couple_info = None
-            CoupleMongoManager.delete_couple_by_id(guild_id=user.guild.id, user_id=user.id)
+            CoupleMongoManager.delete_couple_by_id(guild_id=guild_id, user_id=user.id)
         
         cq = ""
         if data.is_authority:
