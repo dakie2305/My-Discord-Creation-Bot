@@ -1248,6 +1248,7 @@ def get_bxh_noi_tu(interaction: discord.Interaction,lan: str, word_matching_chan
         lan = "Tiếng Việt"
     embed = discord.Embed(title=f"Xếp hạng các player theo điểm.", description=f"Trò Chơi Nối Từ {lan}", color=0x03F8FC)
     embed.add_field(name=f"", value="___________________", inline=False)
+    embed.add_field(name=f"", value=f"Round thứ: **{word_matching_channel.current_round}**", inline=False)
     count = 0
     if word_matching_channel.player_profiles:
         word_matching_channel.player_profiles.sort(key=lambda x: x.points, reverse=True)
@@ -1487,6 +1488,7 @@ async def word_matching(message: discord.Message):
                 db.create_and_update_player_bans_word_matching_info(channel_id= message.channel.id, guild_id= message.guild.id, language= lan, user_id= message.author.id, user_name=message.author.name, ban_remaining=5)
                 await message.reply(f"{message.author.mention} đã spam quá nhiều và bị khoá mõm trong vòng **5** lượt chơi tiếp theo!")
                 print(f"Player {message.author.name} is banned 5 round from world matching game for spamming")
+                message_tracker.clear_user_messages(user_id=message.author.id, channel_id=message.channel.id)
             return
         #Kiểm tra xem content có chứa first character là last character của current word không
         elif word_matching_channel.special_case == False and message.content.lower()[0] != word_matching_channel.last_character:
@@ -1503,6 +1505,11 @@ async def word_matching(message: discord.Message):
         elif lan == 'vn' and message.content.lower() not in vietnamese_dict.keys():
             await matching_words_fail(err= f"Từ `{message.content}` không nằm trong từ điển.", message=message, word_matching_channel=word_matching_channel,lan=lan,point=point)
         else:
+            if word_matching_channel.current_round>=1200:
+                #Reset
+                await message.channel.send(f"Đã chơi được 1200 round rồi. Cảm ơn mọi người đã chơi nhé. Đến lúc reset lại rồi, nên mọi người bắt đầu lại nhé!")
+                await process_reset_word_matching(message=message, word_matching_channel=word_matching_channel, language=lan)
+                return
             #Coi như pass hết
             await message.add_reaction('👍')
             #Nếu trong game việt nam, gặp những từ có đuôi như sau thì đánh special case để xử lý tiếp
@@ -1580,6 +1587,7 @@ async def matching_words_fail(message: discord.Message, err: str, word_matching_
         db.create_and_update_player_bans_word_matching_info(channel_id= message.channel.id, guild_id= message.guild.id, language= lan, user_id= message.author.id, user_name=message.author.name, ban_remaining=5)
         await message.reply(f"{message.author.mention} đã spam quá nhiều và bị khoá mõm trong vòng **5** lượt chơi tiếp theo!")
         print(f"Player {message.author.name} is banned 5 round from world matching game for spamming")
+        message_tracker.clear_user_messages(user_id=message.author.id, channel_id=message.channel.id)
         return
     await message.add_reaction('❌')
     await message.reply(f"{err} {message_tu_hien_tai}")

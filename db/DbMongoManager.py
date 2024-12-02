@@ -340,6 +340,9 @@ def update_data_word_matching_info(channel_id: int, guild_id: int, current_playe
     elif language == 'vn' or language == 'vietnam':
         existing_info.remaining_word = get_remaining_words_vietnamese(data=last_character, used_words= used_words, special_case=special_case_vn)
     used_words.append(current_word)
+    #Cộng current round lên 1
+    existing_info.current_round += 1
+    
     result = collection.update_one({"channel_id": channel_id}, {"$set": {"current_player_id": current_player_id,
                                                                          "current_player_name": current_player_name,
                                                                          "current_word": current_word,
@@ -347,6 +350,7 @@ def update_data_word_matching_info(channel_id: int, guild_id: int, current_playe
                                                                          "last_character": last_character,
                                                                          "remaining_word": existing_info.remaining_word,
                                                                          "special_case": special_case_vn,
+                                                                         "current_round": existing_info.current_round,
                                                                          "used_words": [word for word in used_words], #chỉ dùng used_words
                                                                          }})
     return result
