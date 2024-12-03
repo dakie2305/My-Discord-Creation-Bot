@@ -194,6 +194,7 @@ class TextInputModal(discord.ui.Modal):
         if suffix == "D" or suffix == "d":
             extra_text = f"Số {CurrencyEmoji.DARKIUM.value} còn lại: **{self.shortened_currency(profile_user.darkium)}**"
         await interaction.followup.send(f"**{profile_user.user_display_name}** đã đổi từ **{self.shortened_currency(amount)}** {from_emoji} -> **{self.shortened_currency(new_money_value)}** {to_emoji}. {tax_text}\n{extra_text}")
+        ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=interaction.user.id)
         
     def add_or_remove_money(self, guild_int: int, profile: Profile, type: str, amount: int, is_add: bool = True):
         if type == "D":

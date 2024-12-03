@@ -160,6 +160,9 @@ class RPSView(discord.ui.View):
         
         embed = discord.Embed(title=f"", description= f"{result}", color=0xC3A757)  # Yellowish color
         await self.message.edit(embed=embed, view=None, content="")
+        #Cộng exp cả hai
+        ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=self.user_profile.user_id)
+        ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=self.target_profile.user_id)
     
     async def on_timeout(self):
         #Sẽ xoá khi player 2 không chọn gì hết

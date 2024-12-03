@@ -92,6 +92,7 @@ class InventoryUseView(discord.ui.View):
 
     #region use support item
     async def using_support_item(self, interaction: discord.Interaction):
+        ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=interaction.user.id)
         channel = interaction.channel
         if self.selected_item.item_id == "rank_up_1":
             #Xoá vật phẩm

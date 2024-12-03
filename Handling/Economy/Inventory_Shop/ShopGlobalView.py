@@ -205,12 +205,13 @@ class TextShopInputModal(discord.ui.Modal):
                 if maintenance_money > 200000: maintenance_money = 200000
                 maintenance_emoji = EmojiCreation2.COPPER.value
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, copper=-maintenance_money)
+                
             maintenance_text = f"\nNgoài ra, {interaction.user.mention} phải đóng thuế VAT là **{maintenance_money}** {maintenance_emoji}!"
-            
             authority_text = f"Chính Quyền đã nhận được **{money_for_authority}** {self.get_emoji_money_from_type(item.item_worth_type)}!"
             if profile_user.is_authority == True:
                 authority_text = ""
             await interaction.followup.send(f"{interaction.user.mention} đã chọn mua **{amount}** [{item.emoji}- **{item.item_name}**] với giá {cost_money} {self.get_emoji_money_from_type(item.item_worth_type)}! {authority_text}{maintenance_text}", ephemeral=False)
+            ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=interaction.user.id)
         except ValueError:
             await interaction.followup.send(f"Chỉ nhập số hợp lệ!", ephemeral=True)
             return

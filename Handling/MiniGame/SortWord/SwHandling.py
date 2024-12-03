@@ -6,6 +6,8 @@ import Handling.MiniGame.SortWord.SwClass
 from Handling.MiniGame.SortWord.SwClass import SortWordInfo
 import CustomFunctions
 import string
+import db.Class.UserList as DefaultUserList
+import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 
 class SwHandlingFunction():
     def __init__ (self, message: discord.Message, message_tracker):
@@ -49,6 +51,7 @@ class SwHandlingFunction():
     async def process_reset(self, message: discord.Message, sw_info: SortWordInfo, language: str):
         embed = discord.Embed(title=f"Xếp hạng các player theo điểm.", description=f"Game Sắp Xếp Từ", color=0x03F8FC)
         embed.add_field(name=f"", value="___________________", inline=False)
+        embed.add_field(name=f"", value=f"Round hiện tại: {sw_info.current_round}", inline=False)
         count = 0
         if sw_info.player_profiles:
             sw_info.player_profiles.sort(key=lambda x: x.point, reverse=True)
@@ -58,7 +61,10 @@ class SwHandlingFunction():
                     embed.add_field(name=f"", value=f"**Hạng {index+1}.** {user.mention}. Tổng điểm: **{profile.point}**. Số lượng kỹ năng đặc biệt: **{len(profile.special_items)}**.", inline=False)
                     count+=1
                 if count >= 25: break
-        await message.channel.send(content=f"Chúc mừng các player top đầu! <@315835396305059840> sẽ trao role đặc biệt cho những Player thuộc top 3 nhé!", embed=embed)
+        text = "Chúc mừng các player top đầu!"
+        if message.guild.id == 1256987900277690470:
+            text+= " <@315835396305059840> sẽ trao role đặc biệt cho những Player thuộc top 3 nhé!"
+        await message.channel.send(content=text, embed=embed)
         #Xoá đi tạo lại
         SwMongoManager.delete_data_info(channel_id=message.channel.id, guild_id=message.guild.id, lang=language)
         
@@ -104,14 +110,6 @@ class SwHandlingFunction():
         if selected_ban:
             await message.reply(f"Bạn đã bị khoá mõm trong vòng **{selected_ban.ban_remaining}** lượt chơi tới. Vui lòng chờ đi.")
             return
-        # elif sw_info.current_player_id == message.author.id:
-        #     await message.reply(f"Bạn đã chơi rồi, vui lòng né qua để cho người khác chơi đi. {message_tu_hien_tai}")
-        #     if self.message_tracker.add_message(user_id= message.author.id, channel_id= message.channel.id, content= "spam đoán từ"): #Đánh dấu những đối tượng thích spam
-        #         #Trừ 5 điểm
-        #         SwMongoManager.update_player_point_data_info(user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= -5, guild_id=message.guild.id, channel_id=message.channel.id,language=lan)
-        #         await message.reply(f"{message.author.mention} không biết đọc nên bị trừ 5 điểm!")
-        #         print(f"Player {message.author.name} got five point reduction from sort word game for spamming")
-        #     return
         point = 1
         if sw_info.special_point != None and sw_info.special_point > 0:
             point = sw_info.special_point
@@ -128,6 +126,9 @@ class SwHandlingFunction():
             SwMongoManager.update_data_info(lang=lan,channel_id=message.channel.id, guild_id= message.guild.id, current_player_id=message.author.id, current_player_name=message.author.name,current_word=current_word)
             #Cập nhật lại điểm
             SwMongoManager.update_player_point_data_info(user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= point, guild_id=message.guild.id, channel_id=message.channel.id,language=lan)
+            
+            ProfileMongoManager.update_level_progressing(guild_id=message.guild.id, user_id=message.author.id)
+            
             #Mỗi game 1000 round là kết thúc
             sw_info, lan = await self.check_if_message_inside_game(source=message)
             if sw_info.current_round>=1200:

@@ -411,7 +411,7 @@ def update_list_items_profile(guild_id: int, guild_name: str, user_id: int, user
         for profile_item in list_items:
             if profile_item.item_id == item.item_id:
                 profile_item.quantity += amount
-                if profile_item.quantity > 99: profile_item.quantity == 99
+                if profile_item.quantity > 99: profile_item.quantity = 99
                 if profile_item.quantity <= 0: list_items.remove(profile_item)
                 exist_flag = True
                 break

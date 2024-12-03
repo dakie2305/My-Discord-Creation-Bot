@@ -17,12 +17,12 @@ import random
 import string
 import CustomButton
 from typing import Optional
-from collections import deque
 import asyncio
 import PIL
 from Handling.MiniGame.SortWord import SwHandling as SwHandling
 from Handling.Misc.Therapy import TherapyHandling
 from discord.app_commands import Choice
+import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 
 load_dotenv()
 intents = discord.Intents.all()
@@ -133,6 +133,7 @@ async def reset_wm(ctx):
 async def process_reset_word_matching(message: discord.Message, word_matching_channel: db.WordMatchingInfo, language):
     embed = discord.Embed(title=f"Xếp hạng các player theo điểm.", description=f"Trò Chơi Nối Từ", color=0x03F8FC)
     embed.add_field(name=f"", value="___________________", inline=False)
+    embed.add_field(name=f"", value=f"Round hiện tại: {word_matching_channel.current_round}", inline=False)
     count = 0
     if word_matching_channel.player_profiles:
         word_matching_channel.player_profiles.sort(key=lambda x: x.points, reverse=True)
@@ -142,7 +143,10 @@ async def process_reset_word_matching(message: discord.Message, word_matching_ch
                 embed.add_field(name=f"", value=f"**Hạng {index+1}.** {user.mention}. Tổng điểm: **{profile.points}**. Số lượng kỹ năng đặc biệt: **{len(profile.special_items)}**.", inline=False)
                 count+=1
             if count >= 25: break
-    await message.channel.send(content=f"Chúc mừng các player top đầu! <@315835396305059840> sẽ trao role đặc biệt cho những Player thuộc top 3 nhé!", embed=embed)
+    text = "Chúc mừng các player top đầu!"
+    if message.guild.id == 1256987900277690470:
+        text+= " <@315835396305059840> sẽ trao role đặc biệt cho những Player thuộc top 3 nhé!"
+    await message.channel.send(content=text, embed=embed)
     #Xoá đi tạo lại
     db.delete_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=language)
     data = db.WordMatchingInfo(channel_id=message.channel.id, channel_name=message.channel.name, current_word="a", first_character="a",last_character="a",remaining_word=12300)
@@ -1521,6 +1525,7 @@ async def word_matching(message: discord.Message):
             db.update_data_word_matching_info(language=lan,channel_id=message.channel.id, guild_id= message.guild.id, current_player_id=message.author.id, current_player_name=message.author.name,current_word=message.content.lower(), special_case_vn=special_case)
             db.update_player_point_word_matching_info(user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= point, guild_id=message.guild.id, channel_id=message.channel.id,language=lan)
             word_matching_channel = db.find_word_matching_info_by_id(channel_id= message.channel.id, guild_id= message.guild.id, language=lan)
+            ProfileMongoManager.update_level_progressing(guild_id=message.guild.id, user_id=message.author.id)
             if word_matching_channel.remaining_word>0:
                 message_tu_hien_tai = f"\nTừ hiện tại là: `'{word_matching_channel.current_word}'`, và có **{word_matching_channel.remaining_word if word_matching_channel.remaining_word else 0}** từ bắt đầu bằng chữ cái `{word_matching_channel.last_character if word_matching_channel.last_character else 0}`"
                 #Kiểm tra xem có special_item không, nếu có thì cộng cho player
@@ -1605,6 +1610,18 @@ async def on_ready():
     #Load extension
     for ext in init_extension:
         await bot.load_extension(ext)
+        
+    activity = discord.Activity(type=discord.ActivityType.watching, 
+                                name="True Heavens",
+                                state = "Dùng lệnh /help để biết thêm thông tin",
+                                details = "Kiểm tra profile của từng người..",
+                                assets={
+                                            "large_image": "true_heaven",
+                                            "large_text": "True Heavens",  # Tooltip text when hovering over the image
+                                            "small_image": "00107-3430954361-photoroom",
+                                            "small_text": "Join My True Heaven",
+                                        })
+    await bot.change_presence(status=discord.Status.online, activity=activity)
 
 @bot.event
 async def on_member_update(before: discord.Member, after: discord.Member):

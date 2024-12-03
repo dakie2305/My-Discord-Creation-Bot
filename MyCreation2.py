@@ -500,6 +500,18 @@ async def on_ready():
     #Load extension
     for ext in init_extension:
         await bot.load_extension(ext)
+    
+    activity = discord.Activity(type=discord.ActivityType.watching, 
+                                name="True Heavens",
+                                state = "Dùng lệnh /help để biết thêm thông tin",
+                                details = "Kiểm tra profile của từng người..",
+                                assets={
+                                            "large_image": "discord_ggtrue-heavens_1",
+                                            "large_text": "True Heavens",  # Tooltip text when hovering over the image
+                                            "small_image": "00107-3430954361-photoroom",
+                                            "small_text": "Join My True Heaven",
+                                        })
+    await bot.change_presence(status=discord.Status.online, activity=activity)
 
 @bot.event
 async def on_message(message: discord.Message):

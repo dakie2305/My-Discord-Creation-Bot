@@ -159,7 +159,7 @@ class CrimeEconomy(commands.Cog):
                 m = await interaction.followup.send(embed=embed, view=view)
                 view.message = m
                 return
-
+        ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=interaction.user.id)
         if action == "fight":
             await self.process_fight_command(interaction=interaction, user=interaction.user, target_user=target_user, user_profile=user_profile, target_profile=target_profile)
         elif action == "rob":

@@ -278,6 +278,8 @@ class WorkEconomy(commands.Cog):
         ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, item=fish_rod, amount= -1)
         #Cập nhật fishing time
         ProfileMongoManager.update_last_fishing_now(guild_id=interaction.guild_id, user_id=interaction.user.id)
+        #Cập nhập level progressing
+        ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=interaction.user.id, bonus_exp=fishup_item.bonus_exp)
         await mess.edit(embed=embed)
             
         
