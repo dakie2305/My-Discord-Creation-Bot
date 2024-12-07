@@ -265,7 +265,47 @@ class InventoryEconomy(commands.Cog):
             mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
             view.message = mess
             return
+        elif target_profile.level + 100 <= user_profile.level:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"{target.display_name} cấp quá thấp, bạn không được tấn công người có rank thấp hơn bản thân tận 100 cấp!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
         
+        if "legend_" in user_profile.attack_item.item_id:
+            if user_profile.level <= 50:
+                view = SelfDestructView(timeout=30)
+                embed = discord.Embed(title=f"Bạn cấp quá thấp, phải đạt ít nhất cấp 50 mới có thể làm chủ được sức mạnh này!",color=discord.Color.blue())
+                mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+                view.message = mess
+                return
+            if user_profile.dignity_point < 75:
+                view = SelfDestructView(timeout=30)
+                embed = discord.Embed(title=f"Nhân phẩm bạn quá thấp, phải đạt ít nhất trên 75 điểm mới có thể làm chủ được sức mạnh này!",color=discord.Color.blue())
+                mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+                view.message = mess
+                return
+            if target_profile.level < 30:
+                view = SelfDestructView(timeout=30)
+                embed = discord.Embed(title=f"Kẻ địch cấp quá thấp, chỉ nên nhắm vào những người trên cấp 30!",color=discord.Color.blue())
+                mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+                view.message = mess
+                return
+            
+            if target_profile.level + 75 < user_profile.level:
+                view = SelfDestructView(timeout=30)
+                embed = discord.Embed(title=f"Bạn cấp quá cao, không nên cầm **Thất Truyền Huyền Khí** đánh cấp quá thấp!",color=discord.Color.blue())
+                mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+                view.message = mess
+                return
+            
+            if target_profile.level - 75 > user_profile.level:
+                view = SelfDestructView(timeout=30)
+                embed = discord.Embed(title=f"Kẻ địch cấp quá cao!",color=discord.Color.blue())
+                mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+                view.message = mess
+                return
+            
         
         await interaction.followup.send(content="Bạn đã tấn công đối phương", ephemeral=True)
         await self.handling_attack(interaction=interaction, target=target, user_profile=user_profile, target_profile=target_profile, authority=authority)
@@ -284,16 +324,23 @@ class InventoryEconomy(commands.Cog):
     
     #region logic attack
     async def handling_attack(self, interaction: discord.Interaction, target: discord.Member, user_profile: Profile, target_profile: Profile, authority: Profile):
+        is_legend_weapon = False
+        if "legend_" in user_profile.attack_item.item_id:
+            is_legend_weapon = True
         channel = interaction.channel
         view = InventoryAttackAuthorityInterceptView(user=interaction.user, user_profile=user_profile, target=target, target_profile=target_profile, authority_user=authority)
         embed = discord.Embed(title=f"", description=f"{interaction.user.mention} đã cầm [{user_profile.attack_item.emoji} - **{user_profile.attack_item.item_name}**] và lao đến {target.mention}!", color=0xc379e0)
-        if user_profile.is_authority == False:
+        if user_profile.is_authority == False and is_legend_weapon == False:
             message = await channel.send(embed=embed, view=view, content=f"{target.mention}")
         else:
             message = await channel.send(embed=embed, view=None, content=f"{target.mention}")
         view.message = message
         await asyncio.sleep(20)
         if view.interrupted == True: return
+        if is_legend_weapon:
+            await self.handling_attack_legend(interaction=interaction, target=target, user_profile=user_profile, target_profile=target_profile, authority=authority, message= message)
+            return
+        
         embed.add_field(name=f"", value="▬▬▬ι═════>", inline=False)
         destroy_armor = True
         success = True
@@ -307,9 +354,6 @@ class InventoryEconomy(commands.Cog):
             if success:
                 #Thêm crime_evident cho target
                 ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, item=user_profile.attack_item, amount= 1)
-            #Xoá amour của target
-            if target_profile.protection_item != None:
-                ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, item=target_profile.protection_item, amount= -1)
             embed.add_field(name=f"", value=text, inline=False)
             embed.add_field(name=f"", value=result, inline=False)
         #region whipping
@@ -322,9 +366,6 @@ class InventoryEconomy(commands.Cog):
             if success:
                 #trừ 10 nhân phẩm cho target
                 ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, dignity_point= -10)
-            #Xoá amour của target
-            if target_profile.protection_item != None:
-                ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, item=target_profile.protection_item, amount= -1)
             embed.add_field(name=f"", value=text, inline=False)
             embed.add_field(name=f"", value=result, inline=False)
         #region sword_1
@@ -567,4 +608,186 @@ class InventoryEconomy(commands.Cog):
                 destroy_armor = False
         return result, success, destroy_armor
 
+#region handling_attack_legend
+    async def handling_attack_legend(self, interaction: discord.Interaction, target: discord.Member, user_profile: Profile, target_profile: Profile, authority: Profile, message: discord.Message):
+              
+        embed = discord.Embed(title=f"", description=f"{interaction.user.mention} đã cầm [{user_profile.attack_item.emoji} - **{user_profile.attack_item.item_name}**] và lao đến {target.mention}!", color=0xc379e0)
+        embed.add_field(name=f"", value="▬▬▬ι═════>", inline=False)
+        #region legend_axe
+        if user_profile.attack_item.item_id == "legend_axe":
+            text = f"{interaction.user.mention} vung thẳng thanh **{user_profile.attack_item.item_name}** để đánh {target.mention} mạnh đến nỗi từng nhát chém đều như chặt đứt thần hồn lẫn hộ giáp của {target.mention}!"
+            result = f"{target.mention} đã bị rìu bổ đến mức kinh động thần hồn và run rẩy như cầy sấy!"
+            if target_profile.protection_item != None:
+                result = f"{target.mention} đã bị rìu bổ mạnh đến mức tan nát thần hồn và vỡ tan tất cả giáp [{target_profile.protection_item.emoji} - **{target_profile.protection_item.item_name}**]!"
+            
+            #Xoá toàn bộ những armour mà target đang mặc
+            if target_profile.protection_item != None:
+                ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, item=target_profile.protection_item, amount= -99)
+            embed.add_field(name=f"", value=text, inline=False)
+            embed.add_field(name=f"", value=result, inline=False)
+        
+        elif user_profile.attack_item.item_id == "legend_axe_2":
+            text = f"{interaction.user.mention} vung thẳng thanh **{user_profile.attack_item.item_name}** để đánh {target.mention} mạnh đến nỗi từng nhát chém đều như chặt đứt thần hồn lẫn hộ giáp của {target.mention}!"
+            result = f"{target.mention} đã bị rìu bổ đến mức bị phế công và mất tận 10 cấp độ!"
+            #trừ 10 cấp
+            ProfileMongoManager.set_level_progressing(guild_id=interaction.guild_id, user_id=target.id, level_progressing=target_profile.level_progressing, level_reduction_point=-10)
+            embed.add_field(name=f"", value=text, inline=False)
+            embed.add_field(name=f"", value=result, inline=False)
+            
+        elif user_profile.attack_item.item_id == "legend_karambit":
+            text = f"{interaction.user.mention} lia thanh **{user_profile.attack_item.item_name}** toả sáng huyền ảo, những hoa văn cổ xưa trên đó như bừng sáng và vụt thẳng tới vũ khí của {target.mention}!"
+            result = f"{target.mention} đã bị chém đến mất vũ khí đang cầm!"
+            
+            if target_profile.attack_item != None:
+                result = f"{target.mention} đã bị chém đến mất toàn bộ vũ khí [{target_profile.attack_item} - **{target_profile.attack_item}**]!"
+                #Gỡ vật phẩm đang dùng
+                ProfileMongoManager.equip_attack_item_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, item=user_profile.attack_item, unequip=True)
+                ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, item=target_profile.attack_item, amount= -99)
+            elif target_profile.list_items!= None and len(target_profile.list_items) > 0:
+                #Chọn ra một vũ khí sẽ bị phế
+                chosen_item = None
+                for item in target_profile.list_items:
+                    if item.item_type == "attack":
+                        chosen_item = item
+                        break
+                if chosen_item != None:
+                    result = f"{target.mention} đã bị chém đến mất toàn bộ vũ khí [{chosen_item.emoji} - **{chosen_item.item_name}**]!"
+                    ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, item=chosen_item, amount= -99)
+            embed.add_field(name=f"", value=text, inline=False)
+            embed.add_field(name=f"", value=result, inline=False)
+            
+        elif user_profile.attack_item.item_id == "legend_scythe":
+            text = f"{interaction.user.mention} lia **{user_profile.attack_item.item_name}** vào đầu của {target.mention} nhằm gặt và xé toàn linh hồn của {target.mention}!"
+            result = f"{target.mention} đã bị lưỡi liềm vung đến mất tất cả mọi vụ mùa!"
+            #Nếu có seed thì huỷ hết, huỷ luôn cả plant
+            ProfileMongoManager.update_plant(guild_id=interaction.guild_id, user_id=target.id, plant=None)
+            if target_profile.list_items!= None and len(target_profile.list_items) > 0:
+                for item in target_profile.list_items:
+                    if item.item_type == "seed":
+                        ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, item=item, amount= -99)
+            embed.add_field(name=f"", value=text, inline=False)
+            embed.add_field(name=f"", value=result, inline=False)
+            
+        elif user_profile.attack_item.item_id == "legend_spear_1":
+            text = f"Với một động tác uyển chuyển, {interaction.user.mention} đâm thẳng **{user_profile.attack_item.item_name}** vào đầu của {target.mention} với sức mạnh kinh thiên động địa!"
+            result = f"{target.mention} đã bị đóng băng toàn bộ mệnh lệnh trong vòng ít nhất vài tiếng tới!"
+            #Update lại thời gian của tất cả lệnh
+            value = datetime.now() + timedelta(hours=4)
+            ProfileMongoManager.update_jail_time(guild_id=interaction.guild_id, user_id=target.id, jail_time=value)
+            ProfileMongoManager.update_last_crime(guild_id=interaction.guild_id, user_id=target.id, last_crime=value)
+            ProfileMongoManager.update_last_attack_item_now(guild_id=interaction.guild_id, user_id=target.id)
+            ProfileMongoManager.update_last_fishing_now(guild_id=interaction.guild_id, user_id=target.id)
+            ProfileMongoManager.update_last_riot_now(guild_id=interaction.guild_id, user_id=target.id)
+            ProfileMongoManager.update_last_work_now(guild_id=interaction.guild_id, user_id=target.id)
+            ProfileMongoManager.update_last_gift_now(guild_id=interaction.guild_id, user_id=target.id)
+            embed.add_field(name=f"", value=text, inline=False)
+            embed.add_field(name=f"", value=result, inline=False)
+        
+        elif user_profile.attack_item.item_id == "legend_spear_2":
+            text = f"Với một động tác thuần thục điêu luyện, {interaction.user.mention} vung **{user_profile.attack_item.item_name}** nhanh như chớp nhắm thẳng vào ngực {target.mention} với sức mạnh hủy diệt!"
+            result = f"{target.mention} đã bị đâm liên tiếp đến mức nát cả bộ giáp đang dùng!"
+            if target_profile.protection_item != None:
+                result = f"{target.mention} đã bị đâm liên tiếp đến mức nát [{target_profile.protection_item} - **{target_profile.protection_item}**]!"
+                #Gỡ vật phẩm đang dùng
+                ProfileMongoManager.equip_protection_item_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, item=user_profile.protection_item, unequip=True)
+                ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, item=target_profile.protection_item, amount= -99)
+            elif target_profile.list_items!= None and len(target_profile.list_items) > 0:
+                #Chọn ra một bộ giáp sẽ bị phế
+                chosen_item = None
+                for item in target_profile.list_items:
+                    if item.item_type == "self_protection":
+                        chosen_item = item
+                        break
+                if chosen_item != None:
+                    result = f"{target.mention} đã bị đâm nhiều đến mức nát hết [{target_profile.protection_item} - **{target_profile.protection_item}**]!"
+                    ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, item=chosen_item, amount= -99)
+            embed.add_field(name=f"", value=text, inline=False)
+            embed.add_field(name=f"", value=result, inline=False)
+            
+        elif user_profile.attack_item.item_id == "legend_sword_1":
+            text = f"Với tốc độ khủng bố, {interaction.user.mention} lia thanh **{user_profile.attack_item.item_name}** rạch qua không khí và nhắm thẳng vào đầu {target.mention} với đường kiếm hoàn hảo!"
+            
+            money = 1
+            money_type = EmojiCreation2.COPPER.value
+            if target_profile.darkium >0:
+                money = int(target_profile.darkium*10/100)
+                if money > 1000: money = 1000
+                money_type = EmojiCreation2.DARKIUM.value
+            elif target_profile.gold >0:
+                money = int(target_profile.gold*10/100)
+                if money > 100000: money = 100000
+                money_type = EmojiCreation2.GOLD.value
+            elif target_profile.silver > 0:
+                money = int(target_profile.silver*10/100)
+                if money > 1000000: money = 1000000
+                money_type = EmojiCreation2.SILVER.value
+            elif target_profile.copper > 0:
+                money = int(target_profile.copper*10/100)
+                if money > 100000000: money = 100000000
+                money_type = EmojiCreation2.COPPER.value
+            if money <= 0: money = 1
+            
+            if money_type == EmojiCreation2.COPPER.value:
+                ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, copper=-money)
+            elif money_type == EmojiCreation2.SILVER.value:
+                ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, silver=-money)
+            elif money_type == EmojiCreation2.GOLD.value:
+                ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, gold=-money)
+            elif money_type == EmojiCreation2.DARKIUM.value:
+                ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, darkium=-money)
+            result = f"{target.mention} chưa kịp phản ứng đã bị một nhát chém chính xác vào vai, máu tươi tuôn trào và đã mất **{UtilitiesFunctions.shortened_currency(money)}** {money_type}!"
+            embed.add_field(name=f"", value=text, inline=False)
+            embed.add_field(name=f"", value=result, inline=False)
+            
+        elif user_profile.attack_item.item_id == "legend_sword_2":
+            text = f"Với tốc độ khủng bố, {interaction.user.mention} vung thanh **{user_profile.attack_item.item_name}** với tất cả sức mạnh của mình và cắt xuyên qua lớp giáp {target.mention}!"
+            result = f"Khuôn mặt {target.mention} tái nhợt, buộc phải quỳ gối xin tha mạng, và đã bị chém cho phế hết tiến trình thăng cấp bậc và mất toàn bộ nhân phẩm!"
+            bonus = 50
+            bonus += target_profile.dignity_point*2
+            bonus += target_profile.level_progressing
+            #Cộng exp thêm cho người tung đòn
+            ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=user_profile.user_id, bonus_exp=bonus)
+            
+            ProfileMongoManager.set_level_progressing(guild_id=interaction.guild_id, user_id=target.id, level_progressing=0, level_reduction_point=0)
+            ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, dignity_point=-1000)
+            embed.add_field(name=f"", value=text, inline=False)
+            embed.add_field(name=f"", value=result, inline=False)
+        elif user_profile.attack_item.item_id == "legend_sword_3":
+            text = f"Với tốc độ thần sầu, {interaction.user.mention} vung thanh **{user_profile.attack_item.item_name}** với tất cả sức mạnh của mình và cắt nát toàn bộ vật phẩm quà tặng của {target.mention}!"
+            result = f"{target.mention} gào thét trong đau đớn, nhưng {interaction.user.mention} vẫn không dừng lại, lưỡi kiếm tiếp tục đâm sâu hơn!"
+            #Nếu có gift thì huỷ hết
+            if target_profile.list_items!= None and len(target_profile.list_items) > 0:
+                for item in target_profile.list_items:
+                    if item.item_type == "gift":
+                        ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, item=item, amount= -99)
+            embed.add_field(name=f"", value=text, inline=False)
+            embed.add_field(name=f"", value=result, inline=False)
+        
+        else:
+            await interaction.channel.send(content=f"Darkie chưa code công dụng của vũ khí [{user_profile.attack_item.emoji} - **{user_profile.attack_item.item_name}**]")
+            return
+        
+        
+        #Xoá amour của target
+        if target_profile.protection_item != None:
+            #gỡ giáp
+            ProfileMongoManager.equip_protection_item_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, item=target_profile.protection_item, unequip= True)
+            #xoá giáp
+            ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, item=target_profile.protection_item, amount= -1)
+        
+        #Gỡ vật phẩm đang dùng
+        ProfileMongoManager.equip_attack_item_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, item=user_profile.attack_item, unequip=True)
+        #Xoá vật phẩm
+        ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, item=user_profile.attack_item, amount= -1)
+        #Cập nhật last_use_attack
+        ProfileMongoManager.update_last_attack_item_now(guild_id=interaction.guild_id, user_id=interaction.user.id)
+        #Trừ 20 điểm nhân phẩm của người tấn công
+        ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, dignity_point=-20)
+        
+        #Cộng exp cho người tấn công
+        ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=interaction.user.id)
+        embed.add_field(name=f"", value="▬▬▬ι═════>", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Ngoài ra, vì đã dùng vũ khí tấn công nên {interaction.user.mention} đã mất thêm **20** điểm nhân phẩm", inline=False)
+        await message.edit(embed=embed, view=None, content=f"{target.mention}")
+        return
     

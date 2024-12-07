@@ -150,7 +150,7 @@ class ItemSelect(discord.ui.Select):
     def __init__(self, user: discord.Member, list_item: List[Item], view: "InventoryUseView"):
         options = [
             discord.SelectOption(label=f"{item.item_name} (x{item.quantity})", description=item.item_description[:97] + '...', value=item.item_id)
-            for item in list_item if item.item_type != "gift" and item.item_type != "misc" and item.item_type != "trash"
+            for item in list_item if item.item_type != "gift" and item.item_type != "misc" and item.item_type != "trash" and item.item_type != "seed"
         ]
         super().__init__(placeholder="Chọn vật phẩm muốn dùng", options=options)
         self.list_item = list_item

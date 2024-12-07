@@ -1,6 +1,5 @@
 from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.EmojiEnum import EmojiCreation2
-from CustomEnum.RoleEnum import TrueHeavenRoleId
 import discord
 from discord.ext import commands
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
@@ -9,10 +8,11 @@ import CustomFunctions
 from Handling.Misc.SelfDestructView import SelfDestructView
 import CustomEnum.UserEnum as UserEnum
 from typing import List, Optional, Dict
-from Handling.Economy.Inventory_Shop.ItemClass import Item, list_gift_items, list_protection_items, list_support_items, list_attack_items, list_fishing_rod
+from Handling.Economy.Inventory_Shop.ItemClass import Item, list_gift_items, list_protection_items, list_support_items, list_attack_items, list_fishing_rod, list_legend_weapon_1, list_legend_weapon_2
 from Handling.Economy.Inventory_Shop.ShopGlobalView import ShopGlobalView
 import Handling.Economy.ConversionRate.ConversionRateMongoManager as ConversionRateMongoManager
 import random
+from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 
 
 async def setup(bot: commands.Bot):
@@ -27,7 +27,7 @@ class ShopEconomy(commands.Cog):
     shop_group = discord.app_commands.Group(name="shop", description="Các lệnh liên quan đến Shop Item!")
     #region shop slash
     @shop_group.command(name="global", description="Hiển thị các mặt hàng trong thị trường toàn cầu")
-    @discord.app_commands.checks.cooldown(1, 10)
+    @discord.app_commands.checks.cooldown(1, 30)
     async def shop_global_slash_command(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=False)
         #Không cho dùng bot nếu không phải user
@@ -90,9 +90,18 @@ class ShopEconomy(commands.Cog):
         #View đầu tiên luôn là gift shop
         self.list_all_shops["Shop Quà Tặng Cuộc Sống"] = list_gift_items
         self.list_all_shops["Shop Hàng Bổ Trợ"] = list_support_items
-        self.list_all_shops["Shop Cần Câu Cá"] = list_fishing_rod
+        self.list_all_shops["Shop Nông Trại"] = list_fishing_rod
         self.list_all_shops["Shop Bảo Hộ"] = list_protection_items
         self.list_all_shops["Shop Vũ Khí"] = list_attack_items
+        
+        
+        if interaction.user.id == 315835396305059840 or (datetime.now().hour == 0 and datetime.now().minute == 0):
+            dice = UtilitiesFunctions.get_chance(50)
+            if dice:
+                self.list_all_shops["Thất Truyền Huyền Khí Nhất Đẳng"] = list_legend_weapon_1
+            else:
+                self.list_all_shops["Thất Truyền Huyền Khí Nhị Đẳng"] = list_legend_weapon_2
+        
         
         keys = list(self.list_all_shops.keys())  # Shop names
         # Tạo embed cho shop

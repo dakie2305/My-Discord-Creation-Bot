@@ -10,6 +10,7 @@ import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
 from CustomEnum.SlashEnum import SlashCommand 
 from CustomEnum.EmojiEnum import EmojiCreation2 
 import string
+from Handling.Economy.Inventory_Shop.ItemClass import Item, list_gift_items, list_protection_items, list_support_items, list_attack_items, list_fishing_rod, list_legend_weapon_1, list_legend_weapon_2
 
 class CurrencyEmoji(Enum):
         DARKIUM = "<a:darkium:1294615481701105734>"
@@ -38,6 +39,18 @@ class AutoresponderHandling():
         
         donate = ["donate"]
         sb_help = ["sb help","cách chơi tài xỉu", "tài xỉu?", "tx help"]
+        legend_weapon = ["thất truyền huyền khí"]
+
+        chosen_item: Item = None
+        
+        for item in list_legend_weapon_1:
+            if item.item_name.lower() in message.content.lower():
+                chosen_item = item
+                break
+        for item in list_legend_weapon_2:
+            if item.item_name.lower() in message.content.lower():
+                chosen_item = item
+                break
                 
         flag = False
         if message.author.bot: return flag
@@ -82,7 +95,7 @@ class AutoresponderHandling():
         
         elif CustomFunctions.contains_substring(message.content.lower(), dignity_help):
             flag = True
-            embed = discord.Embed(title=f"", description=f"Hướng dẫn **Diểm nhân phẩm**", color=0xc379e0)
+            embed = discord.Embed(title=f"", description=f"Hướng dẫn **Điểm nhân phẩm**", color=0xc379e0)
             embed.add_field(name="", value="-------------------------------------", inline=False)
             embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Điểm nhân phẩm sẽ quyết định rất nhiều điều, về số tiền bạn kiếm được, về kinh nghiệm bạn kiếm được... và sẽ tác động đến những lệnh khác mà cần tốn tiền.", inline=False)
             embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Điểm nhân phẩm càng thấp thì nhân phẩm bạn sẽ thấp và có thể gặp bất lợi, nhưng đồng thời cũng có lợi ở đôi chỗ khác như {SlashCommand.WORK.value} thì có thể trốn thuế nhiều hơn.", inline=False)
@@ -114,6 +127,32 @@ class AutoresponderHandling():
             embed.add_field(name="", value="-------------------------------------", inline=False)
             embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Địa vị chính là tổng số tài sản của bạn cộng lại mà ra. Tổng tài sản càng nhiều thì địa vị sẽ tăng lên, và ngược lại.", inline=False)
             embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Để kiếm được tiền thì bạn có thể dùng những lệnh như {SlashCommand.WORK.value}, {SlashCommand.DAILY.value}, hoặc đi bạo động chính quyền, hoặc chơi các lệnh cờ bạc! Vô vàn lựa chọn cho bạn chọn!", inline=False)
+            embed.add_field(name="", value="-------------------------------------", inline=False)
+            view = SelfDestructView(timeout=180)
+            _mess = await message.channel.send(embed=embed, view=view)
+            view.message= _mess
+            
+        elif chosen_item!= None:
+            flag = True
+            embed = discord.Embed(title=f"", description=f"**Thất Truyền Huyền Khí**", color=0xc379e0)
+            embed.add_field(name="", value="-------------------------------------", inline=False)
+            embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Vũ khí: [{chosen_item.emoji} - **{chosen_item.item_name}**]", inline=False)
+            embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Mô tả: {chosen_item.item_description}", inline=False)
+            embed.add_field(name="", value="-------------------------------------", inline=False)
+            view = SelfDestructView(timeout=180)
+            _mess = await message.channel.send(embed=embed, view=view)
+            view.message= _mess
+            
+        elif CustomFunctions.contains_substring(message.content.lower(), legend_weapon):
+            flag = True
+            embed = discord.Embed(title=f"", description=f"**Thất Truyền Huyền Khí**", color=0xc379e0)
+            embed.add_field(name="", value="-------------------------------------", inline=False)
+            embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Chúng là tập hợp các vũ khí huyền thoại từng làm điên đảo thế gian, và đã thất lạc đến ngàn đời sau.", inline=False)
+            embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Mỗi vũ khí đều là vũ khí độc nhất với kỹ năng tối thượng cực mạnh và xuyên phá tất cả giáp mà kẻ địch đang mang", inline=False)
+            embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Một số vũ khí có thể nhắm vào tất cả vật phẩm của kẻ địch", inline=False)
+            embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Bắt buộc phải trên 75 điểm nhân phẩm, cấp trên 50 mới làm chủ được sức mạnh của **Thất Truyền Huyền Khí**", inline=False)
+            embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Có thể câu được chúng bằng các cần câu cùi, tỉ lệ 1%", inline=False)
+            embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Có thể mua được chúng trong {SlashCommand.SHOP_GLOBAL.value} vào đúng 00:00 đêm duy nhất", inline=False)
             embed.add_field(name="", value="-------------------------------------", inline=False)
             view = SelfDestructView(timeout=180)
             _mess = await message.channel.send(embed=embed, view=view)
