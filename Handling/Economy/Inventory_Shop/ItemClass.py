@@ -775,7 +775,7 @@ list_plant = [
         item_require_target = False,
         is_self_usable = False,
         bonus_exp = 120,
-        bonus_dignity = -10,
+        bonus_dignity = 10,
         rank_required = 1,
     ),
 ]

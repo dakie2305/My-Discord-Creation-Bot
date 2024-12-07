@@ -7,6 +7,7 @@ from Handling.Economy.Inventory_Shop.ItemClass import Item, list_gift_items
 from Handling.Economy.Inventory_Shop.LockpickView import LockpickView
 import asyncio
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
+import Handling.Economy.Couple.CoupleMongoManager as CoupleMongoManager
 
 class InventoryUseView(discord.ui.View):
     def __init__(self, user_profile: Profile, user: discord.Member):
@@ -141,6 +142,18 @@ class InventoryUseView(discord.ui.View):
             #Reset last_breakup
             ProfileMongoManager.update_breakup_time(guild_id=interaction.guild_id, user_id=interaction.user.id, last_breakup= None)
             await channel.send(f'{interaction.user.mention} đã ngửi [{self.selected_item.emoji} - **{self.selected_item.item_name}**] và không còn nhớ nhung gì người xưa nữa!')
+        elif self.selected_item.item_id == "weed":
+            #Xoá vật phẩm
+            ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, amount= -1)
+            #Giảm nhân phẩm, tăng exp, tăng điểm thân mật, tăng cả tỷ lệ love progressing
+            ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, dignity_point=-self.selected_item.bonus_dignity)
+            ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=self.user.id, bonus_exp=self.selected_item.bonus_exp)
+            CoupleMongoManager.update_love_point(guild_id=interaction.guild_id,user_id=self.user.id, love_point=10)
+            CoupleMongoManager.update_love_progressing(guild_id=interaction.guild_id,user_id=self.user.id, bonus_exp=10)
+            #Reset last_breakup
+            ProfileMongoManager.update_breakup_time(guild_id=interaction.guild_id, user_id=self.user.id, last_breakup= None)
+            
+            await channel.send(f'{interaction.user.mention} đã rít một điếu [{self.selected_item.emoji} - **{self.selected_item.item_name}**] và thư thả, quên đi người cũ, thắt chặt tình cảm hiện tại, mất đi một tý nhân phẩm nhưng tăng thêm EXP!')
         else:
             await channel.send(f'Darkie vẫn chưa code xong công dụng cho vật phẩm [{self.selected_item.emoji} - **{self.selected_item.item_name}**]', ephemeral=True)
         return
