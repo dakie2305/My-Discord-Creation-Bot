@@ -94,7 +94,8 @@ class ShopEconomy(commands.Cog):
         self.list_all_shops["Shop Bảo Hộ"] = list_protection_items
         self.list_all_shops["Shop Vũ Khí"] = list_attack_items
         
-        
+        self.list_all_shops.pop("Thất Truyền Huyền Khí Nhất Đẳng", None)
+        self.list_all_shops.pop("Thất Truyền Huyền Khí Nhị Đẳng", None)
         if interaction.user.id == 315835396305059840 or (datetime.now().hour == 0 and datetime.now().minute == 0):
             dice = UtilitiesFunctions.get_chance(50)
             if dice:
