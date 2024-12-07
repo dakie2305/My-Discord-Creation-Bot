@@ -126,6 +126,7 @@ class EmojiCreation2(Enum):
     FISHING_ROD_2 = "<:Fishing_Rod_2:1313155222045986847>"
     FISHING_ROD_3 = "<:fishing_rod_3:1313155235669213244>"
     FISHING_ROD_4 = "<:Fishing_Rod_4:1313155245559250987>"
+    FISHING_ROD_5 = "<:dynamite:1314948461379977236>"
     
     CLOTH = "<:cloth:1313155485842804817>"
     PANTIES_PINK = "<:clothing_panties:1313155492729716787>"
@@ -158,6 +159,28 @@ class EmojiCreation2(Enum):
     SMALL_FISH = "<a:small_fish:1313160622447267952>"
     STAB_PENGUIN = "<a:stab_penguin:1313160684653121626>"
     JELLY_FISH = "<a:jelly_fish:1313159973597085716>"
+    
+    SEED_WHEAT = "<:seed_rice:1314948493059555409>"
+    SEED_CORN = "<:seed_corn:1314948476290994319>"
+    SEED_POTATO = "<:potato:1314948469193969687>"
+    SEED_WATERMELON = "<:seed_watermelon:1314948501318406165>"
+    SEED_WEED = "<:weed_seed:1314948530057510983>"
+    
+    WHEAT = "<:wheat:1314948540103004160>"
+    CORN = "<a:corn:1314948453608062987>"
+    WATERMELON = "<:watermelon:1314948522243784725>"
+    POTATO = "<:potato:1314948469193969687>"
+    WEED = "<a:trippy_weed:1314948515599880224>"
+    
+    LEGEND_AXE_1 = "<:legend_axe:1314994749341433866>"
+    LEGEND_AXE_2 = "<:legend_axe_2:1314994757369462855>"
+    LEGEND_KARAMBIT = "<:legend_karambit:1314994767200911360>"
+    LEGEND_SCYTHES = "<:legend_scythe:1314994777191743538>"
+    LEGEND_SPEAR_1 = "<:legend_spear:1314994787476045884>"
+    LEGEND_SPEAR_2 = "<:legend_spear_2:1314994798331039774>"
+    LEGEND_SWORD_1 = "<:legend_sword_1:1314994809789874237>"
+    LEGEND_SWORD_2 = "<a:legend_sword_2:1314994822469386240>"
+    LEGEND_SWORD_3 = "<:legend_sword_3:1314994832476737676>"
     
     
     

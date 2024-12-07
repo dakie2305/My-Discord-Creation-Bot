@@ -68,7 +68,7 @@ class ShopGlobalView(discord.ui.View):
     
     @discord.ui.button(label="Mua", style=discord.ButtonStyle.green)
     async def buy_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_modal(TextShopInputModal(rate=self.rate, current_list_item=self.current_list_item))
+        await interaction.response.send_modal(TextShopInputModal(rate=self.rate, message=self.message, current_list_item=self.current_list_item))
         return
 
     @discord.ui.button(label="Sau", style=discord.ButtonStyle.primary)
@@ -79,15 +79,18 @@ class ShopGlobalView(discord.ui.View):
             await interaction.response.edit_message(embed=self.create_embed(), view=self)
         
     async def on_timeout(self):
-        if self.message != None: 
-            await self.message.delete()
-            return
+        if self.message != None:
+            try:
+                await self.message.delete()
+            except Exception:
+                return
 
 # Create a custom modal for text input
 class TextShopInputModal(discord.ui.Modal):
-    def __init__(self, current_list_item: List[Item], rate: float = 1.0):
+    def __init__(self, current_list_item: List[Item],message: discord.Message, rate: float = 1.0):
         super().__init__(title="Chọn mã vật phẩm mà bạn muốn mua")
         self.rate = rate
+        self.message: discord.Message = message
         self.current_list_item = current_list_item
         self.input_id_field = discord.ui.TextInput(
             label="Nhập số thứ tự của vật phẩm muốn mua",
@@ -132,7 +135,12 @@ class TextShopInputModal(discord.ui.Modal):
             if profile_user.level < item.rank_required:
                 await interaction.followup.send(f"Bạn phải nâng rank mình lên trên **{item.rank_required}** để mua vật phẩm {item.emoji}!", ephemeral=True)
                 return
-            
+            #Kiểm tra phải vũ khí huyền thoại không
+            legend_check = False
+            if "legend_" in item.item_id:
+                legend_check = True
+                amount = 1
+                
             cost_money = int(amount * int(item.item_worth_amount*self.rate))
             
             if item.item_worth_type == "C" and profile_user.copper < cost_money:
@@ -167,6 +175,8 @@ class TextShopInputModal(discord.ui.Modal):
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, darkium=-cost_money)
                 if profile_user.is_authority != True:
                     ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, darkium=money_for_authority)
+            if "legend_" in item.item_id:
+                item.item_worth_amount = item.item_worth_amount/2
             ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, item=item, amount=amount)
 
             maintenance_text = ""
@@ -212,6 +222,8 @@ class TextShopInputModal(discord.ui.Modal):
                 authority_text = ""
             await interaction.followup.send(f"{interaction.user.mention} đã chọn mua **{amount}** [{item.emoji}- **{item.item_name}**] với giá {cost_money} {self.get_emoji_money_from_type(item.item_worth_type)}! {authority_text}{maintenance_text}", ephemeral=False)
             ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=interaction.user.id)
+            if legend_check:
+                if self.message != None: await self.message.delete()
         except ValueError:
             await interaction.followup.send(f"Chỉ nhập số hợp lệ!", ephemeral=True)
             return
