@@ -229,3 +229,29 @@ class UtilitiesFunctions():
         elif rank >= 2:
             text= "Tình Chớm Nở"
         return text
+    
+    @staticmethod
+    def progress_bar_plant(start_time: datetime, end_time: datetime, bar_length: int = 15) -> str:
+        now = datetime.now()
+        
+        if start_time > end_time:
+            bar = "█" * bar_length
+            return f"{bar} 100%"
+        
+        if datetime.now() > end_time:
+            bar = "█" * bar_length
+            return f"{bar} 100%"
+        
+        total_duration = (end_time - start_time).total_seconds()
+        elapsed_time = (now - start_time).total_seconds()
+        
+        # Ensure progress is within bounds (0 to 100%)
+        progress_percentage = max(0, min(100, (elapsed_time / total_duration) * 100))
+        
+        # Calculate the number of "filled" blocks in the bar
+        filled_length = int(bar_length * (progress_percentage / 100))
+        empty_length = bar_length - filled_length
+        
+        # Create the bar
+        bar = "█" * filled_length + "░" * empty_length
+        return f"{bar} {progress_percentage:.0f}%"

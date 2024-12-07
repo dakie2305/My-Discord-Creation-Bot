@@ -11,7 +11,8 @@ import CustomEnum.UserEnum as UserEnum
 import CustomFunctions
 import asyncio
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
-from Handling.Economy.Inventory_Shop.ItemClass import Item, list_small_copper_fish,list_gold_fish, list_silver_fish, list_gift_items, list_trash
+from Handling.Economy.Inventory_Shop.ItemClass import Item, list_small_copper_fish,list_gold_fish, list_silver_fish, list_gift_items, list_trash, list_plant, list_legend_weapon_1, list_legend_weapon_2
+from Handling.Economy.Work.WorkPlantView import WorkPlantView
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(WorkEconomy(bot=bot))
@@ -258,14 +259,14 @@ class WorkEconomy(commands.Cog):
             return
         
         fish_rod = self.get_most_expensive_fishing_rod(items=user_profile.list_items)
-        embed = discord.Embed(title=f"", description=f"{interaction.user.mention} đã dùng [{fish_rod.emoji} - **{fish_rod.item_name}**] để câu cá]",color=discord.Color.blue())
+        embed = discord.Embed(title=f"", description=f"{interaction.user.mention} đã dùng [{fish_rod.emoji} - **{fish_rod.item_name}**] để câu cá",color=discord.Color.blue())
         mess = await interaction.followup.send(embed=embed)
         await asyncio.sleep(10)
         fishup_item = self.get_fished_up_item(fish_rod = fish_rod)
         embed.add_field(name=f"", value="▬▬▬▬ι═══════>", inline=False)
-        embed.add_field(name=f"", value=f"- {interaction.user.mention} đã câu lên được: [{fishup_item.emoji} - **{fishup_item.item_name}**]!", inline=False)
+        embed.add_field(name=f"", value=f"{interaction.user.mention} đã câu lên được: [{fishup_item.emoji} - **{fishup_item.item_name}**]!", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Mô tả: {fishup_item.item_description}", inline=False)
-        text = f"{EmojiCreation2.SHINY_POINT.value} {interaction.user.mention} nhận được: "
+        text = f"{EmojiCreation2.SHINY_POINT.value} Nhận được: "
         if fishup_item.bonus_dignity != 0:
             text += f"**{fishup_item.bonus_dignity}** Nhân Phẩm. "
         if fishup_item.bonus_exp != 0:
@@ -278,12 +279,11 @@ class WorkEconomy(commands.Cog):
         ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, item=fish_rod, amount= -1)
         #Cập nhật fishing time
         ProfileMongoManager.update_last_fishing_now(guild_id=interaction.guild_id, user_id=interaction.user.id)
-        #Cập nhập level progressing
+        #Cập nhập level progressing và nhân phẩm
         ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=interaction.user.id, bonus_exp=fishup_item.bonus_exp)
+        ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id, guild_name= "", user_display_name="", user_name="", user_id=interaction.user.id, dignity_point=fishup_item.bonus_dignity)
         await mess.edit(embed=embed)
-            
-        
-    
+
     @work_fising_slash_command.error
     async def work_fising_slash_command_error(self, interaction: discord.Interaction, error):
         if isinstance(error, discord.app_commands.CommandOnCooldown):
@@ -292,6 +292,124 @@ class WorkEconomy(commands.Cog):
         else:
             # Handle any other errors that might occur
             await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
+    
+    @work_group.command(name="planting", description="Làm anh nông dân trồng trọt vui vẻ")
+    @discord.app_commands.checks.cooldown(1, 10)
+    async def work_planting_slash_command(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=False)
+        # #Không cho dùng bot nếu không phải user
+        if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
+        user_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
+        if user_profile == None:
+            user_profile = ProfileMongoManager.create_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name)
+        
+        #Không cho thực hiện nếu còn jail_time
+        if user_profile != None and user_profile.jail_time != None:
+            if user_profile.jail_time > datetime.now():
+                unix_time = int(user_profile.jail_time.timestamp())
+                embed = discord.Embed(title=f"", description=f"⛓️ Bạn đã bị chính quyền bắt giữ rồi, vui lòng đợi đến <t:{unix_time}:t> !", color=0xc379e0)
+                view = SelfDestructView(timeout=120)
+                mess = await interaction.followup.send(embed=embed, view=view, ephemeral=False)
+                view.message = mess
+                return
+            else:
+                ProfileMongoManager.update_jail_time(guild_id=interaction.guild_id, user_id=interaction.user.id, jail_time=None)
+        
+        if user_profile.plant == None:
+            #Kiểm tra trong list profile có cây trồng không
+            if user_profile.list_items == None or len(user_profile.list_items) == 0:
+                embed = discord.Embed(title=f"", description=f"🚫 Bạn không có hạt giống nào cả, vui lòng dùng lệnh {SlashCommand.SHOP_GLOBAL.value} để mua!", color=0xc379e0)
+                view = SelfDestructView(timeout=120)
+                mess = await interaction.followup.send(embed=embed, view=view, ephemeral=False)
+                view.message = mess
+                return
+            flag = False
+            for item in user_profile.list_items:
+                if "seed_" in item.item_id:
+                    flag = True
+                    break
+            if flag == False:
+                embed = discord.Embed(title=f"", description=f"🚫 Bạn không có hạt giống nào cả, vui lòng dùng lệnh {SlashCommand.SHOP_GLOBAL.value} để mua!", color=0xc379e0)
+                view = SelfDestructView(timeout=120)
+                mess = await interaction.followup.send(embed=embed, view=view, ephemeral=False)
+                view.message = mess
+                return
+            #Hiện embed chọn cây trồng
+            embed = discord.Embed(title=f"", description=f"Menu Chọn Cây Trồng", color=0xddede7)
+            embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+            embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Hãy chọn những hạt giống mà bạn đang sở hữu dưới đây để trồng trọt nhé!", inline=False)
+            embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+            view = WorkPlantView(user_profile=user_profile, user=interaction.user)
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
+        else:
+            time_window = timedelta(hours=user_profile.plant.hour_require)
+            #Kiểm tra xem trồng xong chưa
+            check = self.check_if_within_time_delta(input=user_profile.plant.plant_date, time_window=time_window)
+            if check:
+                 #Lấy thời gian cũ để cộng vào
+                next_time = user_profile.plant.plant_date + time_window
+                unix_time = int(next_time.timestamp())
+                #Chưa trồng xong
+                #Hiện lại embed plant
+                embed = discord.Embed(title="", description=f"**Vườn nhà của {interaction.user.mention}**", color=0xddede7)
+                if interaction.user.avatar != None:
+                    embed.set_thumbnail(url=interaction.user.avatar.url)
+                embed.add_field(name=f"", value=f"Thông tin cây trồng", inline=True)
+                embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+                embed.add_field(name=f"", value=f"Hạt giống đang trồng: [{user_profile.plant.source_item.emoji} - **{user_profile.plant.source_item.item_name}**]", inline=False)
+                embed.add_field(name=f"", value=f"Tiến trình:", inline=False)
+                embed.add_field(name=f"", value=f"{UtilitiesFunctions.progress_bar_plant(start_time=user_profile.plant.plant_date, end_time=next_time)}", inline=False)
+                embed.add_field(name=f"", value=f"Thời gian thu hoạch: <t:{unix_time}:t>", inline=False)
+                embed.add_field(name=f"", value=f"Sẽ thu hoạch được:", inline=False)
+                embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} [{user_profile.plant.des_item.emoji} - **{user_profile.plant.des_item.item_name}**]", inline=False)
+                embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+                mess = await interaction.followup.send(embed=embed, ephemeral=False)
+                return
+            else:
+                #Đã trồng xong
+                random_quantity = random.randint(2,6)
+                if user_profile.plant.des_item.item_id == "seed_weed":
+                    random_quantity = random.randint(1,3)
+                embed = discord.Embed(title="", description=f"**Vườn nhà của {interaction.user.mention}**", color=0xddede7)
+                if interaction.user.avatar != None:
+                    embed.set_thumbnail(url=interaction.user.avatar.url)
+                embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+                embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Chúc mừng {interaction.user.mention} đã thu hoạch được: **{random_quantity}** [{user_profile.plant.des_item.emoji} - **{user_profile.plant.des_item.item_name}**]", inline=False)
+                text = f"{EmojiCreation2.SHINY_POINT.value} Và {interaction.user.mention} nhận được: "
+                if user_profile.plant.des_item.bonus_dignity != 0:
+                    text += f"**{user_profile.plant.des_item.bonus_dignity}** Nhân Phẩm. "
+                if user_profile.plant.des_item.bonus_exp != 0:
+                    text += f"**{user_profile.plant.des_item.bonus_exp}** Điểm Kinh Nghiệm. "
+                embed.add_field(name=f"", value=f"{text}", inline=False)
+                embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+                
+                #Cộng level progress và dignity point
+                ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=interaction.user.id, bonus_exp=user_profile.plant.des_item.bonus_exp)
+                ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id, guild_name= "", user_display_name="", user_name="", user_id=interaction.user.id, dignity_point=user_profile.plant.des_item.bonus_dignity)
+                #Cộng thêm đồ
+                ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, item=user_profile.plant.des_item, amount= random_quantity)
+                #Xoá plant
+                ProfileMongoManager.update_plant(guild_id=interaction.guild_id, user_id=interaction.user.id, plant=None)
+                mess = await interaction.followup.send(embed=embed, ephemeral=False)
+                return
+        
+    
+    @work_planting_slash_command.error
+    async def work_planting_slash_command_error(self, interaction: discord.Interaction, error):
+        if isinstance(error, discord.app_commands.CommandOnCooldown):
+            # Send a cooldown message to the user, formatted nicely
+            await interaction.response.send_message(f"⏳ Lệnh đang cooldown, vui lòng thực hiện lại trong vòng {error.retry_after:.2f}s tới.", ephemeral=True)
+        else:
+            # Handle any other errors that might occur
+            await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
+    
     
     def check_if_within_time_delta(self, input: datetime, time_window: timedelta):
         now = datetime.now()
@@ -328,12 +446,24 @@ class WorkEconomy(commands.Cog):
             dice_trash = UtilitiesFunctions.get_chance(20)
             if dice_trash: return random.choice(list_trash)
             
+            dice_legend = UtilitiesFunctions.get_chance(1)
+            if dice_legend:
+                dice_check = UtilitiesFunctions.get_chance(50)
+                if dice_check: return random.choice(list_legend_weapon_1)
+                else: return random.choice(list_legend_weapon_2)
+            
             dice_fish_silver = UtilitiesFunctions.get_chance(10)
             if dice_fish_silver: return random.choice(list_silver_fish)
             else: return random.choice(list_small_copper_fish)
         elif fish_rod.item_id == "fish_rod_2":
             dice_trash = UtilitiesFunctions.get_chance(10)
             if dice_trash: return random.choice(list_trash)
+            
+            dice_legend = UtilitiesFunctions.get_chance(1)
+            if dice_legend:
+                dice_check = UtilitiesFunctions.get_chance(50)
+                if dice_check: return random.choice(list_legend_weapon_1)
+                else: return random.choice(list_legend_weapon_2)
             
             dice_fish_silver = UtilitiesFunctions.get_chance(45)
             if dice_fish_silver: return random.choice(list_silver_fish)
@@ -352,7 +482,29 @@ class WorkEconomy(commands.Cog):
             dice_gift = UtilitiesFunctions.get_chance(10)
             if dice_gift: return random.choice(list_gift_items)
             dice_fish_gold = UtilitiesFunctions.get_chance(80)
-            if dice_fish_gold: return random.choice(list_gold_fish)
-            else: return random.choice(list_silver_fish)
+            if dice_fish_gold: 
+                fish = random.choice(list_gold_fish)
+                fish.quantity = random.randint(1, 3)
+                return fish
+            else:
+                fish = random.choice(list_silver_fish)
+                fish.quantity = random.randint(1, 5)
+                return fish
+            
+        elif fish_rod.item_id == "fish_rod_5":
+            dice_trash = UtilitiesFunctions.get_chance(10)
+            if dice_trash:
+                fish = random.choice(list_trash)
+                fish.quantity = random.randint(1, 5)
+                return fish
+            dice_fish_gold = UtilitiesFunctions.get_chance(80)
+            if dice_fish_gold: 
+                fish = random.choice(list_gold_fish)
+                fish.quantity = random.randint(1, 10)
+                return fish
+            else:
+                fish = random.choice(list_silver_fish)
+                fish.quantity = random.randint(1, 15)
+                return fish
         else:
             return random.choice(list_trash)

@@ -3,7 +3,7 @@ from pymongo import MongoClient
 from datetime import datetime, timedelta
 from Handling.Economy.Profile.ProfileClass import Profile
 import Handling.Economy.ConversionRate.ConversionRateMongoManager as ConversionRateMongoManager
-from Handling.Economy.Inventory_Shop.ItemClass import Item, list_gift_items
+from Handling.Economy.Inventory_Shop.ItemClass import Item, list_gift_items, PlantItem
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 from bson.int64 import Int64
 
@@ -347,6 +347,20 @@ def update_last_crime(guild_id:int, user_id: int, last_crime: datetime = None):
     result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"last_crime": value,
                                                                                     }})
     return result
+
+#region plant
+def update_plant(guild_id:int, user_id: int, plant: PlantItem = None):
+    collection = db_specific[f'profile_{guild_id}']
+    existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
+    if existing_data == None: return
+    if plant != None:
+        result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"plant": plant.to_dict(),
+                                                                                    }})
+    else:
+        result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"plant": None,
+                                                                                    }})
+    return result
+
 
 #region quote
 def update_profile_quote(guild_id: int, guild_name: str, user_id: int, user_name: str, user_display_name: str, quote: str):

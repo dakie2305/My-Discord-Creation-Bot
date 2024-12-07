@@ -6,6 +6,7 @@ from CustomEnum.EmojiEnum import EmojiCreation2
 from typing import List, Optional, Dict
 from Handling.Economy.Inventory_Shop.ItemClass import Item, list_gift_items
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
+from datetime import datetime, timedelta
 
 class ProfileToInventoryView(discord.ui.View):
     def __init__(self, profile: Profile):
@@ -13,8 +14,17 @@ class ProfileToInventoryView(discord.ui.View):
         self.message: discord.Message = None
         self.profile = profile
         
-    @discord.ui.button(label="Kho Đồ", style=discord.ButtonStyle.primary)
-    async def inventory_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if profile.list_items != None and len(profile.list_items)>0:
+            self.profile_button = discord.ui.Button(label="Kho Đồ", style=discord.ButtonStyle.primary)
+            self.profile_button.callback = self.inventory_button_function
+            self.add_item(self.profile_button)
+        if profile.plant != None:
+            self.gard_button = discord.ui.Button(label="Khu Vườn", style=discord.ButtonStyle.primary)
+            self.gard_button.callback = self.garden_button_function
+            self.add_item(self.gard_button)
+        
+    # @discord.ui.button(label="Kho Đồ", style=discord.ButtonStyle.primary)
+    async def inventory_button_function(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
         
         embed = discord.Embed(title=f"", description=f"**Kho đồ của <@{self.profile.user_id}>**", color=0xddede7)
@@ -28,6 +38,27 @@ class ProfileToInventoryView(discord.ui.View):
         m = await self.message.edit(embed=embed, view = view)
         view.message = m
         await interaction.followup.send(f"Bạn đã chuyển sang chế độ Kho Đồ!", ephemeral=True)
+    
+    async def garden_button_function(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
+        
+        time_window = timedelta(hours=self.profile.plant.hour_require)
+        next_time = self.profile.plant.plant_date + time_window
+        unix_time = int(next_time.timestamp())
+        embed = discord.Embed(title="", description=f"**Vườn nhà của {interaction.user.mention}**", color=0xddede7)
+        embed.add_field(name=f"", value=f"Thông tin cây trồng", inline=True)
+        embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+        embed.add_field(name=f"", value=f"Hạt giống đang trồng: [{self.profile.plant.source_item.emoji} - **{self.profile.plant.source_item.item_name}**]", inline=False)
+        embed.add_field(name=f"", value=f"Tiến trình:", inline=False)
+        embed.add_field(name=f"", value=f"{UtilitiesFunctions.progress_bar_plant(start_time=self.profile.plant.plant_date, end_time=next_time)}", inline=False)
+        embed.add_field(name=f"", value=f"Thời gian thu hoạch: <t:{unix_time}:t>", inline=False)
+        embed.add_field(name=f"", value=f"Sẽ thu hoạch được:", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} [{self.profile.plant.des_item.emoji} - **{self.profile.plant.des_item.item_name}**]", inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+        view = InventoryBackToProfileView(profile=self.profile)
+        m = await self.message.edit(embed=embed, view = view)
+        view.message = m
+        await interaction.followup.send(f"Bạn đã chuyển sang Khu Vườn!", ephemeral=True)
 
     async def on_timeout(self):
         #Delete

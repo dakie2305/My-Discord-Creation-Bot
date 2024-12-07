@@ -59,7 +59,7 @@ def update_love_progressing(guild_id:int, user_id: int, bonus_exp: int = 0):
         existing_data.love_progressing += 20
     elif existing_data.love_rank == 19:
         #Cực khó
-        existing_data.love_progressing += 1
+        existing_data.love_progressing += 25
         bonus_exp = 0
     
     
