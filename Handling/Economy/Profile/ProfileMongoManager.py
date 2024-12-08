@@ -438,7 +438,7 @@ def update_list_items_profile(guild_id: int, guild_name: str, user_id: int, user
         if item.quantity > 0: list_items.append(item)
     
     if len(list_items) > 20:
-        list_items.pop()
+        list_items.pop(0)
     
     result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"list_items": [data.to_dict() for data in list_items],
                                                                                     }})
