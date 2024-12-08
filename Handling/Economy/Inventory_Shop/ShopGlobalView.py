@@ -196,14 +196,14 @@ class TextShopInputModal(discord.ui.Modal):
                 #mặc định 5% giá trị của item
                 maintenance_money = int(cost_money * 5 / 100)
                 maintenance_emoji = EmojiCreation2.GOLD.value
-                if maintenance_money <= 0: maintenance_money = 100
+                if maintenance_money <= 0: maintenance_money = 1
                 if maintenance_money > 10000: maintenance_money = 10000
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, gold=-maintenance_money)
             elif item.item_worth_type == "S":
                 #mặc định 10% giá trị của item
                 maintenance_money = int(cost_money * 10 / 100)
                 maintenance_emoji = EmojiCreation2.SILVER.value
-                if maintenance_money <= 0: maintenance_money = 10000
+                if maintenance_money <= 0: maintenance_money = 100
                 if maintenance_money > 80000: maintenance_money = 80000
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, silver=-maintenance_money)
             else:
@@ -211,7 +211,6 @@ class TextShopInputModal(discord.ui.Modal):
                 #mặc định 20% giá trị của item
                 maintenance_money = int(cost_money * 20 / 100)
                 if maintenance_money < 3500: maintenance_money = 3500
-                if maintenance_money == 0: maintenance_money = 10000
                 if maintenance_money > 200000: maintenance_money = 200000
                 maintenance_emoji = EmojiCreation2.COPPER.value
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, copper=-maintenance_money)
