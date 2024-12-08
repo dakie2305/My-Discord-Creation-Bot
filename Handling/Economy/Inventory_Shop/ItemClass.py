@@ -749,7 +749,7 @@ list_plant = [
         rank_required = 1,
     ),
     Item(
-        item_id = "watermelone",
+        item_id = "watermelon",
         item_name = "Trái dưa hấu",
         item_description = "Một trái dưa hấu mọng nước ngon lành!",
         item_type = "gift",
