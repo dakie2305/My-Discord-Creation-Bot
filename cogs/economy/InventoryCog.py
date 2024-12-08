@@ -639,9 +639,9 @@ class InventoryEconomy(commands.Cog):
             result = f"{target.mention} đã bị chém đến mất vũ khí đang cầm!"
             
             if target_profile.attack_item != None:
-                result = f"{target.mention} đã bị chém đến mất toàn bộ vũ khí [{target_profile.attack_item} - **{target_profile.attack_item}**]!"
+                result = f"{target.mention} đã bị chém đến mất toàn bộ vũ khí [{target_profile.attack_item.emoji} - **{target_profile.attack_item.item_name}**]!"
                 #Gỡ vật phẩm đang dùng
-                ProfileMongoManager.equip_attack_item_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, item=user_profile.attack_item, unequip=True)
+                ProfileMongoManager.equip_attack_item_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, item=target_profile.attack_item, unequip=True)
                 ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, item=target_profile.attack_item, amount= -99)
             elif target_profile.list_items!= None and len(target_profile.list_items) > 0:
                 #Chọn ra một vũ khí sẽ bị phế
