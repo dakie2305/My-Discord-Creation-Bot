@@ -17,6 +17,7 @@ import Handling.Economy.ConversionRate.ConversionRateMongoManager as ConversionR
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 from datetime import datetime, timedelta
 import asyncio
+import Handling.Economy.Couple.CoupleMongoManager as CoupleMongoManager
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(InventoryEconomy(bot=bot))
@@ -699,7 +700,7 @@ class InventoryEconomy(commands.Cog):
                         chosen_item = item
                         break
                 if chosen_item != None:
-                    result = f"{target.mention} đã bị đâm nhiều đến mức nát hết [{target_profile.protection_item} - **{target_profile.protection_item}**]!"
+                    result = f"{target.mention} đã bị đâm nhiều đến mức nát hết [{chosen_item.emoji} - **{chosen_item.item_name}**]!"
                     ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, item=chosen_item, amount= -99)
             embed.add_field(name=f"", value=text, inline=False)
             embed.add_field(name=f"", value=result, inline=False)
@@ -741,15 +742,17 @@ class InventoryEconomy(commands.Cog):
             
         elif user_profile.attack_item.item_id == "legend_sword_2":
             text = f"Với tốc độ khủng bố, {interaction.user.mention} vung thanh **{user_profile.attack_item.item_name}** với tất cả sức mạnh của mình và cắt xuyên qua lớp giáp {target.mention}!"
-            result = f"Khuôn mặt {target.mention} tái nhợt, buộc phải quỳ gối xin tha mạng, và đã bị chém cho phế hết tiến trình thăng cấp bậc và mất toàn bộ nhân phẩm!"
+            result = f"Khuôn mặt {target.mention} tái nhợt, buộc phải quỳ gối xin tha mạng, và đã bị chém cho phế hết tất cả tiến trình, và mất toàn bộ nhân phẩm!"
             bonus = 50
             bonus += target_profile.dignity_point*2
             bonus += target_profile.level_progressing
             #Cộng exp thêm cho người tung đòn
             ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=user_profile.user_id, bonus_exp=bonus)
-            
+            ProfileMongoManager.update_plant_date(guild_id=interaction.guild_id, user_id=target.id)
             ProfileMongoManager.set_level_progressing(guild_id=interaction.guild_id, user_id=target.id, level_progressing=0, level_reduction_point=0)
             ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, dignity_point=-1000)
+            CoupleMongoManager.set_love_point_value(guild_id=interaction.guild_id, user_id=target.id, love_point=0)
+            CoupleMongoManager.set_love_progressing_value(guild_id=interaction.guild_id, user_id=target.id, love_progressing=0)
             embed.add_field(name=f"", value=text, inline=False)
             embed.add_field(name=f"", value=result, inline=False)
         elif user_profile.attack_item.item_id == "legend_sword_3":
