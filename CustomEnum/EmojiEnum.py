@@ -46,6 +46,7 @@ class EmojiCreation2(Enum):
     ARMOUR_PROTECTION_5 = "<:armor_protection_5:1312153667755053206>"
     
     COLORFUL_PILL = "<a:colorful_pill:1305560071513702482>"
+    PILL = "<a:pill:1315704024946708530>"
     LOCKPICK = "<:lockpick:1305560110386380957>"
     TICKET = "<:ticket:1305560125854978098>"
     BLOODY_KNIFE = "<:bloody_knife:1312154476655677460>"
@@ -181,6 +182,9 @@ class EmojiCreation2(Enum):
     LEGEND_SWORD_1 = "<:legend_sword_1:1314994809789874237>"
     LEGEND_SWORD_2 = "<a:legend_sword_2:1314994822469386240>"
     LEGEND_SWORD_3 = "<:legend_sword_3:1314994832476737676>"
+    
+    CERT_CLOWNS = "<:certificate_1:1315707049958576229>"
+    CERT_2 = "<:certificate_2:1315707058762416209>"
     
     
     

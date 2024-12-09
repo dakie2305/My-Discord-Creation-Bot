@@ -8,6 +8,7 @@ from Handling.Economy.Inventory_Shop.LockpickView import LockpickView
 import asyncio
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 import Handling.Economy.Couple.CoupleMongoManager as CoupleMongoManager
+from datetime import datetime, timedelta
 
 class InventoryUseView(discord.ui.View):
     def __init__(self, user_profile: Profile, user: discord.Member):
@@ -154,6 +155,29 @@ class InventoryUseView(discord.ui.View):
             ProfileMongoManager.update_breakup_time(guild_id=interaction.guild_id, user_id=self.user.id, last_breakup= None)
             
             await channel.send(f'{interaction.user.mention} đã rít một điếu [{self.selected_item.emoji} - **{self.selected_item.item_name}**] và thư thả, quên đi người cũ, thắt chặt tình cảm hiện tại, mất đi một tý nhân phẩm nhưng tăng thêm EXP!')
+        elif self.selected_item.item_id == "rank_down_1":
+            #Xoá vật phẩm
+            ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, amount= -1)
+            #trừ một cấp
+            ProfileMongoManager.add_one_level_and_reset_progress(guild_id=interaction.guild_id, user_id=interaction.user.id, level=-1)
+            text = ""
+            #30% bị công an ập vào túm cổ và phạt 5% gold, tối đa 2000 gold
+            police_chance = UtilitiesFunctions.get_chance(30)
+            if police_chance:
+                money_lost = int(self.user_profile.gold*10/100)
+                if money_lost > 2000: money_lost = 2000
+                text = f"\nNhưng công an đã ập vào bắt quả tang {interaction.user.mention} tội chơi thuốc! {interaction.user.mention} đã mất **{money_lost}** {EmojiCreation2.GOLD.value}!"
+                ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name="", user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, gold=-money_lost)
+            await channel.send(f'{interaction.user.mention} đã dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] và tự phế một cấp bậc của bản thân xuống cấp **{self.user_profile.level - 1}**!{text}')
+            
+        elif self.selected_item.item_id == "trash_cot_use":
+            #Xoá vật phẩm
+            ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, amount= -1)
+            await channel.send(f'{interaction.user.mention} đã dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] để bón cho khu vườn của mình và giúp cây lớn nhanh hơn!')
+            #Cộng ba mươi phút cho cây trồng
+            if self.user_profile.plant != None:
+                plant_date = self.user_profile.plant.plant_date - timedelta(minutes=25)
+                ProfileMongoManager.update_plant_date(guild_id=interaction.guild_id, user_id=self.user.id, plant_date=plant_date)
         else:
             await channel.send(f'Darkie vẫn chưa code xong công dụng cho vật phẩm [{self.selected_item.emoji} - **{self.selected_item.item_name}**]', ephemeral=True)
         return

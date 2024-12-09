@@ -301,12 +301,12 @@ def update_auto_level_progressing(guild_id:int, user_id: int):
                                                                                     }})
     return result
 
-def add_one_level_and_reset_progress(guild_id:int, user_id: int):
+def add_one_level_and_reset_progress(guild_id:int, user_id: int, level: int = 1):
     collection = db_specific[f'profile_{guild_id}']
     existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
     if existing_data == None: return
     
-    existing_data.level += 1
+    existing_data.level += level
     existing_data.level_progressing = 0
     result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"level_progressing": existing_data.level_progressing,
                                                                                     "level": existing_data.level,
@@ -339,11 +339,13 @@ def is_in_debt(data: Profile, darkium_threshold = 0, gold_threshold = 0, silver_
         return False
 
 #region crime
-def update_last_crime(guild_id:int, user_id: int, last_crime: datetime = None):
+def update_last_crime(guild_id:int, user_id: int, last_crime: datetime = None, flag_remove= True):
     collection = db_specific[f'profile_{guild_id}']
     value = datetime.now()
     if last_crime != None:
         value = last_crime
+    if flag_remove:
+        value = None
     result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"last_crime": value,
                                                                                     }})
     return result
@@ -361,6 +363,16 @@ def update_plant(guild_id:int, user_id: int, plant: PlantItem = None):
                                                                                     }})
     return result
 
+def update_plant_date(guild_id:int, user_id: int, plant_date: datetime = None):
+    collection = db_specific[f'profile_{guild_id}']
+    existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
+    if existing_data == None or existing_data.plant == None: return
+    value = datetime.now()
+    if plant_date != None:
+        value = plant_date
+    result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"plant.plant_date": value,
+                                                                                    }})
+    return result
 
 #region quote
 def update_profile_quote(guild_id: int, guild_name: str, user_id: int, user_name: str, user_display_name: str, quote: str):

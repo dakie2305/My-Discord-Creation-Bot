@@ -55,7 +55,7 @@ class AuthorityInterceptView(discord.ui.View):
             #Jail 3 tiếng
             ProfileMongoManager.update_jail_time(guild_id=interaction.guild_id, user_id=self.user.id, jail_time=jail_time)
             #Cập nhật last crime
-            ProfileMongoManager.update_last_crime(guild_id=interaction.guild_id, user_id=self.user.id)
+            ProfileMongoManager.update_last_crime(guild_id=interaction.guild_id, user_id=self.user.id, flag_remove=False)
             me = await interaction.followup.send(embed=embed, ephemeral=False)
             await self.jail_real(interaction=interaction, actual_user=self.user, message=me)
             return
@@ -91,7 +91,7 @@ class AuthorityInterceptView(discord.ui.View):
             #Jail 3 tiếng
             ProfileMongoManager.update_jail_time(guild_id=interaction.guild_id, user_id=self.user.id, jail_time=jail_time)
             #Cập nhật last crime
-            ProfileMongoManager.update_last_crime(guild_id=interaction.guild_id, user_id=self.user.id)
+            ProfileMongoManager.update_last_crime(guild_id=interaction.guild_id, user_id=self.user.id, flag_remove=False)
             me = await interaction.followup.send(embed=embed, ephemeral=False)
             await self.jail_real(interaction=interaction, actual_user=self.user, message=me)
             return
@@ -127,7 +127,7 @@ class AuthorityInterceptView(discord.ui.View):
             #Jail 5 tiếng
             ProfileMongoManager.update_jail_time(guild_id=interaction.guild_id, user_id=self.user.id, jail_time=jail_time)
             #Cập nhật last crime
-            ProfileMongoManager.update_last_crime(guild_id=interaction.guild_id, user_id=self.user.id)
+            ProfileMongoManager.update_last_crime(guild_id=interaction.guild_id, user_id=self.user.id, flag_remove=False)
             me = await interaction.followup.send(embed=embed, ephemeral=False)
             await self.jail_real(interaction=interaction, actual_user=self.user, message=me)
             return
@@ -153,7 +153,7 @@ class AuthorityInterceptView(discord.ui.View):
             #Jail 3 tiếng
             ProfileMongoManager.update_jail_time(guild_id=interaction.guild_id, user_id=self.user.id, jail_time=jail_time)
             #Cập nhật last crime
-            ProfileMongoManager.update_last_crime(guild_id=interaction.guild_id, user_id=self.user.id)
+            ProfileMongoManager.update_last_crime(guild_id=interaction.guild_id, user_id=self.user.id, flag_remove=False)
             me = await interaction.followup.send(embed=embed, ephemeral=False)
             await self.jail_real(interaction=interaction, actual_user=self.user, message=me)
             return
