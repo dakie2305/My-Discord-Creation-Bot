@@ -79,6 +79,13 @@ class SortWords(commands.Cog):
     async def reset_sw(self, ctx):
         message: discord.Message = ctx.message
         if message:
+            if message.guild.id == 1256987900277690470:
+                #Chỉ check trong guild True Heaven
+                req_roles = ['Cai Ngục', 'Moderator','Server Master']
+                has_required_role = any(role.name in req_roles for role in message.author.roles)
+                if not has_required_role:
+                    await ctx.send("Không đủ thẩm quyền để dùng lệnh.")
+                    return
             #Kiểm xem có game Sort Word ở đây không
             sw_info, lan = await self.check_if_message_inside_game(source=message)
             if sw_info == None:

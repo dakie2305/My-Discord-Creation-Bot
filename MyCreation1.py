@@ -112,11 +112,13 @@ async def start_wm_vn(ctx):
 async def reset_wm(ctx):
     message: discord.Message = ctx.message
     if message:
-        req_roles = ['Supervisor', 'Server Master', 'Moderator', 'Ultimate Admins']
-        has_required_role = any(role.name in req_roles for role in message.author.roles)
-        if not has_required_role:
-            await ctx.send("Không đủ thẩm quyền để thực hiện lệnh.")
-            return
+        if message.guild.id == 1256987900277690470:
+            #Chỉ check trong True Heaven
+            req_roles = ['Supervisor', 'Server Master', 'Moderator', 'Ultimate Admins']
+            has_required_role = any(role.name in req_roles for role in message.author.roles)
+            if not has_required_role:
+                await ctx.send("Không đủ thẩm quyền để thực hiện lệnh.")
+                return
         #Kiểm tra xem đã tồn tại WordMatchingClass cho channel này chưa
         word_matching_channel = db.find_word_matching_info_by_id(channel_id=message.channel.id, guild_id=message.guild.id, language='en')
         if word_matching_channel:
@@ -235,11 +237,17 @@ async def wm_give_ban(ctx, user: discord.Member, ban_amount: int):
 async def wm_remove_skill(ctx, item_id: str = None, user: Optional[discord.Member] = None):
     message: discord.Message = ctx.message
     called_channel = message.channel
-    req_roles = ['Cai Ngục', 'Moderator','Server Master']
-    has_required_role = any(role.name in req_roles for role in message.author.roles)
-    if not has_required_role:
+    if message.guild.id == 1256987900277690470:
+        #Chỉ check trong guild True Heaven
+        req_roles = ['Cai Ngục', 'Moderator','Server Master']
+        has_required_role = any(role.name in req_roles for role in message.author.roles)
+        if not has_required_role:
+            await ctx.send("Không đủ thẩm quyền để dùng lệnh.")
+            return
+    elif message.guild.owner_id != message.author.id:
         await ctx.send("Không đủ thẩm quyền để dùng lệnh.")
         return
+        
     #Kiểm tra xem ở đây là bảng channel nối từ hay không
     word_matching_channel = db.find_word_matching_info_by_id(channel_id= called_channel.id, guild_id= called_channel.guild.id, language= 'en')
     if word_matching_channel:
