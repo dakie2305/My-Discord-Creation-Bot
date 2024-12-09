@@ -15,6 +15,7 @@ import random
 from Handling.Misc.RandomDropboxEconomyView import RandomDropboxEconomyView
 import asyncio
 from Handling.MiniGame.RandomQuizz.RandomQuizzView import RandomQuizzView, random_quizzes
+from Handling.Economy.Inventory_Shop.ItemClass import Item
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(AuthorityEconomy(bot=bot))
@@ -28,44 +29,6 @@ class AuthorityEconomy(commands.Cog):
     # Define the parent command group for 'authority'
     authority_group = discord.app_commands.Group(name="authority", description="Các lệnh liên quan đến Chính Quyền của server!")
     
-    #region Authority view
-    @authority_group.command(name="view", description="Xem chính quyền đương nhiệm hiện tại của server")
-    async def view_authority_slash(self, interaction: discord.Interaction):
-        await interaction.response.defer(ephemeral=True)
-        
-        #Không cho dùng bot nếu không phải user
-        if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
-            view = SelfDestructView(timeout=30)
-            embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
-            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
-            view.message = mess
-            return
-        
-        #Kiểm tra xem server đã tồn tại ai là chính quyền chưa
-        existed_authority = ProfileMongoManager.get_authority(guild_id=interaction.guild_id)
-        if existed_authority!= None:
-            #Get thử xem còn tồn tại trong server không
-            member = interaction.guild.get_member(existed_authority.user_id)
-            if member:
-                #Kiểm xem chính quyền có mặc nợ không, có thì từ chức và phạt authority
-                if ProfileMongoManager.is_in_debt(data= existed_authority, copper_threshold=100000):
-                    embed = discord.Embed(title=f"", description=f"Chính Quyền đã nợ nần quá nhiều và tự sụp đổ. Hãy dùng lệnh {self.CurrencySlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", color=0xddede7)
-                    existed_authority.copper = -10000
-                    existed_authority.silver = 0
-                    existed_authority.gold = 0
-                    existed_authority.darkium = 0
-                    ProfileMongoManager.update_profile_money_fast(guild_id= interaction.guild.id, data=existed_authority)
-                    ProfileMongoManager.remove_authority_from_server(guild_id=interaction.guild.id)
-                    ProfileMongoManager.update_last_authority(guild_id=interaction.guild.id, user_id=existed_authority.user_id)
-                    return embed, None
-                else:
-                    await interaction.followup.send(content=f"Server này đã có Chính Quyền là {member.mention} rồi! Vui lòng bào tiền Chính Quyền, hoặc ép Chính Quyền từ bỏ địa vị để tranh chức Chính Quyền!", ephemeral=True)
-            else:
-                await interaction.followup.send(f"Chính Quyền đã lưu vong khỏi server. Vui lòng dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!")
-                ProfileMongoManager.delete_profile(guild_id=interaction.guild_id, user_id= existed_authority.user_id)
-        else:
-            await interaction.followup.send(f"Server không tồn tại Chính Quyền! Vui lòng dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!")
-        
     #region Authority vote
     @authority_group.command(name="vote", description="Bầu chọn bản thân làm Chính Quyền, sẽ tốn 500 C mỗi lần làm")
     async def vote_authority_slash(self, interaction: discord.Interaction):
@@ -464,10 +427,33 @@ class AuthorityEconomy(commands.Cog):
         if existed_authority == None:
             await interaction.followup.send(content=f"Server không tồn tại Chính Quyền! Vui lòng dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", ephemeral=True)
             return
-        if interaction.user.id != existed_authority.user_id and interaction.user.id != interaction.guild.owner_id:
-            await interaction.followup.send(content=f"Chỉ chính quyền mới được quyền dùng lệnh này để reset rate của shop được!", ephemeral=True)
-            return
         cost_money = 200
+        if interaction.user.id != existed_authority.user_id and interaction.user.id != interaction.guild.owner_id:
+            #check profile
+            user_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
+            if user_profile == None:
+                await interaction.followup.send(content=f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đi đã!", ephemeral=True)
+                return
+            elif user_profile.gold <= cost_money:
+                await interaction.followup.send(content=f"Cần sở hữu ít nhất {cost_money} {EmojiCreation2.GOLD.value} để điều tra hành vi phạm tội của đối tượng {user.mention}!", ephemeral=True)
+                return
+            elif user_profile.list_items == None or len(user_profile.list_items) <=0:
+                await interaction.followup.send(content=f"Vui lòng dùng mua vật phẩm **Lệnh Khám Xét** trong {SlashCommand.SHOP_GLOBAL.value} trước đi đã!", ephemeral=True)
+                return
+            #Lấy item đặc biệt ra
+            chosen_item = None
+            for item in user_profile.list_items:
+                if "search_warrant" in item.item_id:
+                    chosen_item = item
+                    break
+            if chosen_item == None:
+                await interaction.followup.send(content=f"Vui lòng dùng mua vật phẩ **Lệnh Khám Xét** trong {SlashCommand.SHOP_GLOBAL.value} trước đi đã!", ephemeral=True)
+                return
+            #Xoá một giấy phép
+            ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, item=chosen_item, amount= -1)
+            #Tiến hành điều tra
+            await self.user_investigate(interaction=interaction, target=user, chosen_item=chosen_item, cost_money=cost_money)
+            return
         if existed_authority != None and existed_authority.gold < cost_money:
             await interaction.followup.send(content=f"Chính quyền cần {cost_money} {EmojiCreation2.GOLD.value} để điều tra hành vi phạm tội của đối tượng {user.mention}!", ephemeral=True)
             return
@@ -531,7 +517,67 @@ class AuthorityEconomy(commands.Cog):
             await mess.edit(content=f"Đối tượng {user.display_name} hoàn toàn vô tội vì chưa từng phạm pháp! Chính quyền đã mất **{cost_money}** {EmojiCreation2.GOLD.value}!")
             ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, gold=-cost_money)
             return
-        
+    
+    async def user_investigate(self, interaction: discord.Interaction, target: discord.Member, chosen_item: Item, cost_money: int):
+        target_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=target.id)
+        if target_profile == None:
+            await interaction.followup.send(content=f"Đối tượng {target.display_name} hoàn toàn vô tội vì còn chưa có profile! {interaction.user.mention} đã mất **{cost_money}** {EmojiCreation2.GOLD.value}!", ephemeral=True)
+            ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, user_id=interaction.user.id, guild_name="", user_display_name="", user_name="", gold=-cost_money)
+            return
+        elif target_profile != None and target_profile.last_crime == None:
+            await interaction.followup.send(content=f"Đối tượng {target.display_name} hoàn toàn vô tội vì chưa từng phạm pháp! {interaction.user.mention} đã mất **{cost_money}** {EmojiCreation2.GOLD.value}!", ephemeral=True)
+            ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, user_id=interaction.user.id, guild_name="", user_display_name="", user_name="", gold=-cost_money)
+            return
+        messe: discord.Message = await interaction.followup.send(content=f"Bạn đã dùng 1 vật phẩm [{chosen_item.emoji} - **{chosen_item.item_name}**] để điều tra {target.mention}!", ephemeral=True)
+        await asyncio.sleep(10)
+        #Kiểm tra xem có hàng cấm trong người không
+        list_contraband = ["crime_evident", "fish_rod_5", "weed"]
+        item = None
+        if target_profile.list_items!= None and len(target_profile.list_items)>1:
+            for target_item in target_profile.list_items:
+                if target_item.item_id in list_contraband:
+                    item = target_item
+                    break
+        if self.is_within_one_hour(target_profile.last_crime) or item != None:
+            dignity_point = 15
+            #chỉ trừ 10% copper
+            fine_money = int(target_profile.copper * 10 / 100)
+            #cap lại ở 500k copper
+            if fine_money > 5000000: fine_money = 5000000
+            if fine_money <= 0: fine_money = 10000
+            cost_money = 50
+            embed = discord.Embed(title=f"", description=f"{interaction.user.mention} đã chi **{cost_money}** {EmojiCreation2.GOLD.value} để điều tra!", color=0xc379e0)
+            if self.is_within_one_hour(target_profile.last_crime):
+                embed.add_field(name=f"", value=f"{target.mention} đã bị {interaction.user.mention} điều tra được hành vi phạm tội!", inline=False)
+            if item != None:
+                embed.add_field(name=f"", value=f"{target.mention} đã bị {interaction.user.mention} phát hiện tàng trữ hàng cấm: x{item.quantity} [{item.emoji}-**{item.item_name}**]", inline=False)
+            embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Trừ **{fine_money}** {EmojiCreation2.COPPER.value}", inline=False)
+            embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Trừ **{dignity_point}** điểm nhân phẩm!", inline=False)
+            if item != None: embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Tịch thụ toàn bộ hàng cấm!", inline=False)
+            embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Tống vào tù trong 1 tiếng!", inline=False)
+            if messe != None:
+                #Reset crime
+                ProfileMongoManager.update_last_crime(guild_id=interaction.guild_id, user_id=target.id)
+                #Trừ dignity point của người bị điều tra
+                ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_display_name=target.display_name, user_name=target.name, dignity_point=-dignity_point)
+                #Trừ tiền người điều tra lẫn chính quyền
+                ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_display_name=target.display_name, user_name=target.name, copper=-fine_money)
+                ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, user_id=interaction.user.id, guild_name="", user_display_name="", user_name="", gold=-cost_money)
+                #Tống giam user
+                time_window = timedelta(hours=1)
+                jail_time = datetime.now() + time_window
+                ProfileMongoManager.update_jail_time(guild_id=interaction.guild_id, user_id=target.id, jail_time=jail_time)
+                #Cộng exp cho chính quyền
+                ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=target.id)
+                if item != None:
+                    #Xoá hết
+                    ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, item=item, amount= -100)
+                await messe.edit(embed=embed)
+                return
+        else:
+            await messe.edit(content=f"Đối tượng {target.display_name} hoàn toàn vô tội vì chưa từng phạm pháp! {interaction.user.mention} đã mất **{cost_money}** {EmojiCreation2.GOLD.value}!")
+            ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, user_id=interaction.user.id, guild_name="", user_display_name="", user_name="", gold=-cost_money)
+            return
     
     @authority_investigate_slash.error
     async def authority_investigate_slash_error(self, interaction: discord.Interaction, error):
