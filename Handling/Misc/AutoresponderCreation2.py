@@ -152,7 +152,7 @@ class AutoresponderHandling():
             embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Một số vũ khí có thể nhắm vào tất cả vật phẩm của kẻ địch", inline=False)
             embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Bắt buộc phải trên 75 điểm nhân phẩm, cấp trên 50 mới làm chủ được sức mạnh của **Thất Truyền Huyền Khí**", inline=False)
             embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Có thể câu được chúng bằng các cần câu cùi, tỉ lệ 1%", inline=False)
-            embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Có thể mua được chúng trong {SlashCommand.SHOP_GLOBAL.value} vào đúng 00:00 đêm duy nhất", inline=False)
+            embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Có thể mua được chúng trong {SlashCommand.SHOP_GLOBAL.value} vào đúng duy nhất **00:00** đêm hoặc **12:00**", inline=False)
             embed.add_field(name="", value="-------------------------------------", inline=False)
             view = SelfDestructView(timeout=180)
             _mess = await message.channel.send(embed=embed, view=view)
