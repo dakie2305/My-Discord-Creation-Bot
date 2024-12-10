@@ -690,7 +690,7 @@ class InventoryEconomy(commands.Cog):
             if target_profile.protection_item != None:
                 result = f"{target.mention} đã bị đâm liên tiếp đến mức nát [{target_profile.protection_item} - **{target_profile.protection_item}**]!"
                 #Gỡ vật phẩm đang dùng
-                ProfileMongoManager.equip_protection_item_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, item=user_profile.protection_item, unequip=True)
+                ProfileMongoManager.equip_protection_item_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, item=target_profile.protection_item, unequip=True)
                 ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, item=target_profile.protection_item, amount= -99)
             elif target_profile.list_items!= None and len(target_profile.list_items) > 0:
                 #Chọn ra một bộ giáp sẽ bị phế
