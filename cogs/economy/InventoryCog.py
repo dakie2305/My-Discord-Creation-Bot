@@ -688,7 +688,7 @@ class InventoryEconomy(commands.Cog):
             text = f"Với một động tác thuần thục điêu luyện, {interaction.user.mention} vung **{user_profile.attack_item.item_name}** nhanh như chớp nhắm thẳng vào ngực {target.mention} với sức mạnh hủy diệt!"
             result = f"{target.mention} đã bị đâm liên tiếp đến mức nát cả bộ giáp đang dùng!"
             if target_profile.protection_item != None:
-                result = f"{target.mention} đã bị đâm liên tiếp đến mức nát [{target_profile.protection_item} - **{target_profile.protection_item}**]!"
+                result = f"{target.mention} đã bị đâm liên tiếp đến mức nát [{target_profile.protection_item.emoji} - **{target_profile.protection_item.item_name}**]!"
                 #Gỡ vật phẩm đang dùng
                 ProfileMongoManager.equip_protection_item_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, item=target_profile.protection_item, unequip=True)
                 ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, item=target_profile.protection_item, amount= -99)
