@@ -93,27 +93,28 @@ class ShopEconomy(commands.Cog):
         self.list_all_shops["Shop Nông Trại"] = list_fishing_rod
         self.list_all_shops["Shop Bảo Hộ"] = list_protection_items
         self.list_all_shops["Shop Vũ Khí"] = list_attack_items
+
         
         check_passed = False
         if datetime.now().hour == 0 and datetime.now().minute == 0:
             check_passed = True
-            print("Check 1")
         elif datetime.now().hour == 12 and datetime.now().minute == 0:
             check_passed = True
-            print("Check 2")
         elif interaction.user.id == 315835396305059840:
             check_passed = True
-            print("Check 3")
         
         if check_passed:
-            self.list_all_shops.pop("Thất Truyền Huyền Khí Nhất Đẳng", None)
-            self.list_all_shops.pop("Thất Truyền Huyền Khí Nhị Đẳng", None)
             dice = UtilitiesFunctions.get_chance(50)
             if dice:
                 self.list_all_shops["Thất Truyền Huyền Khí Nhất Đẳng"] = list_legend_weapon_1
             else:
                 self.list_all_shops["Thất Truyền Huyền Khí Nhị Đẳng"] = list_legend_weapon_2
-        
+        else:
+            try:
+                self.list_all_shops.pop("Thất Truyền Huyền Khí Nhất Đẳng", None)
+                self.list_all_shops.pop("Thất Truyền Huyền Khí Nhị Đẳng", None)
+            except Exception:
+                print()
         
         keys = list(self.list_all_shops.keys())  # Shop names
         # Tạo embed cho shop
