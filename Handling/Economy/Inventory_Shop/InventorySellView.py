@@ -40,6 +40,8 @@ class ItemSelect(discord.ui.Select):
         options = []
 
         for item in list_item:
+            if item.item_id in seen_item_ids:
+                continue
             seen_item_ids.add(item.item_id)
             options.append(
                 discord.SelectOption(
