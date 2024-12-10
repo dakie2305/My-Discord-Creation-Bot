@@ -185,10 +185,20 @@ class InventoryUseView(discord.ui.View):
         
 class ItemSelect(discord.ui.Select):
     def __init__(self, user: discord.Member, list_item: List[Item], view: "InventoryUseView"):
-        options = [
-            discord.SelectOption(label=f"{item.item_name} (x{item.quantity})", description=item.item_description[:97] + '...', value=item.item_id)
-            for item in list_item if item.item_type != "gift" and item.item_type != "misc" and item.item_type != "trash" and item.item_type != "seed"
-        ]
+        seen_item_ids = set()
+        options = []
+
+        for item in list_item:
+            if item.item_type in ["gift", "misc", "trash", "seed"] or item.item_id in seen_item_ids:
+                continue
+            seen_item_ids.add(item.item_id)
+            options.append(
+                discord.SelectOption(
+                    label=f"{item.item_name} (x{item.quantity})",
+                    description=(item.item_description[:97] + '...') if len(item.item_description) > 100 else item.item_description,
+                    value=item.item_id
+                )
+            )
         super().__init__(placeholder="Chọn vật phẩm muốn dùng", options=options)
         self.list_item = list_item
         self.parent_view  = view

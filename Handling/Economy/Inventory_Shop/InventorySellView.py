@@ -36,10 +36,18 @@ class InventorySellView(discord.ui.View):
 
 class ItemSelect(discord.ui.Select):
     def __init__(self, user: discord.Member, list_item: List[Item], view: "InventorySellView"):
-        options = [
-            discord.SelectOption(label=f"{item.item_name} (x{item.quantity})", description=item.item_description[:97] + '...', value=item.item_id)
-            for item in list_item
-        ]
+        seen_item_ids = set()
+        options = []
+
+        for item in list_item:
+            seen_item_ids.add(item.item_id)
+            options.append(
+                discord.SelectOption(
+                    label=f"{item.item_name} (x{item.quantity})",
+                    description=(item.item_description[:97] + '...'),
+                    value=item.item_id
+                )
+            )
         super().__init__(placeholder="Chọn vật phẩm muốn bán", options=options)
         self.list_item = list_item
         self.parent_view  = view
