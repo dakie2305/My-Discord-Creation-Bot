@@ -197,7 +197,7 @@ class CrimeEconomy(commands.Cog):
         view = AuthorityInterceptView(user=user, user_profile=user_profile, crime_type="rob", target_profile=target_profile, target_user=target_user, authority_user=authority_user)
         await interaction.followup.send(f"Bạn đã cướp giật!", ephemeral=True)
         #Update last_crime
-        ProfileMongoManager.update_last_crime(guild_id=interaction.guild_id, user_id=user.id)
+        ProfileMongoManager.update_last_crime(guild_id=interaction.guild_id, user_id=user.id, flag_remove=False)
         channel = interaction.channel
         if user_profile.is_authority == False:
             me = await channel.send(embed=embed, view=view, content=f"{target_user.mention}")
@@ -342,7 +342,7 @@ class CrimeEconomy(commands.Cog):
         view = AuthorityInterceptView(user=user, user_profile=user_profile, crime_type="fight", target_profile=target_profile, target_user=target_user, authority_user=authority_user)
         await interaction.followup.send(f"Bạn đã gây gỗ!", ephemeral=True)
         #Update last_crime
-        ProfileMongoManager.update_last_crime(guild_id=interaction.guild_id, user_id=user.id)
+        ProfileMongoManager.update_last_crime(guild_id=interaction.guild_id, user_id=user.id, flag_remove=False)
         channel = interaction.channel
         if user_profile.is_authority == False:
             me = await channel.send(embed=embed, view=view, content=f"{target_user.mention}")
@@ -417,7 +417,7 @@ class CrimeEconomy(commands.Cog):
         view = AuthorityInterceptView(user=user, user_profile=user_profile, crime_type="laundry", target_profile=target_profile, target_user=target_user, authority_user=authority_user)
         await interaction.followup.send(f"Bạn đã rửa tiền và trốn thuế!", ephemeral=True)
         #Update last_crime
-        ProfileMongoManager.update_last_crime(guild_id=interaction.guild_id, user_id=user.id)
+        ProfileMongoManager.update_last_crime(guild_id=interaction.guild_id, user_id=user.id, flag_remove=False)
         channel = interaction.channel
         if user_profile.is_authority == False:
             me = await channel.send(embed=embed, view=view, content=f"")
@@ -485,7 +485,7 @@ class CrimeEconomy(commands.Cog):
         view = AuthorityInterceptView(user=user, user_profile=user_profile, crime_type="smuggler", target_profile=target_profile, target_user=target_user, authority_user=authority_user)
         await interaction.followup.send(f"Bạn đã buôn lậu!", ephemeral=True)
         #Update last_crime
-        ProfileMongoManager.update_last_crime(guild_id=interaction.guild_id, user_id=user.id)
+        ProfileMongoManager.update_last_crime(guild_id=interaction.guild_id, user_id=user.id, flag_remove=False)
         channel = interaction.channel
         if user_profile.is_authority == False:
             me = await channel.send(embed=embed, view=view, content=f"")
