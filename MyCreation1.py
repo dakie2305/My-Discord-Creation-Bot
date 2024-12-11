@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
 import CustomFunctions
-import db.Class.UserList as DefaultUserList
 import google.generativeai as genai
 import time
 import DailyLogger
@@ -23,6 +22,8 @@ from Handling.MiniGame.SortWord import SwHandling as SwHandling
 from Handling.Misc.Therapy import TherapyHandling
 from discord.app_commands import Choice
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
+import Handling.Economy.Couple.CoupleMongoManager as CoupleMongoManager
+import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
 
 load_dotenv()
 intents = discord.Intents.all()
@@ -1379,6 +1380,47 @@ async def remove_old_conversation():
                 count+=1
     print(f"Found {count} old conversation in collection 'user_conversation_info_{bot_name}' and deleted them.")
 
+
+@tasks.loop(hours=12)
+async def clear_up_data_task():
+    guilds = bot.guilds
+    for guild in guilds:
+        #Kiểm tra quest cũ, xóa đi nếu cần
+        all_quest_data = QuestMongoManager.find_all_profiles(guild_id=guild.id)
+        if all_quest_data != None:
+            count = 0
+            for quest in all_quest_data:
+                if datetime.now() > quest.reset_date: 
+                    QuestMongoManager.delete_quest(guild_id=guild.id, user_id=quest.user_id)
+                    count+=1
+            print(f"clear_up_data_task started. Deleted {count} quest data in guild {guild.name}")
+        else:
+            #Drop quest collection
+            QuestMongoManager.drop_quest_collection(guild_id=guild.id)
+        #Kiểm tra snipe message cũ, xóa đi nếu cần
+        all_snipe_channels = db.find_all_snipe_channel_info(guild_id=guild.id)
+        if all_snipe_channels != None:
+            count = 0
+            for snipe_channel in all_snipe_channels:
+                if snipe_channel.snipe_messages != None and len(snipe_channel.snipe_messages) > 0:
+                    #Xóa bớt message
+                    snipe_messages = snipe_channel.snipe_messages
+                    for deleted_mess in snipe_messages:
+                        date_deleted = deleted_mess.deleted_date
+                        overdue_date = date_deleted + timedelta(weeks=12)
+                        if datetime.now() > overdue_date:
+                            snipe_messages.remove(deleted_mess)
+                            count+=1
+                    db.replace_snipe_message_info(guild_id=guild.id, channel_id=snipe_channel.channel_id, snipe_messages=snipe_messages)
+                else:
+                    #Xóa channell
+                    db.delete_snipe_channel_info(guild_id=guild.id, channel_id=snipe_channel.channel_id)
+            print(f"clear_up_data_task started. Deleted {count} snipe message in {guild.name}")
+        else:
+            #drop collection
+            db.drop_snipe_channel_info_collection(guild_id=guild.id)
+
+
 #region Response AI
 async def sub_function_ai_response(message: discord.Message, speakFlag = True):
     if speakFlag == False: return
@@ -1615,6 +1657,7 @@ async def on_ready():
     if CustomFunctions.check_if_dev_mode()==False:
         automatic_speak_randomly.start()
     remove_old_conversation.start()
+    clear_up_data_task.start()
     #Load extension
     for ext in init_extension:
         await bot.load_extension(ext)
