@@ -403,15 +403,15 @@ async def clear_up_data_task():
                     snipe_messages = snipe_channel.snipe_messages
                     for deleted_mess in snipe_messages:
                         date_deleted = deleted_mess.deleted_date
-                        overdue_date = date_deleted + timedelta(weeks=12)
+                        overdue_date = date_deleted + timedelta(weeks=2)
                         if datetime.now() > overdue_date:
                             snipe_messages.remove(deleted_mess)
                             count+=1
                     db.replace_snipe_message_info(guild_id=guild.id, channel_id=snipe_channel.channel_id, snipe_messages=snipe_messages)
+                    print(f"clear_up_data_task started. Deleted {count} snipe message in {guild.name}")
                 else:
                     #Xóa channell
                     db.delete_snipe_channel_info(guild_id=guild.id, channel_id=snipe_channel.channel_id)
-            print(f"clear_up_data_task started. Deleted {count} snipe message in {guild.name}")
         else:
             #drop collection
             db.drop_snipe_channel_info_collection(guild_id=guild.id)

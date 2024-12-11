@@ -386,6 +386,15 @@ def delete_word_matching_info(channel_id: int, guild_id: int, language: str):
         result = collection.delete_one({"channel_id": channel_id})
         return result
 
+def drop_word_matching_info_collection(guild_id: int):
+    db_specific = client['word_matching_database']
+    collection = db_specific[f'en_word_matching_guild_{guild_id}']
+    if collection:
+        collection.drop()
+    collection = db_specific[f'vn_word_matching_guild_{guild_id}']
+    if collection:
+        collection.drop()
+
 def update_special_point_word_matching_info(channel_id: int, guild_id: int, language: str, special_point: int):
     db_specific = client['word_matching_database']
     collection = db_specific[f'{language}_word_matching_guild_{guild_id}']

@@ -66,7 +66,17 @@ def delete_data_info(channel_id: int, guild_id: int, lang: str):
         #Xoá đi
         result = collection.delete_one({"channel_id": channel_id})
         return result
-    
+
+def drop_word_matching_info_collection(guild_id: int):
+    db_specific = client['word_matching_database']
+    collection = db_specific[f'en_sw_guild_{guild_id}']
+    if collection:
+        collection.drop()
+    collection = db_specific[f'vn_sw_guild_{guild_id}']
+    if collection:
+        collection.drop()
+
+
 def update_special_point_data_info(channel_id: int, guild_id: int, language: str, special_point: int = 0):
     collection = db_specific[f'{language}_sw_guild_{guild_id}']
     #Cập nhật special point của channel lại
