@@ -13,6 +13,7 @@ import asyncio
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 from Handling.Economy.Inventory_Shop.ItemClass import Item, list_small_copper_fish,list_gold_fish, list_silver_fish, list_gift_items, list_trash, list_plant, list_legend_weapon_1, list_legend_weapon_2
 from Handling.Economy.Work.WorkPlantView import WorkPlantView
+import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(WorkEconomy(bot=bot))
@@ -62,6 +63,13 @@ class WorkEconomy(commands.Cog):
             mes = await message.reply(embed=embed, view=view)
             if view != None:
                 view.message = mes
+
+            check_quest_message = QuestMongoManager.increase_quest_objective_count(guild_id=message.guild.id, user_id=message.author.id, quest_type="work_normal_count")
+            if check_quest_message == True:
+                view = SelfDestructView(60)
+                quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
+                ms = await message.channel.send(embed=quest_embed, content=f"{message.author.mention}", view=view)
+                view.message = ms
             return
     
     work_group = discord.app_commands.Group(name="work", description="Các lệnh liên quan đến làm việc kiếm tiền!")
@@ -82,6 +90,13 @@ class WorkEconomy(commands.Cog):
         mess = await interaction.followup.send(embed=embed)
         if view != None:
             view.message = mess
+        
+        check_quest_message = QuestMongoManager.increase_quest_objective_count(guild_id=interaction.guild_id, user_id=interaction.user.id, quest_type="work_normal_count")
+        if check_quest_message == True:
+            view = SelfDestructView(60)
+            quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
+            ms = await interaction.channel.send(embed=quest_embed, content=f"{interaction.user.mention}", view=view)
+            view.message = ms
         return
         
     async def embed_work_command(self, user: discord.Member):
@@ -199,6 +214,7 @@ class WorkEconomy(commands.Cog):
         embed = discord.Embed(title=f"", description=f"{base_text}", color=0x1ae8e8)
         return embed, None
     
+    #region fishing
     @work_group.command(name="fishing", description="Dùng cần câu để câu cá")
     @discord.app_commands.checks.cooldown(1, 10)
     async def work_fising_slash_command(self, interaction: discord.Interaction):
@@ -283,6 +299,13 @@ class WorkEconomy(commands.Cog):
         ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=interaction.user.id, bonus_exp=fishup_item.bonus_exp)
         ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id, guild_name= "", user_display_name="", user_name="", user_id=interaction.user.id, dignity_point=fishup_item.bonus_dignity)
         await mess.edit(embed=embed)
+
+        check_quest_message = QuestMongoManager.increase_quest_objective_count(guild_id=interaction.guild_id, user_id=interaction.user.id, quest_type="work_fishing_count")
+        if check_quest_message == True:
+            view = SelfDestructView(60)
+            quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
+            ms = await interaction.channel.send(embed=quest_embed, content=f"{interaction.user.mention}", view=view)
+            view.message = ms
 
     @work_fising_slash_command.error
     async def work_fising_slash_command_error(self, interaction: discord.Interaction, error):
@@ -398,6 +421,13 @@ class WorkEconomy(commands.Cog):
                 #Xoá plant
                 ProfileMongoManager.update_plant(guild_id=interaction.guild_id, user_id=interaction.user.id, plant=None)
                 mess = await interaction.followup.send(embed=embed, ephemeral=False)
+
+                check_quest_message = QuestMongoManager.increase_quest_objective_count(guild_id=interaction.guild_id, user_id=interaction.user.id, quest_type="work_planting_count")
+                if check_quest_message == True:
+                    view = SelfDestructView(60)
+                    quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
+                    ms = await interaction.channel.send(embed=quest_embed, content=f"{interaction.user.mention}", view=view)
+                    view.message = ms
                 return
         
     

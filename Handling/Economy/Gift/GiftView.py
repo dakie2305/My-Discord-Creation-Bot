@@ -6,6 +6,8 @@ from CustomEnum.EmojiEnum import EmojiCreation2
 from typing import List
 from Handling.Economy.Inventory_Shop.ItemClass import Item
 import Handling.Economy.Couple.CoupleMongoManager as CoupleMongoManager
+import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
+from Handling.Misc.SelfDestructView import SelfDestructView
 
 class GiftView(discord.ui.View):
     def __init__(self, user_profile: Profile, target_profile: Profile, user: discord.Member, target_user: discord.Member):
@@ -64,6 +66,13 @@ class GiftView(discord.ui.View):
         #-1 vật phẩm
         ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, amount=-1)
         await channel.send(embed=embed, content=f"{self.target_user.mention}")
+
+        check_quest_message = QuestMongoManager.increase_quest_objective_count(guild_id=interaction.guild_id, user_id=interaction.user.id, quest_type="gift_count")
+        if check_quest_message == True:
+            view = SelfDestructView(60)
+            quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
+            ms = await interaction.channel.send(embed=quest_embed, content=f"{interaction.user.mention}", view=view)
+            view.message = ms
         return
         
 

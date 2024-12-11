@@ -110,6 +110,12 @@ def find_guild_extra_info_by_id(guild_id: int):
         return GuildExtraInfo.from_dict(data)
     return None
 
+def delete_guild_extra_info_by_id(guild_id: int):
+    db_specific = client['guild_database']
+    collection = db_specific['guild_extra_info']
+    result = collection.delete_one({"guild_id": guild_id})
+    return result
+
 def find_all_guild_extra_info():
     db_specific = client['guild_database']
     collection = db_specific['guild_extra_info']
@@ -236,6 +242,21 @@ def update_or_insert_snipe_message_info(guild_id: int, channel_id: int, snipe_me
     result = collection.update_one({"channel_id": channel_id}, {"$set": {"snipe_messages": [conv.to_dict() for conv in list_sniped_mess]}})
     return result
 
+def replace_snipe_message_info(guild_id: int, channel_id: int, snipe_messages: List['SnipeMessage']):
+    db_specific = client['guild_database']
+    collection = db_specific[f'snipe_info_guild_{guild_id}']
+    #Tìm xem có đã tồn tại SnipeChannelInfo với channel_id truyền vào chưa cái đã
+    existing_data = collection.find_one({"channel_id": channel_id})
+    existing_info = SnipeChannelInfo.from_dict(existing_data)
+    if existing_data == None: return
+    result = collection.update_one({"channel_id": channel_id}, {"$set": {"snipe_messages": [conv.to_dict() for conv in snipe_messages]}})
+    return result
+
+def drop_snipe_channel_info_collection(guild_id: int):
+    db_specific = client['guild_database']
+    collection = db_specific[f'snipe_info_guild_{guild_id}']
+    if collection:
+        collection.drop()
 
 def delete_snipe_channel_info(channel_id:int, guild_id: int):
     db_specific = client['guild_database']

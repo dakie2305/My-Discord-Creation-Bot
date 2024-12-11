@@ -562,6 +562,8 @@ class SicboCog(commands.Cog):
         mess = await interaction.followup.send(embed=embed)
         if mess:
             await self.edit_embed_slot_machine(message=mess, user=interaction.user, choice=choice, so_tien=so_tien,loai_tien=loai_tien,profile=profile)
+
+        
         return
     
     async def edit_embed_slot_machine(self, message: discord.Message, user: discord.Member, choice: str, so_tien:int = None, loai_tien:str = None, profile: Profile = None):
@@ -642,6 +644,13 @@ class SicboCog(commands.Cog):
             elif loai_tien == "C": self.update_player_money_and_authority_money(is_player_win=is_player_win, guild_int=user.guild.id, profile=profile, copper=so_tien, loai_tien=loai_tien)
         
         await message.edit(embed=embed)
+
+        check_quest_message = QuestMongoManager.increase_quest_objective_count(guild_id=user.guild.id, user_id=user.id, quest_type="sb_slot_machine_count")
+        if check_quest_message == True:
+            view = SelfDestructView(60)
+            quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
+            ms = await message.channel.send(embed=quest_embed, content=f"{user.mention}", view=view)
+            view.message = ms
         
         return
         
@@ -716,6 +725,13 @@ class SicboCog(commands.Cog):
         mess = await interaction.followup.send(embed=embed, view=view)
         view.message = mess
         await view.start_countdown()
+
+        check_quest_message = QuestMongoManager.increase_quest_objective_count(guild_id=interaction.guild_id, user_id=interaction.user.id, quest_type="sb_bai_cao_count")
+        if check_quest_message == True:
+            view = SelfDestructView(60)
+            quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
+            ms = await interaction.channel.send(embed=quest_embed, content=f"{interaction.user.mention}", view=view)
+            view.message = ms
     
     @sb_bai_cao_command.error
     async def sb_bai_cao_command_error(self, interaction: discord.Interaction, error):

@@ -5,8 +5,11 @@ class SlashCommand(Enum):
     BANK = "</bank:1295012466417205368>"
     TRANSFER = "</transfer:1295074790872318057>"
     DAILY = "</daily:1295439525669245018>"
+
     WORK = "</work normal:1295777179992326154>"
     WORK_FISHING = "</work fishing:1295777179992326154>"
+    WORK_PLANTING = "</work planting:1315721623340318872>"
+
     QUEST_CHANNELS = "</quests channels:1297233430307668070>"
     QUEST_RESET = "</quests reset:1297233430307668070>"
     QUEST = "</quest:1297233430307668069>"
@@ -18,6 +21,8 @@ class SlashCommand(Enum):
     SB_NORMAL = "</sb normal:1300146431126143057>"
     SB_DOUBLE = "</sb double:1300146431126143057>"
     SB_TRIPLE = "</sb triple:1300146431126143057>"
+    SB_SLOT_MACHINE = "</sb slot_machine:1315721622984069145>"
+    SB_BAI_CAO = "</sb bai_cao:1315721622984069145>"
     
     SHOP_GLOBAL = "</shop global:1302622680977248256>"
     GIFT = "</gift:1302680680391639160>"
@@ -26,4 +31,3 @@ class SlashCommand(Enum):
     COUPLE_FIGHT = "</couple fight:1309954230894985386>"
     
     INVENTORY_USE = "</inventory use:1305912928486166632>"
-

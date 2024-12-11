@@ -103,7 +103,7 @@ class QuestEconomy(commands.Cog):
             #Cộng tiền
             ProfileMongoManager.update_profile_money(guild_id=user.guild.id, guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name= user.display_name, gold=quest.quest_reward_gold, silver=quest.quest_reward_silver, copper=quest.quest_reward_copper)
             #Cộng kinh nghiệm
-            ProfileMongoManager.update_level_progressing(guild_id=user.guild.id, user_id=user.id, bonus_exp= 40 + quest.bonus_exp)
+            ProfileMongoManager.update_level_progressing(guild_id=user.guild.id, user_id=user.id, bonus_exp= quest.bonus_exp)
             #Xoá quest hiện tại
             QuestMongoManager.delete_quest(guild_id=user.guild.id, user_id=user.id)
             return new_embed
