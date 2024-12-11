@@ -462,10 +462,6 @@ class AuthorityEconomy(commands.Cog):
             await interaction.followup.send(content=f"Đối tượng {user.display_name} hoàn toàn vô tội vì còn chưa có profile! Chính quyền đã mất **{cost_money}** {EmojiCreation2.GOLD.value}!", ephemeral=True)
             ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, gold=-cost_money)
             return
-        elif target_profile != None and target_profile.last_crime == None:
-            await interaction.followup.send(content=f"Đối tượng {user.display_name} hoàn toàn vô tội vì chưa từng phạm pháp! Chính quyền đã mất **{cost_money}** {EmojiCreation2.GOLD.value}!", ephemeral=True)
-            ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, gold=-cost_money)
-            return
         
         #Kiểm tra xem có hàng cấm trong người không
         list_contraband = ["crime_evident", "fish_rod_5", "weed"]
@@ -522,10 +518,6 @@ class AuthorityEconomy(commands.Cog):
         target_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=target.id)
         if target_profile == None:
             await interaction.followup.send(content=f"Đối tượng {target.display_name} hoàn toàn vô tội vì còn chưa có profile! {interaction.user.mention} đã mất **{cost_money}** {EmojiCreation2.GOLD.value}!", ephemeral=True)
-            ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, user_id=interaction.user.id, guild_name="", user_display_name="", user_name="", gold=-cost_money)
-            return
-        elif target_profile != None and target_profile.last_crime == None:
-            await interaction.followup.send(content=f"Đối tượng {target.display_name} hoàn toàn vô tội vì chưa từng phạm pháp! {interaction.user.mention} đã mất **{cost_money}** {EmojiCreation2.GOLD.value}!", ephemeral=True)
             ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, user_id=interaction.user.id, guild_name="", user_display_name="", user_name="", gold=-cost_money)
             return
         messe: discord.Message = await interaction.followup.send(content=f"Bạn đã dùng 1 vật phẩm [{chosen_item.emoji} - **{chosen_item.item_name}**] để điều tra {target.mention}!", ephemeral=True)
@@ -658,7 +650,8 @@ class AuthorityEconomy(commands.Cog):
     
     
     
-    def is_within_one_hour(self, past_time: datetime) -> bool:
+    def is_within_one_hour(self, past_time: datetime = None) -> bool:
+        if past_time == None: return False
         now = datetime.now()
         one_hour_after = past_time + timedelta(hours=1)
         return past_time <= now <= one_hour_after
