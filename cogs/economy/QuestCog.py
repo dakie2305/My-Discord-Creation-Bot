@@ -122,7 +122,7 @@ class QuestEconomy(commands.Cog):
                 quest_channel = user.guild.get_channel(random_quest_channel_id)
         if quest == None:
             #Tạo random quest
-            quest = QuestMongoManager.create_new_random_quest(guild_id=user.guild.id, guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, channel_id=quest_channel.id, channel_name=quest_channel.name)
+            quest = QuestMongoManager.create_new_random_quest(guild_id=user.guild.id, guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, channel_id=quest_channel.id, channel_name=quest_channel.name, data_profile=data)
         embed = discord.Embed(title=f"", description=f"**Nhiệm vụ dành cho {user.mention}**", color=0xe9f5ec)
         if user.avatar!=None:
             embed.set_thumbnail(url=user.avatar.url)

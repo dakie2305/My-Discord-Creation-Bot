@@ -476,7 +476,7 @@ class WorkEconomy(commands.Cog):
             dice_trash = UtilitiesFunctions.get_chance(20)
             if dice_trash: return random.choice(list_trash)
             
-            dice_legend = UtilitiesFunctions.get_chance(1)
+            dice_legend = UtilitiesFunctions.get_chance(5)
             if dice_legend:
                 dice_check = UtilitiesFunctions.get_chance(50)
                 if dice_check: return random.choice(list_legend_weapon_1)
@@ -489,7 +489,7 @@ class WorkEconomy(commands.Cog):
             dice_trash = UtilitiesFunctions.get_chance(10)
             if dice_trash: return random.choice(list_trash)
             
-            dice_legend = UtilitiesFunctions.get_chance(1)
+            dice_legend = UtilitiesFunctions.get_chance(5)
             if dice_legend:
                 dice_check = UtilitiesFunctions.get_chance(50)
                 if dice_check: return random.choice(list_legend_weapon_1)

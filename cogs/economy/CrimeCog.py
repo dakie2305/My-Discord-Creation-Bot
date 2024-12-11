@@ -174,6 +174,12 @@ class CrimeEconomy(commands.Cog):
             m = await interaction.followup.send(embed=embed, view=view)
             view.message = m
             return
+        check_quest_message = QuestMongoManager.increase_quest_objective_count(guild_id=interaction.guild_id, user_id=interaction.user.id, quest_type="crime_count")
+        if check_quest_message == True:
+            view = SelfDestructView(60)
+            quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
+            ms = await interaction.channel.send(embed=quest_embed, content=f"{interaction.user.mention}", view=view)
+            view.message = ms
         
     #region Rob
     async def process_rob_command(self, interaction: discord.Interaction, user: discord.Member, target_user: discord.Member, user_profile: Profile, target_profile: Profile):    
