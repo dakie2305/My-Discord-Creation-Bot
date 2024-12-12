@@ -28,6 +28,7 @@ from Handling.MiniGame.RandomQuizz.RandomQuizzView import RandomQuizzView, rando
 from Handling.Misc.AutoLevelupProfile import AutoLevelupProfileHandling
 import asyncio
 import Handling.Economy.Couple.CoupleMongoManager as CoupleMongoManager
+import Handling.MiniGame.RockPaperScissor.RpsMongoManager as RpsMongoManager
 
 load_dotenv()
 intents = discord.Intents.all()
@@ -656,6 +657,8 @@ async def on_guild_remove(self, guild: discord.Guild):
     db.delete_guild_extra_info_by_id(guild_id=guild.id)
     #Drop snipe của guild
     db.drop_snipe_channel_info_collection(guild_id=guild.id)
+    #Drop rps
+    RpsMongoManager.drop_rps_collection(guild_id=guild.id)
     print(f"Bot {bot.user.display_name} removed from guild {guild.name}. Deleted all related collection")
     
 

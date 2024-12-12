@@ -86,16 +86,24 @@ class AuthorityEconomy(commands.Cog):
         if data.darkium > 0:
             money_to_vote = int(data.darkium * 10 / 100)
             emoji = EmojiCreation2.DARKIUM.value
+            if money_to_vote == 0: money_to_vote = 1
+            ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_display_name=interaction.user.display_name, user_name=interaction.user.name, darkium=-money_to_vote)
         elif data.gold > 0:
             money_to_vote = int(data.gold * 10 / 100)
             emoji = EmojiCreation2.GOLD.value
+            if money_to_vote == 0: money_to_vote = 1
+            ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_display_name=interaction.user.display_name, user_name=interaction.user.name, gold=-money_to_vote)
         elif data.silver > 0:
             money_to_vote = int(data.silver * 10 / 100)
             emoji = EmojiCreation2.SILVER.value
+            if money_to_vote == 0: money_to_vote = 1
+            ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_display_name=interaction.user.display_name, user_name=interaction.user.name, silver=-money_to_vote)
         else:
             money_to_vote = int(data.copper * 10 / 100)
             emoji = EmojiCreation2.COPPER.value
-        if money_to_vote == 0: money_to_vote = 1
+            if money_to_vote == 0: money_to_vote = 1
+            if money_to_vote < 500: money_to_vote = 500
+            ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_display_name=interaction.user.display_name, user_name=interaction.user.name, copper=-money_to_vote)
         if emoji == EmojiCreation2.COPPER.value and money_to_vote < 500: money_to_vote = 500
 
         await interaction.followup.send(content=f"{interaction.user.mention} đã bỏ **{money_to_vote}** {emoji} để vận động tranh cử chức Chính Quyền server!")

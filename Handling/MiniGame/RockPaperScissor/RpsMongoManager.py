@@ -17,6 +17,11 @@ def find_rps_info_by_id(guild_id: int):
         return RpsInfo.from_dict(data)
     return None
 
+def drop_rps_collection(guild_id: int):
+    collection = db_specific[f'rps_{guild_id}']
+    if collection:
+        collection.drop()
+        
 def create_rps_info(guild_id: int, guild_name: str):
     #Mỗi server là một collection, chia theo server id
     collection = db_specific[f'rps_{guild_id}']
