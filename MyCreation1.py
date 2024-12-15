@@ -1274,7 +1274,7 @@ def get_bxh_noi_tu(interaction: discord.Interaction,lan: str, word_matching_chan
                 if user != None and (profile.points!= 0):
                     embed.add_field(name=f"", value=f"**Hạng {index+1}.** {user.mention}. Tổng điểm: **{profile.points}**. Số lượng kỹ năng đặc biệt: **{len(profile.special_items)}**.", inline=False)
                     count+=1
-                if count >= 25: break
+                if count >= 15: break
         else:
             matched = False
             for index, profile in enumerate(word_matching_channel.player_profiles):

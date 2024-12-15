@@ -150,7 +150,7 @@ class SortWords(commands.Cog):
                     if user != None and (profile.point!= 0):
                         embed.add_field(name=f"", value=f"**Hạng {index+1}.** {user.mention}. Tổng điểm: **{profile.point}**. Số lượng kỹ năng đặc biệt: **{len(profile.special_items)}**.", inline=False)
                         count+=1
-                    if count >= 25: break
+                    if count >= 15: break
             else:
                 matched = False
                 for index, profile in enumerate(sw_info.player_profiles):
