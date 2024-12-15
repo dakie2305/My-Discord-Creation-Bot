@@ -283,7 +283,7 @@ class SicboCog(commands.Cog):
     
     async def edit_embed_sb_double(self, message: discord.Message, user: discord.Member, number: int = None, so_tien:int = None, loai_tien:str = None, profile: Profile = None):
         #65% thua ngay
-        lose_chance = self.get_chance(45)
+        lose_chance = self.get_chance(30)
         if lose_chance == True:
             first_num, first_dice_emoji, second_num, second_dice_emoji, third_num, third_dice_emoji = self.fixed_roll_dice_double_lose()
         else:
@@ -796,11 +796,11 @@ class SicboCog(commands.Cog):
             "patlcan"]
         
         chance = random.random()
-        if chance < 0.1:
+        if chance < 0.3:
             chosen_value = random.choice(list_slot_value)
             return [chosen_value, chosen_value, chosen_value]
         
-        elif chance < 0.4:
+        elif chance < 0.65:
             # Chọn 2 cái giống, 1 cái khác
             chosen_value = choice
             other_value = random.choice([value for value in list_slot_value if value != chosen_value])
