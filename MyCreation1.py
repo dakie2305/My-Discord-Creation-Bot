@@ -20,11 +20,13 @@ import asyncio
 import PIL
 from Handling.MiniGame.SortWord import SwHandling as SwHandling
 from Handling.Misc.Therapy import TherapyHandling
+from Handling.Misc.StickyMessage import StickyMessageHandling
 from discord.app_commands import Choice
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 import Handling.Economy.Couple.CoupleMongoManager as CoupleMongoManager
 import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
 import Handling.MiniGame.SortWord.SwMongoManager as SwMongoManager
+from CustomEnum.EmojiEnum import EmojiCreation2, EmojiCreation1
 
 load_dotenv()
 intents = discord.Intents.all()
@@ -1710,7 +1712,10 @@ async def on_message(message: discord.Message):
         model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
         asyncio.create_task(TherapyHandling(bot=bot, model=model).handling_therapy_ai(message=message))
         speakFlag = False
-
+    if guild_extra_info != None and guild_extra_info.custom_parameter_2 != None and message.channel.id == guild_extra_info.custom_parameter_2: #Hiện tại chỉ có true heaven có
+        speakFlag = False
+        #sticky message
+        await StickyMessageHandling(bot=bot).handling_sticky_message(message=message)
     await sub_function_ai_response(message=message, speakFlag=speakFlag)
     asyncio.create_task(word_matching(message=message))
     await bot.process_commands(message)
@@ -1724,7 +1729,7 @@ init_extension = [
                   "cogs.games.SortWordCog",
                   "cogs.games.TruthDareCog",
                   "cogs.misc.TherapyAICog",
-                  "cogs.misc.TrueHeavenRuleCog",
+                  "cogs.misc.TrueHeavenCustomCommandsCog",
                   "cogs.misc.HelpCog",
                   ]
 bot.tree.add_command(delete_message_context)
