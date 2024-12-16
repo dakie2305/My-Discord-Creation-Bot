@@ -79,10 +79,20 @@ class GiftView(discord.ui.View):
 
 class ItemSelect(discord.ui.Select):
     def __init__(self, user: discord.Member, list_item: List[Item], view: "GiftView"):
-        options = [
-            discord.SelectOption(label=f"{item.item_name} (x{item.quantity})", description=item.item_description[:97] + '...', value=item.item_id)
-            for item in list_item if item.item_type == "gift"
-        ]
+        seen_item_ids = set()
+        options = []
+        
+        for item in list_item:
+            if item.item_id in seen_item_ids or item.item_type != "gift":
+                continue
+            seen_item_ids.add(item.item_id)
+            options.append(
+                discord.SelectOption(
+                    label=f"{item.item_name} (x{item.quantity})",
+                    description=(item.item_description[:97] + '...'),
+                    value=item.item_id
+                )
+            )
         super().__init__(placeholder="Chọn vật phẩm muốn tặng...", options=options)
         self.list_item = list_item
         self.parent_view  = view
