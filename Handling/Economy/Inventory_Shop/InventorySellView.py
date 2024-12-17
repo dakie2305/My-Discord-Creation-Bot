@@ -34,7 +34,7 @@ class InventorySellView(discord.ui.View):
 
         profile_user = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=self.user.id)
         if profile_user == None:
-            await interaction.followup.send(f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True)
+            await interaction.channel.send(f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True)
             return
         #Kiểm tra xem item đó còn không
         check_fail = True
@@ -43,7 +43,7 @@ class InventorySellView(discord.ui.View):
                 check_fail = False
                 break
         if check_fail:
-            await interaction.followup.send(f'Vật phẩm {self.selected_item.emoji} - **{self.selected_item.item_name}** đã không còn trong túi đồ của bạn!')
+            await interaction.channel.send(f'Vật phẩm {self.selected_item.emoji} - **{self.selected_item.item_name}** đã không còn trong túi đồ của bạn!')
             return
 
         await interaction.response.send_modal(TextSellInventoryInputModal(rate=self.rate, current_item=self.selected_item, user=self.user))        
