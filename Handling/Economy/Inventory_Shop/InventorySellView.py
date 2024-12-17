@@ -34,7 +34,7 @@ class InventorySellView(discord.ui.View):
 
         profile_user = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=self.user.id)
         if profile_user == None:
-            await interaction.channel.send(f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True)
+            await interaction.channel.send(f"{interaction.user.mention} Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True)
             return
         #Kiểm tra xem item đó còn không
         check_fail = True
@@ -43,7 +43,7 @@ class InventorySellView(discord.ui.View):
                 check_fail = False
                 break
         if check_fail:
-            await interaction.channel.send(f'Vật phẩm {self.selected_item.emoji} - **{self.selected_item.item_name}** đã không còn trong túi đồ của bạn!')
+            await interaction.channel.send(f'{interaction.user.mention} Vật phẩm {self.selected_item.emoji} - **{self.selected_item.item_name}** đã không còn trong túi đồ của bạn!')
             return
 
         await interaction.response.send_modal(TextSellInventoryInputModal(rate=self.rate, current_item=self.selected_item, user=self.user))        
@@ -99,7 +99,7 @@ class TextSellInventoryInputModal(discord.ui.Modal):
         await interaction.response.defer(ephemeral=False)
         profile_user = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
         if profile_user == None:
-            await interaction.followup.send(f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True)
+            await interaction.followup.send(f"{interaction.user.mention} Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True)
             return
         
         #Kiểm tra xem item đó còn không
@@ -111,7 +111,7 @@ class TextSellInventoryInputModal(discord.ui.Modal):
                 item_remaining_quantity = player_item.quantity
                 break
         if check_fail:
-            await interaction.followup.send(f'Vật phẩm {self.current_item.emoji} - **{self.current_item.item_name}** đã không còn trong túi đồ của bạn!')
+            await interaction.followup.send(f'{interaction.user.mention} Vật phẩm {self.current_item.emoji} - **{self.current_item.item_name}** đã không còn trong túi đồ của bạn!')
             return
         
         if self.current_item.item_id == "crime_evident":
@@ -123,7 +123,7 @@ class TextSellInventoryInputModal(discord.ui.Modal):
         try:
             amount = int(input_amount_field)
             if amount <= 0:
-                await interaction.followup.send(f"Chỉ nhập số hợp lệ!", ephemeral=False)
+                await interaction.followup.send(f"{interaction.user.mention} Chỉ nhập số hợp lệ!", ephemeral=False)
                 return
             #Nếu số quá cao thì bán hết
             if amount > item_remaining_quantity: amount = item_remaining_quantity
