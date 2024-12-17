@@ -45,7 +45,7 @@ class ProfileToInventoryView(discord.ui.View):
         time_window = timedelta(hours=self.profile.plant.hour_require)
         next_time = self.profile.plant.plant_date + time_window
         unix_time = int(next_time.timestamp())
-        embed = discord.Embed(title="", description=f"**Vườn nhà của {interaction.user.mention}**", color=0xddede7)
+        embed = discord.Embed(title="", description=f"**Vườn nhà của <@{self.profile.user_id}>**", color=0xddede7)
         embed.add_field(name=f"", value=f"Thông tin cây trồng", inline=True)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
         embed.add_field(name=f"", value=f"Hạt giống đang trồng: [{self.profile.plant.source_item.emoji} - **{self.profile.plant.source_item.item_name}**]", inline=False)
