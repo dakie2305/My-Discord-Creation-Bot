@@ -433,7 +433,7 @@ def update_list_items_profile(guild_id: int, guild_name: str, user_id: int, user
     
     exist_flag = False
     #Nếu đã có items trong list thì chỉnh quantity lại theo amount
-    if len(list_items)>1:
+    if len(list_items)>0:
         for profile_item in list_items:
             if profile_item.item_id == item.item_id:
                 profile_item.quantity += amount
