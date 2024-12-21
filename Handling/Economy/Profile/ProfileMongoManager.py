@@ -2,6 +2,7 @@ from typing import List
 from pymongo import MongoClient
 from datetime import datetime, timedelta
 from Handling.Economy.Profile.ProfileClass import Profile
+from Handling.Economy.GA.GuardianAngelClass import GuardianAngel, GuardianAngelSkill
 import Handling.Economy.ConversionRate.ConversionRateMongoManager as ConversionRateMongoManager
 from Handling.Economy.Inventory_Shop.ItemClass import Item, list_gift_items, PlantItem
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
@@ -672,5 +673,15 @@ def update_last_fishing_now(guild_id:int, user_id: int):
     collection = db_specific[f'profile_{guild_id}']
     today = datetime.now()
     result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"last_fishing": today,
+                                                                                    }})
+    return result
+
+#region guardian
+def set_main_guardian_profile(guild_id: int, user_id: int, guardian: GuardianAngel):
+    collection = db_specific[f'profile_{guild_id}']
+    existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
+    if existing_data == None: return
+    
+    result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"guardian": guardian.to_dict(),
                                                                                     }})
     return result
