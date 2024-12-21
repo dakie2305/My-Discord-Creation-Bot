@@ -68,7 +68,8 @@ class PaginationView(discord.ui.View):
         if message:
             modern_time = message.deleted_date.strftime(f"%d/%m/%Y %H:%M")
             user = interaction.guild.get_member(message.author_id)
-            self.embed.set_thumbnail(url=user.avatar.url)
+            if user.avatar != None:
+                self.embed.set_thumbnail(url=user.avatar.url)
             self.embed.add_field(name=f"", value=f"**Channel {interaction.channel.mention}. Tin nhắn của user: {user.mention}, username: {user.name}**", inline=False)
             if message.user_message_content != "" and message.user_message_content != None:
                 self.embed.add_field(name=f"", value=f"{message.user_message_content}", inline=False)
