@@ -181,6 +181,7 @@ class Help(commands.Cog):
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value}`/authority overthrow`: lật đổ Chính Quyền hiện tại! Chỉ dành cho chủ server hoặc Chính Quyền hiện tại! Phạt tiền cực nặng!", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value}`/authority investigate`: điều tra hành vi phạm tội của user khác! Nếu user đó đã dùng lệnh `/crime` trong một tiếng đổ lại thì người đó coi như sẽ bị bắt!", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value}`/authority resign`: cho phép bỏ 10% tiền để từ chức trong yên bình sau khi nhậm chức hai tuần, vẫn sẽ giữ được mọi của cải!", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value}`!um`: Lệnh dành riêng cho server owner. Cho phép cộng trừ tiền cho bất kỳ ai tuỳ thích!", inline=False)
         list_embed.append(embed)
         
         #Authority

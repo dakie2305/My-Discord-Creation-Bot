@@ -479,8 +479,14 @@ class WorkEconomy(commands.Cog):
             dice_legend = UtilitiesFunctions.get_chance(5)
             if dice_legend:
                 dice_check = UtilitiesFunctions.get_chance(50)
-                if dice_check: return random.choice(list_legend_weapon_1)
-                else: return random.choice(list_legend_weapon_2)
+                if dice_check:
+                    item = random.choice(list_legend_weapon_1)
+                    item.item_worth_amount = 100
+                    return item
+                else: 
+                    item = random.choice(list_legend_weapon_2)
+                    item.item_worth_amount = 100
+                    return item
             
             dice_fish_silver = UtilitiesFunctions.get_chance(10)
             if dice_fish_silver: return random.choice(list_silver_fish)
@@ -492,8 +498,14 @@ class WorkEconomy(commands.Cog):
             dice_legend = UtilitiesFunctions.get_chance(5)
             if dice_legend:
                 dice_check = UtilitiesFunctions.get_chance(50)
-                if dice_check: return random.choice(list_legend_weapon_1)
-                else: return random.choice(list_legend_weapon_2)
+                if dice_check:
+                    item = random.choice(list_legend_weapon_1)
+                    item.item_worth_amount = 100
+                    return item
+                else: 
+                    item = random.choice(list_legend_weapon_2)
+                    item.item_worth_amount = 100
+                    return item
             
             dice_fish_silver = UtilitiesFunctions.get_chance(45)
             if dice_fish_silver: return random.choice(list_silver_fish)
