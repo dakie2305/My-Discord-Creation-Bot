@@ -255,3 +255,40 @@ class UtilitiesFunctions():
         # Create the bar
         bar = "█" * filled_length + "░" * empty_length
         return f"{bar} {progress_percentage:.0f}%"
+    
+    @staticmethod
+    def get_text_on_guardian_level(level: int):
+        text = "Tân Binh"
+        if level >= 120:
+            text= "Thượng Cổ Đại Thần"
+        elif level >= 100:
+            text= "Vệ Chiến Thần"
+        elif level >= 95:
+            text= "Thiên Tử"
+        elif level >= 90:
+            text= "Tử Thần"
+        elif level >= 80:
+            text= "Bất Diệt Chiến Đế"
+        elif level >= 80:
+            text= "Đại Chiến Tôn"
+        elif level >= 70:
+            text= "Chúa Tể"
+        elif level >= 60:
+            text= "Đại Hộ Vệ"
+        elif level >= 50:
+            text= "Lãnh Quản Chiến Khí"
+        elif level >= 40:
+            text= "Thống Lãnh"
+        elif level >= 30:
+            text= "Tư Lệnh"
+        elif level >= 25:
+            text= "Tướng Quân"
+        elif level >= 20:
+            text= "Chỉ Huy"
+        elif level >= 15:
+            text= "Tinh Anh"
+        elif level >= 10:
+            text= "Dị Nhân"
+        elif level >= 5:
+            text= "Đấu Sĩ"
+        return text
