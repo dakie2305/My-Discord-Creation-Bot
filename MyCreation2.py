@@ -368,10 +368,12 @@ async def love_point_rank_reducing_task():
             two_weeks_after = datetime.now() + timedelta(weeks=2)
             delete_check = 0
             if couple.last_fight_action == None and couple.last_love_action == None: delete_check +=1
-            if couple.last_fight_action != None and couple.last_fight_action < two_weeks_ago: delete_check +=1
-            if couple.last_love_action != None and couple.last_love_action < two_weeks_ago: delete_check +=1
+            if couple.last_love_action != None and couple.last_love_action + timedelta(weeks=2) < datetime.now(): delete_check +=1
+            if couple.last_fight_action != None and couple.last_fight_action + timedelta(weeks=2) < datetime.now(): delete_check +=1
             if couple.love_point == 0: delete_check +=1
-            if couple.date_created < two_weeks_after: delete_check -=1
+            if couple.love_point == 0 and couple.love_progressing == 0: delete_check +=1
+            #Mới tạo trong vòng 2 tuần không cần check
+            if couple.date_created + timedelta(weeks=2) > datetime.now(): delete_check -=2
             if couple.love_rank == 20: delete_check = -99
             #Nếu đạt trên ba tiêu chí trên thì xoá
             if delete_check >= 3:
