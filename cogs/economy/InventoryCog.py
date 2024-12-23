@@ -168,7 +168,7 @@ class InventoryEconomy(commands.Cog):
     
     #region attack
     @inventory_group.command(name="attack", description="Chọn vũ khí để tấn công người khác")
-    @discord.app_commands.checks.cooldown(1, 10)
+    @discord.app_commands.checks.cooldown(1, 30)
     async def inventory_attack_slash_command(self, interaction: discord.Interaction, target: discord.Member):
         await interaction.response.defer(ephemeral=True)
         #Không cho dùng bot nếu không phải user
@@ -274,44 +274,18 @@ class InventoryEconomy(commands.Cog):
             return
         
         if "legend_" in user_profile.attack_item.item_id:
-            if user_profile.level <= 50:
+            if target_profile.level < 15:
                 view = SelfDestructView(timeout=30)
-                embed = discord.Embed(title=f"Bạn cấp quá thấp, phải đạt ít nhất cấp 50 mới có thể làm chủ được sức mạnh này!",color=discord.Color.blue())
-                mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
-                view.message = mess
-                return
-            if user_profile.dignity_point < 75:
-                view = SelfDestructView(timeout=30)
-                embed = discord.Embed(title=f"Nhân phẩm bạn quá thấp, phải đạt ít nhất trên 75 điểm mới có thể làm chủ được sức mạnh này!",color=discord.Color.blue())
-                mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
-                view.message = mess
-                return
-            if target_profile.level < 30:
-                view = SelfDestructView(timeout=30)
-                embed = discord.Embed(title=f"Kẻ địch cấp quá thấp, chỉ nên nhắm vào những người trên cấp 30!",color=discord.Color.blue())
+                embed = discord.Embed(title=f"Kẻ địch cấp quá thấp, chỉ nên nhắm vào những người trên cấp 15!",color=discord.Color.blue())
                 mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
                 view.message = mess
                 return
             
-            if target_profile.level + 75 < user_profile.level:
-                view = SelfDestructView(timeout=30)
-                embed = discord.Embed(title=f"Bạn cấp quá cao, không nên cầm **Thất Truyền Huyền Khí** đánh cấp quá thấp!",color=discord.Color.blue())
-                mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
-                view.message = mess
-                return
-            
-            if target_profile.level - 75 > user_profile.level:
-                view = SelfDestructView(timeout=30)
-                embed = discord.Embed(title=f"Kẻ địch cấp quá cao!",color=discord.Color.blue())
-                mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
-                view.message = mess
-                return
-            
-        
+        #Cập nhật last_use_attack
+        ProfileMongoManager.update_last_attack_item_now(guild_id=interaction.guild_id, user_id=interaction.user.id)
         await interaction.followup.send(content="Bạn đã tấn công đối phương", ephemeral=True)
         await self.handling_attack(interaction=interaction, target=target, user_profile=user_profile, target_profile=target_profile, authority=authority)
         #Xử lý tình huống tấn công
-        
         
         
     @inventory_attack_slash_command.error
@@ -537,7 +511,7 @@ class InventoryEconomy(commands.Cog):
         #Cập nhật last_use_attack
         ProfileMongoManager.update_last_attack_item_now(guild_id=interaction.guild_id, user_id=interaction.user.id)
         #Trừ 20 điểm nhân phẩm của người tấn công
-        ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, dignity_point=-20)
+        ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, dignity_point=-20)
         
         #Cộng exp cho người tấn công
         ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=interaction.user.id)
@@ -785,7 +759,7 @@ class InventoryEconomy(commands.Cog):
         #Cập nhật last_use_attack
         ProfileMongoManager.update_last_attack_item_now(guild_id=interaction.guild_id, user_id=interaction.user.id)
         #Trừ 20 điểm nhân phẩm của người tấn công
-        ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, dignity_point=-20)
+        ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, dignity_point=-20)
         
         #Cộng exp cho người tấn công
         ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=interaction.user.id)
