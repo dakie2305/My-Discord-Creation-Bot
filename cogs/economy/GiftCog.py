@@ -26,6 +26,7 @@ class GiftEconomy(commands.Cog):
     #region gift
     @discord.app_commands.command(name="gift", description="Tặng vật phẩm cho người khác")
     @discord.app_commands.describe(user="Chọn user muốn tặng.")
+    @discord.app_commands.checks.cooldown(1, 60)
     async def gift_slash_command(self, interaction: discord.Interaction, user: discord.Member):
         await interaction.response.defer(ephemeral=False)
         #Không cho dùng bot nếu không phải user
@@ -93,6 +94,15 @@ class GiftEconomy(commands.Cog):
         mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
         view.message = mess
         return
+    
+    @gift_slash_command.error
+    async def gift_slash_command_error(self, interaction: discord.Interaction, error):
+        if isinstance(error, discord.app_commands.CommandOnCooldown):
+            # Send a cooldown message to the user, formatted nicely
+            await interaction.response.send_message(f"⏳ Lệnh đang cooldown, vui lòng thực hiện lại trong vòng {error.retry_after:.2f}s tới.", ephemeral=True)
+        else:
+            # Handle any other errors that might occur
+            await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
     
     
     def check_if_within_time_delta(self, input: datetime, time_window: timedelta):

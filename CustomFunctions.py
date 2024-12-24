@@ -42,7 +42,7 @@ async def check_swear_content(message):
     swear_words= ["địt", "clmm", "clm", "đụ", "ỉa", "đái", "đĩ", "đm", "đmm", "chịch", "cu dài", "cu to", "chịt", "ch*ch", "hiếp dâm", "hấp diêm",
                   "lồn", "cặc", "con cu", "con mẹ mày", "đỉ", "l*n", "súc vật", "cặn bã", "c*c", "khoả thân",
                   "nứng", "n*ng", "mọi đen", "mẹ mày", "mẹ m", "nigger", "niger", "da đen", "nigga", "n*gga", "ních gà", "dốt", "đần độn", "đần chó", "bú cu", "buscu", "bú liếm",
-                  "fuck", "f*ck", "f**k", "sex", "pedophile", "pedo", "ấu dâm"]
+                  "fuck", "f*ck", "f**k", "sex", "pedophile", "pedo", "ấu dâm", "đi mẹ", "câm mồm", "câm miệng", "câm mẹ", "đit me", "đit mẹ", "đu me", "đu ma", "câm cụ mày", "cái lòn", "lòn mẹ", "lòn me", "đit cụ"]
     if contains_substring(message, swear_words):
             return True
     return False
