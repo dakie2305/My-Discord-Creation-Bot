@@ -76,7 +76,7 @@ def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_n
         if reward_type == "C":
             base_reward_amount = 4500 * rand_reward_amount
         elif reward_type == "S":
-            base_reward_amount = 100 * rand_reward_amount
+            base_reward_amount = 25 * rand_reward_amount
         elif reward_type == "G":
             base_reward_amount = 2 * rand_reward_amount
         quest_title = f"Thả **{base_amount}** reactions bất kỳ tại kênh <#{channel_id}>"
@@ -89,7 +89,7 @@ def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_n
         if reward_type == "C":
             base_reward_amount = 4500 * rand_reward_amount
         elif reward_type == "S":
-            base_reward_amount = 200 * rand_reward_amount
+            base_reward_amount = 20 * rand_reward_amount
         elif reward_type == "G":
             base_reward_amount = 5 * rand_reward_amount
         quest_title = f"Nhắn **{base_amount}** tin nhắn tại kênh <#{channel_id}>"
@@ -117,7 +117,7 @@ def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_n
         if reward_type == "C":
             base_reward_amount = 3000 * rand_reward_amount
         elif reward_type == "S":
-            base_reward_amount = 5 * rand_reward_amount
+            base_reward_amount = 2 * rand_reward_amount
         elif reward_type == "G":
             base_reward_amount = 1 * rand_reward_amount
         quest_title = f"Chơi **{base_amount}** trò {game_name} trong game Truth Dare ({SlashCommand.TRUTH_DARE.value})"

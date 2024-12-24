@@ -179,7 +179,7 @@ class QuestEconomy(commands.Cog):
             await interaction.followup.send(f"Đã tạo Guild Extra Info và thêm channel này vào trong hệ thống nhiệm vụ của server này.", ephemeral= True)
     
     #region quest reset
-    @quest_group.command(name="reset", description="Reset nhiệm vụ của bản thân. Tốn 10 Silver để reset")
+    @quest_group.command(name="reset", description="Reset nhiệm vụ của bản thân. Tốn tiền để reset")
     async def quest_reset_slash(self, interaction: discord.Interaction):
         await interaction.response.defer()
         #Không cho dùng bot nếu không phải user
@@ -200,15 +200,32 @@ class QuestEconomy(commands.Cog):
             embed = discord.Embed(title=f"Vui lòng dùng lệnh {SlashCommand.QUEST.value} hoặc {SlashCommand.PROFILE.value} trước đã!",color=discord.Color.blue())
             await interaction.followup.send(embed=embed, ephemeral=True)
             return
-        elif profile.silver < 10:
-            embed = discord.Embed(title=f"Bạn không có đủ 10 {EmojiCreation2.SILVER.value} để reset quest hiện tại!",color=discord.Color.blue())
+        
+        #Dựa vào quest reward_type để xác định loại tiền cần tốn
+        cost_money = 10
+        money_type = EmojiCreation2.SILVER.value
+        if quest.quest_reward_gold > 0:
+            cost_money = quest.quest_reward_gold
+            money_type = EmojiCreation2.GOLD.value
+        elif quest.quest_reward_silver > 10:
+            cost_money = quest.quest_reward_silver
+            money_type = EmojiCreation2.SILVER.value
+        
+        if money_type == EmojiCreation2.SILVER.value and profile.silver < cost_money:
+            embed = discord.Embed(title=f"Bạn không có đủ **{cost_money}** {EmojiCreation2.SILVER.value} để reset quest hiện tại!",color=discord.Color.blue())
+            await interaction.followup.send(embed=embed, ephemeral=True)
+            return
+        elif money_type == EmojiCreation2.GOLD.value and profile.gold < cost_money:
+            embed = discord.Embed(title=f"Bạn không có đủ **{cost_money}** {EmojiCreation2.GOLD.value} để reset quest hiện tại!",color=discord.Color.blue())
             await interaction.followup.send(embed=embed, ephemeral=True)
             return
         
         QuestMongoManager.delete_quest(guild_id=interaction.guild_id, user_id=interaction.user.id)
-        profile.silver -= 10
-        ProfileMongoManager.update_profile_money_fast(guild_id=interaction.guild_id, data=profile)
-        embed = discord.Embed(title=f"Bạn đã bị trừ 10 {EmojiCreation2.SILVER.value} để reset nhiệm vụ hiện tại! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để nhận Nhiệm Vụ mới.",color=discord.Color.blue())
+        if money_type == EmojiCreation2.SILVER.value:
+            ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name="", user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, silver=-cost_money)
+        if money_type == EmojiCreation2.GOLD.value:
+            ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name="", user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, gold=-cost_money)
+        embed = discord.Embed(title=f"Bạn đã bị trừ {cost_money} {money_type} để reset nhiệm vụ hiện tại! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để nhận Nhiệm Vụ mới.",color=discord.Color.blue())
         await interaction.followup.send(embed=embed, ephemeral=True)
         return
         
