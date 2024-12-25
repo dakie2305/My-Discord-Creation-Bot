@@ -2,7 +2,7 @@ from typing import List, Optional
 from datetime import datetime
 
 class GuardianAngel:
-    def __init__(self, ga_id: str, ga_name: str, ga_emoji: str, stamina: int, max_stamina: int, health: int, max_health: int, mana: int, max_mana:int, attack_power: int = 10, buff_attack_percent: int = 0, level: int = 1, level_progressing: int = 0, stats_point: int = 0, list_skills : Optional[List['GuardianAngelSkill']] = None, max_skills: int = 1, is_injured: bool = False, time_to_recover: datetime = None, worth_amount: int = 50, worth_type: str = "D", background_urls: Optional[List[str]] = None):
+    def __init__(self, ga_id: str, ga_name: str, ga_emoji: str, stamina: int, max_stamina: int, health: int, max_health: int, mana: int, max_mana:int, attack_power: int = 10, buff_attack_percent: int = 0, level: int = 1, level_progressing: int = 0, stats_point: int = 0, list_skills : Optional[List['GuardianAngelSkill']] = None, max_skills: int = 1, is_injured: bool = False, time_to_recover: datetime = None, worth_amount: int = 50, worth_type: str = "D", last_feed: datetime = None, last_meditation: datetime = None):
         self.ga_id = ga_id
         self.ga_name = ga_name
         self.ga_emoji = ga_emoji
@@ -20,7 +20,9 @@ class GuardianAngel:
         self.max_skills = max_skills
         self.worth_amount = worth_amount
         self.worth_type = worth_type
-        self.background_urls = background_urls if background_urls else None
+        
+        self.last_feed = last_feed if last_feed else None
+        self.last_meditation = last_meditation if last_meditation else None
         
         self.is_injured = is_injured
         self.time_to_recover = time_to_recover if time_to_recover else None
@@ -48,9 +50,10 @@ class GuardianAngel:
             
             "is_injured": self.is_injured,
             "time_to_recover": self.time_to_recover if self.time_to_recover else None,
+            "last_feed": self.last_feed if self.last_feed else None,
+            "last_meditation": self.last_meditation if self.last_meditation else None,
             
             "list_skills": [data.to_dict() for data in self.list_skills],
-            "background_urls": [data for data in self.background_urls],
         }
     
     @staticmethod
@@ -76,9 +79,10 @@ class GuardianAngel:
                 
                 is_injured=data.get("is_injured", False),
                 time_to_recover=data.get("time_to_recover", None),
+                last_meditation=data.get("last_meditation", None),
+                last_feed=data.get("last_feed", None),
                 
                 list_skills = [GuardianAngelSkill.from_dict(data) for data in data.get("list_skills", [])],
-                background_urls = [data for data in data.get("background_urls", [])],
             )
 
 class GuardianAngelSkill:

@@ -72,12 +72,17 @@ class ProfileToInventoryView(discord.ui.View):
         await interaction.response.defer(ephemeral=True)
         embed = discord.Embed(title="", description=f"**Thông tin Hộ Vệ Thần của <@{self.profile.user_id}>**", color=0xddede7)
         embed.add_field(name=f"", value=f"{self.profile.guardian.ga_emoji} - **{self.profile.guardian.ga_name}**", inline=False)
+        if self.profile.guardian.stats_point > 0:
+            embed.add_field(name=f"", value=f"Có **{self.profile.guardian.stats_point}** điểm cộng", inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+        embed.add_field(name=f"", value=f">>> **Sức tấn công** \n🦾: **{self.profile.guardian.attack_power}**", inline=False)
+        embed.add_field(name=f"", value=f">>> **Máu** \n{EmojiCreation2.HP.value}: {self.profile.guardian.health}/{self.profile.guardian.max_health}", inline=False)
+        embed.add_field(name=f"", value=f">>> **Mana** \n{EmojiCreation2.MP.value}: {self.profile.guardian.mana}/{self.profile.guardian.max_mana}", inline=False)
+        embed.add_field(name=f"", value=f">>> **Thể lực** \n{EmojiCreation2.STAMINA.value}: {self.profile.guardian.stamina}/{self.profile.guardian.max_stamina}", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
         embed.add_field(name=f"", value=f"Cấp bậc: **{UtilitiesFunctions.get_text_on_guardian_level(self.profile.guardian.level)}** [{self.profile.guardian.level}]", inline=False)
-        embed.add_field(name=f"", value=f"Máu: \n{EmojiCreation2.HP.value}: {self.profile.guardian.max_health}", inline=True)
-        embed.add_field(name=f"", value=f"Mana: \n{EmojiCreation2.MP.value}: {self.profile.guardian.max_mana}", inline=True)
-        embed.add_field(name=f"", value=f"Thể lực: \n{EmojiCreation2.STAMINA.value}: {self.profile.guardian.max_stamina}", inline=True)
-        embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+        bar_progress = UtilitiesFunctions.progress_bar(input_value= self.profile.guardian.level_progressing)
+        embed.add_field(name=f"", value=f"{bar_progress}\n", inline=False)
         if self.profile.guardian.list_skills != None and len(self.profile.guardian.list_skills)>0:
             count = 0
             embed.add_field(name=f"", value=f"Đang sở hữu **{len(self.profile.guardian.list_skills)}** kỹ năng!", inline=False)

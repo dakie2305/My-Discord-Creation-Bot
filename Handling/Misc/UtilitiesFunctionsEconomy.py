@@ -292,3 +292,14 @@ class UtilitiesFunctions():
         elif level >= 5:
             text= "Đấu Sĩ"
         return text
+    
+    @staticmethod
+    def progress_bar(input_value: int, total_progress: int = 1000, bar_length=15):
+        # Calculate the percentage of progress
+        percentage = (input_value / total_progress) * 100
+        # Determine the number of filled (█) characters
+        filled_length = int(bar_length * input_value // total_progress)
+        # Create the progress bar string
+        bar = '█' * filled_length + '░' * (bar_length - filled_length)
+        # Format the output with percentage
+        return f'{bar} **{int(percentage)}%**'
