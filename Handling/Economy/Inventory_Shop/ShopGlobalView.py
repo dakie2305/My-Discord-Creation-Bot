@@ -1,8 +1,6 @@
 import discord
 from Handling.Economy.Profile.ProfileClass import Profile
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
-from  Handling.Economy.ConversionRate.ConversionRateClass import ConversionRate
-import Handling.Economy.ConversionRate.ConversionRateMongoManager as ConversionRateMongoManager
 from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.EmojiEnum import EmojiCreation2
 from typing import List, Optional, Dict

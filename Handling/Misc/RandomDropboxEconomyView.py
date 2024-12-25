@@ -5,6 +5,7 @@ from Handling.Economy.Profile.ProfileClass import Profile
 from CustomEnum.EmojiEnum import EmojiCreation2
 import random
 from Handling.Economy.Inventory_Shop.ItemClass import Item, list_gift_items
+from Handling.Misc.SelfDestructView import SelfDestructView
 
 class RandomDropboxEconomyView(discord.ui.View):
     def __init__(self):
@@ -80,7 +81,9 @@ class RandomDropboxEconomyView(discord.ui.View):
         
         await interaction.followup.send(f"Bạn đã nhận hộp quà!",ephemeral=True)
         called_channel = interaction.channel
-        await called_channel.send(embed=embed, view= None)
+        view = SelfDestructView(60)
+        m = await called_channel.send(embed=embed, view= view)
+        view.message = m
         return
     
     async def on_timeout(self):

@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 
 class InventoryUseView(discord.ui.View):
     def __init__(self, user_profile: Profile, user: discord.Member):
-        super().__init__(timeout=30)
+        super().__init__(timeout=15)
         self.message: discord.Message = None
         self.user_profile = user_profile
         self.user = user

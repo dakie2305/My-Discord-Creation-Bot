@@ -6,7 +6,7 @@ import random
 from Handling.Economy.Inventory_Shop.ItemClass import Item, list_gift_items
 from typing import List
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
-
+from Handling.Misc.SelfDestructView import SelfDestructView
 
 
 class Quizz:
@@ -113,7 +113,9 @@ class QuizButton(Button):
                 embed.add_field(name=f"", value=f"Đáp án đúng chính là **{self.label}**! Chúc mừng {interaction.user.mention} đã trả lời đúng và nhận được:", inline=False)
                 embed.add_field(name=f"", value=f"> {EmojiCreation2.GOLDEN_GIFT_BOX.value}: **{amount}** {emoji}", inline=False)
                 embed.set_footer(text=f"Hỏi Nhanh Có Thưởng sẽ xuất hiện ngẫu nhiên, và khi thấy thì nhớ trả lời đúng nhé!", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/8fd7278827dbc92713e315ee03e0b502.webp?size=32")
-                await channel.send(embed=embed, view=None)
+                view = SelfDestructView()
+                m = await channel.send(embed=embed, view=view)
+                view.message = m
             except Exception:
                 return
         else:

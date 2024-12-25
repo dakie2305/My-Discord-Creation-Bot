@@ -6,4 +6,6 @@ class SelfDestructView(discord.ui.View):
         
     async def on_timeout(self):
         #Xoá message
-        if self.message != None: await self.message.delete()
+        if self.message != None:
+            try: await self.message.delete()
+            except Exception: return
