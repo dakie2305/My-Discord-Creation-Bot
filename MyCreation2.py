@@ -538,14 +538,8 @@ async def on_ready():
         automatic_speak_randomly.start()
         random_dropbox.start()
         random_quizz_embed.start()
-    remove_old_conversation.start()
-    love_point_rank_reducing_task.start()
-    clear_up_data_task.start()
-    #Load extension
-    for ext in init_extension:
-        await bot.load_extension(ext)
-    
-    activity = discord.Activity(type=discord.ActivityType.watching, 
+        
+        activity = discord.Activity(type=discord.ActivityType.watching, 
                                 name="True Heavens",
                                 state = "Dùng lệnh /help để biết thêm thông tin",
                                 details = "Kiểm tra profile của từng người..",
@@ -555,7 +549,15 @@ async def on_ready():
                                             "small_image": "00107-3430954361-photoroom",
                                             "small_text": "Join My True Heaven",
                                         })
-    await bot.change_presence(status=discord.Status.online, activity=activity)
+        await bot.change_presence(status=discord.Status.online, activity=activity)
+    remove_old_conversation.start()
+    love_point_rank_reducing_task.start()
+    clear_up_data_task.start()
+    #Load extension
+    for ext in init_extension:
+        await bot.load_extension(ext)
+    
+    
 
 @bot.event
 async def on_message(message: discord.Message):
@@ -719,6 +721,7 @@ init_extension = ["cogs.games.RockPaperScissorCog",
                   "cogs.economy.GiftCog",
                   "cogs.economy.InventoryCog",
                   "cogs.economy.CoupleCog",
+                  "cogs.economy.GaCog",
                   
                   "cogs.misc.HelpCog",
                   ]
