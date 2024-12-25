@@ -191,6 +191,10 @@ class EmojiCreation2(Enum):
     BLIZZARD = "<:blizzard:1320096021962952725>"
     TELEKINESIS = "<:Telekinesis:1320096030192308366>"
     
+    HP = "<:HP:1320777603358920724>"
+    MP = "<:MP:1320777612926386256>"
+    STAMINA = "<:stamina:1320777620874592288>"
+    
     
     
 class EmojiCreation1(Enum):

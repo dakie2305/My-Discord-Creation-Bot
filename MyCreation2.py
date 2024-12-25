@@ -368,10 +368,12 @@ async def love_point_rank_reducing_task():
             two_weeks_after = datetime.now() + timedelta(weeks=2)
             delete_check = 0
             if couple.last_fight_action == None and couple.last_love_action == None: delete_check +=1
-            if couple.last_fight_action != None and couple.last_fight_action < two_weeks_ago: delete_check +=1
-            if couple.last_love_action != None and couple.last_love_action < two_weeks_ago: delete_check +=1
+            if couple.last_love_action != None and couple.last_love_action + timedelta(weeks=2) < datetime.now(): delete_check +=1
+            if couple.last_fight_action != None and couple.last_fight_action + timedelta(weeks=2) < datetime.now(): delete_check +=1
             if couple.love_point == 0: delete_check +=1
-            if couple.date_created < two_weeks_after: delete_check -=1
+            if couple.love_point == 0 and couple.love_progressing == 0: delete_check +=1
+            #Mới tạo trong vòng 2 tuần không cần check
+            if couple.date_created + timedelta(weeks=2) > datetime.now(): delete_check -=2
             if couple.love_rank == 20: delete_check = -99
             #Nếu đạt trên ba tiêu chí trên thì xoá
             if delete_check >= 3:
@@ -536,14 +538,8 @@ async def on_ready():
         automatic_speak_randomly.start()
         random_dropbox.start()
         random_quizz_embed.start()
-    remove_old_conversation.start()
-    love_point_rank_reducing_task.start()
-    clear_up_data_task.start()
-    #Load extension
-    for ext in init_extension:
-        await bot.load_extension(ext)
-    
-    activity = discord.Activity(type=discord.ActivityType.watching, 
+        
+        activity = discord.Activity(type=discord.ActivityType.watching, 
                                 name="True Heavens",
                                 state = "Dùng lệnh /help để biết thêm thông tin",
                                 details = "Kiểm tra profile của từng người..",
@@ -553,7 +549,15 @@ async def on_ready():
                                             "small_image": "00107-3430954361-photoroom",
                                             "small_text": "Join My True Heaven",
                                         })
-    await bot.change_presence(status=discord.Status.online, activity=activity)
+        await bot.change_presence(status=discord.Status.online, activity=activity)
+    remove_old_conversation.start()
+    love_point_rank_reducing_task.start()
+    clear_up_data_task.start()
+    #Load extension
+    for ext in init_extension:
+        await bot.load_extension(ext)
+    
+    
 
 @bot.event
 async def on_message(message: discord.Message):
@@ -717,6 +721,7 @@ init_extension = ["cogs.games.RockPaperScissorCog",
                   "cogs.economy.GiftCog",
                   "cogs.economy.InventoryCog",
                   "cogs.economy.CoupleCog",
+                  "cogs.economy.GaCog",
                   
                   "cogs.misc.HelpCog",
                   ]

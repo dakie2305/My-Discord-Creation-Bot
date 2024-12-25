@@ -2,6 +2,7 @@ from typing import List
 from pymongo import MongoClient
 from datetime import datetime, timedelta
 from Handling.Economy.Profile.ProfileClass import Profile
+from Handling.Economy.GA.GuardianAngelClass import GuardianAngel, GuardianAngelSkill
 import Handling.Economy.ConversionRate.ConversionRateMongoManager as ConversionRateMongoManager
 from Handling.Economy.Inventory_Shop.ItemClass import Item, list_gift_items, PlantItem
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
@@ -268,7 +269,7 @@ def update_level_progressing(guild_id:int, user_id: int, bonus_exp: int = 0):
                                                                                     }})
     return result
 
-def set_level_progressing(guild_id:int, user_id: int, level_progressing: int, level_reduction_point: int = 0):
+def reduce_level_progressing(guild_id:int, user_id: int, level_progressing: int, level_reduction_point: int = 0):
     collection = db_specific[f'profile_{guild_id}']
     existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
     if existing_data == None: return
@@ -674,3 +675,72 @@ def update_last_fishing_now(guild_id:int, user_id: int):
     result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"last_fishing": today,
                                                                                     }})
     return result
+
+#region guardian
+def set_main_guardian_profile(guild_id: int, user_id: int, guardian: GuardianAngel = None):
+    collection = db_specific[f'profile_{guild_id}']
+    existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
+    if existing_data == None: return
+    
+    if guardian:
+        result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"guardian": guardian.to_dict(),
+                                                                                    }})
+    else:
+        result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"guardian": None,
+                                                                                    }})
+    return result
+
+
+def update_main_guardian_level_progressing(guild_id:int, user_id: int, bonus_exp: int = 0):
+    collection = db_specific[f'profile_{guild_id}']
+    existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
+    if existing_data == None: return
+    if existing_data.guardian == None: return
+    
+    if existing_data.guardian.level < 10:
+        existing_data.guardian.level_progressing += 50
+    elif existing_data.guardian.level >= 10 and existing_data.guardian.level < 25:
+        existing_data.guardian.level_progressing += 45
+    elif existing_data.guardian.level >= 25 and existing_data.guardian.level < 50:
+        existing_data.guardian.level_progressing += 45
+    elif existing_data.guardian.level >= 50 and existing_data.guardian.level < 75:
+        existing_data.guardian.level_progressing += 35
+    elif existing_data.guardian.level >= 75 and existing_data.guardian.level < 99:
+        existing_data.guardian.level_progressing += 30
+    elif existing_data.guardian.level == 99:
+        #Cực khó sau level 99
+        existing_data.guardian.level_progressing += 1
+        bonus_exp = 0
+    
+    if bonus_exp < 0: bonus_exp = 0
+    #Cộng thêm bonus nếu có
+    existing_data.guardian.level_progressing += bonus_exp
+    
+    if existing_data.guardian.level_progressing >= 1000:
+        lp = existing_data.guardian.level_progressing
+        existing_data.guardian.level_progressing =  lp - 1000
+        existing_data.guardian.level += 1
+        existing_data.guardian.stats_point += 1
+    
+    result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"guardian.level_progressing": existing_data.guardian.level_progressing,
+                                                                                    "guardian.level": existing_data.guardian.level,
+                                                                                    "guardian.stats_point": existing_data.guardian.stats_point,
+                                                                                    }})
+    return result
+
+def update_main_guardian_profile_time(guild_id: int, user_id: int, data_type: str, date_value: datetime = None):
+    collection = db_specific[f'profile_{guild_id}']
+    existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
+    if existing_data == None: return
+    
+    if data_type == "time_to_recover":
+        result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"guardian.time_to_recover": date_value,
+                                                                                    }})
+    elif data_type == "last_feed":
+        result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"guardian.last_feed": date_value,
+                                                                                    }})
+    elif data_type == "last_meditation":
+        result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"guardian.last_meditation": date_value,
+                                                                                    }})
+        
+    return

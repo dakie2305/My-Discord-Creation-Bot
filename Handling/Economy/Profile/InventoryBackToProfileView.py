@@ -6,7 +6,9 @@ from CustomEnum.EmojiEnum import EmojiCreation2
 from typing import List, Optional, Dict
 from Handling.Economy.Inventory_Shop.ItemClass import Item, list_gift_items
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
+import Handling.Economy.GA.ListGAAndSkills as ListGAAndSkills
 from datetime import datetime, timedelta
+import random
 
 class ProfileToInventoryView(discord.ui.View):
     def __init__(self, profile: Profile):
@@ -22,6 +24,12 @@ class ProfileToInventoryView(discord.ui.View):
             self.gard_button = discord.ui.Button(label="Khu Vườn", style=discord.ButtonStyle.primary)
             self.gard_button.callback = self.garden_button_function
             self.add_item(self.gard_button)
+        
+        if profile.guardian != None:
+            self.guardian_button = discord.ui.Button(label="Hộ Vệ Thần", style=discord.ButtonStyle.primary)
+            self.guardian_button.callback = self.guardian_button_function
+            self.add_item(self.guardian_button)
+        
         
     # @discord.ui.button(label="Kho Đồ", style=discord.ButtonStyle.primary)
     async def inventory_button_function(self, interaction: discord.Interaction):
@@ -60,6 +68,50 @@ class ProfileToInventoryView(discord.ui.View):
         view.message = m
         await interaction.followup.send(f"Bạn đã chuyển sang Khu Vườn!", ephemeral=True)
 
+    async def guardian_button_function(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
+        embed = discord.Embed(title="", description=f"**Thông tin Hộ Vệ Thần của <@{self.profile.user_id}>**", color=0xddede7)
+        embed.add_field(name=f"", value=f"{self.profile.guardian.ga_emoji} - **{self.profile.guardian.ga_name}**", inline=False)
+        if self.profile.guardian.stats_point > 0:
+            embed.add_field(name=f"", value=f"Có **{self.profile.guardian.stats_point}** điểm cộng", inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+        embed.add_field(name=f"", value=f">>> **Sức tấn công** \n🦾: **{self.profile.guardian.attack_power}**", inline=False)
+        embed.add_field(name=f"", value=f">>> **Máu** \n{EmojiCreation2.HP.value}: {self.profile.guardian.health}/{self.profile.guardian.max_health}", inline=False)
+        embed.add_field(name=f"", value=f">>> **Mana** \n{EmojiCreation2.MP.value}: {self.profile.guardian.mana}/{self.profile.guardian.max_mana}", inline=False)
+        embed.add_field(name=f"", value=f">>> **Thể lực** \n{EmojiCreation2.STAMINA.value}: {self.profile.guardian.stamina}/{self.profile.guardian.max_stamina}", inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+        embed.add_field(name=f"", value=f"Cấp bậc: **{UtilitiesFunctions.get_text_on_guardian_level(self.profile.guardian.level)}** [{self.profile.guardian.level}]", inline=False)
+        bar_progress = UtilitiesFunctions.progress_bar(input_value= self.profile.guardian.level_progressing)
+        embed.add_field(name=f"", value=f"{bar_progress}\n", inline=False)
+        if self.profile.guardian.list_skills != None and len(self.profile.guardian.list_skills)>0:
+            count = 0
+            embed.add_field(name=f"", value=f"Đang sở hữu **{len(self.profile.guardian.list_skills)}** kỹ năng!", inline=False)
+            for skill in self.profile.guardian.list_skills:
+                embed.add_field(name=f"", value=f"[{skill.emoji} - **{skill.skill_name}**]", inline=True)
+                count += 1
+                if count > 6:
+                    embed.add_field(name=f"", value=f"\nNgoài ra còn nhiều kỹ năng khác!", inline=False)
+                    break
+        embed.set_footer(text=f"Đừng quên, mọi Hộ Vệ Thần đều có tỉ lệ chết vĩnh viễn nếu trọng thương nhé!", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/9e8749a5a47cae53211484d7aee42040.webp?size=100&quot")
+        view = InventoryBackToProfileView(profile=self.profile)
+        try:
+            #Gắn link background dựa trên id của guardian nếu có
+            urls = ListGAAndSkills.get_list_back_ground_on_ga_id(self.profile.guardian.ga_id)
+            if urls != None and len(urls)>0:
+                url = random.choice(urls)
+                embed.set_image(url=url)
+            m = await self.message.edit(embed=embed, view = view)
+            view.message = m
+            await interaction.followup.send(f"Bạn đã chuyển sang Hộ Vệ Thần!", ephemeral=True)
+        except Exception:
+            embed.set_image(url=None)
+            m = await self.message.edit(embed=embed, view=view)
+            view.message = m
+            await interaction.followup.send(f"Bạn đã chuyển sang Hộ Vệ Thần!", ephemeral=True)
+            return
+
+    
+    
     async def on_timeout(self):
         #Delete
         if self.message != None: 

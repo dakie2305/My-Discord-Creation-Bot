@@ -31,3 +31,5 @@ class SlashCommand(Enum):
     COUPLE_FIGHT = "</couple fight:1315721623340318881>"
     
     INVENTORY_USE = "</inventory use:1315721623340318880>"
+    GA_SELL = "</ga sell:1321514401614004255>"
+    SHOP_GUARDIAN = "</shop guardian:1315721623340318878>"
