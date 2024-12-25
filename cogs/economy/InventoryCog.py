@@ -30,7 +30,7 @@ class InventoryEconomy(commands.Cog):
     inventory_group = discord.app_commands.Group(name="inventory", description="Các lệnh liên quan đến Inventory!")
     
     @inventory_group.command(name="use", description="Chọn và sử dụng vật phẩm trong kho đồ")
-    @discord.app_commands.checks.cooldown(1, 10)
+    @discord.app_commands.checks.cooldown(1, 60)
     async def inventory_use_slash_command(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=False)
         # #Không cho dùng bot nếu không phải user
@@ -430,7 +430,7 @@ class InventoryEconomy(commands.Cog):
                     if calculated_new_progressing <= 10:
                         level_reduction = 1
                         calculated_new_progressing = 990
-                    ProfileMongoManager.set_level_progressing(guild_id=interaction.guild_id,user_id=target.id,level_progressing=calculated_new_progressing, level_reduction_point=level_reduction)
+                    ProfileMongoManager.reduce_level_progressing(guild_id=interaction.guild_id,user_id=target.id,level_progressing=calculated_new_progressing, level_reduction_point=level_reduction)
             embed.add_field(name=f"", value=text, inline=False)
             embed.add_field(name=f"", value=result, inline=False)
         
@@ -463,7 +463,7 @@ class InventoryEconomy(commands.Cog):
                     if calculated_new_progressing <= 10:
                         level_reduction = 1
                         calculated_new_progressing = 990
-                    ProfileMongoManager.set_level_progressing(guild_id=interaction.guild_id,user_id=target.id,level_progressing=calculated_new_progressing, level_reduction_point=level_reduction)
+                    ProfileMongoManager.reduce_level_progressing(guild_id=interaction.guild_id,user_id=target.id,level_progressing=calculated_new_progressing, level_reduction_point=level_reduction)
             embed.add_field(name=f"", value=text, inline=False)
             embed.add_field(name=f"", value=result, inline=False)
         
@@ -570,7 +570,7 @@ class InventoryEconomy(commands.Cog):
                 if calculated_new_progressing <= 10:
                     level_reduction = 1
                     calculated_new_progressing = 990
-                ProfileMongoManager.set_level_progressing(guild_id=interaction.guild_id, user_id=interaction.user.id, level_progressing=calculated_new_progressing, level_reduction_point=level_reduction)
+                ProfileMongoManager.reduce_level_progressing(guild_id=interaction.guild_id, user_id=interaction.user.id, level_progressing=calculated_new_progressing, level_reduction_point=level_reduction)
         else:
             #10% success nếu là giáp khác
             dice = UtilitiesFunctions.get_chance(10)
@@ -605,7 +605,7 @@ class InventoryEconomy(commands.Cog):
             text = f"{interaction.user.mention} vung thẳng thanh **{user_profile.attack_item.item_name}** để đánh {target.mention} mạnh đến nỗi từng nhát chém đều như chặt đứt thần hồn lẫn hộ giáp của {target.mention}!"
             result = f"{target.mention} đã bị rìu bổ đến mức bị phế công và mất tận 10 cấp độ!"
             #trừ 10 cấp
-            ProfileMongoManager.set_level_progressing(guild_id=interaction.guild_id, user_id=target.id, level_progressing=target_profile.level_progressing, level_reduction_point=-10)
+            ProfileMongoManager.reduce_level_progressing(guild_id=interaction.guild_id, user_id=target.id, level_progressing=target_profile.level_progressing, level_reduction_point=10)
             embed.add_field(name=f"", value=text, inline=False)
             embed.add_field(name=f"", value=result, inline=False)
             
@@ -723,7 +723,7 @@ class InventoryEconomy(commands.Cog):
             #Cộng exp thêm cho người tung đòn
             ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=user_profile.user_id, bonus_exp=bonus)
             ProfileMongoManager.update_plant_date(guild_id=interaction.guild_id, user_id=target.id)
-            ProfileMongoManager.set_level_progressing(guild_id=interaction.guild_id, user_id=target.id, level_progressing=0, level_reduction_point=0)
+            ProfileMongoManager.reduce_level_progressing(guild_id=interaction.guild_id, user_id=target.id, level_progressing=0, level_reduction_point=0)
             ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, dignity_point=-1000)
             CoupleMongoManager.set_love_point_value(guild_id=interaction.guild_id, user_id=target.id, love_point=0)
             CoupleMongoManager.set_love_progressing_value(guild_id=interaction.guild_id, user_id=target.id, love_progressing=0)
