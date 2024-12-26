@@ -212,6 +212,7 @@ class ShopEconomy(commands.Cog):
         if ga_urls != None and len(ga_urls)>0:
             url= ga_urls[0]
         embed = discord.Embed(title=f"**Cửa Hàng Hộ Vệ Thần**", description=f"", color=discord.Color.blue())
+        embed.add_field(name=f"", value=f"Tỷ giá hiện tại: {shop_rate}",inline=False)
         embed.add_field(name=f"", value=f"▬▬▬▬▬▬▬▬▬▬▬▬▬▬",inline=False)
         embed.add_field(name=f"", value=f"{first_ga.ga_emoji} - **{first_ga.ga_name}**",inline=False)
         embed.add_field(name=f"", value=f"Cấp bậc: **{UtilitiesFunctions.get_text_on_guardian_level(first_ga.level)}** [{first_ga.level}]", inline=False)

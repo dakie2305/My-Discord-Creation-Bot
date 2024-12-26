@@ -38,6 +38,7 @@ class ShopGuardianView(discord.ui.View):
     def create_embed(self):
         ga = self.list_ga[self.current_page]
         embed = discord.Embed(title=f"**Cửa Hàng Hộ Vệ Thần**", description=f"", color=discord.Color.blue())
+        embed.add_field(name=f"", value=f"Tỷ giá hiện tại: {self.rate}",inline=False)
         embed.add_field(name=f"", value=f"▬▬▬▬▬▬▬▬▬▬▬▬▬▬",inline=False)
         embed.add_field(name=f"", value=f"{ga.ga_emoji} - **{ga.ga_name}**",inline=False)
         embed.add_field(name=f"", value=f"Cấp bậc: **{UtilitiesFunctions.get_text_on_guardian_level(ga.level)}** [{ga.level}]", inline=False)
@@ -46,7 +47,7 @@ class ShopGuardianView(discord.ui.View):
         embed.add_field(name=f"", value=f"Thể lực: \n{EmojiCreation2.STAMINA.value}: {ga.max_stamina}", inline=True)
         embed.add_field(name=f"", value=f"▬▬▬▬▬▬▬▬▬▬▬▬▬▬",inline=False)
         embed.add_field(name=f"", value=f"Giá: **{int(ga.worth_amount* self.rate)}** {UtilitiesFunctions.get_emoji_from_loai_tien(ga.worth_type)}",inline=False)
-        embed.set_footer(text=f"Trang 1/{len(self.list_ga)}")
+        embed.set_footer(text=f"Trang {self.current_page+1}/{len(self.list_ga)}")
         
         ga_urls = ListGAAndSkills.get_list_back_ground_on_ga_id(ga.ga_id)
         url = None
