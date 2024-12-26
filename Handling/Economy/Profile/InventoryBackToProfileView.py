@@ -122,7 +122,7 @@ class ProfileToInventoryView(discord.ui.View):
                 if isinstance(item, discord.ui.Select):
                     item.disabled = True
             try:
-                await self.message.edit(view=self)
+                await self.message.edit(view=None)
             except Exception:
                 return
         
@@ -142,7 +142,7 @@ class InventoryBackToProfileView(discord.ui.View):
                 if isinstance(item, discord.ui.Select):
                     item.disabled = True
             try:
-                await self.message.edit(view=self)
+                await self.message.edit(view=None)
             except Exception:
                 return
     
