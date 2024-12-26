@@ -10,9 +10,8 @@ import CustomEnum.UserEnum as UserEnum
 from typing import List, Optional, Dict
 import Handling.Economy.GA.ListGAAndSkills as ListGAAndSkills
 from Handling.Economy.GA.GuardianAngelClass import GuardianAngel, GuardianAngelSkill
-from Handling.Economy.GA.ShopGuardianView import ShopGuardianView
 from Handling.Economy.GA.ConfirmSellGuardianView import ConfirmSellGuardianView
-from Handling.Economy.Inventory_Shop.ShopGlobalView import ShopGlobalView
+from Handling.Economy.GA.RankUpView import RankUpView
 import Handling.Economy.ConversionRate.ConversionRateMongoManager as ConversionRateMongoManager
 import random
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
@@ -226,7 +225,7 @@ class GuardianAngel(commands.Cog):
             await interaction.followup.send(f"Vui lòng mua Hộ Vệ Thần trước bằng lệnh {SlashCommand.SHOP_GUARDIAN.value} đã!", ephemeral=True)
             return
         elif user_profile.guardian.stats_point == 0:
-            await interaction.followup.send(f"Hộ Vệ Thần của bạn không có điểm cộng nào hết!", ephemeral=True)
+            await interaction.followup.send(f"Hộ Vệ Thần của bạn không có điểm cộng nào hết! Hãy dùng các lệnh như {SlashCommand.GA_FEED.value}, {SlashCommand.GA_MEDITATE.value} để nâng cấp cho Hộ Vệ Thần", ephemeral=True)
             return
         
         embed = discord.Embed(title=f"", description=f"Nâng điểm chỉ số Hộ Vệ Thần", color=0x0ce7f2)
@@ -236,4 +235,7 @@ class GuardianAngel(commands.Cog):
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} **1** điểm cộng có thể nâng **5** điểm chỉ số Máu, Thể Lực, Mana", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
         embed.add_field(name=f"", value=f"> Số điểm cộng hiện tại: **{user_profile.guardian.stats_point}**", inline=False)
-        
+        view = RankUpView(user_profile=user_profile, user=interaction.user)
+        mess = await interaction.followup.send(embed=embed, view=view)
+        view.message = mess
+        return

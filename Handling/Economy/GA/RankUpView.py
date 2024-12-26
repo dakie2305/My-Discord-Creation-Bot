@@ -49,10 +49,8 @@ class RankUpView(discord.ui.View):
     
     @discord.ui.button(label="💱 Nâng Cấp", style=discord.ButtonStyle.green)
     async def submit_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-            # await interaction.response.defer(ephemeral=True)
             if interaction.user.id != self.user.id: return
             await interaction.response.send_modal(TextInputModal(selected_value= self.selected_value))
-            # await interaction.followup.send(view=TextInputView())
 
 
 # Create a custom modal for text input
@@ -112,7 +110,7 @@ class TextInputModal(discord.ui.Modal):
                 ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id,user_id=interaction.user.id, max_stamina=point, stamina= user_profile.guardian.max_stamina+point)
             #Trừ điểm stats point
             ProfileMongoManager.set_guardian_stats_points(guild_id=interaction.guild_id,user_id=interaction.user.id, stats_point=-amount)
-            await interaction.followup.send(f"{interaction.user.mention} đã dùng **{amount}** điểm nâng cấp để nâng **{point}** chỉ số {text} cho Hộ Vệ Thần của bản thân!", ephemeral=True)
+            await interaction.followup.send(f"{interaction.user.mention} đã dùng **{amount}** điểm nâng cấp để nâng **{point}** chỉ số {text} cho Hộ Vệ Thần của bản thân!", ephemeral=False)
         except ValueError:
             await interaction.followup.send(f"Chỉ nhập số hợp lệ!", ephemeral=True)
             return
