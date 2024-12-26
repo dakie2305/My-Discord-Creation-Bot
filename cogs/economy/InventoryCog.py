@@ -61,6 +61,15 @@ class InventoryEconomy(commands.Cog):
             view.message = mess
             return
         
+        if user_profile.last_attack_item_used != None:
+            time_window = timedelta(minutes=2)
+            check = UtilitiesFunctions.check_if_within_time_delta(input=user_profile.last_attack_item_used, time_window=time_window)
+            if check:
+                embed = discord.Embed(title=f"", description=f"🚫 Vui lòng đợi hai phút thì hãy sử dụng lại lệnh này!", color=0xc379e0)
+                view = SelfDestructView(timeout=120)
+                mess = await interaction.followup.send(embed=embed, view=view, ephemeral=False)
+                view.message = mess
+                return
         
         embed = discord.Embed(title=f"", description=f"Menu Sử Dụng Vật Phẩm", color=0xddede7)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
@@ -114,6 +123,7 @@ class InventoryEconomy(commands.Cog):
             view.message = mess
             return
         
+        
         #Phải tồn tại chính quyền server thì mới làm được
         authority = ProfileMongoManager.get_authority(guild_id=interaction.guild.id)
         if authority == None:
@@ -142,6 +152,16 @@ class InventoryEconomy(commands.Cog):
             ProfileMongoManager.update_last_authority(guild_id=interaction.user.guild.id, user_id=authority.user_id)
             await interaction.followup.send(embed=embed)
             return
+        
+        if user_profile.last_attack_item_used != None:
+            time_window = timedelta(minutes=2)
+            check = UtilitiesFunctions.check_if_within_time_delta(input=user_profile.last_attack_item_used, time_window=time_window)
+            if check:
+                embed = discord.Embed(title=f"", description=f"🚫 Vui lòng đợi hai phút thì hãy sử dụng lại lệnh này!", color=0xc379e0)
+                view = SelfDestructView(timeout=120)
+                mess = await interaction.followup.send(embed=embed, view=view, ephemeral=False)
+                view.message = mess
+                return
         
         shop_rate = 1.0
         conversion_rate = ConversionRateMongoManager.find_conversion_rate_by_id(guild_id=interaction.guild_id)

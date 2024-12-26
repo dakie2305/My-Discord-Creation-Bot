@@ -26,11 +26,19 @@ class GuardianAngel(commands.Cog):
         self.bot = bot
     
     ga_group = discord.app_commands.Group(name="ga", description="Các lệnh liên quan đến Guardian Angel!")
-    #region ga slash
+    #region ga sell slash
     @ga_group.command(name="sell", description="Bán Hộ Vệ Thần hiện tại!")
     @discord.app_commands.checks.cooldown(1, 30)
     async def ga_sell_slash_command(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=False)
+        
+        #Không cho dùng bot nếu không phải user
+        if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
         
         user_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
         if user_profile == None:
@@ -59,11 +67,20 @@ class GuardianAngel(commands.Cog):
             await interaction.response.send_message(f"⏳ Lệnh đang cooldown, vui lòng thực hiện lại trong vòng {error.retry_after:.2f}s tới.", ephemeral=True)
         else:
             await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
-            
+    
+    #region ga meditate slash
     @ga_group.command(name="meditate", description="Cho Hộ Vệ Thần tu thiền để hồi phục thể lực và tăng kinh nghiệm!")
     @discord.app_commands.checks.cooldown(1, 15)
     async def ga_meditate_slash_command(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=False)
+        
+        #Không cho dùng bot nếu không phải user
+        if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
         
         user_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
         if user_profile == None:
@@ -111,10 +128,19 @@ class GuardianAngel(commands.Cog):
         else:
             await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
     
+    #region ga feed slash
     @ga_group.command(name="feed", description="Cho Hộ Vệ Thần ăn để hồi phục!")
     @discord.app_commands.checks.cooldown(1, 15)
     async def ga_feed_slash_command(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=False)
+        
+        #Không cho dùng bot nếu không phải user
+        if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
         
         user_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
         if user_profile == None:
@@ -168,6 +194,7 @@ class GuardianAngel(commands.Cog):
         ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id,user_id=interaction.user.id, guild_name="", user_display_name="", user_name="", dignity_point=dignity_point)
         ProfileMongoManager.update_main_guardian_profile_time(guild_id=interaction.guild_id,user_id=interaction.user.id, data_type="last_feed", date_value=datetime.now())
         ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id,user_id=interaction.user.id, health=health, stamina=stamina)
+        ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id,user_id=interaction.user.id, user_display_name="", user_name="", guild_name="", item=chosen_item, amount=-1)
         await interaction.followup.send(embed=embed)
         
     @ga_feed_slash_command.error
@@ -177,4 +204,36 @@ class GuardianAngel(commands.Cog):
         else:
             await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
         
-    
+    #region ga rankup slash
+    @ga_group.command(name="rankup", description="Nâng cấp chỉ số cho Hộ Vệ Thần!")
+    @discord.app_commands.checks.cooldown(1, 15)
+    async def ga_feed_slash_command(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=False)
+        
+        #Không cho dùng bot nếu không phải user
+        if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
+        
+        user_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
+        if user_profile == None:
+            await interaction.followup.send(f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True)
+            return
+        elif user_profile.guardian == None:
+            await interaction.followup.send(f"Vui lòng mua Hộ Vệ Thần trước bằng lệnh {SlashCommand.SHOP_GUARDIAN.value} đã!", ephemeral=True)
+            return
+        elif user_profile.guardian.stats_point == 0:
+            await interaction.followup.send(f"Hộ Vệ Thần của bạn không có điểm cộng nào hết!", ephemeral=True)
+            return
+        
+        embed = discord.Embed(title=f"", description=f"Nâng điểm chỉ số Hộ Vệ Thần", color=0x0ce7f2)
+        embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
+        embed.add_field(name=f"", value=f"Chọn chỉ số để nâng cấp Hộ Vệ Thần {user_profile.guardian.ga_emoji} - **{user_profile.guardian.ga_name}**", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} **1** điểm cộng có thể nâng **10** điểm tấn công", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} **1** điểm cộng có thể nâng **5** điểm chỉ số Máu, Thể Lực, Mana", inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
+        embed.add_field(name=f"", value=f"> Số điểm cộng hiện tại: **{user_profile.guardian.stats_point}**", inline=False)
+        
