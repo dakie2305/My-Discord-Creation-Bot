@@ -458,7 +458,8 @@ class InventoryEconomy(commands.Cog):
                     ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, silver= -lost_money)
                 else:
                     #Trừ rank
-                    target_profile.level_progressing -= 150
+                    old_progressing = target_profile.level_progressing
+                    calculated_new_progressing = old_progressing - 150
                     level_reduction = 0
                     if calculated_new_progressing <= 10:
                         level_reduction = 1
