@@ -744,3 +744,38 @@ def update_main_guardian_profile_time(guild_id: int, user_id: int, data_type: st
                                                                                     }})
         
     return
+
+def update_guardian_stats(guild_id:int, user_id: int, health: int = 0, max_health: int = 0, mana: int = 0, max_mana = 0, stamina: int = 0, max_stamina: int = 0):
+    collection = db_specific[f'profile_{guild_id}']
+    existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
+    if existing_data == None: return
+    if existing_data.guardian == None: return
+    
+    existing_data.guardian.health += health
+    if existing_data.guardian.health <= 0: existing_data.guardian.health = 0
+    existing_data.guardian.max_health += max_health
+    
+    if existing_data.guardian.max_health <= 0: existing_data.guardian.max_health = 0
+    existing_data.guardian.mana += mana
+    if existing_data.guardian.mana <= 0: existing_data.guardian.mana = 0
+    existing_data.guardian.max_mana += max_mana
+    if existing_data.guardian.max_mana <= 0: existing_data.guardian.max_mana = 0
+    existing_data.guardian.stamina += stamina
+    if existing_data.guardian.stamina <= 0: existing_data.guardian.stamina = 0
+    existing_data.guardian.max_stamina += max_stamina
+    if existing_data.guardian.max_stamina <= 0: existing_data.guardian.max_stamina = 0
+    
+    if existing_data.guardian.health > existing_data.guardian.max_health: existing_data.guardian.health = existing_data.guardian.max_health
+    if existing_data.guardian.mana > existing_data.guardian.max_mana: existing_data.guardian.mana = existing_data.guardian.max_mana
+    if existing_data.guardian.stamina > existing_data.guardian.max_stamina: existing_data.guardian.stamina = existing_data.guardian.max_stamina
+    
+    
+    result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"guardian.health": existing_data.guardian.health,
+                                                                                    "guardian.max_health": existing_data.guardian.max_health,
+                                                                                    "guardian.mana": existing_data.guardian.mana,
+                                                                                    "guardian.max_mana": existing_data.guardian.max_mana,
+                                                                                    "guardian.stamina": existing_data.guardian.stamina,
+                                                                                    "guardian.max_stamina": existing_data.guardian.max_stamina,
+                                                                                    }})
+    return result
+    
