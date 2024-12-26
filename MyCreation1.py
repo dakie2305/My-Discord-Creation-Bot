@@ -165,12 +165,16 @@ async def process_reset_word_matching(message: discord.Message, word_matching_ch
 @app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
 async def wm_give_skill(ctx, item_id: str = None, user: Optional[discord.Member] = None):
     message: discord.Message = ctx.message
-    called_channel = message.channel
-    req_roles = ['Cai Ngục', 'Server Master']
-    has_required_role = any(role.name in req_roles for role in message.author.roles)
-    if not has_required_role and message.author.id != 315835396305059840:
-        await ctx.send("Không đủ thẩm quyền để dùng lệnh.")
+    if message.guild.id == 1256987900277690470:
+        req_roles = ['Cai Ngục', 'Server Master']
+        has_required_role = any(role.name in req_roles for role in message.author.roles)
+        if not has_required_role and message.author.id != 315835396305059840:
+            await ctx.send("Không đủ thẩm quyền để dùng lệnh.")
+            return
+    elif message.guild.owner_id != message.author.id:
+        await ctx.send("Không đủ thẩm quyền để dùng lệnh. Chỉ Server Owner mới được dùng lệnh này")
         return
+    called_channel = message.channel
     #Kiểm tra xem ở đây là bảng channel nối từ hay không
     word_matching_channel = db.find_word_matching_info_by_id(channel_id= called_channel.id, guild_id= called_channel.guild.id, language= 'en')
     if word_matching_channel:
@@ -210,12 +214,16 @@ async def wm_give_skill(ctx, item_id: str = None, user: Optional[discord.Member]
 @app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
 async def wm_give_ban(ctx, user: discord.Member, ban_amount: int):
     message: discord.Message = ctx.message
-    called_channel = message.channel
-    req_roles = ['Cai Ngục', 'Server Master']
-    has_required_role = any(role.name in req_roles for role in message.author.roles)
-    if not has_required_role and message.author.id != 315835396305059840:
-        await ctx.send("Không đủ thẩm quyền để dùng lệnh.")
+    if message.guild.id == 1256987900277690470:
+        req_roles = ['Cai Ngục', 'Server Master']
+        has_required_role = any(role.name in req_roles for role in message.author.roles)
+        if not has_required_role and message.author.id != 315835396305059840:
+            await ctx.send("Không đủ thẩm quyền để dùng lệnh.")
+            return
+    elif message.guild.owner_id != message.author.id:
+        await ctx.send("Không đủ thẩm quyền để dùng lệnh. Chỉ Server Owner mới được dùng lệnh này")
         return
+    called_channel = message.channel
     if ban_amount is None or user is None:
             await ctx.send(f"Dùng sai câu lệnh. Vui lòng dùng câu lệnh đúng format sau.\n!give_ban @User 1")
             return
@@ -1134,11 +1142,6 @@ async def delete_message_context(interaction: discord.Interaction, message: disc
 @app_commands.describe(user="Chọn user đã phạm luật để báo cáo", reason="Lý do tại sao báo cáo", message_id= "Chuột phải vào message muốn xoá, vào bấm Copy Id rồi dán vào đây", image = "Chọn hình làm bằng chứng (sẽ xử lý nhanh hơn).")
 async def report(interaction: discord.Interaction, user : discord.Member, reason: str, message_id: Optional[str] = None, image: Optional[discord.Attachment] = None):
     await interaction.response.defer(ephemeral=True)
-    req_roles = ['Thần Dân', 'Supervisor', 'Server Master', 'Moderator', 'Ultimate Admins']
-    has_required_role = any(role.name in req_roles for role in interaction.user.roles)
-    if not has_required_role:
-        await interaction.followup.send("Không đủ thẩm quyền để thực hiện lệnh. Phải có role 'Thần Dân'.")
-        return
     try:
         await interaction.followup.send(f"Đã thành công gửi báo cáo {user.mention} về cho dàn admin và moderator xem xét với lý do: {reason}.", ephemeral=True)
         channel = bot.get_channel(1257004337989943370) #great-hall
@@ -1217,44 +1220,6 @@ async def bxh_noi_tu(interaction: discord.Interaction, user: Optional[discord.Me
             await interaction.followup.send(embed= embed)
         else:
             await interaction.followup.send(f"Đây không phải là channel dùng để chơi nối từ. Chỉ dùng lệnh này trong channel chơi nối từ thôi!")
-
-
-#region Verify
-@bot.tree.command(name="verify_user", description="Xác minh user.", guild=discord.Object(id=1256987900277690470))
-@app_commands.describe(user="Chọn user cần xác minh")
-async def verify(interaction: discord.Interaction, user: discord.Member):
-    await interaction.response.defer()
-    req_roles = ['Supervisor', 'Server Master', 'Moderator', 'Ultimate Admins']
-    has_required_role = any(role.name in req_roles for role in interaction.user.roles)
-    if not has_required_role:
-        await interaction.followup.send("Không đủ thẩm quyền để thực hiện lệnh.")
-        return
-    for role in user.roles:
-        if role.name == "Thần Dân":
-            await interaction.followup.send("User đã được xác minh rồi.")
-            return
-    #Add role Thần Dân
-    verify_role = discord.utils.get(user.guild.roles, name="Thần Dân")
-    await user.add_roles(verify_role)
-    await interaction.followup.send(f"Đã xác minh user {user.mention} thành công.")
-
-#region Unverify
-@bot.tree.command(name="unverify_user", description="Huỷ xác minh user.", guild=discord.Object(id=1256987900277690470))
-@app_commands.describe(user="Chọn user cần huỷ xác minh")
-async def verify(interaction: discord.Interaction, user: discord.Member):
-    await interaction.response.defer(ephemeral=True)
-    req_roles = ['Supervisor', 'Server Master', 'Moderator', 'Ultimate Admins']
-    has_required_role = any(role.name in req_roles for role in interaction.user.roles)
-    if not has_required_role:
-        await interaction.followup.send("Không đủ thẩm quyền để thực hiện lệnh.")
-        return
-    for role in user.roles:
-        if role.name == "Thần Dân":
-            await user.remove_roles(role)
-            await interaction.followup.send("Đã huỷ xác minh user.", ephemeral= True)
-            return
-    await interaction.followup.send(f"User {user.mention} vẫn chưa xác minh.", ephemeral= True)
-
 
 
 def get_bxh_noi_tu(interaction: discord.Interaction,lan: str, word_matching_channel: db.WordMatchingInfo, user_mention: Optional[discord.Member] = None):

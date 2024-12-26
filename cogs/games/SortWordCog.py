@@ -181,13 +181,16 @@ class SortWords(commands.Cog):
     @discord.app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
     async def sws_give_skill(self, ctx, item_id: str = None, user: Optional[discord.Member] = None):
         message: discord.Message = ctx.message
-        called_channel = message.channel
-        req_roles = ['Cai Ngục', 'Server Master']
-        has_required_role = any(role.name in req_roles for role in message.author.roles)
-        if not has_required_role and message.author.id != 315835396305059840 and message.author.id != message.guild.owner_id:
-            await ctx.send("Không đủ thẩm quyền để dùng lệnh.")
+        if message.guild.id == 1256987900277690470:
+            req_roles = ['Cai Ngục', 'Server Master']
+            has_required_role = any(role.name in req_roles for role in message.author.roles)
+            if not has_required_role and message.author.id != 315835396305059840:
+                await ctx.send("Không đủ thẩm quyền để dùng lệnh.")
+                return
+        elif message.guild.owner_id != message.author.id:
+            await ctx.send("Không đủ thẩm quyền để dùng lệnh. Chỉ Server Owner mới được dùng lệnh này")
             return
-        
+        called_channel = message.channel
         if item_id is None or user is None:
             await ctx.send(f"Dùng sai câu lệnh. Vui lòng dùng câu lệnh đúng format sau.\n!sws_give_skill skill_id @User")
             return
