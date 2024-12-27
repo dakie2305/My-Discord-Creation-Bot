@@ -113,7 +113,8 @@ class BaCaoView(discord.ui.View):
                 third_card = self.get_random_card()
                 player = PlayerCardInfo(user=self.bot,first_card=first_card, second_card=second_card, third_card=third_card)
                 self.player_list.append(player)
-            elif self.host_card == None:
+            
+            if self.host_card == None:
                 await self.message.edit(embed=None,view= None, content= f"Nhà cái {self.user.mention} đã sủi ván bài. Số tiền đặt cược của nhà cái coi như sẽ mất hết.")
                 if self.loai_tien == "C": self.update_host_and_player_money(player=None, is_player_win=True, copper=self.so_tien)
                 if self.loai_tien == "S": self.update_host_and_player_money(player=None, is_player_win=True, silver=self.so_tien)

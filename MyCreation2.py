@@ -432,7 +432,6 @@ async def sub_function_ai_response(message: discord.Message, speakFlag: bool = T
                     await message.channel.send(f"Tính năng AI của Bot chỉ hoạt động đến 12h đêm, vui lòng đợi đến 8h sáng hôm sau.")
                     return
             elif message.guild.id == 1194106864582004849 and message.channel.id != 1264455905756446740: #Học viện 2ten/ channel #sân-chơi-creation-2
-                await message.channel.send(f"Bạn ơi vui lòng xuống <#1264455905756446740> để nói chuyện với mình nha, ở đây mình không muốn nói chuyện.")
                 return
             flag, mess = await CustomFunctions.check_message_nsfw(message, bot)
             if flag != 0:
