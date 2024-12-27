@@ -282,12 +282,14 @@ class WorkEconomy(commands.Cog):
         embed.add_field(name=f"", value="▬▬▬▬ι═══════>", inline=False)
         embed.add_field(name=f"", value=f"{interaction.user.mention} đã câu lên được: [{fishup_item.emoji} - **{fishup_item.item_name}**]!", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Mô tả: {fishup_item.item_description}", inline=False)
-        text = f"{EmojiCreation2.SHINY_POINT.value} Nhận được: "
-        if fishup_item.bonus_dignity != 0:
-            text += f"**{fishup_item.bonus_dignity}** Nhân Phẩm. "
-        if fishup_item.bonus_exp != 0:
-            text += f"**{fishup_item.bonus_exp}** Điểm Kinh Nghiệm. "
-        embed.add_field(name=f"", value=f"{text}", inline=False)
+        text = ""
+        if fishup_item.bonus_dignity != 0 and fishup_item.bonus_exp != 0:
+            text = f"{EmojiCreation2.SHINY_POINT.value} Nhận được: "
+            if fishup_item.bonus_dignity != 0:
+                text += f"**{fishup_item.bonus_dignity}** Nhân Phẩm. "
+            if fishup_item.bonus_exp != 0:
+                text += f"**{fishup_item.bonus_exp}** Điểm Kinh Nghiệm. "
+            embed.add_field(name=f"", value=f"{text}", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι═══════>", inline=False)
         #Thêm item cho player
         ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, item=fishup_item, amount= 1)

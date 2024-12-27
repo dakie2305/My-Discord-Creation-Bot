@@ -41,10 +41,14 @@ class GuardianAngel(commands.Cog):
         
         user_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
         if user_profile == None:
-            await interaction.followup.send(f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True)
+            view = SelfDestructView(timeout=30)
+            mess = await interaction.followup.send(content=f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True, view=view)
+            view.message = mess
             return
         elif user_profile.guardian == None:
-            await interaction.followup.send(f"Vui lòng mua Hộ Vệ Thần trước bằng lệnh {SlashCommand.SHOP_GUARDIAN.value} đã!", ephemeral=True)
+            view = SelfDestructView(timeout=30)
+            mess = await interaction.followup.send(content=f"Vui lòng mua Hộ Vệ Thần trước bằng lệnh {SlashCommand.SHOP_GUARDIAN.value} đã!", ephemeral=True, view=view)
+            view.message = mess
             return
         #Tính toán số tiền bán hộ vệ thần
         money = int(user_profile.guardian.worth_amount * 30 / 100)
@@ -83,10 +87,14 @@ class GuardianAngel(commands.Cog):
         
         user_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
         if user_profile == None:
-            await interaction.followup.send(f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True)
+            view = SelfDestructView(timeout=30)
+            mess = await interaction.followup.send(content=f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True, view=view)
+            view.message = mess
             return
         elif user_profile.guardian == None:
-            await interaction.followup.send(f"Vui lòng mua Hộ Vệ Thần trước bằng lệnh {SlashCommand.SHOP_GUARDIAN.value} đã!", ephemeral=True)
+            view = SelfDestructView(timeout=30)
+            mess = await interaction.followup.send(content=f"Vui lòng mua Hộ Vệ Thần trước bằng lệnh {SlashCommand.SHOP_GUARDIAN.value} đã!", ephemeral=True, view=view)
+            view.message = mess
             return
         
         if user_profile.guardian.last_meditation != None:
@@ -143,13 +151,19 @@ class GuardianAngel(commands.Cog):
         
         user_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
         if user_profile == None:
-            await interaction.followup.send(f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True)
+            view = SelfDestructView(timeout=30)
+            mess = await interaction.followup.send(content=f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True, view=view)
+            view.message = mess
             return
         elif user_profile.guardian == None:
-            await interaction.followup.send(f"Vui lòng mua Hộ Vệ Thần trước bằng lệnh {SlashCommand.SHOP_GUARDIAN.value} đã!", ephemeral=True)
+            view = SelfDestructView(timeout=30)
+            mess = await interaction.followup.send(content=f"Vui lòng mua Hộ Vệ Thần trước bằng lệnh {SlashCommand.SHOP_GUARDIAN.value} đã!", ephemeral=True, view=view)
+            view.message = mess
             return
         elif user_profile.list_items == None or len(user_profile.list_items) ==0:
-            await interaction.followup.send(f"Vui lòng trồng trái cây bằng lệnh {SlashCommand.WORK_PLANTING.value} để kiếm thức ăn!", ephemeral=True)
+            view = SelfDestructView(timeout=30)
+            mess = await interaction.followup.send(content=f"Vui lòng trồng trái cây bằng lệnh {SlashCommand.WORK_PLANTING.value} để kiếm thức ăn!", ephemeral=True, view=view)
+            view.message = mess
             return
         
         allowed_item_id = ["wheat","potato", "corn", "watermelon", "weed", "g_pocky","g_chocolate", "g_stcake"]
@@ -159,7 +173,9 @@ class GuardianAngel(commands.Cog):
                 chosen_item = item
                 break
         if chosen_item == None:
-            await interaction.followup.send(f"Vui lòng trồng trái cây bằng lệnh {SlashCommand.WORK_PLANTING.value} hoặc mua thức ăn!", ephemeral=True)
+            view = SelfDestructView(timeout=30)
+            mess = await interaction.followup.send(content=f"Vui lòng trồng trái cây bằng lệnh {SlashCommand.WORK_PLANTING.value} hoặc mua thức ăn!", ephemeral=True, view=view)
+            view.message = mess
             return
         
         if user_profile.guardian.last_feed != None:
@@ -179,13 +195,16 @@ class GuardianAngel(commands.Cog):
         stamina = int(user_profile.guardian.max_stamina*50/100)
         random_bonus_exp = chosen_item.bonus_exp
         dignity_point = 5
+        if chosen_item.item_id == "weed":
+            dignity_point = 0
         embed = discord.Embed(title=f"", description=f"Cho ăn", color=0x0ce7f2)
         embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
         embed.add_field(name=f"", value=f"Hộ Vệ Thần {user_profile.guardian.ga_emoji} - **{user_profile.guardian.ga_name}** đã ăn [{chosen_item.emoji} - **{chosen_item.item_name}**]", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Hồi phục **{health}** {EmojiCreation2.HP.value} máu!", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Hồi phục **{stamina}** {EmojiCreation2.STAMINA.value} thể lực!", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Cộng **{random_bonus_exp}** điểm EXP cho Hộ Vệ Thần!", inline=False)
-        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Cộng **{dignity_point}** nhân phẩm!", inline=False)
+        if dignity_point != 0:
+            embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Cộng **{dignity_point}** nhân phẩm!", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
         
         ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id,user_id=interaction.user.id)
@@ -219,13 +238,19 @@ class GuardianAngel(commands.Cog):
         
         user_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
         if user_profile == None:
-            await interaction.followup.send(f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True)
+            view = SelfDestructView(timeout=30)
+            mess = await interaction.followup.send(content=f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True, view=view)
+            view.message = mess
             return
         elif user_profile.guardian == None:
-            await interaction.followup.send(f"Vui lòng mua Hộ Vệ Thần trước bằng lệnh {SlashCommand.SHOP_GUARDIAN.value} đã!", ephemeral=True)
+            view = SelfDestructView(timeout=30)
+            mess = await interaction.followup.send(content=f"Vui lòng mua Hộ Vệ Thần trước bằng lệnh {SlashCommand.SHOP_GUARDIAN.value} đã!", ephemeral=True, view=view)
+            view.message = mess
             return
         elif user_profile.guardian.stats_point == 0:
-            await interaction.followup.send(f"Hộ Vệ Thần của bạn không có điểm cộng nào hết! Hãy dùng các lệnh như {SlashCommand.GA_FEED.value}, {SlashCommand.GA_MEDITATE.value} để nâng cấp cho Hộ Vệ Thần", ephemeral=True)
+            view = SelfDestructView(timeout=30)
+            mess = await interaction.followup.send(content=f"Hộ Vệ Thần của bạn không có điểm cộng nào hết! Hãy dùng các lệnh như {SlashCommand.GA_FEED.value}, {SlashCommand.GA_MEDITATE.value} để nâng cấp cho Hộ Vệ Thần", ephemeral=True, view=view)
+            view.message = mess
             return
         
         embed = discord.Embed(title=f"", description=f"Nâng điểm chỉ số Hộ Vệ Thần", color=0x0ce7f2)
