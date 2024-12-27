@@ -73,7 +73,7 @@ class ProfileToInventoryView(discord.ui.View):
         embed = discord.Embed(title="", description=f"**Thông tin Hộ Vệ Thần của <@{self.profile.user_id}>**", color=0xddede7)
         embed.add_field(name=f"", value=f"{self.profile.guardian.ga_emoji} - **{self.profile.guardian.ga_name}**", inline=False)
         if self.profile.guardian.stats_point > 0:
-            embed.add_field(name=f"", value=f"Có **{self.profile.guardian.stats_point}** điểm cộng", inline=False)
+            embed.add_field(name=f"", value=f"Có **{self.profile.guardian.stats_point}** điểm cộng ({SlashCommand.GA_RANKUP.value})", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
         embed.add_field(name=f"", value=f">>> **Sức tấn công** \n🦾: **{self.profile.guardian.attack_power}**", inline=False)
         embed.add_field(name=f"", value=f">>> **Máu** \n{EmojiCreation2.HP.value}: {self.profile.guardian.health}/{self.profile.guardian.max_health}", inline=False)
@@ -85,7 +85,7 @@ class ProfileToInventoryView(discord.ui.View):
         embed.add_field(name=f"", value=f"{bar_progress}\n", inline=False)
         if self.profile.guardian.list_skills != None and len(self.profile.guardian.list_skills)>0:
             count = 0
-            embed.add_field(name=f"", value=f"Đang sở hữu **{len(self.profile.guardian.list_skills)}** kỹ năng!", inline=False)
+            embed.add_field(name=f"", value=f"Đang sở hữu **{len(self.profile.guardian.list_skills)}** kỹ năng [{len(self.profile.guardian.list_skills)}/{self.profile.guardian.max_skills}]", inline=False)
             for skill in self.profile.guardian.list_skills:
                 embed.add_field(name=f"", value=f"[{skill.emoji} - **{skill.skill_name}**]", inline=True)
                 count += 1
