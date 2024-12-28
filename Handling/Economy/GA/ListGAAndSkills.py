@@ -2,7 +2,7 @@ from typing import List, Optional
 from datetime import datetime
 from Handling.Economy.GA.GuardianAngelClass import GuardianAngel, GuardianAngelSkill
 from CustomEnum.EmojiEnum import EmojiCreation2
-
+import random
 
 list_ga_shop = [
     GuardianAngel(
@@ -81,4 +81,91 @@ def get_list_back_ground_on_ga_id(ga_id: str):
       ]
     
     return background_urls
+
+def get_random_ga_enemy_generic(level: int = 1):
+    data = GuardianAngel(
+        ga_id = "enemy_generic",
+        ga_name= "",
+        ga_emoji= "",
+        stamina = 80,
+        max_stamina= 80,
+        health= 120,
+        max_health= 120,
+        mana= 90,
+        max_mana= 90,
+        buff_attack_percent = 0,
+        attack_power= 15,
+        worth_amount = 50, 
+        worth_type = "D",
+    )
     
+    list_name_emojis = [
+        ("Lính Gác", "👮"),
+        ("Binh Lính", "💂"),
+        ("Vệ Binh", "🕵️‍♂️"),
+        ("Ninja", "🥷"),
+        ("Cướp", "🦹‍♂️"),
+        ("Tướng Cướp", "🦹‍♂️"),
+        ("Zombie", "🧟‍♂️"),
+        ("Quái Zombie", "🧟‍♀️"),
+        ("Ma Nữ Zombie", "🧟"),
+        ("Sĩ Binh", "👩‍🏭"),
+        ("Địch Nhân", "🥷"),
+        ("Ma Cà Rồng", "🧛‍♂️"),
+        ("Quái Vật", "👾"),
+        ("Quái Thú", "👾"),
+        ("Tà Quỷ", "👿"),
+        ("Dâm Quỷ", "👿"),
+        ("Quỷ Dữ", "👹"),
+        ("Đại Quỷ", "👺"),
+        ("Chúa Tể Vampire", "🧛‍♂️"),
+        ("Băng Đảng Astraliệt", "👩‍🦼"),
+        ("Orge", "🧌"),
+        ("Orc", "🧌"),
+        ("Quái Nhân", "🧌"),
+        ("Pháp Sư", "🧙‍♂️"),
+        ("Đại Pháp Sư", "🧙‍♂️"),
+        ("Nhất Viên Sư", "🧙"),
+        ("Tiên Quỷ", "🧚‍♂️"),
+        ("Big Foot", "👣"),
+        ("Xác Sống", "🧟‍♂️"),
+        ("Báo Đời Đom Đóm", "🐆"),
+    ]
+    
+    #dựa trên level để tăng giảm stats của kẻ địch
+    data.level = level + 5
+    
+    percent_boost = 5
+    base = 20
+    bonus_base = 30
+    data.attack_power = base + bonus_base*int(percent_boost * level / 100) #tăng 5% mỗi level
+    
+    percent_boost = 6
+    base = 80
+    bonus_base = 80
+    data.max_stamina = base + bonus_base*int(percent_boost * level / 100)
+    data.stamina = data.max_stamina
+    
+    percent_boost = 5
+    base = 100
+    bonus_base = 110
+    data.max_health = base + bonus_base*int(percent_boost * level / 100)
+    data.health = data.max_health
+    
+    percent_boost = 5
+    base = 50
+    bonus_base = 105
+    data.max_mana = base + bonus_base*int(percent_boost * level / 100)
+    data.mana = data.max_mana
+    
+    data.buff_attack_percent = random.randint(0, 5)
+    data.bonus_dignity_point = random.randint(0, 10)
+    data.bonus_exp = random.randint(10, 50)
+    data.bonus_exp = data.bonus_exp + data.bonus_exp*int(data.level/10)
+    if data.bonus_exp > 100: data.bonus_exp = 100
+    
+    name, emoji = random.choice(list_name_emojis)
+    data.ga_name = name
+    data.ga_emoji = emoji
+    
+    return data

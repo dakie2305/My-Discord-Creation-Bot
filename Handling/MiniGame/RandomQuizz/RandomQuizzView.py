@@ -166,7 +166,7 @@ random_quizzes = [
             Quizz(
                 question="Là ai đã vẽ bức tranh nổi tiếng nàng Mona Lisa?",
                 options=["Leonardo da Vinci", "Lenardo da Vinci", "Leonardo da Vini"],
-                correct_answer="Sông Nile"
+                correct_answer="Leonardo da Vinci"
             ),
             Quizz(
                 question="Búp bê Barbie tên đầy đủ là gì?",

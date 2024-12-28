@@ -2,7 +2,7 @@ from typing import List, Optional
 from datetime import datetime
 
 class GuardianAngel:
-    def __init__(self, ga_id: str, ga_name: str, ga_emoji: str, stamina: int, max_stamina: int, health: int, max_health: int, mana: int, max_mana:int, attack_power: int = 10, buff_attack_percent: int = 0, level: int = 1, level_progressing: int = 0, stats_point: int = 0, list_skills : Optional[List['GuardianAngelSkill']] = None, max_skills: int = 1, is_injured: bool = False, time_to_recover: datetime = None, worth_amount: int = 50, worth_type: str = "D", last_feed: datetime = None, last_meditation: datetime = None):
+    def __init__(self, ga_id: str, ga_name: str, ga_emoji: str, stamina: int, max_stamina: int, health: int, max_health: int, mana: int, max_mana:int, attack_power: int = 10, buff_attack_percent: int = 0, level: int = 1, level_progressing: int = 0, stats_point: int = 0, list_skills : Optional[List['GuardianAngelSkill']] = None, max_skills: int = 1, is_injured: bool = False, time_to_recover: datetime = None, worth_amount: int = 50, worth_type: str = "D", last_feed: datetime = None, last_meditation: datetime = None, bonus_dignity_point: int = 0, bonus_exp: int = 0, last_battle: datetime = None, last_dungeon: datetime = None):
         self.ga_id = ga_id
         self.ga_name = ga_name
         self.ga_emoji = ga_emoji
@@ -20,9 +20,13 @@ class GuardianAngel:
         self.max_skills = max_skills
         self.worth_amount = worth_amount
         self.worth_type = worth_type
+        self.bonus_dignity_point = bonus_dignity_point
+        self.bonus_exp = bonus_exp
         
         self.last_feed = last_feed if last_feed else None
         self.last_meditation = last_meditation if last_meditation else None
+        self.last_battle = last_battle if last_battle else None
+        self.last_dungeon = last_dungeon if last_dungeon else None
         
         self.is_injured = is_injured
         self.time_to_recover = time_to_recover if time_to_recover else None
@@ -47,11 +51,15 @@ class GuardianAngel:
             "max_skills": self.max_skills,
             "worth_amount": self.worth_amount,
             "worth_type": self.worth_type,
+            "bonus_dignity_point": self.bonus_dignity_point,
+            "bonus_exp": self.bonus_exp,
             
             "is_injured": self.is_injured,
             "time_to_recover": self.time_to_recover if self.time_to_recover else None,
             "last_feed": self.last_feed if self.last_feed else None,
             "last_meditation": self.last_meditation if self.last_meditation else None,
+            "last_battle": self.last_battle if self.last_battle else None,
+            "last_dungeon": self.last_dungeon if self.last_dungeon else None,
             
             "list_skills": [data.to_dict() for data in self.list_skills],
         }
@@ -76,11 +84,15 @@ class GuardianAngel:
                 max_skills=data.get("max_skills", 0),
                 worth_type=data.get("worth_type", "D"),
                 worth_amount=data.get("worth_amount", 10),
+                bonus_dignity_point=data.get("bonus_dignity_point", 0),
+                bonus_exp=data.get("bonus_exp", 0),
                 
                 is_injured=data.get("is_injured", False),
                 time_to_recover=data.get("time_to_recover", None),
                 last_meditation=data.get("last_meditation", None),
                 last_feed=data.get("last_feed", None),
+                last_battle=data.get("last_battle", None),
+                last_dungeon=data.get("last_dungeon", None),
                 
                 list_skills = [GuardianAngelSkill.from_dict(data) for data in data.get("list_skills", [])],
             )
@@ -146,5 +158,8 @@ class GuardianAngelSkill:
             percent_min_stamina_req=data.get("percent_min_stamina_req", 1),
             percent_min_health_req=data.get("percent_min_health_req", 1),
             percent_min_mana_req=data.get("percent_min_mana_req", 1),
+            stamina_loss=data.get("stamina_loss", 0),
+            health_loss=data.get("health_loss", 0),
+            mana_loss=data.get("mana_loss", 0),
         )
 

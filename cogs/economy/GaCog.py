@@ -10,11 +10,14 @@ import CustomEnum.UserEnum as UserEnum
 from typing import List, Optional, Dict
 import Handling.Economy.GA.ListGAAndSkills as ListGAAndSkills
 from Handling.Economy.GA.GuardianAngelClass import GuardianAngel, GuardianAngelSkill
+from Handling.Economy.GA.GuardianAngelAttackClass import GuardianAngelAttackClass
 from Handling.Economy.GA.ConfirmSellGuardianView import ConfirmSellGuardianView
 from Handling.Economy.GA.RankUpView import RankUpView
+from Handling.Economy.GA.GaBattleView import GaBattleView
 import Handling.Economy.ConversionRate.ConversionRateMongoManager as ConversionRateMongoManager
 import random
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
+from discord.app_commands import Choice
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(GuardianAngel(bot=bot))
@@ -225,7 +228,7 @@ class GuardianAngel(commands.Cog):
     #region ga rankup slash
     @ga_group.command(name="rankup", description="Nâng cấp chỉ số cho Hộ Vệ Thần!")
     @discord.app_commands.checks.cooldown(1, 15)
-    async def ga_feed_slash_command(self, interaction: discord.Interaction):
+    async def ga_rankup_slash_command(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=False)
         
         #Không cho dùng bot nếu không phải user
@@ -264,3 +267,114 @@ class GuardianAngel(commands.Cog):
         mess = await interaction.followup.send(embed=embed, view=view)
         view.message = mess
         return
+    
+    @ga_rankup_slash_command.error
+    async def ga_rankup_slash_command_error(self, interaction: discord.Interaction, error):
+        if isinstance(error, discord.app_commands.CommandOnCooldown):
+            await interaction.response.send_message(f"⏳ Lệnh đang cooldown, vui lòng thực hiện lại trong vòng {error.retry_after:.2f}s tới.", ephemeral=True)
+        else:
+            await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
+    
+    #region ga battle slash
+    @ga_group.command(name="battle", description="Cho Hộ Vệ Thần đi chiến đấu! Nếu không chọn đối thủ sẽ đánh với bot!")
+    @discord.app_commands.describe(target="Chọn user để chiến đấu với Hộ Vệ Thần của người đó.")
+    @discord.app_commands.describe(max_players="Cho phép bấy nhiêu người gia nhập cuộc chiến.")
+    @discord.app_commands.choices(max_players=[
+        Choice(name="1", value="1"),
+        Choice(name="2", value="2"),
+        Choice(name="3", value="3"),
+    ])
+    @discord.app_commands.checks.cooldown(1, 20)
+    async def ga_battle_slash_command(self, interaction: discord.Interaction, target: Optional[discord.Member] = None, max_players: str = None):
+        await interaction.response.defer(ephemeral=False)
+        
+        if interaction.user.id != UserEnum.UserId.DARKIE.value:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Darkie chưa phát triển xong tính năng này! Vui lòng đợi nhé!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
+        
+        #Không cho dùng bot nếu không phải user
+        if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
+        
+        user_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
+        if user_profile == None:
+            view = SelfDestructView(timeout=30)
+            mess = await interaction.followup.send(content=f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True, view=view)
+            view.message = mess
+            return
+        elif user_profile.guardian == None:
+            view = SelfDestructView(timeout=30)
+            mess = await interaction.followup.send(content=f"Vui lòng mua Hộ Vệ Thần trước bằng lệnh {SlashCommand.SHOP_GUARDIAN.value} đã!", ephemeral=True, view=view)
+            view.message = mess
+            return
+        
+        if user_profile.guardian.last_battle != None:
+            time_window = timedelta(hours=1)
+            check = UtilitiesFunctions.check_if_within_time_delta(input=user_profile.guardian.last_battle, time_window=time_window)
+            if check:
+                next_time = user_profile.guardian.last_battle + time_window
+                unix_time = int(next_time.timestamp())
+                embed = discord.Embed(title=f"", description=f"🚫 Bạn đã cho Hộ Vệ Thần chiến đấu rồi. Vui lòng thực hiện lại lệnh vào lúc <t:{unix_time}:t>!", color=0xc379e0)
+                view = SelfDestructView(timeout=120)
+                mess = await interaction.followup.send(embed=embed, view=view, ephemeral=False)
+                view.message = mess
+                return
+        
+        target_profile = None
+        if target != None:
+            target_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=target.id)
+            if target_profile == None:
+                view = SelfDestructView(timeout=30)
+                mess = await interaction.followup.send(content=f"Đối thủ {target.mention} vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True, view=view)
+                view.message = mess
+                return
+            elif target_profile.guardian == None:
+                view = SelfDestructView(timeout=30)
+                mess = await interaction.followup.send(content=f"Đối thủ {target.mention} vui lòng mua Hộ Vệ Thần trước bằng lệnh {SlashCommand.SHOP_GUARDIAN.value} đã!", ephemeral=True, view=view)
+                view.message = mess
+                return
+        is_players_versus_player = False
+        title = f""
+        if target != None:
+            is_players_versus_player = True
+            title = f"🔥 {interaction.user.mention} VS {target.mention} 🔥"
+        embed = discord.Embed(title=f"", description=title, color=0x0ce7f2)
+        
+        embed.add_field(name=f"", value=f"Hộ Vệ Thần {user_profile.guardian.ga_emoji} - **{user_profile.guardian.ga_name}** (Cấp {user_profile.guardian.level}) của {interaction.user.mention}", inline=False)
+        embed.add_field(name=f"", value=f"🦾: **{user_profile.guardian.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=user_profile.guardian.health, max_value=user_profile.guardian.max_health, emoji=EmojiCreation2.HP.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=user_profile.guardian.stamina, max_value=user_profile.guardian.max_stamina, emoji=EmojiCreation2.STAMINA.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=user_profile.guardian.mana, max_value=user_profile.guardian.max_mana, emoji=EmojiCreation2.MP.value)}", inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
+        text = ""
+        enemy: GuardianAngel = None
+        if target != None:
+            text = f"Hộ Vệ Thần {target_profile.guardian.ga_emoji} - **{target_profile.guardian.ga_name}** (Cấp {target_profile.guardian.level}) của {target.mention}"
+            embed.add_field(name=f"", value=text, inline=False)
+            embed.add_field(name=f"", value=f"🦾: **{target_profile.guardian.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=target_profile.guardian.health, max_value=target_profile.guardian.max_health, emoji=EmojiCreation2.HP.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=target_profile.guardian.stamina, max_value=target_profile.guardian.max_stamina, emoji=EmojiCreation2.STAMINA.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=target_profile.guardian.mana, max_value=target_profile.guardian.max_mana, emoji=EmojiCreation2.MP.value)}", inline=False)
+            enemy = target_profile.guardian
+        else:
+            enemy: GuardianAngel = ListGAAndSkills.get_random_ga_enemy_generic(level=user_profile.guardian.level)
+            text = f"Kẻ thù {enemy.ga_emoji} - **{enemy.ga_name}** (Cấp {enemy.level})"
+            embed.add_field(name=f"", value=text, inline=False)
+            embed.add_field(name=f"", value="", inline=False)
+            embed.add_field(name=f"", value=f"🦾: **{enemy.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.health, max_value=enemy.max_health, emoji=EmojiCreation2.HP.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.stamina, max_value=enemy.max_stamina, emoji=EmojiCreation2.STAMINA.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.mana, max_value=enemy.max_mana, emoji=EmojiCreation2.MP.value)}", inline=False)
+            
+        if max_players == None: max_players = "1"
+        max_players_as_int = int(max_players)
+        view = GaBattleView(user=interaction.user, user_profile=user_profile, target=target, target_profile=target_profile, is_players_versus_players=is_players_versus_player, max_players=max_players_as_int, enemy_ga=enemy, embed_title=title)
+        mess = await interaction.followup.send(embed=embed, view=view)
+        view.message = mess
+        await view.commence_battle()
+        return
+        
+    @ga_battle_slash_command.error
+    async def ga_battle_slash_command_error(self, interaction: discord.Interaction, error):
+        if isinstance(error, discord.app_commands.CommandOnCooldown):
+            await interaction.response.send_message(f"⏳ Lệnh đang cooldown, vui lòng thực hiện lại trong vòng {error.retry_after:.2f}s tới.", ephemeral=True)
+        else:
+            await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)

@@ -303,3 +303,14 @@ class UtilitiesFunctions():
         bar = '█' * filled_length + '░' * (bar_length - filled_length)
         # Format the output with percentage
         return f'{bar} **{int(percentage)}%**'
+
+    @staticmethod
+    def progress_bar_stat(input_value: int, max_value: int, emoji: str, bar_length=15):
+        # Calculate the percentage of progress
+        percentage = (input_value / max_value) * 100
+        # Determine the number of filled (█) characters
+        filled_length = int(bar_length * input_value // max_value)
+        # Create the progress bar string
+        bar = '█' * filled_length + '░' * (bar_length - filled_length)
+        # Format the output with percentage
+        return f'{emoji}: {bar} ({input_value}/{max_value})'
