@@ -78,18 +78,17 @@ class ShopGuardianView(discord.ui.View):
             await interaction.followup.send(f"Bạn đã có Hộ Vệ Thần rồi! Vui lòng bán Hộ Vệ Thần bằng lệnh {SlashCommand.GA_SELL.value}", ephemeral=True)
             return
         try:
-            
             cost_money = int(self.current_ga.worth_amount*self.rate)
-            if self.current_ga.worth_amount == "C" and profile_user.copper < cost_money:
+            if self.current_ga.worth_type == "C" and profile_user.copper < cost_money:
                 await interaction.followup.send(f"{interaction.user.mention}, bạn không đủ {EmojiCreation2.COPPER.value} để mua!", ephemeral=True)
                 return
-            elif self.current_ga.worth_amount == "S" and profile_user.silver < cost_money:
+            elif self.current_ga.worth_type == "S" and profile_user.silver < cost_money:
                 await interaction.followup.send(f"{interaction.user.mention}, bạn không đủ {EmojiCreation2.SILVER.value} để mua!", ephemeral=True)
                 return
-            elif self.current_ga.worth_amount == "G" and profile_user.gold < cost_money:
+            elif self.current_ga.worth_type == "G" and profile_user.gold < cost_money:
                 await interaction.followup.send(f"{interaction.user.mention}, bạn không đủ {EmojiCreation2.GOLD.value} để mua!", ephemeral=True)
                 return
-            elif self.current_ga.worth_amount == "D" and profile_user.darkium < cost_money:
+            elif self.current_ga.worth_type == "D" and profile_user.darkium < cost_money:
                 await interaction.followup.send(f"{interaction.user.mention}, bạn không đủ {EmojiCreation2.DARKIUM.value} để mua!", ephemeral=True)
                 return
             
