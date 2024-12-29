@@ -20,10 +20,10 @@ from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 from discord.app_commands import Choice
 
 async def setup(bot: commands.Bot):
-    await bot.add_cog(GuardianAngel(bot=bot))
+    await bot.add_cog(GuardianAngelCog(bot=bot))
     print("Guardian Angel is ready!")
 
-class GuardianAngel(commands.Cog):
+class GuardianAngelCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
     
@@ -288,13 +288,6 @@ class GuardianAngel(commands.Cog):
     async def ga_battle_slash_command(self, interaction: discord.Interaction, target: Optional[discord.Member] = None, max_players: str = None):
         await interaction.response.defer(ephemeral=False)
         
-        if interaction.user.id != UserEnum.UserId.DARKIE.value:
-            view = SelfDestructView(timeout=30)
-            embed = discord.Embed(title=f"Darkie chưa phát triển xong tính năng này! Vui lòng đợi nhé!",color=discord.Color.blue())
-            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
-            view.message = mess
-            return
-        
         #Không cho dùng bot nếu không phải user
         if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
             view = SelfDestructView(timeout=30)
@@ -316,7 +309,7 @@ class GuardianAngel(commands.Cog):
             return
         
         if user_profile.guardian.last_battle != None:
-            time_window = timedelta(hours=1)
+            time_window = timedelta(minutes=30)
             check = UtilitiesFunctions.check_if_within_time_delta(input=user_profile.guardian.last_battle, time_window=time_window)
             if check:
                 next_time = user_profile.guardian.last_battle + time_window
@@ -326,6 +319,21 @@ class GuardianAngel(commands.Cog):
                 mess = await interaction.followup.send(embed=embed, view=view, ephemeral=False)
                 view.message = mess
                 return
+        
+        if user_profile.guardian.time_to_recover != None:
+            if user_profile.guardian.time_to_recover > datetime.now():
+                view = SelfDestructView(timeout=30)
+                next_time = user_profile.guardian.time_to_recover
+                unix_time = int(next_time.timestamp())
+                mess = await interaction.followup.send(content=f"Hộ Vệ Thần của bạn đang bị thương! Vui lòng chờ hồi phục vào lúc <t:{unix_time}:t> hoặc mua bình hồi phục trong {SlashCommand.SHOP_GLOBAL.value}!", ephemeral=True, view=view)
+                view.message = mess
+                return
+            else:
+                #Hồi phục 50% máu, 50% thể lực
+                health = int(user_profile.guardian.max_health*50/100)
+                stamina = int(user_profile.guardian.max_stamina*50/100)
+                ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id,user_id=interaction.user.id, health=health, stamina=stamina)
+        
         
         target_profile = None
         if target != None:
@@ -340,6 +348,21 @@ class GuardianAngel(commands.Cog):
                 mess = await interaction.followup.send(content=f"Đối thủ {target.mention} vui lòng mua Hộ Vệ Thần trước bằng lệnh {SlashCommand.SHOP_GUARDIAN.value} đã!", ephemeral=True, view=view)
                 view.message = mess
                 return
+            
+            if target_profile.guardian.time_to_recover != None:
+                if target_profile.guardian.time_to_recover > datetime.now():
+                    view = SelfDestructView(timeout=30)
+                    next_time = target_profile.guardian.time_to_recover
+                    unix_time = int(next_time.timestamp())
+                    mess = await interaction.followup.send(content=f"Hộ Vệ Thần của {target.mention} đang bị thương! Vui lòng chờ hồi phục vào lúc <t:{unix_time}:t> hoặc mua bình hồi phục trong {SlashCommand.SHOP_GLOBAL.value}!", ephemeral=True, view=view)
+                    view.message = mess
+                    return
+                else:
+                    #Hồi phục 50% máu, 50% thể lực
+                    health = int(target_profile.guardian.max_health*50/100)
+                    stamina = int(target_profile.guardian.max_stamina*50/100)
+                    ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id,user_id=target.id, health=health, stamina=stamina)
+            
         is_players_versus_player = False
         title = f""
         if target != None:
@@ -349,7 +372,7 @@ class GuardianAngel(commands.Cog):
         
         embed.add_field(name=f"", value=f"Hộ Vệ Thần {user_profile.guardian.ga_emoji} - **{user_profile.guardian.ga_name}** (Cấp {user_profile.guardian.level}) của {interaction.user.mention}", inline=False)
         embed.add_field(name=f"", value=f"🦾: **{user_profile.guardian.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=user_profile.guardian.health, max_value=user_profile.guardian.max_health, emoji=EmojiCreation2.HP.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=user_profile.guardian.stamina, max_value=user_profile.guardian.max_stamina, emoji=EmojiCreation2.STAMINA.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=user_profile.guardian.mana, max_value=user_profile.guardian.max_mana, emoji=EmojiCreation2.MP.value)}", inline=False)
-        embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬▬▬ι═══════════>", inline=False)
         text = ""
         enemy: GuardianAngel = None
         if target != None:
@@ -366,8 +389,28 @@ class GuardianAngel(commands.Cog):
             
         if max_players == None: max_players = "1"
         max_players_as_int = int(max_players)
-        view = GaBattleView(user=interaction.user, user_profile=user_profile, target=target, target_profile=target_profile, is_players_versus_players=is_players_versus_player, max_players=max_players_as_int, enemy_ga=enemy, embed_title=title)
+        
+
+        #Tính reward của battle
+        gold_reward = 75
+        silver_reward = 100
+        exp_reward = 100
+        dignity_point_reward = 10
+        
+        if is_players_versus_player:
+            gold_reward = 45
+            exp_reward = 50
+            dignity_point_reward = 5
+            silver_reward = 0
+        
+        #Tính lại theo enemy_ga
+        gold_reward = int(gold_reward + gold_reward*enemy.level*0.2)
+        silver_reward = int(silver_reward + silver_reward*enemy.level*0.3)
+        exp_reward = int(exp_reward + exp_reward*enemy.level*0.1)
+            
+        view = GaBattleView(user=interaction.user, user_profile=user_profile, target=target, target_profile=target_profile, is_players_versus_players=is_players_versus_player, max_players=max_players_as_int, enemy_ga=enemy, embed_title=title, guild_id=interaction.guild_id, gold_reward=gold_reward, silver_reward=silver_reward, bonus_exp=exp_reward, dignity_point=dignity_point_reward)
         mess = await interaction.followup.send(embed=embed, view=view)
+        ProfileMongoManager.update_main_guardian_profile_time(guild_id=interaction.guild_id,user_id=interaction.user.id, data_type="last_battle", date_value=datetime.now())
         view.message = mess
         await view.commence_battle()
         return

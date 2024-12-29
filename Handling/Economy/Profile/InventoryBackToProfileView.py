@@ -71,7 +71,14 @@ class ProfileToInventoryView(discord.ui.View):
     async def guardian_button_function(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
         embed = discord.Embed(title="", description=f"**Thông tin Hộ Vệ Thần của <@{self.profile.user_id}>**", color=0xddede7)
-        embed.add_field(name=f"", value=f"{self.profile.guardian.ga_emoji} - **{self.profile.guardian.ga_name}**", inline=False)
+        
+        text_name = f"{self.profile.guardian.ga_emoji} - **{self.profile.guardian.ga_name}**"
+        if self.profile.guardian.time_to_recover != None and self.profile.guardian.time_to_recover > datetime.now():
+            next_time = self.profile.guardian.time_to_recover
+            unix_time = int(next_time.timestamp())
+            text_name += f" (Trọng thương đến <t:{unix_time}:t>)"
+        
+        embed.add_field(name=f"", value=text_name, inline=False)
         if self.profile.guardian.stats_point > 0:
             embed.add_field(name=f"", value=f"Có **{self.profile.guardian.stats_point}** điểm cộng ({SlashCommand.GA_RANKUP.value})", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)

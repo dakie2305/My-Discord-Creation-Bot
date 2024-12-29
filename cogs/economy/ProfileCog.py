@@ -13,6 +13,7 @@ import CustomEnum.UserEnum as UserEnum
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 from Handling.Economy.Profile.InventoryBackToProfileView import ProfileToInventoryView, InventoryBackToProfileView
 import Handling.Economy.Couple.CoupleMongoManager as CoupleMongoManager
+from datetime import datetime, timedelta
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(ProfileEconomy(bot=bot))
@@ -136,6 +137,14 @@ class ProfileEconomy(commands.Cog):
         data = ProfileMongoManager.find_profile_by_id(guild_id=guild_id, user_id=user.id)
         if data == None:
             data = ProfileMongoManager.create_profile(guild_id=guild_id, user_id=user.id, guild_name=user.guild.name, user_name=user.name, user_display_name=user.display_name)
+        
+        if data.guardian!= None and data.guardian.time_to_recover!= None:
+            if data.guardian.time_to_recover < datetime.now():
+                #Hồi phục 50% máu, 50% thể lực
+                health = int(data.guardian.max_health*50/100)
+                stamina = int(data.guardian.max_stamina*50/100)
+                ProfileMongoManager.update_guardian_stats(guild_id=guild_id,user_id=user.id, health=health, stamina=stamina)
+                data = ProfileMongoManager.create_profile(guild_id=guild_id, user_id=user.id, guild_name=user.guild.name, user_name=user.name, user_display_name=user.display_name)
         
         if data.is_authority and ProfileMongoManager.is_in_debt(data= data, copper_threshold=100000):
             embed = discord.Embed(title=f"", description=f"Chính Quyền đã nợ nần quá nhiều và tự sụp đổ. Hãy dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", color=0xddede7)

@@ -717,10 +717,11 @@ def update_main_guardian_level_progressing(guild_id:int, user_id: int, bonus_exp
     existing_data.guardian.level_progressing += bonus_exp
     
     if existing_data.guardian.level_progressing >= 1000:
-        lp = existing_data.guardian.level_progressing
-        existing_data.guardian.level_progressing =  lp - 1000
-        existing_data.guardian.level += 1
-        existing_data.guardian.stats_point += 1
+        while existing_data.guardian.level_progressing >= 1000:
+            lp = existing_data.guardian.level_progressing
+            existing_data.guardian.level_progressing =  lp - 1000
+            existing_data.guardian.level += 1
+            existing_data.guardian.stats_point += 1
     
     result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"guardian.level_progressing": existing_data.guardian.level_progressing,
                                                                                     "guardian.level": existing_data.guardian.level,
@@ -742,6 +743,12 @@ def update_main_guardian_profile_time(guild_id: int, user_id: int, data_type: st
     elif data_type == "last_meditation":
         result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"guardian.last_meditation": date_value,
                                                                                     }})
+    elif data_type == "last_battle":
+        result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"guardian.last_battle": date_value,
+                                                                                    }})
+    elif data_type == "last_dungeon":
+        result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"guardian.last_dungeon": date_value,
+                                                                                    }})
         
     return
 
@@ -751,10 +758,18 @@ def update_guardian_stats(guild_id:int, user_id: int, health: int = 0, max_healt
     if existing_data == None: return
     if existing_data.guardian == None: return
     
+    is_injured = False
+    time_to_recover = None
     existing_data.guardian.health += health
-    if existing_data.guardian.health <= 0: existing_data.guardian.health = 0
+    if existing_data.guardian.health <= 0: 
+        existing_data.guardian.health = 0
+        #Coi như bị thương
+        is_injured = True
+        time_to_recover = datetime.now() + timedelta(hours=3)
+        
     existing_data.guardian.max_health += max_health
-    if existing_data.guardian.max_health <= 0: existing_data.guardian.max_health = 0
+    if existing_data.guardian.max_health <= 0: 
+        existing_data.guardian.max_health = 0
     
     existing_data.guardian.mana += mana
     if existing_data.guardian.mana <= 0: existing_data.guardian.mana = 0
@@ -780,6 +795,8 @@ def update_guardian_stats(guild_id:int, user_id: int, health: int = 0, max_healt
                                                                                     "guardian.stamina": existing_data.guardian.stamina,
                                                                                     "guardian.max_stamina": existing_data.guardian.max_stamina,
                                                                                     "guardian.attack_power": existing_data.guardian.attack_power,
+                                                                                    "guardian.is_injured": is_injured,
+                                                                                    "guardian.time_to_recover": time_to_recover,
                                                                                     }})
     return result
 
