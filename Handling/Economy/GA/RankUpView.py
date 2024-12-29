@@ -87,8 +87,8 @@ class TextInputModal(discord.ui.Modal):
             
             
             amount = int(user_input)
-            point = 5
-            if self.selected_value == "attack": point = 10
+            point = 10
+            if self.selected_value == "attack": point = 5
             
             if amount > user_profile.guardian.stats_point: amount = user_profile.guardian.stats_point
             point = point*amount

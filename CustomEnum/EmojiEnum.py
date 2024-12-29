@@ -188,12 +188,21 @@ class EmojiCreation2(Enum):
     
     TATSUMAKI = "<a:tatsumaki:1320096007949648014>"
     FUBUKI = "<:fubuki:1320096012492083282>"
+    LY_HOA_PHUONG = "<:ly_hoa_phuong:1322951390242541678>"
+    SHINRA = "<:shinra:1322951512363892756>"
+    
+    
     BLIZZARD = "<:blizzard:1320096021962952725>"
     TELEKINESIS = "<:Telekinesis:1320096030192308366>"
     
     HP = "<:HP:1320777603358920724>"
     MP = "<:MP:1320777612926386256>"
     STAMINA = "<:stamina:1320777620874592288>"
+    
+    POTION_ALL = "<a:potion_all:1322946312450211890>"
+    POTION_HP_1 = "<:potion_hp_1:1322946322772267139>"
+    POTION_MANA_1 = "<:potion_mana_1:1322946332767555655>"
+    POTION_STAMINA_1 = "<:potion_stamina_1:1322946339629301760>"
     
     
     

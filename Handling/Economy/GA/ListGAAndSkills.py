@@ -36,6 +36,37 @@ list_ga_shop = [
       worth_amount = 50, 
       worth_type = "D",
     ),
+    
+    GuardianAngel(
+      ga_id = "ly_hoa_phuong",
+      ga_name= "Lý Hoả Phượng",
+      ga_emoji= EmojiCreation2.LY_HOA_PHUONG.value,
+      stamina = 100,
+      max_stamina= 100,
+      health= 100,
+      max_health= 100,
+      mana= 80,
+      max_mana= 80,
+      buff_attack_percent = 0,
+      attack_power= 15,
+      worth_amount = 50, 
+      worth_type = "D",
+    ),
+    GuardianAngel(
+      ga_id = "shinra",
+      ga_name= "Shinra Lính Hoả",
+      ga_emoji= EmojiCreation2.SHINRA.value,
+      stamina = 100,
+      max_stamina= 100,
+      health= 100,
+      max_health= 100,
+      mana= 80,
+      max_mana= 80,
+      buff_attack_percent = 0,
+      attack_power= 15,
+      worth_amount = 50, 
+      worth_type = "D",
+    ),
 ]
 
 
@@ -78,6 +109,21 @@ def get_list_back_ground_on_ga_id(ga_id: str):
           "https://i.pinimg.com/736x/17/8f/eb/178febfb63859f94cbdee980ebbb8eae.jpg",
           "https://i.pinimg.com/originals/bd/2c/6f/bd2c6f155472ade0bdeb28769b14ca21.gif",
           "https://i.pinimg.com/originals/c4/e1/86/c4e186c336d1b7f0b16196d6432e1d99.gif",
+      ]
+    elif ga_id == "ly_hoa_phuong":
+        background_urls = [
+          "https://i.pinimg.com/736x/6d/c0/4d/6dc04df23e7f80cc1702aaf3340da762.jpg",
+          "https://i.pinimg.com/736x/a0/f8/9b/a0f89b3d9917fd279e93a3aac69b8e7f.jpg",
+          "https://i.pinimg.com/736x/a3/58/13/a3581374991998a569b9739e465c58a1.jpg",
+          "https://i.pinimg.com/736x/33/a1/b5/33a1b557b76d02cda2f1a65f64974547.jpg",
+      ]
+    elif ga_id == "shinra":
+        background_urls = [
+          "https://i.pinimg.com/originals/f0/e3/41/f0e341329cb46cd97c341384961f3f1e.gif",
+          "https://i.pinimg.com/originals/cb/87/c2/cb87c206fb0e30728129fcb474f2ce52.gif",
+          "https://i.pinimg.com/originals/0d/28/4a/0d284ad1925736d14f087072a778232f.gif",
+          "https://i.pinimg.com/originals/b2/3f/a0/b23fa027f9faca52267ff7d37e393c01.gif",
+          "https://i.pinimg.com/originals/2f/f7/94/2ff794c670ac411307a0f08953936612.gif",
       ]
     
     return background_urls
@@ -134,6 +180,18 @@ def get_random_ga_enemy_generic(level: int = 1):
     
     #dựa trên level để tăng giảm stats của kẻ địch
     random_level_bonus = random.randint(-3, 7)
+    if level < 10:
+        random_level_bonus = random.randint(-3, 5)
+    elif level > 10 and level < 20:
+        random_level_bonus = random.randint(4, 10)
+    elif level > 20 and level < 30:
+        random_level_bonus = random.randint(6, 10)
+    elif level > 30 and level < 40:
+        random_level_bonus = random.randint(3, 15)
+    elif level > 40 and level < 50:
+        random_level_bonus = random.randint(5, 15)
+    else:
+        random_level_bonus = random.randint(6, 15)
     
     data.level = level + random_level_bonus
     
