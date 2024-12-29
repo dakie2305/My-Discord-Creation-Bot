@@ -432,6 +432,13 @@ class GuardianAngelCog(commands.Cog):
             exp_reward = 50
             dignity_point_reward = 5
             silver_reward = 0
+            #Đánh giao hữu thì 100% hết
+            user_profile.guardian.health = user_profile.guardian.max_health
+            user_profile.guardian.mana = user_profile.guardian.max_mana
+            user_profile.guardian.stamina = user_profile.guardian.max_stamina
+            target_profile.guardian.health = target_profile.guardian.max_health
+            target_profile.guardian.mana = target_profile.guardian.max_mana
+            target_profile.guardian.stamina = target_profile.guardian.max_stamina
         
         #Tính lại theo enemy_ga
         gold_reward = int(gold_reward + gold_reward*enemy.level*0.2)

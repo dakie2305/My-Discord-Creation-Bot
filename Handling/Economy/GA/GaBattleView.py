@@ -297,6 +297,11 @@ class GaBattleView(discord.ui.View):
                 stamina = int(new_player_profile.guardian.max_stamina*50/100)
                 ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id,user_id=interaction.user.id, health=health, stamina=stamina)
         
+        #Đánh giao hữu thì 100% hết stats
+        new_player_profile.guardian.health = new_player_profile.guardian.max_health
+        new_player_profile.guardian.mana = new_player_profile.guardian.max_mana
+        new_player_profile.guardian.stamina = new_player_profile.guardian.max_stamina
+        
         data = GuardianAngelAttackClass(player_profile=new_player_profile, player_ga=new_player_profile.guardian, starting_at_round=self.round)
         self.upper_attack_class.append(data)
         self.joined_player_id.append(interaction.user.id)
@@ -332,6 +337,11 @@ class GaBattleView(discord.ui.View):
                 health = int(new_player_profile.guardian.max_health*50/100)
                 stamina = int(new_player_profile.guardian.max_stamina*50/100)
                 ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id,user_id=interaction.user.id, health=health, stamina=stamina)
+        
+        #Đánh giao hữu thì 100% hết stats
+        new_player_profile.guardian.health = new_player_profile.guardian.max_health
+        new_player_profile.guardian.mana = new_player_profile.guardian.max_mana
+        new_player_profile.guardian.stamina = new_player_profile.guardian.max_stamina
         
         data = GuardianAngelAttackClass(player_profile=new_player_profile, player_ga=new_player_profile.guardian, starting_at_round=self.round)
         self.lower_attack_class.append(data)
