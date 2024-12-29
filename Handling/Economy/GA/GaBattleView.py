@@ -176,7 +176,7 @@ class GaBattleView(discord.ui.View):
         if entry_turn > self.round:
             return 0
         turns_participated = self.round - entry_turn + 1
-        contribution_percentage = int(turns_participated / self.round) * 100
+        contribution_percentage = int(turns_participated / self.round * 100) 
         return contribution_percentage
     
     def is_empty_or_whitespace(self, s: str):
@@ -246,7 +246,7 @@ class GaBattleView(discord.ui.View):
             #Chỉ trừ stamina của lower, tỉ lệ thấp hơn, tầm 50% của info.player_ga.attack_power
             loss_amount = int(self_player_info.player_ga.attack_power * 0.5)
             opponent_alive_attack_info.player_ga.stamina -= loss_amount
-            base_text += f"nhưng mục tiêu đã kịp né tránh! Mục tiêu mất **{loss_amount}** thể lực!"
+            base_text = f"[{self_player_info.player_ga.ga_emoji} - **{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã lao đến đánh {opponent_alive_attack_info.player_ga.ga_name} {text_target_profile_exist} nhưng mục tiêu đã kịp né tránh, và chỉ mất **{loss_amount}** thể lực!"
             #Nếu là player vs npc thì lưu lại
             if self.is_players_versus_players == False and opponent_alive_attack_info.player_profile!= None:
                 ProfileMongoManager.update_guardian_stats(guild_id=self.guild_id, user_id=opponent_alive_attack_info.player_profile.user_id,stamina=-loss_amount)
@@ -257,7 +257,7 @@ class GaBattleView(discord.ui.View):
             #trừ stamina của lower, tỉ lệ thấp hơn, tầm 10% của info.player_ga.attack_power
             loss_amount = int(self_player_info.player_ga.attack_power * 0.25)
             opponent_alive_attack_info.player_ga.stamina -= loss_amount
-            base_text += f"và mục tiêu đã dính đòn! Mục tiêu mất **{loss_health}** Máu và **{loss_amount}** thể lực!"
+            base_text = f"[{self_player_info.player_ga.ga_emoji} - **{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã đánh trúng [{opponent_alive_attack_info.player_ga.ga_emoji} - {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist}! Mục tiêu mất **{loss_health}** Máu và **{loss_amount}** Thể Lực!"
             
             additional_loss_stats_text = ""
             if opponent_alive_attack_info.player_ga.health <= 0:
