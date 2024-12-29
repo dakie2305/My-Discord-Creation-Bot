@@ -154,7 +154,15 @@ class InventoryUseView(discord.ui.View):
             #Reset last_breakup
             ProfileMongoManager.update_breakup_time(guild_id=interaction.guild_id, user_id=self.user.id, last_breakup= None)
             
-            await channel.send(f'{interaction.user.mention} đã rít một điếu [{self.selected_item.emoji} - **{self.selected_item.item_name}**] và thư thả, quên đi người cũ, thắt chặt tình cảm hiện tại, mất đi một tý nhân phẩm nhưng tăng thêm EXP!')
+            #30% bị công an ập vào túm cổ và phạt 10% gold, tối đa 8000 gold
+            police_chance = UtilitiesFunctions.get_chance(30)
+            if police_chance:
+                money_lost = int(self.user_profile.gold*10/100)
+                if money_lost > 8000: money_lost = 8000
+                text = f"\nNhưng công an đã ập vào bắt quả tang {interaction.user.mention} tội chơi đồ! {interaction.user.mention} đã mất **{money_lost}** {EmojiCreation2.GOLD.value}!"
+                ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name="", user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, gold=-money_lost)
+            
+            await channel.send(f'{interaction.user.mention} đã rít một điếu [{self.selected_item.emoji} - **{self.selected_item.item_name}**] và thư thả, quên đi người cũ, thắt chặt tình cảm hiện tại, mất đi một tý nhân phẩm nhưng tăng thêm EXP!{text}')
         elif self.selected_item.item_id == "rank_down_1":
             #Xoá vật phẩm
             ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, amount= -1)
@@ -178,6 +186,47 @@ class InventoryUseView(discord.ui.View):
             if self.user_profile.plant != None:
                 plant_date = self.user_profile.plant.plant_date - timedelta(minutes=25)
                 ProfileMongoManager.update_plant_date(guild_id=interaction.guild_id, user_id=self.user.id, plant_date=plant_date)
+        
+        elif self.selected_item.item_id == "ga_heal_1":
+            #Xoá vật phẩm
+            ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, amount= -1)
+            text = f"{interaction.user.mention} đã dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] nhưng quên mất mình làm gì có Hộ Vệ Thần!"
+            health_to_heal = 0
+            if self.user_profile.guardian!= None:
+                health_to_heal = int(self.user_profile.guardian.max_health*0.3)
+                ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id, user_id=self.user.id, health=health_to_heal)
+                text = f"{interaction.user.mention} đã dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] và hồi phục **{health_to_heal}** Máu {EmojiCreation2.HP.value} cho Hộ Vệ Thần của mình!"
+            await channel.send(content=text)
+            
+        elif self.selected_item.item_id == "ga_stamina_1":
+            #Xoá vật phẩm
+            ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, amount= -1)
+            text = f"{interaction.user.mention} đã dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] nhưng quên mất mình làm gì có Hộ Vệ Thần!"
+            stats_restored = 0
+            if self.user_profile.guardian!= None:
+                stats_restored = int(self.user_profile.guardian.max_stamina*0.5)
+                ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id, user_id=self.user.id, stamina=stats_restored)
+                text = f"{interaction.user.mention} đã dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] và hồi phục **{stats_restored}** Thể Lực {EmojiCreation2.STAMINA.value} cho Hộ Vệ Thần của mình!"
+            await channel.send(content=text)
+        elif self.selected_item.item_id == "ga_mana_1":
+            #Xoá vật phẩm
+            ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, amount= -1)
+            text = f"{interaction.user.mention} đã dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] nhưng quên mất mình làm gì có Hộ Vệ Thần!"
+            stats_restored = 0
+            if self.user_profile.guardian!= None:
+                stats_restored = int(self.user_profile.guardian.max_mana*0.5)
+                ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id, user_id=self.user.id, mana=stats_restored)
+                text = f"{interaction.user.mention} đã dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] và hồi phục **{stats_restored}** Mana {EmojiCreation2.MP.value} cho Hộ Vệ Thần của mình!"
+            await channel.send(content=text)
+            
+        elif self.selected_item.item_id == "ga_all_restored":
+            #Xoá vật phẩm
+            ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, amount= -1)
+            text = f"{interaction.user.mention} đã dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] nhưng quên mất mình làm gì có Hộ Vệ Thần!"
+            if self.user_profile.guardian!= None:
+                ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id, user_id=self.user.id, health=self.user_profile.guardian.max_health, stamina=self.user_profile.guardian.max_stamina, mana=self.user_profile.guardian.max_mana)
+                text = f"{interaction.user.mention} đã dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] và hồi phục Hộ Vệ Thần về trạng thái hoàng kim!"
+            await channel.send(content=text)
         else:
             await channel.send(f'Darkie vẫn chưa code xong công dụng cho vật phẩm [{self.selected_item.emoji} - **{self.selected_item.item_name}**]', ephemeral=True)
         return
