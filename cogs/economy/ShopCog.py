@@ -8,7 +8,7 @@ import CustomFunctions
 from Handling.Misc.SelfDestructView import SelfDestructView
 import CustomEnum.UserEnum as UserEnum
 from typing import List, Optional, Dict
-from Handling.Economy.Inventory_Shop.ItemClass import Item, list_gift_items, list_protection_items, list_support_items, list_attack_items, list_fishing_rod, list_legend_weapon_1, list_legend_weapon_2
+from Handling.Economy.Inventory_Shop.ItemClass import Item, list_gift_items, list_protection_items, list_support_items, list_attack_items, list_fishing_rod, list_legend_weapon_1, list_legend_weapon_2, list_support_ga_items
 import Handling.Economy.GA.ListGAAndSkills as ListGAAndSkills
 from Handling.Economy.GA.GuardianAngelClass import GuardianAngel, GuardianAngelSkill
 from Handling.Economy.GA.ShopGuardianView import ShopGuardianView
@@ -94,6 +94,7 @@ class ShopEconomy(commands.Cog):
         self.list_all_shops["Shop Quà Tặng Cuộc Sống"] = list_gift_items
         self.list_all_shops["Shop Hàng Bổ Trợ"] = list_support_items
         self.list_all_shops["Shop Nông Trại"] = list_fishing_rod
+        self.list_all_shops["Shop Bổ Trợ Hộ Vệ Thần"] = list_support_ga_items
         self.list_all_shops["Shop Bảo Hộ"] = list_protection_items
         self.list_all_shops["Shop Vũ Khí"] = list_attack_items
 
