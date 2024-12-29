@@ -39,7 +39,7 @@ list_ga_shop = [
     
     GuardianAngel(
       ga_id = "ly_hoa_phuong",
-      ga_name= "Lý Hoả Phượng",
+      ga_name= "Lý Hoả Vượng",
       ga_emoji= EmojiCreation2.LY_HOA_PHUONG.value,
       stamina = 100,
       max_stamina= 100,

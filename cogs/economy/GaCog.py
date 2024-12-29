@@ -402,12 +402,12 @@ class GuardianAngelCog(commands.Cog):
                 #Tính reward của battle
         gold_reward = 75
         silver_reward = 100
-        exp_reward = 100
+        exp_reward = 80
         dignity_point_reward = 10
         
         if is_players_versus_player:
             gold_reward = 45
-            exp_reward = 50
+            exp_reward = 45
             dignity_point_reward = 5
             silver_reward = 0
             #Đánh giao hữu thì 100% hết

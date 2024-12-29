@@ -681,7 +681,6 @@ def set_main_guardian_profile(guild_id: int, user_id: int, guardian: GuardianAng
     collection = db_specific[f'profile_{guild_id}']
     existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
     if existing_data == None: return
-    
     if guardian:
         result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"guardian": guardian.to_dict(),
                                                                                     }})
@@ -713,6 +712,7 @@ def update_main_guardian_level_progressing(guild_id:int, user_id: int, bonus_exp
         bonus_exp = 0
     
     if bonus_exp < 0: bonus_exp = 0
+    if bonus_exp > 500: bonus_exp = 500
     #Cộng thêm bonus nếu có
     existing_data.guardian.level_progressing += bonus_exp
     
