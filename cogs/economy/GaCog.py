@@ -223,9 +223,9 @@ class GuardianAngelCog(commands.Cog):
                 ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id,user_id=interaction.user.id, health=health, stamina=stamina)
         
         
-        #heal tính 50% của max_health, 50% của max thể lực
-        health = int(user_profile.guardian.max_health*50/100)
-        stamina = int(user_profile.guardian.max_stamina*50/100)
+        #heal tính 40% của max_health, 40% của max thể lực
+        health = int(user_profile.guardian.max_health*40/100)
+        stamina = int(user_profile.guardian.max_stamina*40/100)
         random_bonus_exp = chosen_item.bonus_exp
         dignity_point = 5
         if chosen_item.item_id == "weed":
@@ -289,8 +289,8 @@ class GuardianAngelCog(commands.Cog):
         embed = discord.Embed(title=f"", description=f"Nâng điểm chỉ số Hộ Vệ Thần", color=0x0ce7f2)
         embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
         embed.add_field(name=f"", value=f"Chọn chỉ số để nâng cấp Hộ Vệ Thần {user_profile.guardian.ga_emoji} - **{user_profile.guardian.ga_name}**", inline=False)
-        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} **1** điểm cộng có thể nâng **10** điểm tấn công", inline=False)
-        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} **1** điểm cộng có thể nâng **5** điểm chỉ số Máu, Thể Lực, Mana", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} **1** điểm cộng có thể nâng **5** điểm tấn công", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} **1** điểm cộng có thể nâng **10** điểm chỉ số Máu, Thể Lực, Mana", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
         embed.add_field(name=f"", value=f"> Số điểm cộng hiện tại: **{user_profile.guardian.stats_point}**", inline=False)
         view = RankUpView(user_profile=user_profile, user=interaction.user)
@@ -398,6 +398,26 @@ class GuardianAngelCog(commands.Cog):
         if target != None:
             is_players_versus_player = True
             title = f"🔥 {interaction.user.mention} VS {target.mention} 🔥"
+            
+                #Tính reward của battle
+        gold_reward = 75
+        silver_reward = 100
+        exp_reward = 100
+        dignity_point_reward = 10
+        
+        if is_players_versus_player:
+            gold_reward = 45
+            exp_reward = 50
+            dignity_point_reward = 5
+            silver_reward = 0
+            #Đánh giao hữu thì 100% hết
+            user_profile.guardian.health = user_profile.guardian.max_health
+            user_profile.guardian.mana = user_profile.guardian.max_mana
+            user_profile.guardian.stamina = user_profile.guardian.max_stamina
+            target_profile.guardian.health = target_profile.guardian.max_health
+            target_profile.guardian.mana = target_profile.guardian.max_mana
+            target_profile.guardian.stamina = target_profile.guardian.max_stamina
+        
         embed = discord.Embed(title=f"", description=title, color=0x0ce7f2)
         
         embed.add_field(name=f"", value=f"Hộ Vệ Thần {user_profile.guardian.ga_emoji} - **{user_profile.guardian.ga_name}** (Cấp {user_profile.guardian.level}) của {interaction.user.mention}", inline=False)
@@ -421,25 +441,7 @@ class GuardianAngelCog(commands.Cog):
         max_players_as_int = int(max_players)
         
 
-        #Tính reward của battle
-        gold_reward = 75
-        silver_reward = 100
-        exp_reward = 100
-        dignity_point_reward = 10
-        
-        if is_players_versus_player:
-            gold_reward = 45
-            exp_reward = 50
-            dignity_point_reward = 5
-            silver_reward = 0
-            #Đánh giao hữu thì 100% hết
-            user_profile.guardian.health = user_profile.guardian.max_health
-            user_profile.guardian.mana = user_profile.guardian.max_mana
-            user_profile.guardian.stamina = user_profile.guardian.max_stamina
-            target_profile.guardian.health = target_profile.guardian.max_health
-            target_profile.guardian.mana = target_profile.guardian.max_mana
-            target_profile.guardian.stamina = target_profile.guardian.max_stamina
-        
+
         #Tính lại theo enemy_ga
         gold_reward = int(gold_reward + gold_reward*enemy.level*0.2)
         silver_reward = int(silver_reward + silver_reward*enemy.level*0.3)
