@@ -114,7 +114,8 @@ class GaBattleView(discord.ui.View):
             base_text = self.execute_attack(self_player_info = self_player_info, opponent_alive_attack_info = opponent_alive_attack_info)
             full_text += base_text + "\n"
         
-        self.round_number_text_report.update({self.round: full_text})
+        if not str.isspace(full_text.strip()):
+            self.round_number_text_report.update({self.round: full_text.strip()})
         
         #Cập nhật embed chiến đấu
         embed = discord.Embed(title=f"", description=self.embed_title, color=0x0ce7f2)
@@ -134,11 +135,11 @@ class GaBattleView(discord.ui.View):
         await self.message.edit(embed=embed, content=formatted_string)
         if flag_end_battle: await self.end_battle()
         else:
-            self.round += 1
             if self.round > 4:
                 #Bỏ đi round đầu để tiếp kiệm chỗ
                 first_key = list(self.round_number_text_report.keys())[0]
-                del self.round_number_text_report[first_key] 
+                del self.round_number_text_report[first_key]
+            self.round += 1
             await self.commence_battle()
         return
     
@@ -182,11 +183,11 @@ class GaBattleView(discord.ui.View):
         silver_reward = int(self.silver_reward * len(self.upper_attack_class) + self.bonus_exp*len(self.lower_attack_class))
         contribution = self.calculate_contribution(info.starting_at_round)
         
-        text_target_profile_exist = f"<@{info.player_profile.user_id}> [{info.starting_at_round}] cống hiến **{contribution}%**: "
+        text_target_profile_exist = f"<@{info.player_profile.user_id}> [{info.starting_at_round}] cống hiến **{contribution}%**, nhận: "
         calculated_exp = int(bonus_exp * (contribution / 100))
         if calculated_exp > 0: 
             text_target_profile_exist += f"**{calculated_exp}** EXP. "
-            ProfileMongoManager.update_level_progressing(guild_id=self.guild_id, user_id=info.player_profile.user_id, bonus_exp=calculated_exp)
+            ProfileMongoManager.update_level_progressing(guild_id=self.guild_id, user_id=info.player_profile.user_id, bonus_exp=int(calculated_exp*0.3))
             ProfileMongoManager.update_main_guardian_level_progressing(guild_id=self.guild_id, user_id=info.player_profile.user_id, bonus_exp=calculated_exp)
         
         calculated_gold_reward = int(gold_reward * (contribution / 100))
@@ -260,8 +261,7 @@ class GaBattleView(discord.ui.View):
             if opponent_alive_attack_info.player_ga.mana <= 0: opponent_alive_attack_info.player_ga.mana = 0
             
             if self.is_players_versus_players == False and opponent_alive_attack_info.player_profile!= None:
-                ProfileMongoManager.update_guardian_stats(guild_id=self.guild_id, user_id=opponent_alive_attack_info.player_profile.user_id,stamina=-loss_amount)
-                ProfileMongoManager.update_guardian_stats(guild_id=self.guild_id, user_id=opponent_alive_attack_info.player_profile.user_id,health=-loss_health)
+                ProfileMongoManager.update_guardian_stats(guild_id=self.guild_id, user_id=opponent_alive_attack_info.player_profile.user_id,stamina=-loss_amount, health=-loss_health)
             
             base_text+= additional_loss_stats_text
         
