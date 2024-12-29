@@ -114,7 +114,7 @@ class GaBattleView(discord.ui.View):
             base_text = self.execute_attack(self_player_info = self_player_info, opponent_alive_attack_info = opponent_alive_attack_info)
             full_text += base_text + "\n"
         
-        if not str.isspace(full_text.strip()):
+        if not self.is_empty_or_whitespace(full_text):
             self.round_number_text_report.update({self.round: full_text.strip()})
         
         #Cập nhật embed chiến đấu
@@ -130,7 +130,7 @@ class GaBattleView(discord.ui.View):
             embed.add_field(name=f"", value=text_target_profile_exist, inline=False)
             embed.add_field(name=f"", value=f"🦾: **{self_player_info.player_ga.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=self_player_info.player_ga.health, max_value=self_player_info.player_ga.max_health, emoji=EmojiCreation2.HP.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=self_player_info.player_ga.stamina, max_value=self_player_info.player_ga.max_stamina, emoji=EmojiCreation2.STAMINA.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=self_player_info.player_ga.mana, max_value=self_player_info.player_ga.max_mana, emoji=EmojiCreation2.MP.value)}", inline=False)
         
-        formatted_string = "\n".join(f"Lượt thứ **{key}**.\n{value}" for key, value in self.round_number_text_report.items())
+        formatted_string = "\n".join(f"Lượt thứ **{key}**.\n{value}\n" for key, value in self.round_number_text_report.items())
         # await self.message.edit(embed=embed, content=f"Lượt thứ **{self.round}**")
         await self.message.edit(embed=embed, content=formatted_string)
         if flag_end_battle: await self.end_battle()
@@ -145,11 +145,6 @@ class GaBattleView(discord.ui.View):
     
     async def end_battle(self):
         #Tính toán kết quả
-        
-        #Nhân theo lượng người tham gia
-        bonus_exp = int(self.bonus_exp * len(self.upper_attack_class) + self.bonus_exp*len(self.lower_attack_class))
-        gold_reward = int(self.gold_reward * len(self.upper_attack_class) + self.bonus_exp*len(self.lower_attack_class))
-        silver_reward = int(self.silver_reward * len(self.upper_attack_class) + self.bonus_exp*len(self.lower_attack_class))
         
         result_text = "**Tổng Kết Chiến Đấu**\n"
         if self.upper_attack_won:
@@ -174,6 +169,9 @@ class GaBattleView(discord.ui.View):
         turns_participated = self.round - entry_turn + 1
         contribution_percentage = int(turns_participated / self.round) * 100
         return contribution_percentage
+    
+    def is_empty_or_whitespace(self, s: str):
+        return not s.strip()
     
     def get_result_addition_stats(self, info: GuardianAngelAttackClass):
         if info.player_profile == None: return ""
@@ -239,7 +237,7 @@ class GaBattleView(discord.ui.View):
             #Chỉ trừ stamina của lower, tỉ lệ thấp hơn, tầm 50% của info.player_ga.attack_power
             loss_amount = int(self_player_info.player_ga.attack_power * 0.5)
             opponent_alive_attack_info.player_ga.stamina -= loss_amount
-            base_text += f"nhưng mục tiêu đã kịp né tránh! Mục tiêu chỉ mất **{loss_amount}** thể lực!"
+            base_text += f"nhưng mục tiêu đã kịp né tránh! Mục tiêu mất **{loss_amount}** thể lực!"
             #Nếu là player vs npc thì lưu lại
             if self.is_players_versus_players == False and opponent_alive_attack_info.player_profile!= None:
                 ProfileMongoManager.update_guardian_stats(guild_id=self.guild_id, user_id=opponent_alive_attack_info.player_profile.user_id,stamina=-loss_amount)
