@@ -15,7 +15,7 @@ from datetime import datetime, timedelta
 
 class GaBattleView(discord.ui.View):
     def __init__(self, user_profile: Profile, user: discord.Member,enemy_ga: GuardianAngel, guild_id: int, is_players_versus_players: bool, target_profile: Profile = None, target: discord.Member = None, allowed_multiple_players: bool = False, max_players:int = 1, embed_title: str = "", gold_reward: int = 0, silver_reward: int= 0, dignity_point: int = 10, bonus_exp: int = 200):
-        super().__init__(timeout=300)
+        super().__init__(timeout=180)
         self.message : discord.Message = None
         self.user: discord.Member = user
         self.target: discord.Member = target
@@ -42,6 +42,8 @@ class GaBattleView(discord.ui.View):
         self.bonus_exp = bonus_exp
         
         self.guild_id = guild_id
+        
+        self.battle_ended = False
         
         first_player_class = GuardianAngelAttackClass(player_profile=user_profile, player_ga=user_profile.guardian)
         self.upper_attack_class.append(first_player_class)
@@ -72,7 +74,7 @@ class GaBattleView(discord.ui.View):
             
     async def on_timeout(self):
         #Delete
-        if self.message != None: 
+        if self.message != None and self.battle_ended == False: 
             await self.message.edit(view= None)
             return
 
@@ -132,10 +134,13 @@ class GaBattleView(discord.ui.View):
         
         formatted_string = "\n".join(f"Lượt thứ **{key}**.\n{value}\n" for key, value in self.round_number_text_report.items())
         # await self.message.edit(embed=embed, content=f"Lượt thứ **{self.round}**")
-        await self.message.edit(embed=embed, content=formatted_string)
+        try:
+            await self.message.edit(embed=embed, content=formatted_string)
+        except Exception as e:
+            await self.message.edit(embed=embed, content=f"Lượt thứ **{self.round}**")
         if flag_end_battle: await self.end_battle()
         else:
-            if self.round > 4:
+            if self.round > 2:
                 #Bỏ đi round đầu để tiếp kiệm chỗ
                 first_key = list(self.round_number_text_report.keys())[0]
                 del self.round_number_text_report[first_key]
@@ -145,7 +150,7 @@ class GaBattleView(discord.ui.View):
     
     async def end_battle(self):
         #Tính toán kết quả
-        
+        self.battle_ended = True
         result_text = "**Tổng Kết Chiến Đấu**\n"
         if self.upper_attack_won:
             result_text += f"Phe trên đã chiến thắng!\n▬▬▬ι════>\n"
@@ -159,7 +164,11 @@ class GaBattleView(discord.ui.View):
                 additional_stats = self.get_result_addition_stats(info)
                 result_text += additional_stats
         result_text += f"▬▬▬ι════>\nPhe thua quá gà, chẳng xứng đáng nhận gì hết!"
-        await self.message.reply(content=result_text)
+        try:
+            await self.message.reply(content=result_text)
+            await self.message.edit(view=None)
+        except Exception as e:
+            return
         return
     
     
