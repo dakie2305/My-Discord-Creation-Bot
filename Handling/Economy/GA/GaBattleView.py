@@ -229,10 +229,12 @@ class GaBattleView(discord.ui.View):
             text_own_profile_exist = f"của <@{self_player_info.player_profile.user_id}>"
         #Tính tỉ lệ evasion
         base_text = f"[{self_player_info.player_ga.ga_emoji} - **{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã lao đến đánh [{opponent_alive_attack_info.player_ga.ga_emoji} - {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist}"
-        evasion = int(opponent_alive_attack_info.player_ga.stamina/10)
-        if evasion > 100: evasion = 90
-        evasion_chance = UtilitiesFunctions.get_chance(evasion)
-        if evasion_chance:
+        evasion = int(opponent_alive_attack_info.player_ga.stamina/5)
+        if evasion > 100: evasion = 85
+        
+        opponent_evasion_chance = self.calculate_evasion_chance(current_stamina=opponent_alive_attack_info.player_ga.stamina, max_stamina=opponent_alive_attack_info.player_ga.max_stamina, level=opponent_alive_attack_info.player_ga.level)
+        evasion_dice = UtilitiesFunctions.get_chance(opponent_evasion_chance)
+        if evasion_dice:
             #Chỉ trừ stamina của lower, tỉ lệ thấp hơn, tầm 50% của info.player_ga.attack_power
             loss_amount = int(self_player_info.player_ga.attack_power * 0.5)
             opponent_alive_attack_info.player_ga.stamina -= loss_amount
@@ -265,7 +267,10 @@ class GaBattleView(discord.ui.View):
         
         return base_text
         
-    
+    def calculate_evasion_chance(self, current_stamina, max_stamina, level, max_evasion=85, level_bonus=0.5):
+        evasion_chance = ((current_stamina / max_stamina) * max_evasion) + (level * level_bonus)
+        return int(min(evasion_chance, max_evasion))
+
     
     #region button event
     async def joined_allied_button_event(self, interaction: discord.Interaction):
