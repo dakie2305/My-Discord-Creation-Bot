@@ -133,29 +133,31 @@ def get_random_ga_enemy_generic(level: int = 1):
     ]
     
     #dựa trên level để tăng giảm stats của kẻ địch
-    data.level = level + 5
+    random_level_bonus = random.randint(-3, 7)
+    
+    data.level = level + random_level_bonus
     
     percent_boost = 5
     base = 20
     bonus_base = 30
-    data.attack_power = base + bonus_base*int(percent_boost * level / 100) #tăng 5% mỗi level
+    data.attack_power = base + bonus_base*int(percent_boost * data.level / 100) #tăng 5% mỗi level
     
     percent_boost = 6
-    base = 80
-    bonus_base = 80
-    data.max_stamina = base + bonus_base*int(percent_boost * level / 100)
+    base = 100
+    bonus_base = 100
+    data.max_stamina = base + bonus_base*int(percent_boost * data.level / 100)
     data.stamina = data.max_stamina
     
     percent_boost = 5
     base = 100
     bonus_base = 110
-    data.max_health = base + bonus_base*int(percent_boost * level / 100)
+    data.max_health = base + bonus_base*int(percent_boost * data.level / 100)
     data.health = data.max_health
     
     percent_boost = 5
     base = 50
     bonus_base = 105
-    data.max_mana = base + bonus_base*int(percent_boost * level / 100)
+    data.max_mana = base + bonus_base*int(percent_boost * data.level / 100)
     data.mana = data.max_mana
     
     data.buff_attack_percent = random.randint(0, 5)

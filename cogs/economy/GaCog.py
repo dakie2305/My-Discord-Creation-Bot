@@ -111,6 +111,21 @@ class GuardianAngelCog(commands.Cog):
                 mess = await interaction.followup.send(embed=embed, view=view, ephemeral=False)
                 view.message = mess
                 return
+            
+        if user_profile.guardian.time_to_recover != None:
+            if user_profile.guardian.time_to_recover > datetime.now():
+                view = SelfDestructView(timeout=30)
+                next_time = user_profile.guardian.time_to_recover
+                unix_time = int(next_time.timestamp())
+                mess = await interaction.followup.send(content=f"Hộ Vệ Thần của bạn đang bị thương! Vui lòng chờ hồi phục vào lúc <t:{unix_time}:t> hoặc mua bình hồi phục trong {SlashCommand.SHOP_GLOBAL.value}!", ephemeral=True, view=view)
+                view.message = mess
+                return
+            else:
+                #Hồi phục 50% máu, 50% thể lực
+                health = int(user_profile.guardian.max_health*50/100)
+                stamina = int(user_profile.guardian.max_stamina*50/100)
+                ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id,user_id=interaction.user.id, health=health, stamina=stamina)
+        
         
         random_bonus_exp = random.randint(15, 60)
         dignity_point = 10
@@ -192,6 +207,21 @@ class GuardianAngelCog(commands.Cog):
                 mess = await interaction.followup.send(embed=embed, view=view, ephemeral=False)
                 view.message = mess
                 return
+        
+        if user_profile.guardian.time_to_recover != None:
+            if user_profile.guardian.time_to_recover > datetime.now():
+                view = SelfDestructView(timeout=30)
+                next_time = user_profile.guardian.time_to_recover
+                unix_time = int(next_time.timestamp())
+                mess = await interaction.followup.send(content=f"Hộ Vệ Thần của bạn đang bị thương! Vui lòng chờ hồi phục vào lúc <t:{unix_time}:t> hoặc mua bình hồi phục trong {SlashCommand.SHOP_GLOBAL.value}!", ephemeral=True, view=view)
+                view.message = mess
+                return
+            else:
+                #Hồi phục 50% máu, 50% thể lực
+                health = int(user_profile.guardian.max_health*50/100)
+                stamina = int(user_profile.guardian.max_stamina*50/100)
+                ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id,user_id=interaction.user.id, health=health, stamina=stamina)
+        
         
         #heal tính 50% của max_health, 50% của max thể lực
         health = int(user_profile.guardian.max_health*50/100)
