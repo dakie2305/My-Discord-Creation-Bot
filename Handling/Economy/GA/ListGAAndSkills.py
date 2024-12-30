@@ -194,7 +194,7 @@ def get_random_ga_enemy_generic(level: int = 1):
         random_level_bonus = random.randint(6, 15)
     
     data.level = level + random_level_bonus
-    
+    if data.level <= 0: data.level = 1
     percent_boost = 5
     base = 20
     bonus_base = 30
