@@ -49,14 +49,13 @@ class ProfileEconomy(commands.Cog):
             embed, data = await self.procress_profile_embed(user=interaction.user, guild_id=interaction.guild_id)
         else:
             embed, data = await self.procress_profile_embed(user=user, guild_id=interaction.guild_id)
-        if data != None and data.list_items != None and len(data.list_items)>0:
+        if data != None:
             view = ProfileToInventoryView(profile=data)
             m = await interaction.followup.send(embed=embed, view = view)
             view.message = m
         else:
             await interaction.followup.send(embed=embed)
         return
-    
     
     @commands.command()
     async def profile(self, ctx, user: Optional[discord.Member] = None):
