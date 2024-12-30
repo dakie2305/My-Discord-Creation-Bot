@@ -246,6 +246,7 @@ class GaBattleView(discord.ui.View):
             #Chỉ trừ stamina của lower, tỉ lệ thấp hơn, tầm 50% của info.player_ga.attack_power
             loss_amount = int(self_player_info.player_ga.attack_power * 0.5)
             opponent_alive_attack_info.player_ga.stamina -= loss_amount
+            if opponent_alive_attack_info.player_ga.stamina <= 0: opponent_alive_attack_info.player_ga.stamina = 0
             base_text = f"[{self_player_info.player_ga.ga_emoji} - **{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã lao đến đánh {opponent_alive_attack_info.player_ga.ga_name} {text_target_profile_exist} nhưng mục tiêu đã kịp né tránh, và chỉ mất **{loss_amount}** thể lực!"
             #Nếu là player vs npc thì lưu lại
             if self.is_players_versus_players == False and opponent_alive_attack_info.player_profile!= None:
@@ -254,9 +255,11 @@ class GaBattleView(discord.ui.View):
             #trừ máu của lower
             loss_health = int(self_player_info.player_ga.attack_power + self_player_info.player_ga.attack_power*(self_player_info.player_ga.buff_attack_percent/100))
             opponent_alive_attack_info.player_ga.health -= loss_health
+            if opponent_alive_attack_info.player_ga.health <= 0: opponent_alive_attack_info.player_ga.health = 0
             #trừ stamina của lower, tỉ lệ thấp hơn, tầm 10% của info.player_ga.attack_power
             loss_amount = int(self_player_info.player_ga.attack_power * 0.25)
             opponent_alive_attack_info.player_ga.stamina -= loss_amount
+            if opponent_alive_attack_info.player_ga.stamina <= 0: opponent_alive_attack_info.player_ga.stamina = 0
             base_text = f"[{self_player_info.player_ga.ga_emoji} - **{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã đánh trúng [{opponent_alive_attack_info.player_ga.ga_emoji} - {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist}! Mục tiêu mất **{loss_health}** Máu và **{loss_amount}** Thể Lực!"
             
             additional_loss_stats_text = ""
