@@ -2,7 +2,7 @@ from typing import List, Optional
 from datetime import datetime
 
 class GuardianAngel:
-    def __init__(self, ga_id: str, ga_name: str, ga_emoji: str, stamina: int, max_stamina: int, health: int, max_health: int, mana: int, max_mana:int, attack_power: int = 10, buff_attack_percent: int = 0, level: int = 1, level_progressing: int = 0, stats_point: int = 0, list_skills : Optional[List['GuardianAngelSkill']] = None, max_skills: int = 1, is_injured: bool = False, time_to_recover: datetime = None, worth_amount: int = 50, worth_type: str = "D", last_feed: datetime = None, last_meditation: datetime = None, bonus_dignity_point: int = 0, bonus_exp: int = 0, last_battle: datetime = None, last_dungeon: datetime = None):
+    def __init__(self, ga_id: str, ga_name: str, ga_emoji: str, stamina: int, max_stamina: int, health: int, max_health: int, mana: int, max_mana:int, attack_power: int = 10, buff_attack_percent: int = 0, level: int = 1, level_progressing: int = 0, stats_point: int = 0, list_skills : Optional[List['GuardianAngelSkill']] = None, max_skills: int = 1, is_injured: bool = False, time_to_recover: datetime = None, worth_amount: int = 50, worth_type: str = "D", last_feed: datetime = None, last_meditation: datetime = None, bonus_dignity_point: int = 0, bonus_exp: int = 0, last_battle: datetime = None, last_dungeon: datetime = None, is_dead = False):
         self.ga_id = ga_id
         self.ga_name = ga_name
         self.ga_emoji = ga_emoji
@@ -29,6 +29,7 @@ class GuardianAngel:
         self.last_dungeon = last_dungeon if last_dungeon else None
         
         self.is_injured = is_injured
+        self.is_dead = is_dead
         self.time_to_recover = time_to_recover if time_to_recover else None
         
         self.list_skills: List[GuardianAngelSkill] = list_skills if list_skills else []
@@ -55,6 +56,7 @@ class GuardianAngel:
             "bonus_exp": self.bonus_exp,
             
             "is_injured": self.is_injured,
+            "is_dead": self.is_dead,
             "time_to_recover": self.time_to_recover if self.time_to_recover else None,
             "last_feed": self.last_feed if self.last_feed else None,
             "last_meditation": self.last_meditation if self.last_meditation else None,
@@ -88,6 +90,7 @@ class GuardianAngel:
                 bonus_exp=data.get("bonus_exp", 0),
                 
                 is_injured=data.get("is_injured", False),
+                is_dead=data.get("is_dead", False),
                 time_to_recover=data.get("time_to_recover", None),
                 last_meditation=data.get("last_meditation", None),
                 last_feed=data.get("last_feed", None),

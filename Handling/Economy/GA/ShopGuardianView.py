@@ -74,7 +74,7 @@ class ShopGuardianView(discord.ui.View):
         if profile_user == None:
             await interaction.followup.send(f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True)
             return
-        elif profile_user.guardian!=None:
+        elif profile_user.guardian!=None and profile_user.guardian.is_dead == False:
             await interaction.followup.send(f"Bạn đã có Hộ Vệ Thần rồi! Vui lòng bán Hộ Vệ Thần bằng lệnh {SlashCommand.GA_SELL.value}", ephemeral=True)
             return
         try:

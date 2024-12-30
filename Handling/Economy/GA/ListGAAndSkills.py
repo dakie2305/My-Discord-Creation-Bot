@@ -6,6 +6,22 @@ import random
 
 list_ga_shop = [
     GuardianAngel(
+      ga_id = "rikka",
+      ga_name= "Rikka Tà Vương Nhãn",
+      ga_emoji= EmojiCreation2.RIKKA.value,
+      stamina = 100,
+      max_stamina= 100,
+      health= 80,
+      max_health= 80,
+      mana= 120,
+      max_mana= 120,
+      attack_power= 20,
+      buff_attack_percent = 1,
+      worth_amount = 50, 
+      worth_type = "D",
+    ),
+    
+    GuardianAngel(
       ga_id = "tatsumaki",
       ga_name= "Tatsumaki Bão Tố",
       ga_emoji= EmojiCreation2.TATSUMAKI.value,
@@ -36,6 +52,37 @@ list_ga_shop = [
       worth_amount = 50, 
       worth_type = "D",
     ),
+    GuardianAngel(
+      ga_id = "makima",
+      ga_name= "Makima Thánh Nữ",
+      ga_emoji= EmojiCreation2.Hatori_Chise.value,
+      stamina = 120,
+      max_stamina= 120,
+      health= 100,
+      max_health= 100,
+      mana= 80,
+      max_mana= 80,
+      buff_attack_percent = 0,
+      attack_power= 15,
+      worth_amount = 50, 
+      worth_type = "D",
+    ),
+    
+    GuardianAngel(
+      ga_id = "reze",
+      ga_name= "Reze Quỷ Bom",
+      ga_emoji= EmojiCreation2.REZE.value,
+      stamina = 110,
+      max_stamina= 110,
+      health= 100,
+      max_health= 100,
+      mana= 80,
+      max_mana= 80,
+      buff_attack_percent = 0,
+      attack_power= 15,
+      worth_amount = 50, 
+      worth_type = "D",
+    ),
     
     GuardianAngel(
       ga_id = "ly_hoa_phuong",
@@ -52,6 +99,7 @@ list_ga_shop = [
       worth_amount = 50, 
       worth_type = "D",
     ),
+    
     GuardianAngel(
       ga_id = "shinra",
       ga_name= "Shinra Lính Hoả",
@@ -67,6 +115,23 @@ list_ga_shop = [
       worth_amount = 50, 
       worth_type = "D",
     ),
+    
+    GuardianAngel(
+      ga_id = "hatori_chise",
+      ga_name= "Hatori Chise",
+      ga_emoji= EmojiCreation2.Hatori_Chise.value,
+      stamina = 110,
+      max_stamina= 110,
+      health= 100,
+      max_health= 100,
+      mana= 80,
+      max_mana= 80,
+      buff_attack_percent = 0,
+      attack_power= 15,
+      worth_amount = 50, 
+      worth_type = "D",
+    ),
+    
 ]
 
 
@@ -113,9 +178,10 @@ def get_list_back_ground_on_ga_id(ga_id: str):
     elif ga_id == "ly_hoa_phuong":
         background_urls = [
           "https://i.pinimg.com/736x/6d/c0/4d/6dc04df23e7f80cc1702aaf3340da762.jpg",
-          "https://i.pinimg.com/736x/a0/f8/9b/a0f89b3d9917fd279e93a3aac69b8e7f.jpg",
           "https://i.pinimg.com/736x/a3/58/13/a3581374991998a569b9739e465c58a1.jpg",
           "https://i.pinimg.com/736x/33/a1/b5/33a1b557b76d02cda2f1a65f64974547.jpg",
+          "https://i.pinimg.com/736x/09/9a/8e/099a8ecb9ede5a8abe6e1722712d6959.jpg",
+          "https://i.pinimg.com/736x/f6/8e/40/f68e40474ca2fc8137991c50b44c09b5.jpg",
       ]
     elif ga_id == "shinra":
         background_urls = [
@@ -125,7 +191,53 @@ def get_list_back_ground_on_ga_id(ga_id: str):
           "https://i.pinimg.com/originals/b2/3f/a0/b23fa027f9faca52267ff7d37e393c01.gif",
           "https://i.pinimg.com/originals/2f/f7/94/2ff794c670ac411307a0f08953936612.gif",
       ]
-    
+    elif ga_id == "hatori_chise":
+        background_urls = [
+          "https://i.pinimg.com/originals/66/4f/d3/664fd36dfdf564cb7921596f05996fdd.gif",
+          "https://i.pinimg.com/originals/32/70/14/327014699a9f31e46f8c41234b7aa273.gif",
+          "https://i.pinimg.com/originals/1f/36/9c/1f369c2b68948d693df4b7936a3a3cf9.gif",
+          "https://i.pinimg.com/originals/19/40/96/194096b4f2d9aac21842e56dc1816187.gif",
+      ]
+        
+    elif ga_id == "makima":
+        background_urls = [
+          "https://i.pinimg.com/originals/03/cf/8d/03cf8d2a1d1b5df4dadda7242a913c86.gif",
+          "https://i.pinimg.com/originals/a3/5f/7c/a35f7cceadbeddbfad284e7ce52adca1.gif",
+          "https://i.pinimg.com/originals/7b/2a/fa/7b2afa88054b838298878346ab755eb7.gif",
+          "https://i.pinimg.com/originals/d0/d0/f4/d0d0f497e74132aac08104ea8619e264.gif",
+          "https://i.pinimg.com/originals/75/c8/48/75c8489a77f759c252b479a491a83fe1.gif",
+          "https://i.pinimg.com/originals/eb/f3/05/ebf3058849bd022783acf7619631726a.gif",
+          "https://i.pinimg.com/originals/82/1e/50/821e50a729b8abd7317404090ecf4d34.gif",
+          "https://i.pinimg.com/originals/ab/8e/46/ab8e46bfddf37c093c3f27c06c3c325f.gif",
+      ]
+        
+    elif ga_id == "reze":
+        background_urls = [
+          "https://i.pinimg.com/originals/06/f9/7b/06f97b762d33c085a2c2555c8d876fb3.gif",
+          "https://i.pinimg.com/originals/c4/95/90/c495906bdc63b24dfd9e44099616a5f4.gif",
+          "https://i.pinimg.com/originals/8f/af/9b/8faf9bce78098e045fa8ec1be704ded4.gif",
+          "https://i.pinimg.com/736x/bc/00/0d/bc000d718edad04d7649ae93538b00a7.jpg",
+          "https://i.pinimg.com/736x/e0/2f/6f/e02f6fca529f94d4a694dd6544994150.jpg",
+          "https://i.pinimg.com/736x/c3/1a/07/c31a073d99379f64e66dd2aa88599623.jpg",
+      ]
+    elif ga_id == "rikka":
+        background_urls = [
+          "https://i.pinimg.com/originals/b7/29/f6/b729f606499c57d3f36d7cd3ec7641c7.gif",
+          "https://i.pinimg.com/originals/5e/f2/53/5ef2537d03e46c1cd5d392aea7b9f2fc.gif",
+          "https://i.pinimg.com/originals/4f/cc/7e/4fcc7e493d0e45a3a8c91b9a862e2418.gif",
+          "https://i.pinimg.com/originals/9f/e2/47/9fe247b1a5a4ba33c4f84fd47efecc0d.gif",
+          "https://i.pinimg.com/originals/a5/1e/d5/a51ed53343d5a126b542fe2481d617b0.gif",
+          "https://i.pinimg.com/originals/ce/9a/22/ce9a226c5950181cc6e3b4cab4c0d4b8.gif",
+          "https://i.pinimg.com/originals/80/6c/f4/806cf4a613ad2467eb4f442cbd3c0cdf.gif",
+          "https://i.pinimg.com/originals/f2/64/2c/f2642c3783a6485716ef39d437f31fc9.gif",
+          "https://i.pinimg.com/originals/dd/3e/4f/dd3e4f6d242ecad5738731da333a592c.gif",
+          "https://i.pinimg.com/originals/18/53/cc/1853cc9948053434410ccbdcd52d535c.gif",
+          "https://i.pinimg.com/originals/41/d2/ec/41d2ec3fe5361a91360ae35a842e4bd7.gif",
+          "https://i.pinimg.com/originals/51/91/da/5191dafcca04f3b198f14987a1541ac6.gif",
+          "https://i.pinimg.com/originals/fd/72/6e/fd726e7a345a047d163a15a5d8c1794b.gif",
+          "https://i.pinimg.com/originals/80/6c/f4/806cf4a613ad2467eb4f442cbd3c0cdf.gif",
+          "https://i.pinimg.com/originals/86/09/2c/86092cbc580fedcd766a80ace9d2bcc3.gif",
+      ]
     return background_urls
 
 def get_random_ga_enemy_generic(level: int = 1):

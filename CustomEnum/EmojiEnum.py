@@ -190,6 +190,10 @@ class EmojiCreation2(Enum):
     FUBUKI = "<:fubuki:1320096012492083282>"
     LY_HOA_PHUONG = "<:ly_hoa_phuong:1322951390242541678>"
     SHINRA = "<:shinra:1322951512363892756>"
+    Hatori_Chise = "<:hatorichise:1323321550442725406>"
+    MAKIMA = "<a:makima:1323328680558198896>"
+    REZE = "<:reze:1323328688430907583>"
+    RIKKA = "<a:rikka:1323331964559949884>"
     
     
     BLIZZARD = "<:blizzard:1320096021962952725>"
@@ -203,6 +207,7 @@ class EmojiCreation2(Enum):
     POTION_HP_1 = "<:potion_hp_1:1322946322772267139>"
     POTION_MANA_1 = "<:potion_mana_1:1322946332767555655>"
     POTION_STAMINA_1 = "<:potion_stamina_1:1322946339629301760>"
+    MAGIC_DV = "<a:magic_dv:1323334240674517147>"
     
     
     

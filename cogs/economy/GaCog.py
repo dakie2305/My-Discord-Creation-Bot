@@ -48,7 +48,7 @@ class GuardianAngelCog(commands.Cog):
             mess = await interaction.followup.send(content=f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True, view=view)
             view.message = mess
             return
-        elif user_profile.guardian == None:
+        elif user_profile.guardian == None or user_profile.guardian.is_dead:
             view = SelfDestructView(timeout=30)
             mess = await interaction.followup.send(content=f"Vui lòng mua Hộ Vệ Thần trước bằng lệnh {SlashCommand.SHOP_GUARDIAN.value} đã!", ephemeral=True, view=view)
             view.message = mess
@@ -94,7 +94,7 @@ class GuardianAngelCog(commands.Cog):
             mess = await interaction.followup.send(content=f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True, view=view)
             view.message = mess
             return
-        elif user_profile.guardian == None:
+        elif user_profile.guardian == None or user_profile.guardian.is_dead:
             view = SelfDestructView(timeout=30)
             mess = await interaction.followup.send(content=f"Vui lòng mua Hộ Vệ Thần trước bằng lệnh {SlashCommand.SHOP_GUARDIAN.value} đã!", ephemeral=True, view=view)
             view.message = mess
@@ -173,7 +173,7 @@ class GuardianAngelCog(commands.Cog):
             mess = await interaction.followup.send(content=f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True, view=view)
             view.message = mess
             return
-        elif user_profile.guardian == None:
+        elif user_profile.guardian == None or user_profile.guardian.is_dead:
             view = SelfDestructView(timeout=30)
             mess = await interaction.followup.send(content=f"Vui lòng mua Hộ Vệ Thần trước bằng lệnh {SlashCommand.SHOP_GUARDIAN.value} đã!", ephemeral=True, view=view)
             view.message = mess
@@ -275,7 +275,7 @@ class GuardianAngelCog(commands.Cog):
             mess = await interaction.followup.send(content=f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True, view=view)
             view.message = mess
             return
-        elif user_profile.guardian == None:
+        elif user_profile.guardian == None or user_profile.guardian.is_dead:
             view = SelfDestructView(timeout=30)
             mess = await interaction.followup.send(content=f"Vui lòng mua Hộ Vệ Thần trước bằng lệnh {SlashCommand.SHOP_GUARDIAN.value} đã!", ephemeral=True, view=view)
             view.message = mess
@@ -332,7 +332,7 @@ class GuardianAngelCog(commands.Cog):
             mess = await interaction.followup.send(content=f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True, view=view)
             view.message = mess
             return
-        elif user_profile.guardian == None:
+        elif user_profile.guardian == None or user_profile.guardian.is_dead:
             view = SelfDestructView(timeout=30)
             mess = await interaction.followup.send(content=f"Vui lòng mua Hộ Vệ Thần trước bằng lệnh {SlashCommand.SHOP_GUARDIAN.value} đã!", ephemeral=True, view=view)
             view.message = mess
@@ -373,7 +373,7 @@ class GuardianAngelCog(commands.Cog):
                 mess = await interaction.followup.send(content=f"Đối thủ {target.mention} vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True, view=view)
                 view.message = mess
                 return
-            elif target_profile.guardian == None:
+            elif target_profile.guardian == None or target_profile.guardian.is_dead:
                 view = SelfDestructView(timeout=30)
                 mess = await interaction.followup.send(content=f"Đối thủ {target.mention} vui lòng mua Hộ Vệ Thần trước bằng lệnh {SlashCommand.SHOP_GUARDIAN.value} đã!", ephemeral=True, view=view)
                 view.message = mess
