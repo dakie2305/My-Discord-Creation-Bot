@@ -9,6 +9,7 @@ from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 import Handling.Economy.GA.ListGAAndSkills as ListGAAndSkills
 from datetime import datetime, timedelta
 import random
+import Handling.Economy.Couple.CoupleMongoManager as CoupleMongoManager
 
 class ProfileToInventoryView(discord.ui.View):
     def __init__(self, profile: Profile):
@@ -164,10 +165,13 @@ class InventoryBackToProfileView(discord.ui.View):
             self.profile.darkium = 0
             ProfileMongoManager.update_profile_money_fast(guild_id= interaction.guild_id, data=self.profile)
             ProfileMongoManager.remove_authority_from_server(guild_id=interaction.guild_id)
-            ProfileMongoManager.update_last_authority(guild_id=interaction.guild_id, user_id=self.profile)
+            ProfileMongoManager.update_last_authority(guild_id=interaction.guild_id, user_id=self.profile.user_id)
             await self.message.edit(embed=embed)
             await interaction.followup.send(f"Bạn đã chuyển sang chế độ Profile!", ephemeral=True)
             return
+        
+        couple_info = CoupleMongoManager.find_couple_by_id(guild_id=interaction.guild_id, user_id=self.profile.user_id)
+        
         cq = ""
         if self.profile.is_authority:
             cq = "Chính Quyền Tối Cao"
@@ -181,6 +185,19 @@ class InventoryBackToProfileView(discord.ui.View):
         embed.add_field(name=f"", value=f"Rank: **{self.profile.level}**", inline=False)
         bar_progress = self.progress_bar(input_value= self.profile.level_progressing)
         embed.add_field(name=f"", value=f"{bar_progress}\n", inline=False)
+        if couple_info!= None:
+            embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+            embed.add_field(name=f"", value=f"Tình trạng cặp đôi: **{UtilitiesFunctions.get_text_on_love_rank(couple_info.love_rank)}** (**{couple_info.love_rank}**)", inline=False)
+            embed.add_field(name=f"", value=f"<@{couple_info.first_user_id}> -`{UtilitiesFunctions.get_heart_emoji_on_rank(couple_info.love_rank)}´- <@{couple_info.second_user_id}>", inline=False)
+            embed.add_field(name=f"", value=f"Điểm thân mật: **{couple_info.love_point}**", inline=False)
+            embed.add_field(name=f"", value=f"Tỉ lệ thăng hoa cảm xúc: **{int(couple_info.love_progressing/1000*100)}%**", inline=False)
+            date_created = couple_info.date_created
+            unix_time = int(date_created.timestamp())
+            embed.add_field(name=f"", value=f"Ngày đầu quen nhau: <t:{unix_time}:D>", inline=False)
+            if couple_info.date_married != None:
+                date_married = couple_info.date_married
+                unix_time_m = int(date_married.timestamp())
+                embed.add_field(name=f"", value=f"Ngày cưới nhau: <t:{unix_time_m}:D>", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
         embed.add_field(name=f"", value=f"**Tổng tài sản**:", inline=False)
         show_darkium = f"{EmojiCreation2.DARKIUM.value}: **{UtilitiesFunctions.shortened_currency(self.profile.darkium)}**\n"
