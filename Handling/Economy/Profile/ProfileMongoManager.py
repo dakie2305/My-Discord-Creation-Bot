@@ -814,3 +814,13 @@ def set_guardian_stats_points(guild_id: int, user_id: int, stats_point: int = 0)
                                                                                     }})
     return result
 
+def set_guardian_dead_status(guild_id: int, user_id: int, is_dead = False):
+    collection = db_specific[f'profile_{guild_id}']
+    existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
+    if existing_data == None: return
+    if existing_data.guardian == None: return
+    
+    existing_data.guardian.is_dead = is_dead
+    result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"guardian.is_dead": existing_data.guardian.is_dead,
+                                                                                    }})
+    return result

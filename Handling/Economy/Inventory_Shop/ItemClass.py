@@ -514,6 +514,21 @@ list_support_ga_items= [
         bonus_dignity = 0,
         rank_required = 1,
     ),
+    Item(
+        item_id = "ga_resurrection",
+        item_name = "Phục Sinh Thạch",
+        item_description = "Một tảng đá thần kỳ giúp hồi sinh Hộ Vệ Thần từ cõi chết! Đôi khi, chết vẫn chưa là hết!",
+        item_type = "self_support",
+        quantity = 1,
+        emoji = EmojiCreation2.MAGIC_DV.value,
+        item_worth_amount = 500,
+        item_worth_type= "D",
+        item_require_target = False,
+        is_self_usable = True,
+        bonus_exp = 0,
+        bonus_dignity = 0,
+        rank_required = 1,
+    ),
 ]
 #region list attack items
 list_attack_items = [

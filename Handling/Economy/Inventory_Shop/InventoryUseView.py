@@ -227,6 +227,15 @@ class InventoryUseView(discord.ui.View):
                 ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id, user_id=self.user.id, health=self.user_profile.guardian.max_health, stamina=self.user_profile.guardian.max_stamina, mana=self.user_profile.guardian.max_mana)
                 text = f"{interaction.user.mention} đã dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] và hồi phục Hộ Vệ Thần về trạng thái hoàng kim!"
             await channel.send(content=text)
+        elif self.selected_item.item_id == "ga_resurrection":
+            #Xoá vật phẩm
+            ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, amount= -1)
+            text = f"{interaction.user.mention} đã sử dụng đến [{self.selected_item.emoji} - **{self.selected_item.item_name}**] nhưng quên mất mình làm gì có Hộ Vệ Thần!"
+            if self.user_profile.guardian!= None:
+                ProfileMongoManager.set_guardian_dead_status(guild_id=interaction.guild_id, user_id=self.user.id, is_dead=False)
+                text = f"{interaction.user.mention} đã lập tức dùng đến [{self.selected_item.emoji} - **{self.selected_item.item_name}**] để Hộ Vệ Thần của mình từ cõi chết trở về!"
+            await channel.send(content=text)
+        
         else:
             await channel.send(f'Darkie vẫn chưa code xong công dụng cho vật phẩm [{self.selected_item.emoji} - **{self.selected_item.item_name}**]', ephemeral=True)
         return
