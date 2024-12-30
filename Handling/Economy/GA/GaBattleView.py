@@ -149,6 +149,7 @@ class GaBattleView(discord.ui.View):
         return
     
     async def end_battle(self):
+        print(f"Username {self.user_profile.user_name} has ended guardian battle in guild {self.user_profile.guild_name}!")
         #Tính toán kết quả
         self.battle_ended = True
         result_text = "**Tổng Kết Chiến Đấu**\n"

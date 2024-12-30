@@ -26,7 +26,7 @@ class ProfileToInventoryView(discord.ui.View):
             self.gard_button.callback = self.garden_button_function
             self.add_item(self.gard_button)
         
-        if profile.guardian != None:
+        if profile.guardian != None and profile.guardian.is_dead == False:
             self.guardian_button = discord.ui.Button(label="Hộ Vệ Thần", style=discord.ButtonStyle.primary)
             self.guardian_button.callback = self.guardian_button_function
             self.add_item(self.guardian_button)

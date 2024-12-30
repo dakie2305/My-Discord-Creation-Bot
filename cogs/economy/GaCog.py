@@ -450,6 +450,7 @@ class GuardianAngelCog(commands.Cog):
         view = GaBattleView(user=interaction.user, user_profile=user_profile, target=target, target_profile=target_profile, is_players_versus_players=is_players_versus_player, max_players=max_players_as_int, enemy_ga=enemy, embed_title=title, guild_id=interaction.guild_id, gold_reward=gold_reward, silver_reward=silver_reward, bonus_exp=exp_reward, dignity_point=dignity_point_reward)
         mess = await interaction.followup.send(embed=embed, view=view)
         view.message = mess
+        print(f"Username {interaction.user.name} has started guardian battle in guild {interaction.guild.name} at channel {interaction.channel.name}!")
         await view.commence_battle()
         return
         
