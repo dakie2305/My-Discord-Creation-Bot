@@ -85,6 +85,22 @@ list_ga_shop = [
     ),
     
     GuardianAngel(
+      ga_id = "asuna",
+      ga_name= "Asuna",
+      ga_emoji= EmojiCreation2.ASUNA.value,
+      stamina = 110,
+      max_stamina= 110,
+      health= 100,
+      max_health= 100,
+      mana= 80,
+      max_mana= 80,
+      buff_attack_percent = 0,
+      attack_power= 15,
+      worth_amount = 50, 
+      worth_type = "D",
+    ),
+    
+    GuardianAngel(
       ga_id = "ly_hoa_phuong",
       ga_name= "Lý Hoả Vượng",
       ga_emoji= EmojiCreation2.LY_HOA_PHUONG.value,
@@ -132,6 +148,21 @@ list_ga_shop = [
       worth_type = "D",
     ),
     
+    GuardianAngel(
+      ga_id = "arya",
+      ga_name= "Arya",
+      ga_emoji= EmojiCreation2.ARYA.value,
+      stamina = 100,
+      max_stamina= 100,
+      health= 100,
+      max_health= 100,
+      mana= 80,
+      max_mana= 80,
+      buff_attack_percent = 0,
+      attack_power= 15,
+      worth_amount = 50, 
+      worth_type = "D",
+    ),
 ]
 
 
@@ -139,11 +170,11 @@ list_ga_skills = [
     GuardianAngelSkill(
         skill_id = "skill_blizzard",
         skill_name= "Bão Tuyết",
-        skill_desc="",
-        skill_type= "attack",
+        skill_desc="Triệu hồi bão tuyết cực mạnh để tấn công kẻ địch! Tăng 5% sức mạnh tấn công và mất 15% mana mỗi khi dùng!",
+        skill_type= ["attack"],
         emoji= EmojiCreation2.BLIZZARD.value,
-        attack_power= 15,
-        item_worth_amount= 100,
+        attack_power= 20,
+        item_worth_amount= 20000,
         item_worth_type= "G",
         percent_min_mana_req= 30,
         mana_loss= 15,
@@ -238,6 +269,24 @@ def get_list_back_ground_on_ga_id(ga_id: str):
           "https://i.pinimg.com/originals/80/6c/f4/806cf4a613ad2467eb4f442cbd3c0cdf.gif",
           "https://i.pinimg.com/originals/86/09/2c/86092cbc580fedcd766a80ace9d2bcc3.gif",
       ]
+    elif ga_id == "asuna":
+        background_urls = [
+          "https://i.imgur.com/BNhnFUa.gif",
+          "https://i.imgur.com/vxAfOTD.gif",
+          "https://i.imgur.com/Sf1nSL2.gif",
+          "https://i.imgur.com/beX7Rdv.gif",
+          "https://i.imgur.com/Wl3XhD9.gif",
+      ]
+    elif ga_id == "arya":
+        background_urls = [
+          "https://i.imgur.com/k0PYV3m.gif",
+          "https://i.imgur.com/NM3cLrO.gif",
+          "https://i.pinimg.com/originals/c4/85/31/c48531f47f49424a03f8e318a183b054.gif",
+          "https://i.pinimg.com/originals/53/0f/1c/530f1c7b35e8928c5ff55f60378dcf10.gif",
+          "https://i.pinimg.com/originals/0d/b6/b7/0db6b741356175283bb6196d897a7c83.gif",
+          "https://i.pinimg.com/originals/e8/bf/be/e8bfbebed33f24afe110314867ffae84.gif",
+          "https://i.pinimg.com/originals/91/1f/f6/911ff6a5913ed95b4af78ab454184e88.gif",
+      ]
     return background_urls
 
 def get_random_ga_enemy_generic(level: int = 1):
@@ -293,17 +342,17 @@ def get_random_ga_enemy_generic(level: int = 1):
     #dựa trên level để tăng giảm stats của kẻ địch
     random_level_bonus = random.randint(-3, 7)
     if level < 10:
-        random_level_bonus = random.randint(-3, 5)
+        random_level_bonus = random.randint(-1, 5)
     elif level > 10 and level < 20:
-        random_level_bonus = random.randint(4, 10)
+        random_level_bonus = random.randint(4, 7)
     elif level > 20 and level < 30:
-        random_level_bonus = random.randint(6, 10)
+        random_level_bonus = random.randint(4, 10)
     elif level > 30 and level < 40:
-        random_level_bonus = random.randint(3, 15)
+        random_level_bonus = random.randint(3, 10)
     elif level > 40 and level < 50:
-        random_level_bonus = random.randint(5, 15)
+        random_level_bonus = random.randint(5, 12)
     else:
-        random_level_bonus = random.randint(6, 15)
+        random_level_bonus = random.randint(4, 15)
     
     data.level = level + random_level_bonus
     if data.level <= 0: data.level = 1

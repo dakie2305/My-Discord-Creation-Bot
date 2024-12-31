@@ -101,11 +101,11 @@ class GuardianAngel:
             )
 
 class GuardianAngelSkill:
-    def __init__(self, skill_id: str, skill_name: str, skill_desc: str, skill_type: str, emoji: str, attack_power: int = 10, defense_power: int = 10, buff_attack_percent = 1, buff_defense_percent = 1, min_level_required: int = 1, item_worth_amount: int = 100, item_worth_type: str = "G", percent_min_stamina_req: int = 1, percent_min_health_req: int = 1, percent_min_mana_req: int = 1, stamina_loss: int = 0, health_loss: int = 0, mana_loss: int = 0):
+    def __init__(self, skill_id: str, skill_name: str, skill_desc: str, skill_type: List[str], emoji: str, attack_power: int = 10, defense_power: int = 10, buff_attack_percent = 1, buff_defense_percent = 1, min_level_required: int = 1, item_worth_amount: int = 100, item_worth_type: str = "G", percent_min_stamina_req: int = 1, percent_min_health_req: int = 1, percent_min_mana_req: int = 1, stamina_loss: int = 0, health_loss: int = 0, mana_loss: int = 0):
         self.skill_id = skill_id
         self.skill_name = skill_name
         self.skill_desc = skill_desc
-        self.skill_type = skill_type
+        self.skill_type = skill_type if skill_type else []
         self.emoji = emoji
         self.attack_power = attack_power
         self.defense_power = defense_power
@@ -126,7 +126,6 @@ class GuardianAngelSkill:
             "skill_id": self.skill_id,
             "skill_name": self.skill_name,
             "skill_desc": self.skill_desc,
-            "skill_type": self.skill_type,
             "emoji": self.emoji,
             "attack_power": self.attack_power,
             "defense_power": self.defense_power,
@@ -141,6 +140,8 @@ class GuardianAngelSkill:
             "stamina_loss": self.stamina_loss,
             "health_loss": self.health_loss,
             "mana_loss": self.mana_loss,
+            
+            "skill_type": [data for data in self.skill_type],
         }
 
     @staticmethod
@@ -149,7 +150,6 @@ class GuardianAngelSkill:
             skill_id=data.get("skill_id", None),
             skill_name=data.get("skill_name", None),
             skill_desc=data.get("skill_desc", None),
-            skill_type=data.get("skill_type", None),
             emoji=data.get("emoji", None),
             attack_power=data.get("attack_power", 10),
             defense_power=data.get("defense_power", 10),
@@ -164,5 +164,7 @@ class GuardianAngelSkill:
             stamina_loss=data.get("stamina_loss", 0),
             health_loss=data.get("health_loss", 0),
             mana_loss=data.get("mana_loss", 0),
+            
+            skill_type = [data for data in data.get("skill_type", [])],
         )
 
