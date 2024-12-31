@@ -166,7 +166,7 @@ async def process_reset_word_matching(message: discord.Message, word_matching_ch
 async def wm_give_skill(ctx, item_id: str = None, user: Optional[discord.Member] = None):
     message: discord.Message = ctx.message
     if message.guild.id == 1256987900277690470:
-        req_roles = ['Cai Ngục', 'Server Master']
+        req_roles = ['Cai Ngục', 'Server Master', 'Moderator']
         has_required_role = any(role.name in req_roles for role in message.author.roles)
         if not has_required_role and message.author.id != 315835396305059840:
             await ctx.send("Không đủ thẩm quyền để dùng lệnh.")
@@ -215,7 +215,7 @@ async def wm_give_skill(ctx, item_id: str = None, user: Optional[discord.Member]
 async def wm_give_ban(ctx, user: discord.Member, ban_amount: int):
     message: discord.Message = ctx.message
     if message.guild.id == 1256987900277690470:
-        req_roles = ['Cai Ngục', 'Server Master']
+        req_roles = ['Cai Ngục', 'Server Master', 'Moderator']
         has_required_role = any(role.name in req_roles for role in message.author.roles)
         if not has_required_role and message.author.id != 315835396305059840:
             await ctx.send("Không đủ thẩm quyền để dùng lệnh.")
