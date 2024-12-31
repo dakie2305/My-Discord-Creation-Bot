@@ -55,7 +55,7 @@ list_ga_shop = [
     GuardianAngel(
       ga_id = "makima",
       ga_name= "Makima Thánh Nữ",
-      ga_emoji= EmojiCreation2.Hatori_Chise.value,
+      ga_emoji= EmojiCreation2.MAKIMA.value,
       stamina = 120,
       max_stamina= 120,
       health= 100,

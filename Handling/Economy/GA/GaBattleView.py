@@ -140,7 +140,9 @@ class GaBattleView(discord.ui.View):
             await self.message.edit(embed=embed, content=f"Lượt thứ **{self.round}**")
         if flag_end_battle: await self.end_battle()
         else:
-            if self.round > 2:
+            max_limit = 2
+            if len(self.upper_attack_class) > 3 or len(self.lower_attack_class) > 3: max_limit = 1
+            if self.round > max_limit:
                 #Bỏ đi round đầu để tiếp kiệm chỗ
                 first_key = list(self.round_number_text_report.keys())[0]
                 del self.round_number_text_report[first_key]
