@@ -824,3 +824,28 @@ def set_guardian_dead_status(guild_id: int, user_id: int, is_dead = False):
     result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"guardian.is_dead": existing_data.guardian.is_dead,
                                                                                     }})
     return result
+
+def update_list_skills_guardian(guild_id: int, user_id: int, skill: GuardianAngelSkill, is_remove: bool = False):
+    collection = db_specific[f'profile_{guild_id}']
+    existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
+    if existing_data == None: return
+    if existing_data.guardian == None: return
+    
+    list_skills = existing_data.guardian.list_skills
+    if list_skills == None: list_skills = []
+    
+    if is_remove == False:
+        #Thêm thì sẽ gắn vào list skill của guardian
+        list_skills.append(skill)
+    else:
+        #Gỡ ra thì sẽ trả lại vào list item trong profile
+        for profile_skill in list_skills:
+            if profile_skill.skill_id == skill.skill_id:
+                list_skills.remove(profile_skill)
+                break
+    
+    #Nếu list skill quá giới hạn thì xoá cái đầu tiên
+    if len(list_skills) > existing_data.guardian.max_skills:
+        list_skills.pop(0)
+    result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"guardian.list_skills": [data.to_dict() for data in list_skills],}})
+    return result
