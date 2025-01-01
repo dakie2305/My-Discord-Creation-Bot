@@ -194,8 +194,8 @@ class EmojiCreation2(Enum):
     MAKIMA = "<a:makima:1323328680558198896>"
     REZE = "<:reze:1323328688430907583>"
     RIKKA = "<a:rikka:1323331964559949884>"
-    ASUNA = "<:Asuna:1323698291657146468>"
-    ARYA = "<:arya:1323708440853614684>"
+    ASUNA = "<a:Asuna_SAO:1324069383080771677>"
+    ARYA = "<:arya_waifu:1324069367897653419>"
     
     
     BLIZZARD = "<:blizzard:1320096021962952725>"
