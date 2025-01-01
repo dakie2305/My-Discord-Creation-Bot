@@ -339,6 +339,12 @@ class GuardianAngelCog(commands.Cog):
             view.message = mess
             return
         
+        if target!= None and target.id == interaction.user.id:
+            view = SelfDestructView(timeout=30)
+            mess = await interaction.followup.send(content=f"Bạn không thể chiến đấu với bản thân mình!", ephemeral=True, view=view)
+            view.message = mess
+            return
+        
         user_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
         if user_profile == None:
             view = SelfDestructView(timeout=30)
