@@ -250,7 +250,7 @@ def update_level_progressing(guild_id:int, user_id: int, bonus_exp: int = 0):
         existing_data.level_progressing += 35
     elif existing_data.level >= 75 and existing_data.level < 99:
         existing_data.level_progressing += 30
-    elif existing_data.level == 99:
+    elif existing_data.level >= 99:
         #Cực khó sau level 99
         existing_data.level_progressing += 1
         bonus_exp = 0
@@ -706,9 +706,9 @@ def update_main_guardian_level_progressing(guild_id:int, user_id: int, bonus_exp
         existing_data.guardian.level_progressing += 35
     elif existing_data.guardian.level >= 75 and existing_data.guardian.level < 99:
         existing_data.guardian.level_progressing += 30
-    elif existing_data.guardian.level == 99:
+    elif existing_data.guardian.level >= 99:
         #Cực khó sau level 99
-        existing_data.guardian.level_progressing += 1
+        existing_data.guardian.level_progressing += 50
         bonus_exp = 0
     
     if bonus_exp < 0: bonus_exp = 0
