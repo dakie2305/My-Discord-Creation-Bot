@@ -43,6 +43,7 @@ class LeaderboardEconomy(commands.Cog):
         Choice(name="Xếp hạng theo tổng số Copper", value="copper_only"),
         Choice(name="Xếp hạng theo rank", value="rank"),
         Choice(name="Xếp hạng Quest hoàn thành", value="quest"),
+        Choice(name="Xếp hạng cấp bậc Hộ Vệ Thần", value="guardian"),
     ])
     @discord.app_commands.checks.cooldown(1, 10)
     @discord.app_commands.command(name="leaderboard", description="Bảng xếp hạng tài chính trong server!")
@@ -287,6 +288,51 @@ class LeaderboardEconomy(commands.Cog):
                         break
             embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
             return embed
+        #region leaderboard guardian
+        elif type == "guardian":
+            #Lọc theo rank
+            title = "Bảng Xếp Hạng Cấp Bậc Vệ Thần"
+            list_profile_guild = sorted(
+                [profile for profile in list_profile_guild if profile.guardian], 
+                key=lambda profile: profile.guardian.level, reverse=True
+            )
+            # list_profile_guild.sort(key=lambda x: x.guardian.level, reverse=True)
+            embed = discord.Embed(title=f"", description=f"{title}", color=0x0ce7f2)
+            embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+            if user == None:
+                count = 1
+                for index, profile in enumerate(list_profile_guild):
+                    if profile == None or profile.user_id == None: continue
+                    if profile.guardian == None: continue
+                    if (index+1) == 1:
+                        embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.FIRST_CUP.value}**: {profile.guardian.ga_emoji} - {profile.guardian.ga_name}, cấp **{profile.guardian.level}** (<@{profile.user_id}>)", inline=False)
+                    elif (index+1) == 2:
+                        embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.SECOND_CUP.value}**: {profile.guardian.ga_emoji} - {profile.guardian.ga_name}, cấp **{profile.guardian.level}** (<@{profile.user_id}>)", inline=False)
+                    elif (index+1) == 3:
+                        embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.THIRD_CUP.value}**: {profile.guardian.ga_emoji} - {profile.guardian.ga_name}, cấp **{profile.guardian.level}** (<@{profile.user_id}>)", inline=False)
+                    else:
+                        embed.add_field(name=f"", value=f"**Hạng {index+1}**: {profile.guardian.ga_emoji} - {profile.guardian.ga_name}, cấp **{profile.guardian.level}** (<@{profile.user_id}>)", inline=False)
+                    count+=1
+                    if count >= 20: break
+            else:
+                embed.add_field(name=f"", value=f"Xếp hạng của {user.mention}", inline=True)
+                embed.add_field(name=f"", value=f"_____________", inline=False)
+                for index, profile in enumerate(list_profile_guild):
+                    if profile == None or profile.user_id == None: continue
+                    if profile.guardian == None: continue
+                    if profile.user_id == user.id:
+                        if (index+1) == 1:
+                            embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.FIRST_CUP.value}**: {profile.guardian.ga_emoji} - {profile.guardian.ga_name}, cấp **{profile.guardian.level}** (<@{profile.user_id}>)", inline=False)
+                        elif (index+1) == 2:
+                            embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.SECOND_CUP.value}**: {profile.guardian.ga_emoji} - {profile.guardian.ga_name}, cấp **{profile.guardian.level}** (<@{profile.user_id}>)", inline=False)
+                        elif (index+1) == 3:
+                            embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.THIRD_CUP.value}**: {profile.guardian.ga_emoji} - {profile.guardian.ga_name}, cấp **{profile.guardian.level}** (<@{profile.user_id}>)", inline=False)
+                        else:
+                            embed.add_field(name=f"", value=f"**Hạng {index+1}**: {profile.guardian.ga_emoji} - {profile.guardian.ga_name}, cấp **{profile.guardian.level}** (<@{profile.user_id}>)", inline=False)
+                        break
+            embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+            return embed
+
         else:
             embed = discord.Embed(title=f"", description=f"Loại bảng xếp hạng này vẫn chưa được code xong!", color=0x03F8FC)
             return embed
