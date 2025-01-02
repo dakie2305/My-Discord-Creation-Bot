@@ -195,6 +195,8 @@ class InventoryUseView(discord.ui.View):
             health_to_heal = 0
             if self.user_profile.guardian!= None:
                 health_to_heal = int(self.user_profile.guardian.max_health*0.3)
+                if health_to_heal > self.user_profile.guardian.max_health:
+                    health_to_heal = self.user_profile.guardian.max_health
                 ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id, user_id=self.user.id, health=health_to_heal)
                 addition_text = f"\nMáu hiện tại: {int(health_to_heal+self.user_profile.guardian.health)}/{self.user_profile.guardian.max_health}"
                 text = f"{interaction.user.mention} đã dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] và hồi phục **{health_to_heal}** Máu {EmojiCreation2.HP.value} cho Hộ Vệ Thần của mình!{addition_text}"
@@ -207,6 +209,8 @@ class InventoryUseView(discord.ui.View):
             stats_restored = 0
             if self.user_profile.guardian!= None:
                 stats_restored = int(self.user_profile.guardian.max_stamina*0.5)
+                if stats_restored > self.user_profile.guardian.max_stamina:
+                    stats_restored = self.user_profile.guardian.max_stamina
                 ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id, user_id=self.user.id, stamina=stats_restored)
                 addition_text = f"\nThể lực hiện tại: {int(stats_restored+self.user_profile.guardian.stamina)}/{self.user_profile.guardian.max_stamina}"
                 text = f"{interaction.user.mention} đã dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] và hồi phục **{stats_restored}** Thể Lực {EmojiCreation2.STAMINA.value} cho Hộ Vệ Thần của mình!{addition_text}"
@@ -218,6 +222,8 @@ class InventoryUseView(discord.ui.View):
             stats_restored = 0
             if self.user_profile.guardian!= None:
                 stats_restored = int(self.user_profile.guardian.max_mana*0.5)
+                if stats_restored > self.user_profile.guardian.max_mana:
+                    stats_restored = self.user_profile.guardian.max_mana
                 ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id, user_id=self.user.id, mana=stats_restored)
                 addition_text = f"\nMana hiện tại: {int(stats_restored+self.user_profile.guardian.mana)}/{self.user_profile.guardian.max_mana}"
                 text = f"{interaction.user.mention} đã dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] và hồi phục **{stats_restored}** Mana {EmojiCreation2.MP.value} cho Hộ Vệ Thần của mình!{addition_text}"
