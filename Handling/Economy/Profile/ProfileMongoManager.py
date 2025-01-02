@@ -723,9 +723,16 @@ def update_main_guardian_level_progressing(guild_id:int, user_id: int, bonus_exp
             existing_data.guardian.level += 1
             existing_data.guardian.stats_point += 1
     
+    max_skills = 1
+    if existing_data.guardian.level >= 25 and existing_data.guardian.level <50: max_skills = 2
+    if existing_data.guardian.level >= 50 and existing_data.guardian.level <75: max_skills = 3
+    if existing_data.guardian.level >= 75 and existing_data.guardian.level <100: max_skills = 4
+    if existing_data.guardian.level >= 100: max_skills = 5
+
     result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"guardian.level_progressing": existing_data.guardian.level_progressing,
                                                                                     "guardian.level": existing_data.guardian.level,
                                                                                     "guardian.stats_point": existing_data.guardian.stats_point,
+                                                                                    "guardian.max_skills": max_skills,
                                                                                     }})
     return result
 
