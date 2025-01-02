@@ -104,8 +104,8 @@ class GaBattleView(discord.ui.View):
             if check:
                 next_time = new_player_profile.guardian.last_joined_battle + time_window
                 unix_time = int(next_time.timestamp())
-                embed = discord.Embed(title=f"", description=f"🚫 Bạn vừa tham chiến xong. Vui lòng đợi một phút rồi thực hiện lại lệnh!", color=0xc379e0)
-                view = SelfDestructView(timeout=120)
+                embed = discord.Embed(title=f"", description=f"🚫 {interaction.user.mention} Bạn vừa tham chiến xong. Vui lòng đợi một phút rồi thực hiện lại lệnh!", color=0xc379e0)
+                view = SelfDestructView(timeout=30)
                 mess = await interaction.followup.send(embed=embed, view=view, ephemeral=False)
                 view.message = mess
                 return
@@ -158,8 +158,8 @@ class GaBattleView(discord.ui.View):
             if check:
                 next_time = new_player_profile.guardian.last_joined_battle + time_window
                 unix_time = int(next_time.timestamp())
-                embed = discord.Embed(title=f"", description=f"🚫 Bạn vừa tham chiến xong. Vui lòng đợi một phút rồi thực hiện lại lệnh!", color=0xc379e0)
-                view = SelfDestructView(timeout=120)
+                embed = discord.Embed(title=f"", description=f"🚫 {interaction.user.mention} Bạn vừa tham chiến xong. Vui lòng đợi một phút rồi thực hiện lại lệnh!", color=0xc379e0)
+                view = SelfDestructView(timeout=30)
                 mess = await interaction.followup.send(embed=embed, view=view, ephemeral=False)
                 view.message = mess
                 return
@@ -213,8 +213,8 @@ class GaBattleView(discord.ui.View):
             if check:
                 next_time = new_player_profile.guardian.last_joined_battle + time_window
                 unix_time = int(next_time.timestamp())
-                embed = discord.Embed(title=f"", description=f"🚫 Bạn vừa tham chiến xong. Vui lòng đợi một phút rồi thực hiện lại lệnh!", color=0xc379e0)
-                view = SelfDestructView(timeout=120)
+                embed = discord.Embed(title=f"", description=f"🚫 {interaction.user.mention} Bạn vừa tham chiến xong. Vui lòng đợi một phút rồi thực hiện lại lệnh!", color=0xc379e0)
+                view = SelfDestructView(timeout=60)
                 mess = await interaction.followup.send(embed=embed, view=view, ephemeral=False)
                 view.message = mess
                 return
