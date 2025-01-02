@@ -34,6 +34,7 @@ class InventoryUseView(discord.ui.View):
         if interaction.user.id != self.user.id: return
         await interaction.response.defer(ephemeral=True)
         
+        self.user_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
         #Kiểm tra xem item đó còn không
         check_fail = True
         for player_item in self.user_profile.list_items:
@@ -45,8 +46,8 @@ class InventoryUseView(discord.ui.View):
             return
         
         await interaction.followup.send(f'Bạn đã dùng vật phẩm [{self.selected_item.emoji} - **{self.selected_item.item_name}**]', ephemeral=True)
-        if self.message != None: 
-            await self.message.delete()
+        # if self.message != None: 
+        #     await self.message.delete()
         
         
         #Thực hiện hiệu ứng của item
