@@ -107,7 +107,7 @@ class ProfileEconomy(commands.Cog):
                 embed, data = await self.procress_profile_embed(user=message.author, guild_id=message.guild.id)
             else:
                 embed, data = await self.procress_profile_embed(user=user, guild_id=message.guild.id)
-            if data != None and data.list_items != None and len(data.list_items)>0:
+            if data != None:
                 view = ProfileToInventoryView(profile=data)
                 m = await message.reply(embed=embed, view= view)
                 view.message = m
