@@ -12,6 +12,8 @@ from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 import random
 import asyncio
 from datetime import datetime, timedelta
+from Handling.Misc.SelfDestructView import SelfDestructView
+
 
 class GaBattleView(discord.ui.View):
     def __init__(self, user_profile: Profile, user: discord.Member,enemy_ga: GuardianAngel, guild_id: int, is_players_versus_players: bool, target_profile: Profile = None, target: discord.Member = None, allowed_multiple_players: bool = False, max_players:int = 1, embed_title: str = "", gold_reward: int = 0, silver_reward: int= 0, dignity_point: int = 10, bonus_exp: int = 200):
@@ -96,6 +98,18 @@ class GaBattleView(discord.ui.View):
             await interaction.followup.send(content=f"Vui lòng mua Hộ Vệ Thần trước bằng lệnh {SlashCommand.SHOP_GUARDIAN.value} đã!", ephemeral=True)
             return
         
+        if new_player_profile.guardian.last_joined_battle != None:
+            time_window = timedelta(minutes=1)
+            check = UtilitiesFunctions.check_if_within_time_delta(input=new_player_profile.guardian.last_joined_battle, time_window=time_window)
+            if check:
+                next_time = new_player_profile.guardian.last_joined_battle + time_window
+                unix_time = int(next_time.timestamp())
+                embed = discord.Embed(title=f"", description=f"🚫 Bạn vừa tham chiến xong. Vui lòng đợi một phút rồi thực hiện lại lệnh!", color=0xc379e0)
+                view = SelfDestructView(timeout=120)
+                mess = await interaction.followup.send(embed=embed, view=view, ephemeral=False)
+                view.message = mess
+                return
+
         if new_player_profile.guardian.time_to_recover!= None:
             if new_player_profile.guardian.time_to_recover > datetime.now():
                 next_time = new_player_profile.guardian.time_to_recover
@@ -116,6 +130,7 @@ class GaBattleView(discord.ui.View):
         data = GuardianAngelAttackClass(player_profile=new_player_profile, player_ga=new_player_profile.guardian, starting_at_round=self.round)
         self.upper_attack_class.append(data)
         self.joined_player_id.append(interaction.user.id)
+        ProfileMongoManager.update_main_guardian_profile_time(guild_id=interaction.guild_id,user_id=interaction.user.id, data_type="last_joined_battle", date_value=datetime.now())
         await interaction.followup.send(content=f"Bạn đã gia nhập phe trên vào lượt thứ {self.round}!", ephemeral=True)
         return
     
@@ -137,6 +152,18 @@ class GaBattleView(discord.ui.View):
             await interaction.followup.send(content=f"Vui lòng mua Hộ Vệ Thần trước bằng lệnh {SlashCommand.SHOP_GUARDIAN.value} đã!", ephemeral=True)
             return
         
+        if new_player_profile.guardian.last_joined_battle != None:
+            time_window = timedelta(minutes=1)
+            check = UtilitiesFunctions.check_if_within_time_delta(input=new_player_profile.guardian.last_joined_battle, time_window=time_window)
+            if check:
+                next_time = new_player_profile.guardian.last_joined_battle + time_window
+                unix_time = int(next_time.timestamp())
+                embed = discord.Embed(title=f"", description=f"🚫 Bạn vừa tham chiến xong. Vui lòng đợi một phút rồi thực hiện lại lệnh!", color=0xc379e0)
+                view = SelfDestructView(timeout=120)
+                mess = await interaction.followup.send(embed=embed, view=view, ephemeral=False)
+                view.message = mess
+                return
+
         if new_player_profile.guardian.time_to_recover!= None:
             if new_player_profile.guardian.time_to_recover > datetime.now():
                 next_time = new_player_profile.guardian.time_to_recover
@@ -157,6 +184,7 @@ class GaBattleView(discord.ui.View):
         data = GuardianAngelAttackClass(player_profile=new_player_profile, player_ga=new_player_profile.guardian, starting_at_round=self.round)
         self.lower_attack_class.append(data)
         self.joined_player_id.append(interaction.user.id)
+        ProfileMongoManager.update_main_guardian_profile_time(guild_id=interaction.guild_id,user_id=interaction.user.id, data_type="last_joined_battle", date_value=datetime.now())
         await interaction.followup.send(content=f"Bạn đã gia nhập phe dưới, vào lượt thứ {self.round}!", ephemeral=True)
         return
 
@@ -179,6 +207,18 @@ class GaBattleView(discord.ui.View):
             await interaction.followup.send(content=f"Vui lòng mua Hộ Vệ Thần trước bằng lệnh {SlashCommand.SHOP_GUARDIAN.value} đã!", ephemeral=True)
             return
         
+        if new_player_profile.guardian.last_joined_battle != None:
+            time_window = timedelta(minutes=1)
+            check = UtilitiesFunctions.check_if_within_time_delta(input=new_player_profile.guardian.last_joined_battle, time_window=time_window)
+            if check:
+                next_time = new_player_profile.guardian.last_joined_battle + time_window
+                unix_time = int(next_time.timestamp())
+                embed = discord.Embed(title=f"", description=f"🚫 Bạn vừa tham chiến xong. Vui lòng đợi một phút rồi thực hiện lại lệnh!", color=0xc379e0)
+                view = SelfDestructView(timeout=120)
+                mess = await interaction.followup.send(embed=embed, view=view, ephemeral=False)
+                view.message = mess
+                return
+        
         if new_player_profile.guardian.time_to_recover!= None:
             if new_player_profile.guardian.time_to_recover > datetime.now():
                 next_time = new_player_profile.guardian.time_to_recover
@@ -195,6 +235,7 @@ class GaBattleView(discord.ui.View):
         self.upper_attack_class.append(data)
         self.joined_player_id.append(interaction.user.id)
         await interaction.followup.send(content=f"Bạn đã gia nhập chiến đấu vào lượt thứ {self.round}!", ephemeral=True)
+        ProfileMongoManager.update_main_guardian_profile_time(guild_id=interaction.guild_id,user_id=interaction.user.id, data_type="last_joined_battle", date_value=datetime.now())
         return
 
     #region battle event
@@ -344,10 +385,10 @@ class GaBattleView(discord.ui.View):
     
     def update_stats_in_database(self, info: GuardianAngelAttackClass):
         if info.player_profile != None:
-            loss_health = int(info.player_ga.max_health - info.player_ga.health)
-            loss_stamina = int(info.player_ga.max_stamina - info.player_ga.stamina)
-            loss_mana = int(info.player_ga.max_mana - info.player_ga.mana)
-            ProfileMongoManager.update_guardian_stats(guild_id=self.guild_id, user_id=info.player_profile.user_id,stamina=-loss_stamina, health=-loss_health, mana=-loss_mana)
+            # loss_health = int(info.player_ga.max_health - info.player_ga.health)
+            # loss_stamina = int(info.player_ga.max_stamina - info.player_ga.stamina)
+            # loss_mana = int(info.player_ga.max_mana - info.player_ga.mana)
+            ProfileMongoManager.set_guardian_current_stats(guild_id=self.guild_id, user_id=info.player_profile.user_id,stamina=info.player_ga.stamina, health=info.player_ga.health, mana=info.player_ga.mana)
     
     def get_ga_stil_alive(self, side: str):
         if side == "upper":

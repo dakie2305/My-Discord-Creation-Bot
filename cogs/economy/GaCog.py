@@ -369,6 +369,18 @@ class GuardianAngelCog(commands.Cog):
                 view.message = mess
                 return
         
+        if user_profile.guardian.last_joined_battle != None:
+            time_window = timedelta(minutes=1)
+            check = UtilitiesFunctions.check_if_within_time_delta(input=user_profile.guardian.last_joined_battle, time_window=time_window)
+            if check:
+                next_time = user_profile.guardian.last_joined_battle + time_window
+                unix_time = int(next_time.timestamp())
+                embed = discord.Embed(title=f"", description=f"🚫 Bạn vừa tham chiến xong. Vui lòng đợi một phút rồi thực hiện lại lệnh!", color=0xc379e0)
+                view = SelfDestructView(timeout=120)
+                mess = await interaction.followup.send(embed=embed, view=view, ephemeral=False)
+                view.message = mess
+                return
+
         if user_profile.guardian.time_to_recover != None:
             if user_profile.guardian.time_to_recover > datetime.now():
                 view = SelfDestructView(timeout=30)
@@ -460,13 +472,12 @@ class GuardianAngelCog(commands.Cog):
         if is_players_versus_player: max_players = "1"
         max_players_as_int = int(max_players)
         
-
-
         #Tính lại theo enemy_ga
         gold_reward = int(gold_reward + gold_reward*enemy.level*0.2)
         silver_reward = int(silver_reward + silver_reward*enemy.level*0.3)
         exp_reward = int(exp_reward + exp_reward*enemy.level*0.1)
         ProfileMongoManager.update_main_guardian_profile_time(guild_id=interaction.guild_id,user_id=interaction.user.id, data_type="last_battle", date_value=datetime.now())
+        ProfileMongoManager.update_main_guardian_profile_time(guild_id=interaction.guild_id,user_id=interaction.user.id, data_type="last_joined_battle", date_value=datetime.now())
         view = GaBattleView(user=interaction.user, user_profile=user_profile, target=target, target_profile=target_profile, is_players_versus_players=is_players_versus_player, max_players=max_players_as_int, enemy_ga=enemy, embed_title=title, guild_id=interaction.guild_id, gold_reward=gold_reward, silver_reward=silver_reward, bonus_exp=exp_reward, dignity_point=dignity_point_reward)
         mess = await interaction.followup.send(embed=embed, view=view)
         view.message = mess

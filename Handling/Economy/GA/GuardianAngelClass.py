@@ -2,7 +2,7 @@ from typing import List, Optional
 from datetime import datetime
 
 class GuardianAngel:
-    def __init__(self, ga_id: str, ga_name: str, ga_emoji: str, stamina: int, max_stamina: int, health: int, max_health: int, mana: int, max_mana:int, attack_power: int = 10, buff_attack_percent: int = 0, level: int = 1, level_progressing: int = 0, stats_point: int = 0, list_skills : Optional[List['GuardianAngelSkill']] = None, max_skills: int = 1, is_injured: bool = False, time_to_recover: datetime = None, worth_amount: int = 50, worth_type: str = "D", last_feed: datetime = None, last_meditation: datetime = None, bonus_dignity_point: int = 0, bonus_exp: int = 0, last_battle: datetime = None, last_dungeon: datetime = None, is_dead = False):
+    def __init__(self, ga_id: str, ga_name: str, ga_emoji: str, stamina: int, max_stamina: int, health: int, max_health: int, mana: int, max_mana:int, attack_power: int = 10, buff_attack_percent: int = 0, level: int = 1, level_progressing: int = 0, stats_point: int = 0, list_skills : Optional[List['GuardianAngelSkill']] = None, max_skills: int = 1, is_injured: bool = False, time_to_recover: datetime = None, worth_amount: int = 50, worth_type: str = "D", last_feed: datetime = None, last_meditation: datetime = None, bonus_dignity_point: int = 0, bonus_exp: int = 0, last_battle: datetime = None, last_joined_battle: datetime = None, last_dungeon: datetime = None, is_dead = False):
         self.ga_id = ga_id
         self.ga_name = ga_name
         self.ga_emoji = ga_emoji
@@ -26,6 +26,7 @@ class GuardianAngel:
         self.last_feed = last_feed if last_feed else None
         self.last_meditation = last_meditation if last_meditation else None
         self.last_battle = last_battle if last_battle else None
+        self.last_joined_battle = last_joined_battle if last_joined_battle else None
         self.last_dungeon = last_dungeon if last_dungeon else None
         
         self.is_injured = is_injured
@@ -62,6 +63,7 @@ class GuardianAngel:
             "last_meditation": self.last_meditation if self.last_meditation else None,
             "last_battle": self.last_battle if self.last_battle else None,
             "last_dungeon": self.last_dungeon if self.last_dungeon else None,
+            "last_joined_battle": self.last_joined_battle if self.last_joined_battle else None,
             
             "list_skills": [data.to_dict() for data in self.list_skills],
         }
@@ -96,6 +98,7 @@ class GuardianAngel:
                 last_feed=data.get("last_feed", None),
                 last_battle=data.get("last_battle", None),
                 last_dungeon=data.get("last_dungeon", None),
+                last_joined_battle=data.get("last_joined_battle", None),
                 
                 list_skills = [GuardianAngelSkill.from_dict(data) for data in data.get("list_skills", [])],
             )
