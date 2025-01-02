@@ -196,7 +196,8 @@ class InventoryUseView(discord.ui.View):
             if self.user_profile.guardian!= None:
                 health_to_heal = int(self.user_profile.guardian.max_health*0.3)
                 ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id, user_id=self.user.id, health=health_to_heal)
-                text = f"{interaction.user.mention} đã dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] và hồi phục **{health_to_heal}** Máu {EmojiCreation2.HP.value} cho Hộ Vệ Thần của mình!"
+                addition_text = f"\nMáu hiện tại: {int(health_to_heal+self.user_profile.guardian.health)}/{self.user_profile.guardian.max_health}"
+                text = f"{interaction.user.mention} đã dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] và hồi phục **{health_to_heal}** Máu {EmojiCreation2.HP.value} cho Hộ Vệ Thần của mình!{addition_text}"
             await channel.send(content=text)
             
         elif self.selected_item.item_id == "ga_stamina_1":
@@ -207,7 +208,8 @@ class InventoryUseView(discord.ui.View):
             if self.user_profile.guardian!= None:
                 stats_restored = int(self.user_profile.guardian.max_stamina*0.5)
                 ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id, user_id=self.user.id, stamina=stats_restored)
-                text = f"{interaction.user.mention} đã dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] và hồi phục **{stats_restored}** Thể Lực {EmojiCreation2.STAMINA.value} cho Hộ Vệ Thần của mình!"
+                addition_text = f"\nThể lực hiện tại: {int(stats_restored+self.user_profile.guardian.stamina)}/{self.user_profile.guardian.max_stamina}"
+                text = f"{interaction.user.mention} đã dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] và hồi phục **{stats_restored}** Thể Lực {EmojiCreation2.STAMINA.value} cho Hộ Vệ Thần của mình!{addition_text}"
             await channel.send(content=text)
         elif self.selected_item.item_id == "ga_mana_1":
             #Xoá vật phẩm
@@ -217,7 +219,8 @@ class InventoryUseView(discord.ui.View):
             if self.user_profile.guardian!= None:
                 stats_restored = int(self.user_profile.guardian.max_mana*0.5)
                 ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id, user_id=self.user.id, mana=stats_restored)
-                text = f"{interaction.user.mention} đã dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] và hồi phục **{stats_restored}** Mana {EmojiCreation2.MP.value} cho Hộ Vệ Thần của mình!"
+                addition_text = f"\nMana hiện tại: {int(stats_restored+self.user_profile.guardian.mana)}/{self.user_profile.guardian.max_mana}"
+                text = f"{interaction.user.mention} đã dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] và hồi phục **{stats_restored}** Mana {EmojiCreation2.MP.value} cho Hộ Vệ Thần của mình!{addition_text}"
             await channel.send(content=text)
             
         elif self.selected_item.item_id == "ga_all_restored":

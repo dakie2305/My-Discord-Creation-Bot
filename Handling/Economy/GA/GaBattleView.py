@@ -402,6 +402,8 @@ class GaBattleView(discord.ui.View):
 
     def execute_attack(self, self_player_info: GuardianAngelAttackClass, opponent_alive_attack_info: GuardianAngelAttackClass):
         health_potion = None
+        stamina_potion = None
+        mana_potion = None
         #Chỉ để check xem profile của đối thủ có hay không
         text_target_profile_exist = ""
         if opponent_alive_attack_info.player_profile != None:
@@ -416,7 +418,10 @@ class GaBattleView(discord.ui.View):
             for item in self_player_info.player_profile.list_items:
                 if item.item_id == "ga_heal_1":
                     health_potion = item
-                    break
+                if item.item_id == "ga_stamina_1":
+                    stamina_potion = item
+                if item.item_id == "ga_mana_1":
+                    mana_potion = item
         
         #Tính tỉ lệ hồi máu nếu máu ít hơn 45% và phải có bình máu trong kho đồ
         if self_player_info.player_profile != None and self_player_info.player_ga.health < self_player_info.player_ga.max_health*0.45 and health_potion != None:
@@ -424,9 +429,9 @@ class GaBattleView(discord.ui.View):
             use_chance = UtilitiesFunctions.get_chance(40)
             if use_chance:
                 #Tuỳ loại bình máu mà hồi theo phần trăm máu, mặc định 30%
-                percent_heal= 0.3
+                percent_restored= 0.3
                 
-                heal_amount = int(self_player_info.player_ga.max_health * percent_heal)
+                heal_amount = int(self_player_info.player_ga.max_health * percent_restored)
                 self_player_info.player_ga.health += heal_amount
                 if self_player_info.player_ga.health > self_player_info.player_ga.max_health: self_player_info.player_ga.health = self_player_info.player_ga.max_health
                 
@@ -440,6 +445,49 @@ class GaBattleView(discord.ui.View):
                 except Exception as e: print()
                 return base_text
         
+        #Tính tỉ lệ hồi thể lực nếu thể lực ít hơn 30% và phải có bình stamina trong kho đồ
+        if self_player_info.player_profile != None and self_player_info.player_ga.stamina < self_player_info.player_ga.max_stamina*0.30 and stamina_potion != None:
+            #roll chance 40% dùng bình nếu có trong inventory của profile
+            use_chance = UtilitiesFunctions.get_chance(40)
+            if use_chance:
+                #Tuỳ loại bình mà hồi theo phần trăm, mặc định 50%
+                percent_restored= 0.5
+                
+                heal_amount = int(self_player_info.player_ga.max_stamina * percent_restored)
+                self_player_info.player_ga.stamina += heal_amount
+                if self_player_info.player_ga.stamina > self_player_info.player_ga.max_stamina: self_player_info.player_ga.stamina = self_player_info.player_ga.max_stamina
+                
+                base_text = f"[{self_player_info.player_ga.ga_emoji} - **{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã sử dụng **{stamina_potion.item_name}** để hồi **{heal_amount}** Thể Lực!"
+                
+                #Xóa item khỏi inventory
+                ProfileMongoManager.update_list_items_profile(guild_id=self.guild_id, user_id=self_player_info.player_profile.user_id, user_name="", guild_name="",user_display_name="", item = stamina_potion, amount=-1)
+                try:
+                    self_player_info.player_profile.list_items.remove(stamina_potion)
+                except Exception as e: print()
+                return base_text
+        
+        #Tính tỉ lệ hồi mana nếu mana ít hơn 30% và phải có bình mana trong kho đồ
+        if self_player_info.player_profile != None and self_player_info.player_ga.mana < self_player_info.player_ga.max_mana*0.30 and mana_potion != None:
+            #roll chance 30% dùng bình nếu có trong inventory của profile
+            use_chance = UtilitiesFunctions.get_chance(30)
+            if use_chance:
+                #Tuỳ loại bình mà hồi theo phần trăm, mặc định 40%
+                percent_restored= 0.4
+
+                heal_amount = int(self_player_info.player_ga.max_mana * percent_restored)
+                self_player_info.player_ga.mana += heal_amount
+                if self_player_info.player_ga.mana > self_player_info.player_ga.max_mana: self_player_info.player_ga.mana = self_player_info.player_ga.max_mana
+
+                base_text = f"[{self_player_info.player_ga.ga_emoji} - **{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã sử dụng **{mana_potion.item_name}** để hồi **{heal_amount}** Mana!"
+
+                #Xóa item khỏi inventory
+                ProfileMongoManager.update_list_items_profile(guild_id=self.guild_id, user_id=self_player_info.player_profile.user_id, user_name="", guild_name="",user_display_name="", item = mana_potion, amount=-1)
+                try:
+                    self_player_info.player_profile.list_items.remove(mana_potion)
+                except Exception as e: print()
+                return base_text
+
+
         #Tính tỉ lệ dùng skill nếu có
         if self_player_info.player_ga.list_skills != None and len(self_player_info.player_ga.list_skills) > 0:
             skill = random.choice(self_player_info.player_ga.list_skills)
