@@ -199,7 +199,12 @@ class EmojiCreation2(Enum):
     
     
     BLIZZARD = "<:blizzard:1320096021962952725>"
-    TELEKINESIS = "<:Telekinesis:1320096030192308366>"
+    CRITICAL_DAMAGE = "<:critical_damge_skill:1324827663952515142>"
+    RUN_AWAY = "<a:run_away_skill:1324827754171990057>"
+    BERSERK = "<:berserk_skill:1324827842273349632>"
+    ONE_HP_LEFT_SKILL = "<:1_hp_skill:1324827906048000072>"
+    BLACK_FIRE = "<a:black_fire_skill:1324829524935966872>"
+    SUMMONING_SKILL = "<a:summoning_skill:1324833374417846344>"
     
     HP = "<:HP:1320777603358920724>"
     MP = "<:MP:1320777612926386256>"

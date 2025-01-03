@@ -170,7 +170,7 @@ list_ga_skills = [
     GuardianAngelSkill(
         skill_id = "skill_blizzard",
         skill_name= "Bão Tuyết",
-        skill_desc="Triệu hồi bão tuyết cực mạnh để tấn công kẻ địch! Tăng 5% sức mạnh tấn công và mất 15% mana mỗi khi dùng!",
+        skill_desc="Triệu hồi bão tuyết cực mạnh để tấn công kẻ địch! Tăng 5% sức mạnh tấn công và sẽ làm giảm mana của địch!",
         skill_type= ["attack"],
         emoji= EmojiCreation2.BLIZZARD.value,
         attack_power= 20,
@@ -182,8 +182,73 @@ list_ga_skills = [
         buff_attack_percent=5,
         min_level_required=1,
     ),
+    GuardianAngelSkill(
+        skill_id = "skill_black_fire",
+        skill_name= "Hắc Hoả Diệm",
+        skill_desc="Triệu hồi Hắc Hoả cực mạnh để tấn công kẻ địch! Sức mạnh sẽ tăng theo tỉ lệ sức mạnh tấn công, và mất 45% mana mỗi khi dùng!",
+        skill_type= ["attack"],
+        emoji= EmojiCreation2.BLACK_FIRE.value,
+        attack_power= 15,
+        item_worth_amount= 40000,
+        item_worth_type= "G",
+        percent_min_mana_req= 45,
+        mana_loss= 45,
+        buff_defense_percent=0,
+        buff_attack_percent=10,
+        min_level_required=1,
+    ),
+    
 ]
 
+list_ga_passive_skills = [
+  GuardianAngelSkill(
+        skill_id = "skill_run_away",
+        skill_name= "Tẩu Vi Thượng Sách",
+        skill_desc="Trong ba mươi sáu kế, bỏ chạy là thượng sách! Khi máu dưới 15% thì Hộ Vệ Thần sẽ chạy trốn để bảo toàn tính, sẽ mất hết mana và thể lực!",
+        skill_type= ["passive"],
+        emoji= EmojiCreation2.RUN_AWAY.value,
+        attack_power= 1,
+        item_worth_amount= 40000,
+        item_worth_type= "G",
+        percent_min_mana_req= 45,
+        mana_loss= 45,
+        buff_defense_percent=0,
+        buff_attack_percent=1,
+        min_level_required=1,
+    ),
+    GuardianAngelSkill(
+        skill_id = "skill_critical_strike",
+        skill_name= "Ngưỡng Máu Tử",
+        skill_desc="Khi Hộ Vệ Thần còn máu dưới 25% thì các đòn tấn công tiếp theo sẽ tăng 15% sát thương, chỉ kích hoạt một lần!",
+        skill_type= ["passive"],
+        emoji= EmojiCreation2.CRITICAL_DAMAGE.value,
+        attack_power= 15,
+        item_worth_amount= 40000,
+        item_worth_type= "G",
+        percent_min_mana_req= 45,
+        mana_loss= 45,
+        buff_defense_percent=0,
+        buff_attack_percent=1,
+        min_level_required=1,
+    ),
+    GuardianAngelSkill(
+        skill_id = "summoning_skill",
+        skill_name= "Triệu Linh",
+        skill_desc="Khi tổ đội dưới ba người thì sẽ có thể dùng 50% mana để triệu hồi một cấp dưới có cấp bằng một nửa người triệu hồi! Có 10% tỉ lệ triệu hồi NPC mạnh hơn gấp 3 lần!",
+        skill_type= ["passive"],
+        emoji= EmojiCreation2.SUMMONING_SKILL.value,
+        attack_power= 1,
+        item_worth_amount= 75000,
+        item_worth_type= "G",
+        percent_min_mana_req= 45,
+        mana_loss= 50,
+        buff_defense_percent=0,
+        buff_attack_percent=1,
+        min_level_required=1,
+    ),
+]
+
+all_skill_lists = [list_ga_skills, list_ga_passive_skills]
 
 def get_list_back_ground_on_ga_id(ga_id: str):
     background_urls = None
@@ -289,6 +354,24 @@ def get_list_back_ground_on_ga_id(ga_id: str):
       ]
     return background_urls
 
+def get_random_skill(skill_id: str = None, blacklist_ids: List[str]= None):
+  if blacklist_ids is None:
+    blacklist_ids = []
+
+  #Nếu có skill name thì ưu tiên tìm xem có skill name không
+  if skill_id != None:
+    for skill_list in all_skill_lists:
+      for skill in skill_list:
+        if skill.skill_id == skill_id and skill.skill_id not in blacklist_ids:
+          return skill
+  else:
+    #Nếu không thì random bình thường
+    random_skill_list = random.choice(all_skill_lists)
+    random_skill = random.choice(random_skill_list)
+    if random_skill.skill_id not in blacklist_ids: return random_skill
+  return None
+
+
 def get_random_ga_enemy_generic(level: int = 1):
     data = GuardianAngel(
         ga_id = "enemy_generic",
@@ -337,6 +420,7 @@ def get_random_ga_enemy_generic(level: int = 1):
         ("Big Foot", "👣"),
         ("Xác Sống", "🧟‍♂️"),
         ("Báo Đời Đom Đóm", "🐆"),
+        ("Triệu Hồi Sư", "🧙‍♂️"),
     ]
     
     #dựa trên level để tăng giảm stats của kẻ địch
@@ -389,4 +473,18 @@ def get_random_ga_enemy_generic(level: int = 1):
     data.ga_name = name
     data.ga_emoji = emoji
     
+    #Nếu level của bản thân đã trên 50 thì mọi kẻ địch đều sẽ sở hữu ít nhất một skill
+    if level > 50:
+        skill = get_random_skill(blacklist_ids=["summoning_skill"])
+        if skill != None: data.list_skills.append(skill)
+    if data.level > 80:
+        #Quái trên 80 thì đương nhiên hưởng thêm skill nữa
+        skill = get_random_skill(blacklist_ids=["summoning_skill"])
+        if skill != None: data.list_skills.append(skill)
+    
+    if data.ga_name == "Triệu Hồi Sư":
+        skill = get_random_skill("summoning_skill")
+        data.list_skills.append(skill)
+    
+
     return data

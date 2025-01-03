@@ -310,6 +310,7 @@ class ShopEconomy(commands.Cog):
         
         #View đầu tiên luôn là gift shop
         self.list_all_shops_guardian_skill["Cửa Hàng Kỹ Năng Tấn Công"] = list_skill
+        self.list_all_shops_guardian_skill["Cửa Hàng Kỹ Năng Nội Tại"] = ListGAAndSkills.list_ga_passive_skills
 
         keys = list(self.list_all_shops_guardian_skill.keys())
         
