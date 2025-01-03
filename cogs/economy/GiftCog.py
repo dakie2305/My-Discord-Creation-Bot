@@ -64,6 +64,12 @@ class GiftEconomy(commands.Cog):
             mess = await interaction.followup.send(embed=embed, view=view)
             view.message = mess
             return
+        elif self.contains_specific_item_types(user_profile.list_items) == False:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Bạn không có quà phù hợp để tặng!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
         
         #Không cho thực hiện nếu còn last_gift
         elif user_profile != None and user_profile.last_gift != None:
@@ -111,4 +117,11 @@ class GiftEconomy(commands.Cog):
             return True
         else:
             return False
+        
+    def contains_specific_item_types(self, items):
+        target_types = ["gift"]
+        for item in items:
+            if item.item_type in target_types:
+                return True
+        return False
     
