@@ -470,7 +470,6 @@ class GuardianAngelCog(commands.Cog):
             embed.add_field(name=f"", value=f"🦾: **{enemy.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.health, max_value=enemy.max_health, emoji=EmojiCreation2.HP.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.stamina, max_value=enemy.max_stamina, emoji=EmojiCreation2.STAMINA.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.mana, max_value=enemy.max_mana, emoji=EmojiCreation2.MP.value)}", inline=False)
             
         if max_players == None: max_players = "3"
-        if is_players_versus_player: max_players = "1"
         max_players_as_int = int(max_players)
         
         #Tính lại theo enemy_ga

@@ -421,6 +421,7 @@ def get_random_ga_enemy_generic(level: int = 1):
         ("Xác Sống", "🧟‍♂️"),
         ("Báo Đời Đom Đóm", "🐆"),
         ("Triệu Hồi Sư", "🧙‍♂️"),
+        ("Quỷ Triệu Hồi", "👺"),
     ]
     
     #dựa trên level để tăng giảm stats của kẻ địch
@@ -482,7 +483,7 @@ def get_random_ga_enemy_generic(level: int = 1):
         skill = get_random_skill(blacklist_ids=["summoning_skill"])
         if skill != None: data.list_skills.append(skill)
     
-    if data.ga_name == "Triệu Hồi Sư":
+    if "Triệu Hội" in data.ga_name:
         skill = get_random_skill("summoning_skill")
         data.list_skills.append(skill)
     

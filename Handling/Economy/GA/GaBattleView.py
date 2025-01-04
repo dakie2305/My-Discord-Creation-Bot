@@ -364,7 +364,7 @@ class GaBattleView(discord.ui.View):
         text_target_profile_exist = f"<@{info.player_profile.user_id}> [{info.starting_at_round}] cống hiến **{contribution}%**, nhận: "
         calculated_exp = int(bonus_exp * (contribution / 100))
         if calculated_exp > 0: 
-            if calculated_exp > 500: calculated_exp = 500
+            if calculated_exp > 350: calculated_exp = 350
             text_target_profile_exist += f"**{calculated_exp}** EXP. "
             ProfileMongoManager.update_level_progressing(guild_id=self.guild_id, user_id=info.player_profile.user_id, bonus_exp=int(calculated_exp*0.3))
             ProfileMongoManager.update_main_guardian_level_progressing(guild_id=self.guild_id, user_id=info.player_profile.user_id, bonus_exp=calculated_exp)
@@ -620,8 +620,8 @@ class GaBattleView(discord.ui.View):
                 if len(self.upper_attack_class) < 3:
                     #Tạo NPC
                     calculated_level= int(self_player_info.player_ga.level/2)
-                    roll_chance_legendary = UtilitiesFunctions.get_chance(10)
-                    if roll_chance_legendary: calculated_level = self_player_info.player_ga.level*3
+                    roll_chance_legendary = UtilitiesFunctions.get_chance(5)
+                    if roll_chance_legendary: calculated_level = self_player_info.player_ga.level*2
                     if calculated_level < 1: calculated_level = 1
                     enemy: GuardianAngel = ListGAAndSkills.get_random_ga_enemy_generic(level=calculated_level)
                     new_enemy = GuardianAngelAttackClass(player_profile=None, player_ga=enemy, starting_at_round=self.round)
