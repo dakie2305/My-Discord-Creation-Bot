@@ -15,6 +15,9 @@ import io
 from gtts import gTTS
 import soundfile as sf
 
+load_dotenv()
+USER_NAME_MONGODB = os.getenv("USER_NAME_MONGODB", "")
+PASSWORD_MONGODB = os.getenv("PASSWORD_MONGODB", "")
 
 def get_random_response(filename):
   """

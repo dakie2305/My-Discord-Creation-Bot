@@ -4,8 +4,13 @@ from CustomEnum.EmojiEnum import EmojiCreation2
 from Handling.Economy.Profile.ProfileClass import Profile
 import random
 from datetime import datetime, timedelta
+import os
+import CustomFunctions as CustomFunctions
 
 class UtilitiesFunctions():
+    USER_NAME_MONGODB = CustomFunctions.USER_NAME_MONGODB
+    PASSWORD_MONGODB = CustomFunctions.PASSWORD_MONGODB
+    
     @staticmethod
     def shortened_currency(number: int):
         if number >= 1000000000:

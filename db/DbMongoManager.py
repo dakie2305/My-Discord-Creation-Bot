@@ -8,6 +8,7 @@ from db.Class.WordMatchingClass import WordMatchingInfo, PlayerProfile, SpecialI
 from db.Class.UserCountClass import UserCount
 import discord
 import CustomFunctions
+from pathlib import Path
 
 #region User Info Database
 
@@ -694,6 +695,33 @@ def update_or_insert_user_count(guild_id: int, user_id: int, user_name: str, use
     return result
 
 #endregion
+def get_env_variable(variable_name):
+  """
+  Gets the value of an environment variable from the .env file in the base directory.
+
+  Args:
+    variable_name: The name of the environment variable.
+
+  Returns:
+    The value of the environment variable.
+  """
+
+  # Get the path to the base directory
+  base_dir = Path(__file__).resolve().parent.parent
+  # Construct the path to the .env file
+  env_file_path = os.path.join(base_dir, ".env")
+
+  # Load environment variables from the .env file
+  if os.path.exists(env_file_path):
+    with open(env_file_path) as f:
+      for line in f:
+        if line.startswith(variable_name):
+          return line.strip().split("=")[1]
+
+  # If the environment variable is not found in the .env file,
+  # try to get it from the environment
+  return os.getenv(variable_name)
+
 
 #endregion
 
@@ -701,7 +729,9 @@ def update_or_insert_user_count(guild_id: int, user_id: int, user_name: str, use
 #Không set thì mặc định vào misc_database hết
 set_database = "misc_database"
 # Connect to the MongoDB server
-client = MongoClient("mongodb://localhost:27017/")
+USER_NAME_MONGODB = get_env_variable('USER_NAME_MONGODB')
+PASSWORD_MONGODB = get_env_variable('PASSWORD_MONGODB')
+client = MongoClient(f"mongodb://{USER_NAME_MONGODB}:{PASSWORD_MONGODB}@localhost:27017/") if USER_NAME_MONGODB != "" and PASSWORD_MONGODB != "" else MongoClient(f"mongodb://localhost:27017/")
 # Create or switch to the database
 db = client["user_database"]
 db_specific = client[set_database]
