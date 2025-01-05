@@ -176,7 +176,7 @@ list_ga_skills = [
         attack_power= 20,
         item_worth_amount= 20000,
         item_worth_type= "G",
-        percent_min_mana_req= 30,
+        percent_min_mana_req= 15,
         mana_loss= 15,
         buff_defense_percent=0,
         buff_attack_percent=5,
@@ -191,13 +191,27 @@ list_ga_skills = [
         attack_power= 15,
         item_worth_amount= 40000,
         item_worth_type= "G",
-        percent_min_mana_req= 45,
+        percent_min_mana_req= 40,
         mana_loss= 45,
         buff_defense_percent=0,
         buff_attack_percent=10,
         min_level_required=1,
     ),
-    
+    GuardianAngelSkill(
+        skill_id = "skill_stun",
+        skill_name= "Triệu Lôi",
+        skill_desc="Sẽ đánh sốc đối thủ và không cho đối thủ tấn công trong lượt đó, kỹ năng này sẽ mất nhiều mana mỗi khi dùng!",
+        skill_type= ["attack"],
+        emoji= EmojiCreation2.STUN_SKILL.value,
+        attack_power= 20,
+        item_worth_amount= 40000,
+        item_worth_type= "G",
+        percent_min_mana_req= 40,
+        mana_loss= 35,
+        buff_defense_percent=0,
+        buff_attack_percent=5,
+        min_level_required=1,
+    ),
 ]
 
 list_ga_passive_skills = [
@@ -210,7 +224,7 @@ list_ga_passive_skills = [
         attack_power= 1,
         item_worth_amount= 40000,
         item_worth_type= "G",
-        percent_min_mana_req= 45,
+        percent_min_mana_req= 10,
         mana_loss= 45,
         buff_defense_percent=0,
         buff_attack_percent=1,
@@ -225,7 +239,7 @@ list_ga_passive_skills = [
         attack_power= 15,
         item_worth_amount= 40000,
         item_worth_type= "G",
-        percent_min_mana_req= 45,
+        percent_min_mana_req= 10,
         mana_loss= 45,
         buff_defense_percent=0,
         buff_attack_percent=1,
@@ -242,6 +256,36 @@ list_ga_passive_skills = [
         item_worth_type= "G",
         percent_min_mana_req= 45,
         mana_loss= 50,
+        buff_defense_percent=0,
+        buff_attack_percent=1,
+        min_level_required=1,
+    ),
+    GuardianAngelSkill(
+        skill_id = "mass_heal_skill",
+        skill_name= "Đại Hồi Phục",
+        skill_desc="Khi tổ đội còn thấp máu sẽ hồi phục 15% máu cho cả tổ đội khi cả tổ đội yếu máu! Kỹ năng này tốn rất nhiều mana!",
+        skill_type= ["passive"],
+        emoji= EmojiCreation2.MASS_HEAL_SKILL.value,
+        attack_power= 1,
+        item_worth_amount= 55000,
+        item_worth_type= "G",
+        percent_min_mana_req= 35,
+        mana_loss= 35,
+        buff_defense_percent=0,
+        buff_attack_percent=1,
+        min_level_required=1,
+    ),
+    GuardianAngelSkill(
+        skill_id = "brain_wash_skill",
+        skill_name= "Tẩy Não",
+        skill_desc="Nếu tổ đội mình dưới ba người thì sẽ tẩy não một kẻ địch qua phe mình trong một vài lượt chơi! Kỹ năng này sẽ tốn rất nhiều mana!",
+        skill_type= ["passive"],
+        emoji= EmojiCreation2.BRAINWASH_SKILL.value,
+        attack_power= 1,
+        item_worth_amount= 45000,
+        item_worth_type= "G",
+        percent_min_mana_req= 35,
+        mana_loss= 35,
         buff_defense_percent=0,
         buff_attack_percent=1,
         min_level_required=1,
@@ -427,7 +471,7 @@ def get_random_ga_enemy_generic(level: int = 1):
     #dựa trên level để tăng giảm stats của kẻ địch
     random_level_bonus = random.randint(-3, 7)
     if level < 10:
-        random_level_bonus = random.randint(-1, 5)
+        random_level_bonus = random.randint(-1, 4)
     elif level > 10 and level < 20:
         random_level_bonus = random.randint(4, 7)
     elif level > 20 and level < 30:
@@ -483,7 +527,7 @@ def get_random_ga_enemy_generic(level: int = 1):
         skill = get_random_skill(blacklist_ids=["summoning_skill"])
         if skill != None: data.list_skills.append(skill)
     
-    if "Triệu Hội" in data.ga_name:
+    if "Triệu Hồi" in data.ga_name:
         skill = get_random_skill("summoning_skill")
         data.list_skills.append(skill)
     

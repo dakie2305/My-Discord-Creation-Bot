@@ -13,6 +13,7 @@ import random
 import asyncio
 from datetime import datetime, timedelta
 from Handling.Misc.SelfDestructView import SelfDestructView
+import CustomFunctions
 
 
 class GaBattleView(discord.ui.View):
@@ -391,6 +392,7 @@ class GaBattleView(discord.ui.View):
             # loss_health = int(info.player_ga.max_health - info.player_ga.health)
             # loss_stamina = int(info.player_ga.max_stamina - info.player_ga.stamina)
             # loss_mana = int(info.player_ga.max_mana - info.player_ga.mana)
+            if CustomFunctions.check_if_dev_mode(): return
             ProfileMongoManager.set_guardian_current_stats(guild_id=self.guild_id, user_id=info.player_profile.user_id,stamina=info.player_ga.stamina, health=info.player_ga.health, mana=info.player_ga.mana)
     
     def get_ga_stil_alive(self, side: str):
@@ -426,7 +428,15 @@ class GaBattleView(discord.ui.View):
                 if item.item_id == "ga_mana_1":
                     mana_potion = item
         
-        #Tính tỉ lệ hồi máu nếu máu ít hơn 45% và phải có bình máu trong kho đồ
+        #Kiểm tra xem có stun không, có thì skip lượt
+        if self_player_info.stunned_round != None:
+            self_player_info.stunned_round -= 1
+            if self_player_info.stunned_round <= 0:
+                self_player_info.stunned_round = None
+                base_text = f"- **[{self_player_info.player_ga.ga_emoji} - {self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã quá choáng váng không thể làm được gì!"
+                return base_text
+        
+        #Tính tỉ lệ hồi máu nếu máu ít hơn % và phải có bình máu trong kho đồ
         if self_player_info.player_profile != None and self_player_info.player_ga.health < self_player_info.player_ga.max_health*0.45 and health_potion != None:
             #roll chance 40% dùng bình máu nếu có trong inventory của profile
             use_chance = UtilitiesFunctions.get_chance(40)
@@ -438,7 +448,7 @@ class GaBattleView(discord.ui.View):
                 self_player_info.player_ga.health += heal_amount
                 if self_player_info.player_ga.health > self_player_info.player_ga.max_health: self_player_info.player_ga.health = self_player_info.player_ga.max_health
                 
-                base_text = f"- [{self_player_info.player_ga.ga_emoji} - **{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã sử dụng **{health_potion.item_name}** để hồi **{heal_amount}** Máu!"
+                base_text = f"- **[{self_player_info.player_ga.ga_emoji} - {self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã sử dụng **{health_potion.item_name}** để hồi **{heal_amount}** Máu!"
                 
                 self_player_info.recovery_time += 1
                 #Xóa item khỏi inventory
@@ -448,8 +458,8 @@ class GaBattleView(discord.ui.View):
                 except Exception as e: print()
                 return base_text
         
-        #Tính tỉ lệ hồi thể lực nếu thể lực ít hơn 30% và phải có bình stamina trong kho đồ
-        if self_player_info.player_profile != None and self_player_info.player_ga.stamina < self_player_info.player_ga.max_stamina*0.30 and stamina_potion != None:
+        #Tính tỉ lệ hồi thể lực nếu thể lực ít hơn % và phải có bình stamina trong kho đồ
+        if self_player_info.player_profile != None and self_player_info.player_ga.stamina < self_player_info.player_ga.max_stamina*0.45 and stamina_potion != None:
             #roll chance 40% dùng bình nếu có trong inventory của profile
             use_chance = UtilitiesFunctions.get_chance(40)
             if use_chance:
@@ -460,7 +470,7 @@ class GaBattleView(discord.ui.View):
                 self_player_info.player_ga.stamina += heal_amount
                 if self_player_info.player_ga.stamina > self_player_info.player_ga.max_stamina: self_player_info.player_ga.stamina = self_player_info.player_ga.max_stamina
                 
-                base_text = f"- [{self_player_info.player_ga.ga_emoji} - **{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã sử dụng **{stamina_potion.item_name}** để hồi **{heal_amount}** Thể Lực!"
+                base_text = f"- **[{self_player_info.player_ga.ga_emoji} - {self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã sử dụng **{stamina_potion.item_name}** để hồi **{heal_amount}** Thể Lực!"
                 
                 #Xóa item khỏi inventory
                 ProfileMongoManager.update_list_items_profile(guild_id=self.guild_id, user_id=self_player_info.player_profile.user_id, user_name="", guild_name="",user_display_name="", item = stamina_potion, amount=-1)
@@ -469,8 +479,8 @@ class GaBattleView(discord.ui.View):
                 except Exception as e: print()
                 return base_text
         
-        #Tính tỉ lệ hồi mana nếu mana ít hơn 30% và phải có bình mana trong kho đồ
-        if self_player_info.player_profile != None and self_player_info.player_ga.mana < self_player_info.player_ga.max_mana*0.30 and mana_potion != None:
+        #Tính tỉ lệ hồi mana nếu mana ít hơn % và phải có bình mana trong kho đồ
+        if self_player_info.player_profile != None and self_player_info.player_ga.mana < self_player_info.player_ga.max_mana*0.5 and mana_potion != None:
             #roll chance 30% dùng bình nếu có trong inventory của profile
             use_chance = UtilitiesFunctions.get_chance(30)
             if use_chance:
@@ -481,7 +491,7 @@ class GaBattleView(discord.ui.View):
                 self_player_info.player_ga.mana += heal_amount
                 if self_player_info.player_ga.mana > self_player_info.player_ga.max_mana: self_player_info.player_ga.mana = self_player_info.player_ga.max_mana
 
-                base_text = f"- [{self_player_info.player_ga.ga_emoji} - **{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã sử dụng **{mana_potion.item_name}** để hồi **{heal_amount}** Mana!"
+                base_text = f"- **[{self_player_info.player_ga.ga_emoji} - {self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã sử dụng **{mana_potion.item_name}** để hồi **{heal_amount}** Mana!"
 
                 #Xóa item khỏi inventory
                 ProfileMongoManager.update_list_items_profile(guild_id=self.guild_id, user_id=self_player_info.player_profile.user_id, user_name="", guild_name="",user_display_name="", item = mana_potion, amount=-1)
@@ -498,23 +508,21 @@ class GaBattleView(discord.ui.View):
             
             #Đến skill tấn công
             attack_skill = self.get_random_skill(list_skills=self_player_info.player_ga.list_skills, skill_types=["attack"])
-            if attack_skill != None: 
-                attack_skill
+            if attack_skill != None:
                 #Thi triển kỹ năng
                 base_text = self.execute_attack_skill(self_player_info = self_player_info, opponent_alive_attack_info = opponent_alive_attack_info, skill=attack_skill, text_target_profile_exist=text_target_profile_exist, text_own_profile_exist=text_own_profile_exist)
                 if base_text != None: return base_text
         
         #Tính tỉ lệ evasion
-        evasion = int(opponent_alive_attack_info.player_ga.stamina/5)
-        if evasion > 100: evasion = 85
         opponent_evasion_chance = self.calculate_evasion_chance(current_stamina=opponent_alive_attack_info.player_ga.stamina, max_stamina=opponent_alive_attack_info.player_ga.max_stamina, level=opponent_alive_attack_info.player_ga.level)
+        if opponent_evasion_chance > 85: opponent_evasion_chance = 85
         evasion_dice = UtilitiesFunctions.get_chance(opponent_evasion_chance)
         if evasion_dice:
             #Chỉ trừ stamina của lower, tỉ lệ thấp hơn, tầm 50% của info.player_ga.attack_power
             loss_amount = int(self_player_info.player_ga.attack_power * 0.5)
             opponent_alive_attack_info.player_ga.stamina -= loss_amount
             if opponent_alive_attack_info.player_ga.stamina <= 0: opponent_alive_attack_info.player_ga.stamina = 0
-            base_text = f"- [{self_player_info.player_ga.ga_emoji} - **{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã lao đến đánh {opponent_alive_attack_info.player_ga.ga_name} {text_target_profile_exist} nhưng mục tiêu đã kịp né tránh, và chỉ mất **{loss_amount}** thể lực!"
+            base_text = f"- **[{self_player_info.player_ga.ga_emoji} - {self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã lao đến đánh {opponent_alive_attack_info.player_ga.ga_name} {text_target_profile_exist} nhưng mục tiêu đã kịp né tránh, và chỉ mất **{loss_amount}** thể lực!"
         else:
             #trừ máu của lower
             loss_health = int(self_player_info.player_ga.attack_power + self_player_info.player_ga.attack_power*(self_player_info.player_ga.buff_attack_percent/100))
@@ -523,7 +531,7 @@ class GaBattleView(discord.ui.View):
             loss_amount = int(self_player_info.player_ga.attack_power * 0.25)
             opponent_alive_attack_info.player_ga.stamina -= loss_amount
             if opponent_alive_attack_info.player_ga.stamina <= 0: opponent_alive_attack_info.player_ga.stamina = 0
-            base_text = f"- [{self_player_info.player_ga.ga_emoji} - **{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã đánh trúng [{opponent_alive_attack_info.player_ga.ga_emoji} - {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist}! Mục tiêu mất **{loss_health}** Máu và **{loss_amount}** Thể Lực!"
+            base_text = f"- **[{self_player_info.player_ga.ga_emoji} - {self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã đánh trúng [{opponent_alive_attack_info.player_ga.ga_emoji} - {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist}! Mục tiêu mất **{loss_health}** Máu và **{loss_amount}** Thể Lực!"
         
         
         additional_loss_stats_text = ""
@@ -536,11 +544,36 @@ class GaBattleView(discord.ui.View):
         if opponent_alive_attack_info.player_ga.stamina <= 0: opponent_alive_attack_info.player_ga.stamina = 0
         if opponent_alive_attack_info.player_ga.mana <= 0: opponent_alive_attack_info.player_ga.mana = 0
         
+        #Trừ -1 tẩy não khi hết lượt
+        if self_player_info.brain_washed_round != None: 
+            self_player_info.brain_washed_round -= 1
+            #Khi còn 0 thì đổi phe
+            if self_player_info.brain_washed_round <= 0:
+                self_player_info.brain_washed_round = None
+                if self_player_info in self.upper_attack_class:
+                    self.upper_attack_class.remove(self_player_info)
+                    self.lower_attack_class.append(self_player_info)
+                else:
+                    self.lower_attack_class.remove(self_player_info)
+                    self.upper_attack_class.append(self_player_info)
+        if opponent_alive_attack_info.brain_washed_round != None:
+            #Khi còn 0 thì đổi phe
+            opponent_alive_attack_info.brain_washed_round -= 1
+            if opponent_alive_attack_info.brain_washed_round <= 0:
+                opponent_alive_attack_info.brain_washed_round = None
+                if opponent_alive_attack_info in self.upper_attack_class:
+                    self.upper_attack_class.remove(opponent_alive_attack_info)
+                    self.lower_attack_class.append(opponent_alive_attack_info)
+                else:
+                    self.lower_attack_class.remove(opponent_alive_attack_info)
+                    self.upper_attack_class.append(opponent_alive_attack_info)
+        
         base_text+= additional_loss_stats_text
         
         return base_text
         
     def calculate_evasion_chance(self, current_stamina, max_stamina, level, max_evasion=85, level_bonus=0.5):
+        if level > 80: level = 80
         evasion_chance = ((current_stamina / max_stamina) * max_evasion) + (level * level_bonus)
         return int(min(evasion_chance, max_evasion))
 
@@ -554,7 +587,7 @@ class GaBattleView(discord.ui.View):
         if skill_types == None:
             return random.choice(list_skills)
         else:
-            legit_skills = [skill for skill in list_skills if skill.skill_type in skill_types]
+            legit_skills = [skill for skill in list_skills if any(t in skill.skill_type for t in skill_types)]
             if len(legit_skills) == 0: return None
             return random.choice(legit_skills)
         return None
@@ -569,7 +602,6 @@ class GaBattleView(discord.ui.View):
             first_chance = UtilitiesFunctions.get_chance(use_magic_int)
             second_chance = UtilitiesFunctions.get_chance(use_magic_int)
             if first_chance == False or second_chance == False: return None #Nếu cả 2 lần không trúng thì không dùng skill
-
             #Tuỳ skill mà tung kỹ năng, vì một số skill tấn công có cách tính khác
             if skill.skill_id == "skill_black_fire":
                 #trừ máu của đối theo attack power của profile nhân với buff attack percent của skill
@@ -582,10 +614,27 @@ class GaBattleView(discord.ui.View):
                 self_player_info.player_ga.mana -= own_loss_mana
                 if self_player_info.player_ga.mana <= 0: self_player_info.player_ga.mana = 0
                 
-                base_text =  f"- [**{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã khai chiêu {skill.emoji} - {skill.skill_name} và thiêu đốt mất {loss_health} máu của [{opponent_alive_attack_info.player_ga.ga_emoji} - {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist}!"
+                base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã khai chiêu {skill.emoji} - {skill.skill_name} và thiêu đốt mất {loss_health} máu của [{opponent_alive_attack_info.player_ga.ga_emoji} - {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist}!"
                 return base_text
+            
+            elif skill.skill_id == "skill_stun":
+                #tăng stunned_round của kẻ địch
+                loss_health = int(skill.attack_power + (self_player_info.player_ga.attack_power*skill.buff_attack_percent/100))
+                opponent_alive_attack_info.player_ga.health -= loss_health
+                if opponent_alive_attack_info.player_ga.health <= 0: opponent_alive_attack_info.player_ga.health = 0
+                opponent_alive_attack_info.stunned_round = 1
                 
-            else: #Những skill còn lại thì sẽ quy hết vào cách tính tổng sát thương bên dưới
+                #trừ mana của người dùng theo tỉ lệ skill
+                loss_own_mana = int(self_player_info.player_ga.max_mana * skill.mana_loss/100) - skill.mana_loss #Không hẳn là trừ quá nhiều, vì thường magic sẽ mạnh hơn, nên buff một tý cho chắc. Để balance sau
+                if loss_own_mana <= 10: loss_own_mana = 20
+                self_player_info.player_ga.mana -= loss_own_mana
+                if self_player_info.player_ga.mana <= 0: self_player_info.player_ga.mana = 0
+                
+                base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã tung chiêu {skill.emoji} - {skill.skill_name} khiến [{opponent_alive_attack_info.player_ga.ga_emoji} - {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist} mất {loss_health} máu và mất một lượt!"
+                return base_text
+            
+            else: 
+                #Những skill còn lại thì sẽ quy hết vào cách tính tổng sát thương bên dưới
                 #trừ máu của đối thủ theo tỉ lệ của skill
                 loss_health = int(skill.attack_power + skill.attack_power*(skill.buff_attack_percent/100))
                 opponent_alive_attack_info.player_ga.health -= loss_health
@@ -599,21 +648,23 @@ class GaBattleView(discord.ui.View):
                 loss_own_mana = int(self_player_info.player_ga.max_mana * (skill.mana_loss/100)) - skill.attack_power #Không hẳn là trừ quá nhiều, vì thường magic sẽ mạnh hơn, nên buff một tý cho chắc. Để balance sau
                 if loss_own_mana <= 10: loss_own_mana = 20
                 self_player_info.player_ga.mana -= loss_own_mana
+                if self_player_info.player_ga.mana <= 0: self_player_info.player_ga.mana = 0
                 
-                base_text =  f"- [**{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã dùng chiêu {skill.skill_name} và đánh bay {loss_health} máu và {loss_mana} Mana của [{opponent_alive_attack_info.player_ga.ga_emoji} - {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist}!"
+                base_text = f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã dùng chiêu {skill.skill_name} và đánh bay {loss_health} máu và {loss_mana} Mana của [{opponent_alive_attack_info.player_ga.ga_emoji} - {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist}!"
+                return base_text
         return base_text
     
     def execute_passive_skill(self, self_player_info: GuardianAngelAttackClass, opponent_alive_attack_info: GuardianAngelAttackClass, text_target_profile_exist: str, text_own_profile_exist: str):
         base_text = None
         
+        is_upper = False
+        if self_player_info in self.upper_attack_class:
+            is_upper = True
+            
         current_mana_percent = int(self_player_info.player_ga.mana/self_player_info.player_ga.max_mana*100)
         skill = self.get_random_skill(list_skills=self_player_info.player_ga.list_skills, skill_id="summoning_skill")
         if skill != None and current_mana_percent >= 50:
             #Skill này sẽ triệu hồi một NPC vào phe của 
-            is_upper = False
-            if self_player_info in self.upper_attack_class:
-                is_upper = True
-            
             #Dựa vào is_upper để xác định phe nào sẽ triệu hồi NPC
             #Nếu phe đó tổng GuardianAngelAttackClass dưới ba mới được triệu hồi
             if is_upper:
@@ -632,11 +683,11 @@ class GaBattleView(discord.ui.View):
                         #Add vào phe attack lower
                         self.lower_attack_class.append(new_enemy)
                     #Trừ 50% mana của bản thân
-                    own_loss_mana = int(self_player_info.player_ga.max_mana * 0.50)
+                    own_loss_mana = int(self_player_info.player_ga.max_mana * 0.50) + skill.mana_loss
                     self_player_info.player_ga.mana -= own_loss_mana
                     if self_player_info.player_ga.mana <= 0: self_player_info.player_ga.mana = 0
                     
-                    base_text =  f"- [**{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã dùng chiêu {skill.emoji} - {skill.skill_name} để triệu hồi **{enemy.ga_emoji} - {enemy.ga_name}** lên gia nhập đội!"
+                    base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã dùng chiêu {skill.emoji} - {skill.skill_name} để triệu hồi **{enemy.ga_emoji} - {enemy.ga_name}** lên gia nhập đội!"
                     return base_text
             else:
                 if len(self.lower_attack_class) < 3:
@@ -654,26 +705,75 @@ class GaBattleView(discord.ui.View):
                         #Add vào phe attack lower
                         self.lower_attack_class.append(new_enemy)
                     #Trừ 50% mana của bản thân
-                    own_loss_mana = int(self_player_info.player_ga.max_mana * 0.50)
+                    own_loss_mana = int(self_player_info.player_ga.max_mana * 0.50) + skill.mana_loss
                     self_player_info.player_ga.mana -= own_loss_mana
                     if self_player_info.player_ga.mana <= 0: self_player_info.player_ga.mana = 0
                     
-                    base_text =  f"- [**{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã dùng chiêu {skill.emoji} - {skill.skill_name} để triệu hồi **{enemy.ga_emoji} - {enemy.ga_name}** lên gia nhập đội!"
+                    base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã dùng chiêu {skill.emoji} - {skill.skill_name} để triệu hồi **{enemy.ga_emoji} - {enemy.ga_name}** lên gia nhập đội!"
                     return base_text
         
-        #Khi máu dưới 15% thì kích hoạt chiêu chạy trốn nếu có
+        skill = self.get_random_skill(list_skills=self_player_info.player_ga.list_skills, skill_id="brain_wash_skill")
+        if skill != None and current_mana_percent >= 50:
+            #Skill này sẽ tẩy não opponent vào phe của self_player  
+            #Dựa vào is_upper để xác định opponent sẽ vào phe nào
+            
+            self_player_team = self.upper_attack_class if is_upper else self.lower_attack_class
+            opponent_team = self.lower_attack_class if is_upper else self.upper_attack_class
+            
+            #Nếu phe ta tổng GuardianAngelAttackClass dưới ba và phe địch trên hai mới được kích hoạt
+            if len(self_player_team) < 3 and len(opponent_team) > 1:
+                if opponent_alive_attack_info in self.lower_attack_class:
+                    self.lower_attack_class.remove(opponent_alive_attack_info)
+                    self.upper_attack_class.append(opponent_alive_attack_info)
+                elif opponent_alive_attack_info in self.upper_attack_class:
+                    self.upper_attack_class.remove(opponent_alive_attack_info)
+                    self.lower_attack_class.append(opponent_alive_attack_info)
+                opponent_alive_attack_info.brain_washed_round = 4
+                
+                #Trừ % mana của bản thân chiếu theo skill
+                own_loss_mana = int(self_player_info.player_ga.max_mana * skill.mana_loss / 100)
+                self_player_info.player_ga.mana -= own_loss_mana
+                if self_player_info.player_ga.mana <= 0: self_player_info.player_ga.mana = 0
+                base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã dùng chiêu {skill.emoji} - {skill.skill_name} để tẩy não {opponent_alive_attack_info.player_ga.ga_name} vào đội của mình!"
+                return base_text
+                
+        
         current_health_percent = int(self_player_info.player_ga.health/self_player_info.player_ga.max_health*100)
+        skill = self.get_random_skill(list_skills=self_player_info.player_ga.list_skills, skill_id="mass_heal_skill")
+        if skill != None and current_mana_percent >= skill.percent_min_mana_req and current_health_percent <= 50:
+            #Chỉ kích hoạt khi cả máu dưới 50%
+            #Hồi phục 15% máu cho cả đội
+            if is_upper:
+                for info in self.upper_attack_class:
+                    additional_health = int(info.player_ga.max_health*0.15)
+                    info.player_ga.health += additional_health
+                    if info.player_ga.health > info.player_ga.max_health: info.player_ga.health = info.player_ga.max_health
+            else:
+                for info in self.lower_attack_class:
+                    additional_health = int(info.player_ga.max_health*0.15)
+                    info.player_ga.health += additional_health
+                    if info.player_ga.health > info.player_ga.max_health: info.player_ga.health = info.player_ga.max_health
+            #Trừ mana bản thân
+            #Trừ % mana của bản thân chiếu theo skill
+            own_loss_mana = int(self_player_info.player_ga.max_mana * skill.mana_loss / 100)
+            self_player_info.player_ga.mana -= own_loss_mana
+            if self_player_info.player_ga.mana <= 0: self_player_info.player_ga.mana = 0
+            base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã dùng chiêu {skill.emoji} - {skill.skill_name} để hồi phục cho cả đội!"
+            return base_text
+        
+        #Khi máu dưới 15% thì kích hoạt chiêu chạy trốn nếu có
         if current_health_percent <= 15:
             skill = self.get_random_skill(list_skills=self_player_info.player_ga.list_skills, skill_id="skill_run_away")
-            if skill != None:
+            if skill != None and self_player_info.player_profile != None:
                 #Dùng skill này sẽ remove ra khỏi list list attack class ngay lập tức, tốn tất cả mana và stamina
-                ProfileMongoManager.set_guardian_current_stats(guild_id=self.guild_id, user_id=self_player_info.player_profile.user_id,stamina=0, health=self_player_info.player_ga.health, mana=0)
+                if CustomFunctions.check_if_dev_mode() == False:
+                    ProfileMongoManager.set_guardian_current_stats(guild_id=self.guild_id, user_id=self_player_info.player_profile.user_id,stamina=0, health=self_player_info.player_ga.health, mana=0)
                 #Kiểm tra trong upper hay lower
                 if self_player_info in self.upper_attack_class:
                     self.upper_attack_class.remove(self_player_info)
                 if self_player_info in self.lower_attack_class:
                     self.lower_attack_class.remove(self_player_info)
-                base_text =  f"- [**{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} cảm thấy không ổn với trận chiến, và đã dùng chiêu {skill.emoji} -{skill.skill_name} để sủi ngay lập tức!"
+                base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} cảm thấy không ổn với trận chiến, và đã dùng chiêu {skill.emoji} -{skill.skill_name} để sủi ngay lập tức!"
                 return base_text
         
         if current_health_percent <= 25 and self_player_info.is_used_skill_critical_strike == False:
@@ -682,10 +782,6 @@ class GaBattleView(discord.ui.View):
                 #Dùng skill này sẽ lập tức tăng 25% sức tấn công cho user
                 self_player_info.player_ga.attack_power += int(self_player_info.player_ga.attack_power * 0.25)
                 self_player_info.is_used_skill_critical_strike = True
-                base_text =  f"- [**{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã dùng chiêu {skill.emoji} - {skill.skill_name} và hoá rồ để tăng 25% sức mạnh tấn công của bản thân!"
+                base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã dùng chiêu {skill.emoji} - {skill.skill_name} và hoá rồ để tăng 25% sức mạnh tấn công của bản thân!"
                 return base_text
-        
-        
-            
-        
         

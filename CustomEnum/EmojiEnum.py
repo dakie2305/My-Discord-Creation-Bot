@@ -205,6 +205,9 @@ class EmojiCreation2(Enum):
     ONE_HP_LEFT_SKILL = "<:1_hp_skill:1324827906048000072>"
     BLACK_FIRE = "<a:black_fire_skill:1324829524935966872>"
     SUMMONING_SKILL = "<a:summoning_skill:1324833374417846344>"
+    STUN_SKILL = "<a:stun_skill:1325474542583550014>"
+    BRAINWASH_SKILL = "<a:brainwash_skill:1325474525219131465>"
+    MASS_HEAL_SKILL = "<:mass_heal_skill:1325474563579973713>"
     
     HP = "<:HP:1320777603358920724>"
     MP = "<:MP:1320777612926386256>"
