@@ -74,7 +74,7 @@ class GuardianAngelCog(commands.Cog):
             embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
             embed.add_field(name=f"", value=f"Bạn có sẵn sàng bán Hộ Vệ Thần [{user_profile.guardian.ga_emoji} - **{user_profile.guardian.ga_name}**] với giá **{money}** {UtilitiesFunctions.get_emoji_from_loai_tien(user_profile.guardian.worth_type)} không?", inline=False)
             embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
-            embed.set_footer(text=f"Hãy nâng cấp của Hộ Vệ Thần lên thật cao thì bán mới được giá nhé!", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/8fd7278827dbc92713e315ee03e0b502.webp?size=32")
+            embed.set_footer(text=f"Hãy nâng cấp của Hộ Vệ Thần lên thật cao thì bán mới được giá nhé!", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")
             view = ConfirmSellGuardianView(money=money, money_type=user_profile.guardian.worth_type, guardian=user_profile.guardian, user=interaction.user)
             mess = await interaction.followup.send(embed=embed, view=view, ephemeral=False)
             view.message = mess
@@ -476,8 +476,9 @@ class GuardianAngelCog(commands.Cog):
         gold_reward = int(gold_reward + gold_reward*enemy.level*0.2)
         silver_reward = int(silver_reward + silver_reward*enemy.level*0.3)
         exp_reward = int(exp_reward + exp_reward*enemy.level*0.1)
-        ProfileMongoManager.update_main_guardian_profile_time(guild_id=interaction.guild_id,user_id=interaction.user.id, data_type="last_battle", date_value=datetime.now())
-        ProfileMongoManager.update_main_guardian_profile_time(guild_id=interaction.guild_id,user_id=interaction.user.id, data_type="last_joined_battle", date_value=datetime.now())
+        if CustomFunctions.check_if_dev_mode() == False:
+            ProfileMongoManager.update_main_guardian_profile_time(guild_id=interaction.guild_id,user_id=interaction.user.id, data_type="last_battle", date_value=datetime.now())
+            ProfileMongoManager.update_main_guardian_profile_time(guild_id=interaction.guild_id,user_id=interaction.user.id, data_type="last_joined_battle", date_value=datetime.now())
         view = GaBattleView(user=interaction.user, user_profile=user_profile, target=target, target_profile=target_profile, is_players_versus_players=is_players_versus_player, max_players=max_players_as_int, enemy_ga=enemy, embed_title=title, guild_id=interaction.guild_id, gold_reward=gold_reward, silver_reward=silver_reward, bonus_exp=exp_reward, dignity_point=dignity_point_reward)
         mess = await interaction.followup.send(embed=embed, view=view)
         view.message = mess

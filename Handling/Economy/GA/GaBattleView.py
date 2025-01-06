@@ -14,6 +14,7 @@ import asyncio
 from datetime import datetime, timedelta
 from Handling.Misc.SelfDestructView import SelfDestructView
 import CustomFunctions
+from Handling.Economy.Inventory_Shop.ItemClass import Item, list_small_copper_fish,list_gold_fish, list_silver_fish, list_gift_items, list_trash, list_plant, list_legend_weapon_1, list_legend_weapon_2, list_support_ga_items, list_protection_items,list_attack_items,list_support_items
 
 
 class GaBattleView(discord.ui.View):
@@ -323,16 +324,19 @@ class GaBattleView(discord.ui.View):
         self.battle_ended = True
         result_text = "**Tổng Kết Chiến Đấu**\n"
         if self.upper_attack_won:
-            result_text += f"Phe trên đã chiến thắng!\n▬▬▬ι════>\n"
+            result_text += f"Phe trên thắng!\n▬▬▬ι════>\n"
+            count = 1
             for info in self.upper_attack_class:
-                additional_stats = self.get_result_addition_stats(info)
+                additional_stats = self.get_result_addition_stats(info, count)
                 result_text += additional_stats
+                count +=1
         else:
-            result_text += f"Phe dưới đã chiến thắng!\n"
+            result_text += f"Phe dưới thắng!\n"
+            count = 1
             for info in self.lower_attack_class:
-                additional_stats = self.get_result_addition_stats(info)
+                additional_stats = self.get_result_addition_stats(info, count)
                 result_text += additional_stats
-        result_text += f"▬▬▬ι════>\nPhe thua quá gà, chẳng xứng đáng nhận gì hết!"
+                count +=1
         try:
             await self.message.reply(content=result_text)
             await self.message.edit(view=None)
@@ -359,7 +363,7 @@ class GaBattleView(discord.ui.View):
     def is_empty_or_whitespace(self, s: str):
         return not s.strip()
     
-    def get_result_addition_stats(self, info: GuardianAngelAttackClass):
+    def get_result_addition_stats(self, info: GuardianAngelAttackClass, count: int):
         if info.player_profile == None: return ""
         #Nhân theo lượng người tham gia
         bonus_exp = int(self.bonus_exp * len(self.upper_attack_class) + self.bonus_exp*len(self.lower_attack_class))
@@ -388,11 +392,92 @@ class GaBattleView(discord.ui.View):
             text_target_profile_exist += f"**{self.dignity_point}** Nhân phẩm. "
             ProfileMongoManager.update_dignity_point(guild_id=self.guild_id, user_id=info.player_profile.user_id, guild_name="",user_display_name="", user_name="", dignity_point=self.dignity_point)
         
+        if count == 1:
+            #Chủ party
+            text_target_profile_exist += f"Thưởng thêm: {self.get_result_additional_reward(info=info)}"
+        
         if info.player_ga.is_dead:
-            text_target_profile_exist+= " Hộ Vệ Thần tử nạn."
+            text_target_profile_exist+= " Hộ Vệ Thần tử nạn. "
         text_target_profile_exist += "\n"
         return text_target_profile_exist
     
+    def get_result_additional_reward(self, info: GuardianAngelAttackClass):
+        if info.player_profile == None: return ""
+        reward_text = ""
+        
+        #point
+        roll_dice = UtilitiesFunctions.get_chance(20)
+        if roll_dice:
+            amount = 1
+            ProfileMongoManager.set_guardian_stats_points(guild_id=self.guild_id, user_id=info.player_profile.user_id, stats_point=1)
+            reward_text = f"x1 **Điểm Cộng Chỉ Số**"
+            return reward_text
+            
+        
+        #legendary weapon chance
+        roll_dice = UtilitiesFunctions.get_chance(5)
+        if roll_dice:
+            dice_check = UtilitiesFunctions.get_chance(50)
+            if dice_check:
+                item = random.choice(list_legend_weapon_1)
+                item.item_worth_amount = 10
+                reward_text = f"x1 **[{item.emoji} - {item.item_name}]**"
+                ProfileMongoManager.update_list_items_profile(guild_id=self.guild_id, guild_name="", user_id=info.player_profile.user_id, user_display_name="", user_name="", item=item, amount=1)
+                return reward_text
+            else: 
+                item = random.choice(list_legend_weapon_2)
+                item.item_worth_amount = 10
+                reward_text = f"x1 **[{item.emoji} - {item.item_name}]**"
+                ProfileMongoManager.update_list_items_profile(guild_id=self.guild_id, guild_name="", user_id=info.player_profile.user_id, user_display_name="", user_name="", item=item, amount=1)
+                return reward_text
+        
+        #darkium
+        roll_dice =UtilitiesFunctions.get_chance(15)
+        if roll_dice:
+            amount = random.randint(1, 3)
+            reward_text = f"**{amount}** {EmojiCreation2.DARKIUM.value}"
+            ProfileMongoManager.update_profile_money(guild_id=self.guild_id, guild_name="", user_id=info.player_profile.user_id, user_display_name="", user_name="", darkium=amount)
+            return reward_text
+        
+        #Random gift
+        roll_dice =UtilitiesFunctions.get_chance(35)
+        if roll_dice:
+            amount = random.randint(1, 5)
+            item = random.choice(list_gift_items)
+            reward_text = f"x{amount} **[{item.emoji} - {item.item_name}]**"
+            ProfileMongoManager.update_list_items_profile(guild_id=self.guild_id, guild_name="", user_id=info.player_profile.user_id, user_display_name="", user_name="", item=item, amount=amount)
+            return reward_text
+        #random potion
+        roll_dice =UtilitiesFunctions.get_chance(35)
+        if roll_dice:
+            amount = random.randint(1, 3)
+            item = random.choice(list_support_ga_items)
+            item.item_worth_amount = 1000
+            reward_text = f"x{amount} **[{item.emoji} - {item.item_name}]**"
+            ProfileMongoManager.update_list_items_profile(guild_id=self.guild_id, guild_name="", user_id=info.player_profile.user_id, user_display_name="", user_name="", item=item, amount=amount)
+            return reward_text
+        #random weapon
+        roll_dice =UtilitiesFunctions.get_chance(35)
+        if roll_dice:
+            amount = random.randint(1, 3)
+            item = random.choice(list_support_ga_items)
+            reward_text = f"x{amount} **[{item.emoji} - {item.item_name}]**"
+            ProfileMongoManager.update_list_items_profile(guild_id=self.guild_id, guild_name="", user_id=info.player_profile.user_id, user_display_name="", user_name="", item=item, amount=amount)
+            return reward_text
+        #random armour
+        roll_dice =UtilitiesFunctions.get_chance(25)
+        if roll_dice:
+            amount = random.randint(1, 2)
+            item = random.choice(list_protection_items)
+            reward_text = f"x{amount} **[{item.emoji} - {item.item_name}]**"
+            ProfileMongoManager.update_list_items_profile(guild_id=self.guild_id, guild_name="", user_id=info.player_profile.user_id, user_display_name="", user_name="", item=item, amount=amount)
+            return reward_text
+        #gold
+        amount = random.randint(1000, 30000)
+        reward_text = f"**{amount}** {EmojiCreation2.GOLD.value}"
+        ProfileMongoManager.update_profile_money(guild_id=self.guild_id, guild_name="", user_id=info.player_profile.user_id, user_display_name="", user_name="", gold=amount)
+        return reward_text
+        
     
     def update_stats_in_database(self, info: GuardianAngelAttackClass):
         if info.player_profile != None:
