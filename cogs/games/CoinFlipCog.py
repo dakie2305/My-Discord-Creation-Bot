@@ -49,7 +49,8 @@ class CoinFlip(commands.Cog):
         
         if (sap_ngua != None and so_tien != None and loai_tien == None):
             loai_tien = "C"
-            
+        if (sap_ngua != None and loai_tien != None and so_tien == None):
+            so_tien = 1
             
         profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
         if sap_ngua != None and profile == None:
@@ -104,7 +105,7 @@ class CoinFlip(commands.Cog):
             embed_updated = discord.Embed(title=f"", description=f"{user.mention} đã tung đồng xu. {response}", color=0x03F8FC)
             await message.edit(embed=embed_updated)
             return
-        lose_chance = UtilitiesFunctions.get_chance(55)
+        lose_chance = UtilitiesFunctions.get_chance(45)
         emoji_state = EmojiCreation2.COIN_NGUA.value
         state = 'ngửa'
         if lose_chance:
