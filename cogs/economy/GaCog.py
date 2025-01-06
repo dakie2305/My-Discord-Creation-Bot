@@ -49,7 +49,7 @@ class GuardianAngelCog(commands.Cog):
             mess = await interaction.followup.send(content=f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True, view=view)
             view.message = mess
             return
-        elif user_profile.guardian == None or user_profile.guardian.is_dead:
+        elif user_profile.guardian == None:
             view = SelfDestructView(timeout=30)
             mess = await interaction.followup.send(content=f"Vui lòng mua Hộ Vệ Thần trước bằng lệnh {SlashCommand.SHOP_GUARDIAN.value} đã!", ephemeral=True, view=view)
             view.message = mess
@@ -67,9 +67,9 @@ class GuardianAngelCog(commands.Cog):
         else:
             #Tính toán số tiền bán hộ vệ thần
             money = int(user_profile.guardian.worth_amount * 30 / 100)
-            if user_profile.guardian.level > 30:
+            if user_profile.guardian.level > 30 and user_profile.guardian.is_dead == False:
                 money += int(user_profile.guardian.worth_amount*user_profile.guardian.level/100)
-            if money > 500 and user_profile.guardian.worth_type == "D": money = 500 
+            if money > 500 and user_profile.guardian.worth_type == "D": money = 500
             embed = discord.Embed(title=f"", description=f"Bán Hộ Vệ Thần", color=0x0ce7f2)
             embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
             embed.add_field(name=f"", value=f"Bạn có sẵn sàng bán Hộ Vệ Thần [{user_profile.guardian.ga_emoji} - **{user_profile.guardian.ga_name}**] với giá **{money}** {UtilitiesFunctions.get_emoji_from_loai_tien(user_profile.guardian.worth_type)} không?", inline=False)
