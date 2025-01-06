@@ -56,7 +56,7 @@ class GuardianAngelCog(commands.Cog):
             return
         
         #Nếu có list skill trong guardian thì hỏi user chọn bán skill hay guardian
-        if user_profile.guardian.list_skills != None and len(user_profile.guardian.list_skills) > 0:
+        if user_profile.guardian.list_skills != None and len(user_profile.guardian.list_skills) > 0 and user_profile.guardian.is_dead == False:
             embed = discord.Embed(title=f"", description=f"Menu Bán Hộ Vệ Thần", color=0x0ce7f2)
             embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
             embed.add_field(name=f"", value=f"Chọn thứ bạn muốn bán", inline=False)
