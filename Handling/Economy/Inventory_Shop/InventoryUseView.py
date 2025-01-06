@@ -192,7 +192,7 @@ class InventoryUseView(discord.ui.View):
             ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, amount= -1)
             text = f"{interaction.user.mention} đã dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] nhưng quên mất mình làm gì có Hộ Vệ Thần!"
             health_to_heal = 0
-            if self.user_profile.guardian!= None:
+            if self.user_profile.guardian!= None and self.user_profile.guardian.is_dead == False:
                 health_to_heal = int(self.user_profile.guardian.max_health*0.3)
                 total = health_to_heal+self.user_profile.guardian.health
                 if total > self.user_profile.guardian.max_health:
@@ -207,7 +207,7 @@ class InventoryUseView(discord.ui.View):
             ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, amount= -1)
             text = f"{interaction.user.mention} đã dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] nhưng quên mất mình làm gì có Hộ Vệ Thần!"
             stats_restored = 0
-            if self.user_profile.guardian!= None:
+            if self.user_profile.guardian!= None and self.user_profile.guardian.is_dead == False:
                 stats_restored = int(self.user_profile.guardian.max_stamina*0.5)
                 total = stats_restored+self.user_profile.guardian.stamina
                 if total > self.user_profile.guardian.max_stamina:
@@ -221,7 +221,7 @@ class InventoryUseView(discord.ui.View):
             ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, amount= -1)
             text = f"{interaction.user.mention} đã dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] nhưng quên mất mình làm gì có Hộ Vệ Thần!"
             stats_restored = 0
-            if self.user_profile.guardian!= None:
+            if self.user_profile.guardian!= None and self.user_profile.guardian.is_dead == False:
                 stats_restored = int(self.user_profile.guardian.max_mana*0.5)
                 total = stats_restored+self.user_profile.guardian.mana
                 if total > self.user_profile.guardian.max_mana:
@@ -235,7 +235,7 @@ class InventoryUseView(discord.ui.View):
             #Xoá vật phẩm
             ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, amount= -1)
             text = f"{interaction.user.mention} đã dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] nhưng quên mất mình làm gì có Hộ Vệ Thần!"
-            if self.user_profile.guardian!= None:
+            if self.user_profile.guardian!= None and self.user_profile.guardian.is_dead == False:
                 ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id, user_id=self.user.id, health=self.user_profile.guardian.max_health, stamina=self.user_profile.guardian.max_stamina, mana=self.user_profile.guardian.max_mana)
                 text = f"{interaction.user.mention} đã dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] và hồi phục Hộ Vệ Thần về trạng thái hoàng kim!"
             await channel.send(content=text)

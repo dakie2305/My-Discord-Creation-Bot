@@ -96,9 +96,10 @@ class GaBattleView(discord.ui.View):
         if new_player_profile == None:
             await interaction.followup.send(content=f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True)
             return
-        elif new_player_profile.guardian == None:
+        elif new_player_profile.guardian == None or new_player_profile.guardian.is_dead:
             await interaction.followup.send(content=f"Vui lòng mua Hộ Vệ Thần trước bằng lệnh {SlashCommand.SHOP_GUARDIAN.value} đã!", ephemeral=True)
             return
+        
         
         if new_player_profile.guardian.last_joined_battle != None:
             time_window = timedelta(minutes=1)
@@ -150,7 +151,7 @@ class GaBattleView(discord.ui.View):
         if new_player_profile == None:
             await interaction.followup.send(content=f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True)
             return
-        elif new_player_profile.guardian == None:
+        elif new_player_profile.guardian == None or new_player_profile.guardian.is_dead:
             await interaction.followup.send(content=f"Vui lòng mua Hộ Vệ Thần trước bằng lệnh {SlashCommand.SHOP_GUARDIAN.value} đã!", ephemeral=True)
             return
         
@@ -205,7 +206,7 @@ class GaBattleView(discord.ui.View):
         if new_player_profile == None:
             await interaction.followup.send(content=f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True)
             return
-        elif new_player_profile.guardian == None:
+        elif new_player_profile.guardian == None or new_player_profile.guardian.is_dead:
             await interaction.followup.send(content=f"Vui lòng mua Hộ Vệ Thần trước bằng lệnh {SlashCommand.SHOP_GUARDIAN.value} đã!", ephemeral=True)
             return
         
