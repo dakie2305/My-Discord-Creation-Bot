@@ -79,7 +79,7 @@ class ProfileToInventoryView(discord.ui.View):
             unix_time = int(next_time.timestamp())
             text_name += f" (Trọng thương đến <t:{unix_time}:t>)"
         if self.profile.guardian.is_dead == True:
-            text_name += f" (Đã **tử nạn**. Hồi sinh bằng Phục Sinh Thạch trong {SlashCommand.SHOP_GLOBAL.value} hoặc bán đi để mua Hộ Vệ Thần mới)"
+            text_name += f"\n(Đã **tử nạn**. Hồi sinh bằng Phục Sinh Thạch trong {SlashCommand.SHOP_GLOBAL.value} hoặc bán đi để mua Hộ Vệ Thần mới)"
         
         embed.add_field(name=f"", value=text_name, inline=False)
         if self.profile.guardian.stats_point > 0:
@@ -102,7 +102,7 @@ class ProfileToInventoryView(discord.ui.View):
                 if count > 6:
                     embed.add_field(name=f"", value=f"\nNgoài ra còn nhiều kỹ năng khác!", inline=False)
                     break
-        embed.set_footer(text=f"Đừng quên, nếu có thắc mắc về Hộ Vệ Thần thì cứ nhắn câu\nga help!", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/9e8749a5a47cae53211484d7aee42040.webp?size=100&quot")
+        embed.set_footer(text=f"Đừng quên, nếu có thắc mắc về Hộ Vệ Thần thì cứ nhắn câu\nga help", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/9e8749a5a47cae53211484d7aee42040.webp?size=100&quot")
         view = InventoryBackToProfileView(profile=self.profile)
         try:
             #Gắn link background dựa trên id của guardian nếu có

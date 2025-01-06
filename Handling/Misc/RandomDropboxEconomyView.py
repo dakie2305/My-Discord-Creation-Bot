@@ -77,7 +77,7 @@ class RandomDropboxEconomyView(discord.ui.View):
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Một hộp quà thần bí đã xuất hiện tại đúng channel này! {interaction.user.mention} đã nhanh tay chộp được hộp quà và mở nó và nhận được:", inline=False)
         embed.add_field(name=f"", value=f"> {EmojiCreation2.GOLDEN_GIFT_BOX.value}: **{amount}** {emoji}", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
-        embed.set_footer(text=f"Hộp quà sẽ xuất hiện ngẫu nhiên, và khi thấy thì nhớ nhanh tay nhé!", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/8fd7278827dbc92713e315ee03e0b502.webp?size=32")
+        embed.set_footer(text=f"Hộp quà sẽ xuất hiện ngẫu nhiên, và khi thấy thì nhớ nhanh tay nhé!", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")
         
         await interaction.followup.send(f"Bạn đã nhận hộp quà!",ephemeral=True)
         called_channel = interaction.channel

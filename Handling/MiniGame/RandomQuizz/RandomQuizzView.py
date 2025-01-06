@@ -112,7 +112,7 @@ class QuizButton(Button):
                 embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
                 embed.add_field(name=f"", value=f"Đáp án đúng chính là **{self.label}**! Chúc mừng {interaction.user.mention} đã trả lời đúng và nhận được:", inline=False)
                 embed.add_field(name=f"", value=f"> {EmojiCreation2.GOLDEN_GIFT_BOX.value}: **{amount}** {emoji}", inline=False)
-                embed.set_footer(text=f"Hỏi Nhanh Có Thưởng sẽ xuất hiện ngẫu nhiên, và khi thấy thì nhớ trả lời đúng nhé!", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/8fd7278827dbc92713e315ee03e0b502.webp?size=32")
+                embed.set_footer(text=f"Hỏi Nhanh Có Thưởng sẽ xuất hiện ngẫu nhiên, và khi thấy thì nhớ trả lời đúng nhé!", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")
                 view = SelfDestructView()
                 m = await channel.send(embed=embed, view=view)
                 view.message = m

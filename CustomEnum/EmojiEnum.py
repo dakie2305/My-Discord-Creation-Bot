@@ -1,6 +1,7 @@
 from enum import Enum
 
 class EmojiCreation2(Enum):
+    TRUE_HEAVEN_LINK_MINI = "https://cdn.discordapp.com/emojis/1307360190353375336.webp?size=96"
     DOGE_COIN = "<a:doge_coin:1287452452827697276>"
     COIN_NGUA = "<:coin_ngua:1287452465733570684>"
     COIN_SAP = "<:coin_sap:1287452474952777750>"

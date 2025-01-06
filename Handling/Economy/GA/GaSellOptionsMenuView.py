@@ -37,7 +37,7 @@ class GaSellOptionsMenuView(discord.ui.View):
         embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
         embed.add_field(name=f"", value=f"Bạn có sẵn sàng bán Hộ Vệ Thần [{self.user_profile.guardian.ga_emoji} - **{self.user_profile.guardian.ga_name}**] với giá **{money}** {UtilitiesFunctions.get_emoji_from_loai_tien(self.user_profile.guardian.worth_type)} không?", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
-        embed.set_footer(text=f"Hãy nâng cấp của Hộ Vệ Thần lên thật cao thì bán mới được giá nhé!", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/8fd7278827dbc92713e315ee03e0b502.webp?size=32")
+        embed.set_footer(text=f"Hãy nâng cấp của Hộ Vệ Thần lên thật cao thì bán mới được giá nhé!", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")
         view = ConfirmSellGuardianView(money=money, money_type=self.user_profile.guardian.worth_type, guardian=self.user_profile.guardian, user=interaction.user)
         mess = await interaction.channel.send(embed=embed, view=view)
         view.message = mess

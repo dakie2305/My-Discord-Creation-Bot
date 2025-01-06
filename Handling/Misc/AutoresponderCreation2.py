@@ -89,7 +89,7 @@ class AutoresponderHandling():
             embed.add_field(name="", value="- Nhìn vào tỉ lệ quy đổi, làm chút toán để biết ta sẽ cần đổi bao nhiêu.", inline=False)
             embed.add_field(name="", value=f"- Ví dụ, muốn đổi **1** {CurrencyEmoji.SILVER.value} sang {CurrencyEmoji.COPPER.value}, thì ta sẽ chọn ô xổ xuống là Quy Đổi Sang Copper, rồi trong ô nhập t ghi là 1S là sẽ đổi từ **1** {CurrencyEmoji.SILVER.value} sang số {CurrencyEmoji.COPPER.value} như trên tỷ lệ quy đổi", inline=False)
             embed.add_field(name="", value="-------------------------------------", inline=False)
-            embed.set_footer(text=f"Tỉ lệ quy đổi sẽ thay đổi theo mỗi ngày hoặc do Chính Quyền ép thay đổi nha!", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/8fd7278827dbc92713e315ee03e0b502.webp?size=32")
+            embed.set_footer(text=f"Tỉ lệ quy đổi sẽ thay đổi theo mỗi ngày hoặc do Chính Quyền ép thay đổi nha!", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")
             view = SelfDestructView(timeout=180)
             _mess = await message.channel.send(embed=embed, view=view)
             view.message= _mess
@@ -106,7 +106,7 @@ class AutoresponderHandling():
             embed.add_field(name="", value=f"- Lệnh {SlashCommand.GA_BATTLE.value} nếu chọn `target` là sẽ đánh với người chơi khác! Đây coi như giao hữu, nên sẽ không mất chỉ số hay chết vĩnh viễn nếu thua!", inline=False)
             embed.add_field(name="", value=f"- Lệnh {SlashCommand.GA_BATTLE.value} nếu không chọn `target` là sẽ đánh với quái! Mọi chỉ số đã mất sẽ lưu lại, và có khả năng chết vĩnh viễn nếu thua!", inline=False)
             embed.add_field(name="", value="-------------------------------------", inline=False)
-            embed.set_footer(text=f"Đừng quên mỗi Hộ Vệ Thần có tỉ lệ chết vĩnh viễn nếu để trọng thương khi đánh với quái nhé! Tỉ lệ rất thấp, nhưng đừng khinh suất!", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/8fd7278827dbc92713e315ee03e0b502.webp?size=32")
+            embed.set_footer(text=f"Đừng quên mỗi Hộ Vệ Thần có tỉ lệ chết vĩnh viễn nếu để trọng thương khi đánh với quái nhé! Tỉ lệ rất thấp, nhưng đừng khinh suất!", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")
             view = SelfDestructView(timeout=180)
             _mess = await message.channel.send(embed=embed, view=view)
             view.message= _mess
@@ -191,8 +191,8 @@ class AutoresponderHandling():
             embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Nếu mọi người có chút lòng thành để ủng hộ và tạo động lực cho Darkie làm thêm chức năng mới, mini-game hoặc cải thiện bot, hoặc đẩy nhanh tiến độ dịch truyện, đăng truyện thì có thể donate một ít cafe nhé! Darkie **xin chân thành cảm ơn** rất rất nhiều!", inline=False)
             embed.add_field(name="", value=f"> ACB: 9799317", inline=False)
             embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
-            embed.set_footer(text=f"Cảm ơn chân thành vì đã đọc, mong tin nhắn này không làm phiền mọi người.", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/8fd7278827dbc92713e315ee03e0b502.webp?size=32")
-            view = SelfDestructView(timeout=120)
+            embed.set_footer(text=f"Cảm ơn chân thành vì đã đọc, mong tin nhắn này không làm phiền mọi người.", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")
+            view = SelfDestructView(timeout=30)
             _mess = await message.channel.send(embed=embed, view=view)
             view.message= _mess
             

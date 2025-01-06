@@ -99,7 +99,7 @@ class QuestEconomy(commands.Cog):
                 new_embed.add_field(name=f"", value=f"{EmojiCreation2.GOLDEN_GIFT_BOX.value}: {quest.bonus_exp} Điểm Kinh Nghiệm", inline=False)
             new_embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
             new_embed.add_field(name=f"", value=f"> Đừng quên dùng lệnh {SlashCommand.QUEST.value} để nhận nhiệm vụ trong server nhé", inline=False)
-            new_embed.set_footer(text=f"Quest {user.name}", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/8fd7278827dbc92713e315ee03e0b502.webp?size=32")
+            new_embed.set_footer(text=f"Quest {user.name}", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")
             #Cộng tiền
             ProfileMongoManager.update_profile_money(guild_id=user.guild.id, guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name= user.display_name, gold=quest.quest_reward_gold, silver=quest.quest_reward_silver, copper=quest.quest_reward_copper)
             #Cộng kinh nghiệm
