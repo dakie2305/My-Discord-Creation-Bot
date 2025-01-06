@@ -393,7 +393,7 @@ class GaBattleView(discord.ui.View):
             text_target_profile_exist += f"**{self.dignity_point}** Nhân phẩm. "
             ProfileMongoManager.update_dignity_point(guild_id=self.guild_id, user_id=info.player_profile.user_id, guild_name="",user_display_name="", user_name="", dignity_point=self.dignity_point)
         
-        if count == 1:
+        if count == 1 and self.is_players_versus_players == False:
             #Chủ party
             text_target_profile_exist += f"Thưởng thêm: {self.get_result_additional_reward(info=info)}"
         
