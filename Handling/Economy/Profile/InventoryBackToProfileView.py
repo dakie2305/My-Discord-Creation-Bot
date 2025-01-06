@@ -42,7 +42,7 @@ class ProfileToInventoryView(discord.ui.View):
         for item in self.profile.list_items:
             embed.add_field(name=f"", value=f"{item.emoji} - {item.item_name} (x{item.quantity})", inline=True)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
-        embed.set_footer(text=f"Đừng quên, bạn chỉ được giữ tối đa 20 vật phẩm, mỗi loại vật phẩm chỉ tối đa 99 cái thôi nhé!", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/9e8749a5a47cae53211484d7aee42040.webp?size=100&quot")
+        embed.set_footer(text=f"Đừng quên, bạn chỉ được giữ tối đa 20 vật phẩm, mỗi loại vật phẩm chỉ tối đa 99 cái thôi nhé!", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")
         view = InventoryBackToProfileView(profile=self.profile)
         m = await self.message.edit(embed=embed, view = view)
         view.message = m
@@ -102,7 +102,7 @@ class ProfileToInventoryView(discord.ui.View):
                 if count > 6:
                     embed.add_field(name=f"", value=f"\nNgoài ra còn nhiều kỹ năng khác!", inline=False)
                     break
-        embed.set_footer(text=f"Đừng quên, nếu có thắc mắc về Hộ Vệ Thần thì cứ nhắn câu\nga help", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/9e8749a5a47cae53211484d7aee42040.webp?size=100&quot")
+        embed.set_footer(text=f"Đừng quên, nếu có thắc mắc về Hộ Vệ Thần thì cứ nhắn câu\nga help", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")
         view = InventoryBackToProfileView(profile=self.profile)
         try:
             #Gắn link background dựa trên id của guardian nếu có
@@ -210,7 +210,7 @@ class InventoryBackToProfileView(discord.ui.View):
         embed.add_field(name=f"", value="\n", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
         embed.add_field(name=f"", value=f"**Quote**: \"{self.profile.quote}\"", inline=False)
-        embed.set_footer(text=f"Profile của {self.profile.user_name}.", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/9e8749a5a47cae53211484d7aee42040.webp?size=100&quot")
+        embed.set_footer(text=f"Profile của {self.profile.user_name}.", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")
         await self.message.edit(embed=embed, view = None)
         await interaction.followup.send(f"Bạn đã chuyển sang chế độ Profile!", ephemeral=True)
         

@@ -294,7 +294,7 @@ async def random_dropbox():
             embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Một hộp quà thần bí đã xuất hiện tại đúng channel này!", inline=False)
             embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Ai nhanh tay thì được nhé, vì hộp quà sẽ biến mất đúng sau: <t:{int(endtime.timestamp())}:R>", inline=False)
             embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
-            embed.set_footer(text=f"Hộp quà sẽ xuất hiện ngẫu nhiên, và khi thấy thì nhớ nhanh tay nhé!", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/9e8749a5a47cae53211484d7aee42040.webp?size=100&quot")
+            embed.set_footer(text=f"Hộp quà sẽ xuất hiện ngẫu nhiên, và khi thấy thì nhớ nhanh tay nhé!", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")
             print(f"Created random dropbox at channel {quest_channel.name} in guild {guild.name}.")
             view = RandomDropboxEconomyView()
             m = await quest_channel.send(embed=embed, view=view)
@@ -332,7 +332,7 @@ async def random_quizz_embed():
                 embed.add_field(name=f"", value=f"**{key}**. {value}", inline=False)
             embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
             embed.add_field(name=f"", value=f"Nhanh tay lên nhé, vì câu hỏi sẽ biến mất sau: <t:{int(endtime.timestamp())}:R>", inline=False)
-            embed.set_footer(text=f"Hỏi Nhanh Có Thưởng sẽ xuất hiện ngẫu nhiên, và khi thấy thì nhớ trả lời đúng nhé!", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/9e8749a5a47cae53211484d7aee42040.webp?size=100&quot")
+            embed.set_footer(text=f"Hỏi Nhanh Có Thưởng sẽ xuất hiện ngẫu nhiên, và khi thấy thì nhớ trả lời đúng nhé!", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")
             print(f"Created random quizz at channel {quest_channel.name} in guild {guild.name}.")
             m = await quest_channel.send(embed=embed, view=view)
             view.old_message = m

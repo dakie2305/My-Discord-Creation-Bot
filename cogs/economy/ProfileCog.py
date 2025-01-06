@@ -204,7 +204,7 @@ class ProfileEconomy(commands.Cog):
         embed.add_field(name=f"", value="\n", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
         embed.add_field(name=f"", value=f"**Quote**: \"{data.quote}\"", inline=False)
-        embed.set_footer(text=f"Profile của {user.name}.", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/9e8749a5a47cae53211484d7aee42040.webp?size=100&quot")
+        embed.set_footer(text=f"Profile của {user.name}.", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")
         
         if user.guild.id == 1256987900277690470:
             #Của true heaven
