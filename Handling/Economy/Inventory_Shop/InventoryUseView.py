@@ -96,13 +96,13 @@ class InventoryUseView(discord.ui.View):
     #region use support item
     async def using_support_item(self, interaction: discord.Interaction):
         ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=interaction.user.id)
+        text = ""
         channel = interaction.channel
         if self.selected_item.item_id == "rank_up_1":
             #Xoá vật phẩm
             ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, amount= -1)
             #tăng một cấp
             ProfileMongoManager.add_one_level_and_reset_progress(guild_id=interaction.guild_id, user_id=interaction.user.id)
-            text = ""
             #30% bị công an ập vào túm cổ và phạt 5% gold, tối đa 2000 gold
             police_chance = UtilitiesFunctions.get_chance(30)
             if police_chance:
@@ -169,7 +169,6 @@ class InventoryUseView(discord.ui.View):
             ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, amount= -1)
             #trừ một cấp
             ProfileMongoManager.add_one_level_and_reset_progress(guild_id=interaction.guild_id, user_id=interaction.user.id, level=-1)
-            text = ""
             #30% bị công an ập vào túm cổ và phạt 5% gold, tối đa 2000 gold
             police_chance = UtilitiesFunctions.get_chance(30)
             if police_chance:
