@@ -118,6 +118,10 @@ class Help(commands.Cog):
         count+=1
         embed.add_field(name=f"", value=f"- **Trang {count}**: Tổng hợp thông tin về Chính Quyền.", inline=False)
         count+=1
+        embed.add_field(name=f"", value=f"- **Trang {count}**: Tổng hợp thông tin về Hộ Vệ Thần (Guardian Angel)", inline=False)
+        count+=1
+        embed.add_field(name=f"", value=f"- **Trang {count}**: Tổng hợp thông tin chiến đấu Hộ Vệ Thần (Guardian Angel Battle)", inline=False)
+        count+=1
         embed.add_field(name=f"", value=f"- **Trang {count}**: Tổng hợp thông tin về hệ thống Cặp Đôi.", inline=False)
         count+=1
         embed.add_field(name=f"", value=f"- **Trang {count}**: Những thông tin hữu ích về bot Creation 2", inline=False)
@@ -198,6 +202,28 @@ class Help(commands.Cog):
         embed.add_field(name=f"", value=f"- Tỉ lệ `/crime` thành công tối đa chỉ dưới 40%!", inline=False)
         embed.add_field(name=f"", value=f"- Sẽ tự động sụp đổ khi Địa Vị xuống Trung Cấp, và phạt tiền cực nặng!", inline=False)
         embed.add_field(name=f"", value=f"- Chơi cờ bạc nếu thua sẽ mất trắng tiền!", inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
+        list_embed.append(embed)
+        
+        #Guardian
+        embed = discord.Embed(title=f"Thông tin về Hộ Vệ Thần", description=f"Thông tin cơ bản về hệ thống Guardian Angel", color=0xddede7)
+        embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
+        embed.add_field(name="", value=f"- Bạn có thể mua một Hộ Vệ Thần trong lệnh {SlashCommand.SHOP_GUARDIAN.value}!", inline=False)
+        embed.add_field(name="", value=f"- Ngoài ra còn có thể mua kỹ năng cho Hộ Vệ Thần trong lệnh {SlashCommand.SHOP_GUARDIAN_SKILL.value}!", inline=False)
+        embed.add_field(name="", value=f"- Mỗi hộ vệ thần có các chỉ số chính: Máu, Thể Lực, Mana và Sức Tấn Công", inline=False)
+        embed.add_field(name="", value=f"- Máu cao sẽ trụ được lâu, Thể Lực cao sẽ né được nhiều đòn, Mana cao sẽ tung được kỹ năng nhiều lần!", inline=False)
+        embed.add_field(name="", value=f"- Đừng quên dùng lệnh {SlashCommand.GA_FEED.value}, {SlashCommand.GA_MEDITATE.value} hoặc mua bình hồi phục trong {SlashCommand.SHOP_GLOBAL.value} để hồi phục chỉ số!", inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
+        list_embed.append(embed)
+        
+        embed = discord.Embed(title=f"Cách chiến đấu Hộ Vệ Thần", description=f"Hướng dẫn dùng lệnh {SlashCommand.GA_BATTLE.value}", color=0xddede7)
+        embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
+        embed.add_field(name="", value=f"- Chiến đấu Hộ Vệ Thần là chiến đấu theo lượt, mỗi lượt thì hai bên sẽ tung đòn, né đòn hoặc sử dụng kỹ năng nếu có.", inline=False)
+        embed.add_field(name="", value=f"- Ngoài ra, người khác có thể gia nhập cuộc chiến để đánh phụ với nhau, giúp nhau chiến thắng.", inline=False)
+        embed.add_field(name="", value=f"- Nếu trong Kho Đồ của bạn có bình phục hồi máu, thể lực, mana thì Hộ Vệ Thần sẽ sử dụng trong lúc giao chiến.", inline=False)
+        embed.add_field(name="", value=f"- Khi chọn thêm `target` tức là Hộ Vệ Thần của bạn sẽ đánh giao hữu với Hộ Vệ Thần của mục tiêu. Cả hai sẽ **không mất chỉ số, sẽ không chết vĩnh viễn** nếu thua. Coi như đánh vui thôi", inline=False)
+        embed.add_field(name="", value=f"- Khi không chọn `target` tức là đánh với quái. Phần thưởng cao hơn, có khả năng lụm phần thưởng tốt, nhưng mọi chỉ số đã mất sẽ lưu lại, và tồn tại khả năng rất thấp là sẽ chết vĩnh viễn. Liều thì ăn nhiều", inline=False)
+        embed.add_field(name="", value=f"- Chọn `max_players` để set mặc định bao nhiêu người đánh với nhau được, tối đa là 3 vs 3.", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
         list_embed.append(embed)
         

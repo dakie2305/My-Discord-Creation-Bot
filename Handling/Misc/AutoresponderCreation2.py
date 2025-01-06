@@ -40,6 +40,7 @@ class AutoresponderHandling():
         donate = ["donate"]
         sb_help = ["sb help","cách chơi tài xỉu", "tài xỉu?", "tx help"]
         legend_weapon = ["thất truyền huyền khí"]
+        ga_help = ["ga help", "guardian help", "hộ vệ thần?", "guardian help"]
 
         chosen_item: Item = None
         
@@ -92,6 +93,24 @@ class AutoresponderHandling():
             view = SelfDestructView(timeout=180)
             _mess = await message.channel.send(embed=embed, view=view)
             view.message= _mess
+            
+        elif CustomFunctions.contains_substring(message.content.lower(), ga_help):
+            flag = True
+            embed = discord.Embed(title=f"", description=f"Hướng dẫn Hộ Vệ Thần", color=0xc379e0)
+            embed.add_field(name="", value="-------------------------------------", inline=False)
+            embed.add_field(name="", value=f"- Bạn có thể mua một Hộ Vệ Thần trong lệnh {SlashCommand.SHOP_GUARDIAN.value}!", inline=False)
+            embed.add_field(name="", value=f"- Ngoài ra còn có thể mua kỹ năng cho Hộ Vệ Thần trong lệnh {SlashCommand.SHOP_GUARDIAN_SKILL.value}!", inline=False)
+            embed.add_field(name="", value=f"- Mỗi hộ vệ thần có các chỉ số chính: Máu, Thể Lực, Mana và Sức Tấn Công", inline=False)
+            embed.add_field(name="", value=f"- Máu cao sẽ trụ được lâu, Thể Lực cao sẽ né được nhiều đòn, Mana cao sẽ tung được kỹ năng nhiều lần!", inline=False)
+            embed.add_field(name="", value=f"- Đừng quên dùng lệnh {SlashCommand.GA_FEED.value}, {SlashCommand.GA_MEDITATE.value} hoặc mua bình hồi phục!", inline=False)
+            embed.add_field(name="", value=f"- Lệnh {SlashCommand.GA_BATTLE.value} nếu chọn `target` là sẽ đánh với người chơi khác! Đây coi như giao hữu, nên sẽ không mất chỉ số hay chết vĩnh viễn nếu thua!", inline=False)
+            embed.add_field(name="", value=f"- Lệnh {SlashCommand.GA_BATTLE.value} nếu không chọn `target` là sẽ đánh với quái! Mọi chỉ số đã mất sẽ lưu lại, và có khả năng chết vĩnh viễn nếu thua!", inline=False)
+            embed.add_field(name="", value="-------------------------------------", inline=False)
+            embed.set_footer(text=f"Đừng quên mỗi Hộ Vệ Thần có tỉ lệ chết vĩnh viễn nếu để trọng thương khi đánh với quái nhé! Tỉ lệ rất thấp, nhưng đừng khinh suất!", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/8fd7278827dbc92713e315ee03e0b502.webp?size=32")
+            view = SelfDestructView(timeout=180)
+            _mess = await message.channel.send(embed=embed, view=view)
+            view.message= _mess
+
         
         elif CustomFunctions.contains_substring(message.content.lower(), dignity_help):
             flag = True
