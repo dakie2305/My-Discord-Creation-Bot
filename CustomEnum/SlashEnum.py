@@ -33,6 +33,8 @@ class SlashCommand(Enum):
     INVENTORY_USE = "</inventory use:1315721623340318880>"
     GA_SELL = "</ga sell:1322835450397986867>"
     SHOP_GUARDIAN = "</shop guardian:1315721623340318878>"
+    SHOP_GUARDIAN_SKILL = "</shop guardian_skill:1315721623340318878>"
     GA_MEDITATE = "</ga meditate:1322835450397986867>"
     GA_FEED = "</ga feed:1322835450397986867>"
     GA_RANKUP = "</ga rankup:1322835450397986867>"
+    GA_BATTLE = "</ga battle:1322835450397986867>"

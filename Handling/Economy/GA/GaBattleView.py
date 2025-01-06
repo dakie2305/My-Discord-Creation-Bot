@@ -285,6 +285,8 @@ class GaBattleView(discord.ui.View):
             text_own_profile_exist = f"{self_player_info.player_ga.ga_emoji} - **{self_player_info.player_ga.ga_name}** (Cấp {self_player_info.player_ga.level})"
             if self_player_info.player_profile != None:
                 text_own_profile_exist = f"Hộ Vệ Thần {self_player_info.player_ga.ga_emoji} - **{self_player_info.player_ga.ga_name}** (Cấp {self_player_info.player_ga.level}) của <@{self_player_info.player_profile.user_id}>"
+                if self_player_info.player_ga.is_dead == True:
+                    text_own_profile_exist += " (Tử Nạn)"
             embed.add_field(name=f"", value=text_own_profile_exist, inline=False)
             embed.add_field(name=f"", value=f"🦾: **{self_player_info.player_ga.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=self_player_info.player_ga.health, max_value=self_player_info.player_ga.max_health, emoji=EmojiCreation2.HP.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=self_player_info.player_ga.stamina, max_value=self_player_info.player_ga.max_stamina, emoji=EmojiCreation2.STAMINA.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=self_player_info.player_ga.mana, max_value=self_player_info.player_ga.max_mana, emoji=EmojiCreation2.MP.value)}", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬▬▬ι═══════════>", inline=False)
@@ -292,6 +294,8 @@ class GaBattleView(discord.ui.View):
             text_target_profile_exist = f"Kẻ Thù {self_player_info.player_ga.ga_emoji} - **{self_player_info.player_ga.ga_name}** (Cấp {self_player_info.player_ga.level})"
             if self_player_info.player_profile != None:
                 text_target_profile_exist = f"Hộ Vệ Thần {self_player_info.player_ga.ga_emoji} - **{self_player_info.player_ga.ga_name}** (Cấp {self_player_info.player_ga.level}) của <@{self_player_info.player_profile.user_id}>"
+                if self_player_info.player_ga.is_dead == True:
+                    text_target_profile_exist += " (Tử Nạn)" 
             embed.add_field(name=f"", value=text_target_profile_exist, inline=False)
             embed.add_field(name=f"", value=f"🦾: **{self_player_info.player_ga.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=self_player_info.player_ga.health, max_value=self_player_info.player_ga.max_health, emoji=EmojiCreation2.HP.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=self_player_info.player_ga.stamina, max_value=self_player_info.player_ga.max_stamina, emoji=EmojiCreation2.STAMINA.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=self_player_info.player_ga.mana, max_value=self_player_info.player_ga.max_mana, emoji=EmojiCreation2.MP.value)}", inline=False)
         
@@ -359,30 +363,33 @@ class GaBattleView(discord.ui.View):
         if info.player_profile == None: return ""
         #Nhân theo lượng người tham gia
         bonus_exp = int(self.bonus_exp * len(self.upper_attack_class) + self.bonus_exp*len(self.lower_attack_class))
+        if bonus_exp > 350: bonus_exp = 350
         gold_reward = int(self.gold_reward * len(self.upper_attack_class) + self.bonus_exp*len(self.lower_attack_class))
         silver_reward = int(self.silver_reward * len(self.upper_attack_class) + self.bonus_exp*len(self.lower_attack_class))
         contribution = self.calculate_contribution(info.starting_at_round)
         text_target_profile_exist = f"<@{info.player_profile.user_id}> [{info.starting_at_round}] cống hiến **{contribution}%**, nhận: "
         calculated_exp = int(bonus_exp * (contribution / 100))
         if calculated_exp > 0: 
-            if calculated_exp > 350: calculated_exp = 350
             text_target_profile_exist += f"**{calculated_exp}** EXP. "
             ProfileMongoManager.update_level_progressing(guild_id=self.guild_id, user_id=info.player_profile.user_id, bonus_exp=int(calculated_exp*0.3))
             ProfileMongoManager.update_main_guardian_level_progressing(guild_id=self.guild_id, user_id=info.player_profile.user_id, bonus_exp=calculated_exp)
         
         calculated_gold_reward = int(gold_reward * (contribution / 100))
         if calculated_gold_reward > 0:
-            text_target_profile_exist += f"**{calculated_gold_reward}** {EmojiCreation2.GOLD.value}. "
+            text_target_profile_exist += f"**{calculated_gold_reward}** {EmojiCreation2.GOLD.value} "
         
         calculated_silver_reward = int(silver_reward * (contribution / 100))
         if calculated_silver_reward > 0:
-            text_target_profile_exist += f"**{calculated_silver_reward}** {EmojiCreation2.SILVER.value}. "
+            text_target_profile_exist += f"**{calculated_silver_reward}** {EmojiCreation2.SILVER.value} "
         
         ProfileMongoManager.update_profile_money(guild_id=self.guild_id, user_id=info.player_profile.user_id, guild_name="",user_display_name="", user_name="", gold=calculated_gold_reward, silver=calculated_silver_reward)
         
         if self.dignity_point > 0:
             text_target_profile_exist += f"**{self.dignity_point}** Nhân phẩm. "
             ProfileMongoManager.update_dignity_point(guild_id=self.guild_id, user_id=info.player_profile.user_id, guild_name="",user_display_name="", user_name="", dignity_point=self.dignity_point)
+        
+        if info.player_ga.is_dead:
+            text_target_profile_exist+= " Hộ Vệ Thần tử nạn."
         text_target_profile_exist += "\n"
         return text_target_profile_exist
     
@@ -393,7 +400,7 @@ class GaBattleView(discord.ui.View):
             # loss_stamina = int(info.player_ga.max_stamina - info.player_ga.stamina)
             # loss_mana = int(info.player_ga.max_mana - info.player_ga.mana)
             if CustomFunctions.check_if_dev_mode(): return
-            ProfileMongoManager.set_guardian_current_stats(guild_id=self.guild_id, user_id=info.player_profile.user_id,stamina=info.player_ga.stamina, health=info.player_ga.health, mana=info.player_ga.mana)
+            ProfileMongoManager.set_guardian_current_stats(guild_id=self.guild_id, user_id=info.player_profile.user_id,stamina=info.player_ga.stamina, health=info.player_ga.health, mana=info.player_ga.mana, is_dead=info.player_ga.is_dead)
     
     def get_ga_stil_alive(self, side: str):
         if side == "upper":
@@ -537,12 +544,22 @@ class GaBattleView(discord.ui.View):
         additional_loss_stats_text = ""
         if opponent_alive_attack_info.player_ga.health <= 0:
             opponent_alive_attack_info.player_ga.health = 0
-            additional_loss_stats_text += f" Mục tiêu đã bị hạ gục!"
+            additional_loss_stats_text = f" Mục tiêu đã bị hạ gục!"
         
         #Để đảm bảo stats không bị âm        
-        if opponent_alive_attack_info.player_ga.health <= 0: opponent_alive_attack_info.player_ga.health = 0
         if opponent_alive_attack_info.player_ga.stamina <= 0: opponent_alive_attack_info.player_ga.stamina = 0
         if opponent_alive_attack_info.player_ga.mana <= 0: opponent_alive_attack_info.player_ga.mana = 0
+        if opponent_alive_attack_info.player_ga.health <= 0: 
+            opponent_alive_attack_info.player_ga.health = 0
+            #Roll tỷ lệ chết nếu đánh PVE
+            if self.is_players_versus_players == False and opponent_alive_attack_info.player_profile != None:
+                actual_death_chance = UtilitiesFunctions.get_chance_guardian_actual_death(level=opponent_alive_attack_info.player_ga.level)
+                roll_dice_death = UtilitiesFunctions.get_chance(actual_death_chance)
+                if roll_dice_death:
+                    #Coi như chết
+                    additional_loss_stats_text = f"Hộ Vệ Thần của mục tiêu đã chết vĩnh viễn!"
+                    opponent_alive_attack_info.is_dead_ga = True
+                    opponent_alive_attack_info.player_ga.is_dead = True
         
         #Trừ -1 tẩy não khi hết lượt
         if self_player_info.brain_washed_round != None: 

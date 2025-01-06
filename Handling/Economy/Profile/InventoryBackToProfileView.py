@@ -26,7 +26,7 @@ class ProfileToInventoryView(discord.ui.View):
             self.gard_button.callback = self.garden_button_function
             self.add_item(self.gard_button)
         
-        if profile.guardian != None and profile.guardian.is_dead == False:
+        if profile.guardian != None:
             self.guardian_button = discord.ui.Button(label="Hộ Vệ Thần", style=discord.ButtonStyle.primary)
             self.guardian_button.callback = self.guardian_button_function
             self.add_item(self.guardian_button)
@@ -74,10 +74,12 @@ class ProfileToInventoryView(discord.ui.View):
         embed = discord.Embed(title="", description=f"**Thông tin Hộ Vệ Thần của <@{self.profile.user_id}>**", color=0xddede7)
         
         text_name = f"{self.profile.guardian.ga_emoji} - **{self.profile.guardian.ga_name}**"
-        if self.profile.guardian.time_to_recover != None and self.profile.guardian.time_to_recover > datetime.now():
+        if self.profile.guardian.time_to_recover != None and self.profile.guardian.time_to_recover > datetime.now() and self.profile.guardian.is_dead == False:
             next_time = self.profile.guardian.time_to_recover
             unix_time = int(next_time.timestamp())
             text_name += f" (Trọng thương đến <t:{unix_time}:t>)"
+        if self.profile.guardian.is_dead == True:
+            text_name += f" (Đã **tử nạn**. Hồi sinh bằng Phục Sinh Thạch trong {SlashCommand.SHOP_GLOBAL.value} hoặc bán đi để mua Hộ Vệ Thần mới)"
         
         embed.add_field(name=f"", value=text_name, inline=False)
         if self.profile.guardian.stats_point > 0:
@@ -100,7 +102,7 @@ class ProfileToInventoryView(discord.ui.View):
                 if count > 6:
                     embed.add_field(name=f"", value=f"\nNgoài ra còn nhiều kỹ năng khác!", inline=False)
                     break
-        embed.set_footer(text=f"Đừng quên, mọi Hộ Vệ Thần đều có tỉ lệ chết vĩnh viễn nếu trọng thương nhé!", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/9e8749a5a47cae53211484d7aee42040.webp?size=100&quot")
+        embed.set_footer(text=f"Đừng quên, nếu có thắc mắc về Hộ Vệ Thần thì cứ nhắn câu\nga help!", icon_url="https://cdn.discordapp.com/icons/1256987900277690470/9e8749a5a47cae53211484d7aee42040.webp?size=100&quot")
         view = InventoryBackToProfileView(profile=self.profile)
         try:
             #Gắn link background dựa trên id của guardian nếu có

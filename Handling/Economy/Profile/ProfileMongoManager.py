@@ -810,7 +810,7 @@ def update_guardian_stats(guild_id:int, user_id: int, health: int = 0, max_healt
                                                                                     }})
     return result
 
-def set_guardian_current_stats(guild_id:int, user_id: int, health: int, mana: int, stamina: int):
+def set_guardian_current_stats(guild_id:int, user_id: int, health: int, mana: int, stamina: int, is_dead = False):
     collection = db_specific[f'profile_{guild_id}']
     existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
     if existing_data == None: return
@@ -841,6 +841,7 @@ def set_guardian_current_stats(guild_id:int, user_id: int, health: int, mana: in
                                                                                     "guardian.stamina": existing_data.guardian.stamina,
                                                                                     "guardian.is_injured": is_injured,
                                                                                     "guardian.time_to_recover": time_to_recover,
+                                                                                    "guardian.is_dead": is_dead,
                                                                                     }})
     return result
 

@@ -319,3 +319,12 @@ class UtilitiesFunctions():
         bar = '█' * filled_length + '░' * (bar_length - filled_length)
         # Format the output with percentage
         return f'{emoji}: {bar} ({input_value}/{max_value})'
+
+    @staticmethod
+    def get_chance_guardian_actual_death(level: int):
+        chance = 0
+        if level <= 25: chance = 1
+        if level > 25 and level < 50: chance = 10
+        if level >= 50 and level < 75: chance = 5
+        else: chance = 3
+        return chance
