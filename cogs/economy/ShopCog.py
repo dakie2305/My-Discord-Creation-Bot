@@ -26,8 +26,6 @@ async def setup(bot: commands.Bot):
 class ShopEconomy(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.list_all_shops: Dict[str, List[Item]] = {}
-        self.list_all_shops_guardian_skill: Dict[str, List[GuardianAngelSkill]] = {}
     
     shop_group = discord.app_commands.Group(name="shop", description="Các lệnh liên quan đến Shop Item!")
     #region shop slash
@@ -79,26 +77,27 @@ class ShopEconomy(commands.Cog):
             conversion_rate = ConversionRateMongoManager.find_conversion_rate_by_id(guild_id=interaction.guild_id)
         elif conversion_rate != None and conversion_rate.last_reset_shop_rate != None and conversion_rate.last_reset_shop_rate.date() != datetime.now().date():
             #Random tỷ lệ rate
-            allowed_values = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.5, 2.6]
+            allowed_values = [0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.5, 2.6]
             new_rate = random.choice(allowed_values)
             ConversionRateMongoManager.create_update_shop_rate(guild_id=interaction.guild_id, rate=new_rate)
             conversion_rate = ConversionRateMongoManager.find_conversion_rate_by_id(guild_id=interaction.guild_id)
         elif conversion_rate != None and conversion_rate.last_reset_shop_rate == None:
             #Random tỷ lệ rate
-            allowed_values = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.5, 2.6]
+            allowed_values = [0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.5, 2.6]
             new_rate = random.choice(allowed_values)
             ConversionRateMongoManager.create_update_shop_rate(guild_id=interaction.guild_id, rate=new_rate)
             conversion_rate = ConversionRateMongoManager.find_conversion_rate_by_id(guild_id=interaction.guild_id)
         if conversion_rate:
             shop_rate = conversion_rate.shop_rate
 
+        list_all_shops: Dict[str, List[Item]] = {} 
         #View đầu tiên luôn là gift shop
-        self.list_all_shops["Shop Quà Tặng Cuộc Sống"] = list_gift_items
-        self.list_all_shops["Shop Hàng Bổ Trợ"] = list_support_items
-        self.list_all_shops["Shop Nông Trại"] = list_fishing_rod
-        self.list_all_shops["Shop Bổ Trợ Hộ Vệ Thần"] = list_support_ga_items
-        self.list_all_shops["Shop Bảo Hộ"] = list_protection_items
-        self.list_all_shops["Shop Vũ Khí"] = list_attack_items
+        list_all_shops["Shop Quà Tặng Cuộc Sống"] = list_gift_items
+        list_all_shops["Shop Hàng Bổ Trợ"] = list_support_items
+        list_all_shops["Shop Nông Trại"] = list_fishing_rod
+        list_all_shops["Shop Bổ Trợ Hộ Vệ Thần"] = list_support_ga_items
+        list_all_shops["Shop Bảo Hộ"] = list_protection_items
+        list_all_shops["Shop Vũ Khí"] = list_attack_items
 
         
         check_passed = False
@@ -112,28 +111,28 @@ class ShopEconomy(commands.Cog):
         if check_passed:
             dice = UtilitiesFunctions.get_chance(50)
             if dice:
-                self.list_all_shops["Thất Truyền Huyền Khí Nhất Đẳng"] = list_legend_weapon_1
+                list_all_shops["Thất Truyền Huyền Khí Nhất Đẳng"] = list_legend_weapon_1
             else:
-                self.list_all_shops["Thất Truyền Huyền Khí Nhị Đẳng"] = list_legend_weapon_2
+                list_all_shops["Thất Truyền Huyền Khí Nhị Đẳng"] = list_legend_weapon_2
         else:
             try:
-                self.list_all_shops.pop("Thất Truyền Huyền Khí Nhất Đẳng", None)
-                self.list_all_shops.pop("Thất Truyền Huyền Khí Nhị Đẳng", None)
+                list_all_shops.pop("Thất Truyền Huyền Khí Nhất Đẳng", None)
+                list_all_shops.pop("Thất Truyền Huyền Khí Nhị Đẳng", None)
             except Exception:
                 print()
         
-        keys = list(self.list_all_shops.keys())  # Shop names
+        keys = list(list_all_shops.keys())  # Shop names
         # Tạo embed cho shop
         embed = discord.Embed(title=f"**Shop Quà Tặng Cuộc Sống**", description=f"Tỷ giá hiện tại: **{conversion_rate.shop_rate}**", color=discord.Color.blue())
         embed.add_field(name=f"", value=f"▬▬▬▬▬▬▬▬▬▬▬▬▬▬",inline=False)
         count = 1
-        for item in self.list_all_shops["Shop Quà Tặng Cuộc Sống"]:
+        for item in list_all_shops["Shop Quà Tặng Cuộc Sống"]:
             embed.add_field(name=f"`{count}` {item.emoji} - {item.item_name}", value=f"{EmojiCreation2.SHINY_POINT.value} Giá: **{int(item.item_worth_amount*shop_rate)}**{self.get_emoji_money_from_type(type=item.item_worth_type)}\n{EmojiCreation2.SHINY_POINT.value} Rank tối thiểu: **{item.rank_required}**\n{EmojiCreation2.SHINY_POINT.value} {item.item_description}",inline=False)
             embed.add_field(name=f"", value=f"\n",inline=False)
             count+=1
         embed.set_footer(text=f"Trang 1/{len(keys)}")
-        view = ShopGlobalView(rate= shop_rate,list_all_shops= self.list_all_shops)
-        view.current_list_item = self.list_all_shops["Shop Quà Tặng Cuộc Sống"]
+        view = ShopGlobalView(rate= shop_rate,list_all_shops= list_all_shops)
+        view.current_list_item = list_all_shops["Shop Quà Tặng Cuộc Sống"]
         mess = await interaction.followup.send(embed=embed, view=view, ephemeral=False)
         view.message = mess
         
@@ -307,12 +306,12 @@ class ShopEconomy(commands.Cog):
             shop_rate = conversion_rate.shop_rate
 
         list_skill = ListGAAndSkills.list_ga_skills
-        
+        list_all_shops_guardian_skill: Dict[str, List[GuardianAngelSkill]] = {}
         #View đầu tiên luôn là gift shop
-        self.list_all_shops_guardian_skill["Cửa Hàng Kỹ Năng Tấn Công"] = list_skill
-        self.list_all_shops_guardian_skill["Cửa Hàng Kỹ Năng Nội Tại"] = ListGAAndSkills.list_ga_passive_skills
+        list_all_shops_guardian_skill["Cửa Hàng Kỹ Năng Tấn Công"] = list_skill
+        list_all_shops_guardian_skill["Cửa Hàng Kỹ Năng Nội Tại"] = ListGAAndSkills.list_ga_passive_skills
 
-        keys = list(self.list_all_shops_guardian_skill.keys())
+        keys = list(list_all_shops_guardian_skill.keys())
         
         embed = discord.Embed(title=f"**Cửa Hàng Kỹ Năng Tấn Công**", description=f"Tỷ giá hiện tại: {shop_rate}", color=discord.Color.blue())
         embed.add_field(name=f"", value=f"▬▬▬▬▬▬▬▬▬▬▬▬▬▬",inline=False)
@@ -323,8 +322,8 @@ class ShopEconomy(commands.Cog):
             embed.add_field(name=f"", value=f"\n",inline=False)
             count+=1
         embed.set_footer(text=f"Trang 1/{len(keys)}")
-        view = ShopGuardianSkillView(rate= shop_rate,list_all_shops= self.list_all_shops_guardian_skill)
-        view.current_list_item = self.list_all_shops_guardian_skill["Cửa Hàng Kỹ Năng Tấn Công"]
+        view = ShopGuardianSkillView(rate= shop_rate,list_all_shops= list_all_shops_guardian_skill)
+        view.current_list_item = list_all_shops_guardian_skill["Cửa Hàng Kỹ Năng Tấn Công"]
         mess = await interaction.followup.send(embed=embed, view=view, ephemeral=False)
         view.message = mess
         return
@@ -336,4 +335,3 @@ class ShopEconomy(commands.Cog):
             await interaction.response.send_message(f"⏳ Lệnh đang cooldown, vui lòng thực hiện lại trong vòng {error.retry_after:.2f}s tới.", ephemeral=True)
         else:
             await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
-    
