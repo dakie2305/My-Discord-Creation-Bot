@@ -197,6 +197,7 @@ class EmojiCreation2(Enum):
     RIKKA = "<a:rikka:1323331964559949884>"
     ASUNA = "<a:Asuna_SAO:1324069383080771677>"
     ARYA = "<:arya_waifu:1324069367897653419>"
+    MEGUMIN = "<a:megumin:1326224295613038603>"
     
     
     BLIZZARD = "<:blizzard:1320096021962952725>"
@@ -209,6 +210,7 @@ class EmojiCreation2(Enum):
     STUN_SKILL = "<a:stun_skill:1325474542583550014>"
     BRAINWASH_SKILL = "<a:brainwash_skill:1325474525219131465>"
     MASS_HEAL_SKILL = "<:mass_heal_skill:1325474563579973713>"
+    MASS_MANA_SKILL = "<:amulet_skill:1326223950052589610>"
     
     HP = "<:HP:1320777603358920724>"
     MP = "<:MP:1320777612926386256>"

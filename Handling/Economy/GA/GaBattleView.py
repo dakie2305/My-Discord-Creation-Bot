@@ -326,18 +326,14 @@ class GaBattleView(discord.ui.View):
         result_text = "**Tổng Kết Chiến Đấu**\n"
         if self.upper_attack_won:
             result_text += f"Phe trên thắng!\n▬▬▬ι════>\n"
-            count = 1
             for info in self.upper_attack_class:
-                additional_stats = self.get_result_addition_stats(info, count)
+                additional_stats = self.get_result_addition_stats(info)
                 result_text += additional_stats
-                count +=1
         else:
             result_text += f"Phe dưới thắng!\n"
-            count = 1
             for info in self.lower_attack_class:
-                additional_stats = self.get_result_addition_stats(info, count)
+                additional_stats = self.get_result_addition_stats(info)
                 result_text += additional_stats
-                count +=1
         try:
             await self.message.reply(content=result_text)
             await self.message.edit(view=None)
@@ -364,10 +360,11 @@ class GaBattleView(discord.ui.View):
     def is_empty_or_whitespace(self, s: str):
         return not s.strip()
     
-    def get_result_addition_stats(self, info: GuardianAngelAttackClass, count: int):
+    def get_result_addition_stats(self, info: GuardianAngelAttackClass):
         if info.player_profile == None: return ""
         #Nhân theo lượng người tham gia
         bonus_exp = int(self.bonus_exp * len(self.upper_attack_class) + self.bonus_exp*len(self.lower_attack_class))
+        if self.is_players_versus_players and bonus_exp > 350: bonus_exp = 280
         if bonus_exp > 350: bonus_exp = 350
         gold_reward = int(self.gold_reward * len(self.upper_attack_class) + self.bonus_exp*len(self.lower_attack_class))
         silver_reward = int(self.silver_reward * len(self.upper_attack_class) + self.bonus_exp*len(self.lower_attack_class))
@@ -393,7 +390,7 @@ class GaBattleView(discord.ui.View):
             text_target_profile_exist += f"**{self.dignity_point}** Nhân phẩm. "
             ProfileMongoManager.update_dignity_point(guild_id=self.guild_id, user_id=info.player_profile.user_id, guild_name="",user_display_name="", user_name="", dignity_point=self.dignity_point)
         
-        if count == 1 and self.is_players_versus_players == False:
+        if info.player_profile.user_id == self.user.id and self.is_players_versus_players == False:
             #Chủ party
             text_target_profile_exist += f"Thưởng thêm: {self.get_result_additional_reward(info=info)}"
         
@@ -407,7 +404,7 @@ class GaBattleView(discord.ui.View):
         reward_text = ""
         
         #point
-        roll_dice = UtilitiesFunctions.get_chance(20)
+        roll_dice = UtilitiesFunctions.get_chance(15)
         if roll_dice:
             amount = 1
             ProfileMongoManager.set_guardian_stats_points(guild_id=self.guild_id, user_id=info.player_profile.user_id, stats_point=1)
@@ -433,7 +430,7 @@ class GaBattleView(discord.ui.View):
                 return reward_text
         
         #darkium
-        roll_dice =UtilitiesFunctions.get_chance(15)
+        roll_dice =UtilitiesFunctions.get_chance(10)
         if roll_dice:
             amount = random.randint(1, 3)
             reward_text = f"**{amount}** {EmojiCreation2.DARKIUM.value}"
@@ -452,8 +449,27 @@ class GaBattleView(discord.ui.View):
         roll_dice =UtilitiesFunctions.get_chance(35)
         if roll_dice:
             amount = random.randint(1, 3)
-            item = random.choice(list_support_ga_items)
-            item.item_worth_amount = 1000
+            #Roll xem trúng bình nào
+            roll_dice = UtilitiesFunctions.get_chance(70)
+            if roll_dice:
+                #Trúng 3 bình bình thường
+                filtered_items = [
+                    item for item in list_support_ga_items 
+                    if item.item_id in ["ga_heal_1", "ga_stamina_1", "ga_mana_1"]
+                ]
+                item = random.choice(filtered_items)
+                item.item_worth_amount = 1000
+            else:
+                amount = 1
+                item_id = "ga_all_restored"
+                additional_dice = UtilitiesFunctions.get_chance(35)
+                if additional_dice: item_id = "ga_resurrection"
+                for randomitem in list_support_ga_items:
+                    if randomitem.item_id == item_id:
+                        item = randomitem
+                        break
+                if item == None:item = random.choice(list_support_ga_items)
+                item.item_worth_amount = 5
             reward_text = f"x{amount} **[{item.emoji} - {item.item_name}]**"
             ProfileMongoManager.update_list_items_profile(guild_id=self.guild_id, guild_name="", user_id=info.player_profile.user_id, user_display_name="", user_name="", item=item, amount=amount)
             return reward_text
@@ -757,6 +773,7 @@ class GaBattleView(discord.ui.View):
                 return base_text
         return base_text
     
+    #region execute_passive_skill
     def execute_passive_skill(self, self_player_info: GuardianAngelAttackClass, opponent_alive_attack_info: GuardianAngelAttackClass, text_target_profile_exist: str, text_own_profile_exist: str):
         base_text = None
         
@@ -864,8 +881,28 @@ class GaBattleView(discord.ui.View):
             base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã dùng chiêu {skill.emoji} - {skill.skill_name} để hồi phục cho cả đội!"
             return base_text
         
+        skill = self.get_random_skill(list_skills=self_player_info.player_ga.list_skills, skill_id="max_mass_restored_mana_skill")
+        if skill != None and current_mana_percent >= skill.percent_min_mana_req and current_mana_percent <= 25 and self_player_info.max_mass_restored_mana_skill > 0:
+            #Chỉ kích hoạt khi cả mana dưới 25%
+            #Hồi phục 20% mana cho cả đội
+            if is_upper:
+                for info in self.upper_attack_class:
+                    additional_mana = int(info.player_ga.max_mana*0.2)
+                    info.player_ga.mana += additional_mana
+                    if info.player_ga.mana > info.player_ga.max_mana: info.player_ga.mana = info.player_ga.max_mana
+            else:
+                for info in self.lower_attack_class:
+                    additional_mana = int(info.player_ga.max_mana*0.2)
+                    info.player_ga.mana += additional_mana
+                    if info.player_ga.mana > info.player_ga.max_mana: info.player_ga.mana = info.player_ga.max_mana
+            #Trừ một lần dùng
+            self_player_info.max_mass_restored_mana_skill -= 1
+            
+            base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã dùng chiêu {skill.emoji} - {skill.skill_name} để hồi phục Mana cho cả đội!"
+            return base_text
+        
         #Khi máu dưới 15% thì kích hoạt chiêu chạy trốn nếu có
-        if current_health_percent <= 15:
+        if current_mana_percent <= 15:
             skill = self.get_random_skill(list_skills=self_player_info.player_ga.list_skills, skill_id="skill_run_away")
             if skill != None and self_player_info.player_profile != None:
                 #Dùng skill này sẽ remove ra khỏi list list attack class ngay lập tức, tốn tất cả mana và stamina

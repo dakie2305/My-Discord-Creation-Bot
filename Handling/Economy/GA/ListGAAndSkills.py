@@ -99,6 +99,21 @@ list_ga_shop = [
       worth_amount = 50, 
       worth_type = "D",
     ),
+    GuardianAngel(
+      ga_id = "megumin",
+      ga_name= "Megumin Bộc Liệt Pháp",
+      ga_emoji= EmojiCreation2.MEGUMIN.value,
+      stamina = 50,
+      max_stamina= 50,
+      health= 100,
+      max_health= 100,
+      mana= 130,
+      max_mana= 130,
+      buff_attack_percent = 1,
+      attack_power= 20,
+      worth_amount = 50, 
+      worth_type = "D",
+    ),
     
     GuardianAngel(
       ga_id = "ly_hoa_phuong",
@@ -276,6 +291,21 @@ list_ga_passive_skills = [
         min_level_required=1,
     ),
     GuardianAngelSkill(
+        skill_id = "mass_restored_mana_skill",
+        skill_name= "Hồi Pháp",
+        skill_desc="Khi tổ đội còn thấp mana sẽ hồi phục 20% mana cho cả tổ đội! Kỹ năng này chỉ kích hoạt hai lần trong một trận!",
+        skill_type= ["passive"],
+        emoji= EmojiCreation2.MASS_MANA_SKILL.value,
+        attack_power= 1,
+        item_worth_amount= 55000,
+        item_worth_type= "G",
+        percent_min_mana_req= 35,
+        mana_loss= 35,
+        buff_defense_percent=0,
+        buff_attack_percent=1,
+        min_level_required=1,
+    ),
+    GuardianAngelSkill(
         skill_id = "brain_wash_skill",
         skill_name= "Tẩy Não",
         skill_desc="Nếu tổ đội mình dưới ba người thì sẽ tẩy não một kẻ địch qua phe mình trong một vài lượt chơi! Kỹ năng này sẽ tốn rất nhiều mana!",
@@ -395,6 +425,14 @@ def get_list_back_ground_on_ga_id(ga_id: str):
           "https://i.pinimg.com/originals/0d/b6/b7/0db6b741356175283bb6196d897a7c83.gif",
           "https://i.pinimg.com/originals/e8/bf/be/e8bfbebed33f24afe110314867ffae84.gif",
           "https://i.pinimg.com/originals/91/1f/f6/911ff6a5913ed95b4af78ab454184e88.gif",
+      ]
+    elif ga_id == "megumin":
+        background_urls = [
+          "https://i.imgur.com/mV9rL6d.png",
+          "https://i.imgur.com/264hrSD.gif",
+          "https://i.imgur.com/MDuDDqU.gif",
+          "https://i.imgur.com/otds392.gif",
+          "https://i.imgur.com/YHxQRW3.gif",
       ]
     return background_urls
 
@@ -524,6 +562,10 @@ def get_random_ga_enemy_generic(level: int = 1):
         if skill != None: data.list_skills.append(skill)
     if data.level > 80:
         #Quái trên 80 thì đương nhiên hưởng thêm skill nữa
+        skill = get_random_skill(blacklist_ids=["summoning_skill"])
+        if skill != None: data.list_skills.append(skill)
+    if data.level > 100:
+        #Quái trên 100 thì đương nhiên hưởng thêm skill nữa
         skill = get_random_skill(blacklist_ids=["summoning_skill"])
         if skill != None: data.list_skills.append(skill)
     
