@@ -32,6 +32,7 @@ def drop_profile_collection(guild_id: int):
         collection.drop()
 
 def create_profile(guild_id: int, guild_name: str, user_id: int, user_name: str, user_display_name: str):
+    if guild_name == "" or guild_name == None: return
     #Mỗi server là một collection, chia theo server id
     collection = db_specific[f'profile_{guild_id}']
     existing_data = collection.find_one({"id": "profile", "user_id": Int64(user_id)})
