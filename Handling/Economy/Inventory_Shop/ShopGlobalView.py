@@ -139,7 +139,7 @@ class TextShopInputModal(discord.ui.Modal):
                 legend_check = True
                 amount = 1
                 
-            cost_money = int(amount * int(item.item_worth_amount*self.rate))
+            cost_money = amount * int(item.item_worth_amount*self.rate)
             
             if item.item_worth_type == "C" and profile_user.copper < cost_money:
                 await interaction.followup.send(f"Bạn không đủ {EmojiCreation2.COPPER.value}!", ephemeral=True)
