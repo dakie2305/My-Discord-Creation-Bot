@@ -17,7 +17,7 @@ from Handling.Economy.Inventory_Shop.ShopGlobalView import ShopGlobalView
 import Handling.Economy.ConversionRate.ConversionRateMongoManager as ConversionRateMongoManager
 import random
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
-
+import copy
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(ShopEconomy(bot=bot))
@@ -111,9 +111,11 @@ class ShopEconomy(commands.Cog):
         if check_passed:
             dice = UtilitiesFunctions.get_chance(50)
             if dice:
-                list_all_shops["Thất Truyền Huyền Khí Nhất Đẳng"] = list_legend_weapon_1
+                temp_legend_list_1 = copy.deepcopy(list_legend_weapon_1)
+                list_all_shops["Thất Truyền Huyền Khí Nhất Đẳng"] = temp_legend_list_1
             else:
-                list_all_shops["Thất Truyền Huyền Khí Nhị Đẳng"] = list_legend_weapon_2
+                temp_legend_list_2 = copy.deepcopy(list_legend_weapon_2)
+                list_all_shops["Thất Truyền Huyền Khí Nhị Đẳng"] = temp_legend_list_2
         else:
             try:
                 list_all_shops.pop("Thất Truyền Huyền Khí Nhất Đẳng", None)

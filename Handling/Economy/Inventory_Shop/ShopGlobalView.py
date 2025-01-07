@@ -173,8 +173,10 @@ class TextShopInputModal(discord.ui.Modal):
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, darkium=-cost_money)
                 if profile_user.is_authority != True:
                     ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, darkium=money_for_authority)
+            
             if "legend_" in item.item_id:
-                item.item_worth_amount = item.item_worth_amount/2
+                new_worth_amount = int(item.item_worth_amount/2)
+                item.item_worth_amount = new_worth_amount
             ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, item=item, amount=amount)
 
             maintenance_text = ""
