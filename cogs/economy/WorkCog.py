@@ -11,9 +11,10 @@ import CustomEnum.UserEnum as UserEnum
 import CustomFunctions
 import asyncio
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
-from Handling.Economy.Inventory_Shop.ItemClass import Item, list_small_copper_fish,list_gold_fish, list_silver_fish, list_gift_items, list_trash, list_plant, list_legend_weapon_1, list_legend_weapon_2
+from Handling.Economy.Inventory_Shop.ItemClass import Item, list_small_copper_fish,list_gold_fish, list_silver_fish, list_gift_items, list_trash, list_plant, list_legend_weapon_1, list_legend_weapon_2, list_attack_items, list_support_ga_items, list_protection_items
 from Handling.Economy.Work.WorkPlantView import WorkPlantView
 import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
+import copy
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(WorkEconomy(bot=bot))
@@ -280,7 +281,7 @@ class WorkEconomy(commands.Cog):
         await asyncio.sleep(10)
         fishup_item = self.get_fished_up_item(fish_rod = fish_rod)
         embed.add_field(name=f"", value="▬▬▬▬ι═══════>", inline=False)
-        embed.add_field(name=f"", value=f"{interaction.user.mention} đã câu lên được: [{fishup_item.emoji} - **{fishup_item.item_name}**]!", inline=False)
+        embed.add_field(name=f"", value=f"{interaction.user.mention} đã câu lên được: x{fishup_item.quantity} [{fishup_item.emoji} - **{fishup_item.item_name}**]!", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Mô tả: {fishup_item.item_description}", inline=False)
         text = ""
         if fishup_item.bonus_dignity != 0 and fishup_item.bonus_exp != 0:
@@ -482,11 +483,11 @@ class WorkEconomy(commands.Cog):
             if dice_legend:
                 dice_check = UtilitiesFunctions.get_chance(50)
                 if dice_check:
-                    item = random.choice(list_legend_weapon_1)
+                    item = copy.deepcopy(random.choice(list_legend_weapon_1))
                     item.item_worth_amount = 10
                     return item
                 else: 
-                    item = random.choice(list_legend_weapon_2)
+                    item = copy.deepcopy(random.choice(list_legend_weapon_2))
                     item.item_worth_amount = 10
                     return item
             
@@ -501,11 +502,11 @@ class WorkEconomy(commands.Cog):
             if dice_legend:
                 dice_check = UtilitiesFunctions.get_chance(50)
                 if dice_check:
-                    item = random.choice(list_legend_weapon_1)
+                    item = copy.deepcopy(random.choice(list_legend_weapon_1))
                     item.item_worth_amount = 10
                     return item
                 else: 
-                    item = random.choice(list_legend_weapon_2)
+                    item = copy.deepcopy(random.choice(list_legend_weapon_2))
                     item.item_worth_amount = 10
                     return item
             
@@ -516,6 +517,40 @@ class WorkEconomy(commands.Cog):
             dice_trash = UtilitiesFunctions.get_chance(6)
             if dice_trash: return random.choice(list_trash)
             
+            dice_gift = UtilitiesFunctions.get_chance(5)
+            if dice_gift: return random.choice(list_gift_items)
+            
+            dice_attack_weapon = UtilitiesFunctions.get_chance(5)
+            if dice_attack_weapon: return random.choice(list_attack_items)
+            
+            dice_armour = UtilitiesFunctions.get_chance(5)
+            if dice_armour: return random.choice(list_protection_items)
+            
+            #potion ga support
+            dice_potion = UtilitiesFunctions.get_chance(5)
+            if dice_potion:
+                item = random.choice(list_support_ga_items)
+                dice = UtilitiesFunctions.get_chance(50)
+                if dice:
+                    #Trúng 3 bình bình thường
+                    filtered_items = [
+                        item for item in list_support_ga_items 
+                        if item.item_id in ["ga_heal_1", "ga_stamina_1", "ga_mana_1"]
+                    ]
+                    item =  copy.deepcopy(random.choice(filtered_items))
+                    item.item_worth_amount = 1000
+                    return item
+                else:
+                    item_id = "ga_all_restored"
+                    additional_dice = UtilitiesFunctions.get_chance(35)
+                    if additional_dice: item_id = "ga_resurrection"
+                    for randomitem in list_support_ga_items:
+                        if randomitem.item_id == item_id:
+                            item = randomitem
+                            break
+                if item == None: item = random.choice(list_support_ga_items)
+                item.item_worth_amount = 5
+                return item
             dice_fish_gold = UtilitiesFunctions.get_chance(30)
             if dice_fish_gold: return random.choice(list_gold_fish)
             else: return random.choice(list_silver_fish)
@@ -525,6 +560,39 @@ class WorkEconomy(commands.Cog):
             if dice_trash: return random.choice(list_trash)
             dice_gift = UtilitiesFunctions.get_chance(10)
             if dice_gift: return random.choice(list_gift_items)
+            
+            dice_attack_weapon = UtilitiesFunctions.get_chance(10)
+            if dice_attack_weapon: return random.choice(list_attack_items)
+            
+            dice_armour = UtilitiesFunctions.get_chance(10)
+            if dice_armour: return random.choice(list_protection_items)
+            
+            #potion ga support
+            dice_potion = UtilitiesFunctions.get_chance(10)
+            if dice_potion:
+                item = random.choice(list_support_ga_items)
+                dice = UtilitiesFunctions.get_chance(50)
+                if dice:
+                    #Trúng 3 bình bình thường
+                    filtered_items = [
+                        item for item in list_support_ga_items 
+                        if item.item_id in ["ga_heal_1", "ga_stamina_1", "ga_mana_1"]
+                    ]
+                    item =  copy.deepcopy(random.choice(filtered_items))
+                    item.item_worth_amount = 1000
+                    return item
+                else:
+                    item_id = "ga_all_restored"
+                    additional_dice = UtilitiesFunctions.get_chance(35)
+                    if additional_dice: item_id = "ga_resurrection"
+                    for randomitem in list_support_ga_items:
+                        if randomitem.item_id == item_id:
+                            item = randomitem
+                            break
+                if item == None: item = random.choice(list_support_ga_items)
+                item.item_worth_amount = 5
+                return item
+            
             dice_fish_gold = UtilitiesFunctions.get_chance(80)
             if dice_fish_gold: 
                 fish = random.choice(list_gold_fish)
@@ -541,6 +609,39 @@ class WorkEconomy(commands.Cog):
                 fish = random.choice(list_trash)
                 fish.quantity = random.randint(1, 5)
                 return fish
+
+            dice_attack_weapon = UtilitiesFunctions.get_chance(15)
+            if dice_attack_weapon: return random.choice(list_attack_items)
+            
+            dice_armour = UtilitiesFunctions.get_chance(15)
+            if dice_armour: return random.choice(list_protection_items)
+            
+            #potion ga support
+            dice_potion = UtilitiesFunctions.get_chance(15)
+            if dice_potion:
+                item = random.choice(list_support_ga_items)
+                dice = UtilitiesFunctions.get_chance(50)
+                if dice:
+                    #Trúng 3 bình bình thường
+                    filtered_items = [
+                        item for item in list_support_ga_items 
+                        if item.item_id in ["ga_heal_1", "ga_stamina_1", "ga_mana_1"]
+                    ]
+                    item =  copy.deepcopy(random.choice(filtered_items))
+                    item.item_worth_amount = 1000
+                    return item
+                else:
+                    item_id = "ga_all_restored"
+                    additional_dice = UtilitiesFunctions.get_chance(35)
+                    if additional_dice: item_id = "ga_resurrection"
+                    for randomitem in list_support_ga_items:
+                        if randomitem.item_id == item_id:
+                            item = randomitem
+                            break
+                if item == None: item = random.choice(list_support_ga_items)
+                item.item_worth_amount = 5
+                return item
+            
             dice_fish_gold = UtilitiesFunctions.get_chance(80)
             if dice_fish_gold: 
                 fish = random.choice(list_gold_fish)
