@@ -92,14 +92,19 @@ class ShopEconomy(commands.Cog):
 
         list_all_shops: Dict[str, List[Item]] = {} 
         #View đầu tiên luôn là gift shop
-        list_all_shops["Shop Quà Tặng Cuộc Sống"] = list_gift_items
-        list_all_shops["Shop Hàng Bổ Trợ"] = list_support_items
-        list_all_shops["Shop Nông Trại"] = list_fishing_rod
-        list_all_shops["Shop Bổ Trợ Hộ Vệ Thần"] = list_support_ga_items
-        list_all_shops["Shop Bảo Hộ"] = list_protection_items
-        list_all_shops["Shop Vũ Khí"] = list_attack_items
+        list_temp = copy.deepcopy(list_gift_items)
+        list_all_shops["Shop Quà Tặng Cuộc Sống"] = list_temp
+        list_temp = copy.deepcopy(list_support_items)
+        list_all_shops["Shop Hàng Bổ Trợ"] = list_temp
+        list_temp = copy.deepcopy(list_fishing_rod)
+        list_all_shops["Shop Nông Trại"] = list_temp
+        list_temp = copy.deepcopy(list_support_ga_items)
+        list_all_shops["Shop Bổ Trợ Hộ Vệ Thần"] = list_temp
+        list_temp = copy.deepcopy(list_protection_items)
+        list_all_shops["Shop Bảo Hộ"] = list_temp
+        list_temp = copy.deepcopy(list_attack_items)
+        list_all_shops["Shop Vũ Khí"] = list_temp
 
-        
         check_passed = False
         if datetime.now().hour == 0 and datetime.now().minute == 0:
             check_passed = True
@@ -208,8 +213,8 @@ class ShopEconomy(commands.Cog):
             shop_rate = conversion_rate.shop_rate
 
         
-        
-        list_ga = ListGAAndSkills.list_ga_shop
+        list_temp = copy.deepcopy(ListGAAndSkills.list_ga_shop)
+        list_ga = list_temp
         first_ga = list_ga[0]
         ga_urls = ListGAAndSkills.get_list_back_ground_on_ga_id(first_ga.ga_id)
         url = None
@@ -307,11 +312,13 @@ class ShopEconomy(commands.Cog):
         if conversion_rate:
             shop_rate = conversion_rate.shop_rate
 
-        list_skill = ListGAAndSkills.list_ga_skills
         list_all_shops_guardian_skill: Dict[str, List[GuardianAngelSkill]] = {}
-        #View đầu tiên luôn là gift shop
+        
+        list_skill = copy.deepcopy(ListGAAndSkills.list_ga_skills)
         list_all_shops_guardian_skill["Cửa Hàng Kỹ Năng Tấn Công"] = list_skill
-        list_all_shops_guardian_skill["Cửa Hàng Kỹ Năng Nội Tại"] = ListGAAndSkills.list_ga_passive_skills
+        
+        list_temp = copy.deepcopy(ListGAAndSkills.list_ga_passive_skills)
+        list_all_shops_guardian_skill["Cửa Hàng Kỹ Năng Nội Tại"] = list_temp
 
         keys = list(list_all_shops_guardian_skill.keys())
         

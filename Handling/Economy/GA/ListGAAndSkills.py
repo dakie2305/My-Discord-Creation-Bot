@@ -3,8 +3,9 @@ from datetime import datetime
 from Handling.Economy.GA.GuardianAngelClass import GuardianAngel, GuardianAngelSkill
 from CustomEnum.EmojiEnum import EmojiCreation2
 import random
+import copy
 
-list_ga_shop = [
+list_ga_shop_private = [
     GuardianAngel(
       ga_id = "rikka",
       ga_name= "Rikka Tà Vương Nhãn",
@@ -179,9 +180,9 @@ list_ga_shop = [
       worth_type = "D",
     ),
 ]
+list_ga_shop = copy.deepcopy(list_ga_shop_private)
 
-
-list_ga_skills = [
+list_ga_skills_private = [
     GuardianAngelSkill(
         skill_id = "skill_blizzard",
         skill_name= "Bão Tuyết",
@@ -228,8 +229,9 @@ list_ga_skills = [
         min_level_required=1,
     ),
 ]
+list_ga_skills = copy.deepcopy(list_ga_skills_private)
 
-list_ga_passive_skills = [
+list_ga_passive_skills_private = [
   GuardianAngelSkill(
         skill_id = "skill_run_away",
         skill_name= "Tẩu Vi Thượng Sách",
@@ -248,7 +250,7 @@ list_ga_passive_skills = [
     GuardianAngelSkill(
         skill_id = "skill_critical_strike",
         skill_name= "Ngưỡng Máu Tử",
-        skill_desc="Khi Hộ Vệ Thần còn máu dưới 25% thì các đòn tấn công tiếp theo sẽ tăng 15% sát thương, chỉ kích hoạt một lần!",
+        skill_desc="Khi Hộ Vệ Thần còn máu dưới 25% thì các đòn tấn công tiếp theo sẽ tăng sát thương, chỉ kích hoạt một lần!",
         skill_type= ["passive"],
         emoji= EmojiCreation2.CRITICAL_DAMAGE.value,
         attack_power= 15,
@@ -263,7 +265,7 @@ list_ga_passive_skills = [
     GuardianAngelSkill(
         skill_id = "summoning_skill",
         skill_name= "Triệu Linh",
-        skill_desc="Khi tổ đội dưới ba người thì sẽ có thể dùng 50% mana để triệu hồi một cấp dưới có cấp bằng một nửa người triệu hồi! Có 10% tỉ lệ triệu hồi NPC mạnh hơn gấp 3 lần!",
+        skill_desc="Khi tổ đội dưới ba người thì sẽ có thể dùng 50% mana để triệu hồi một cấp dưới có cấp bằng một nửa người triệu hồi! Có 5% tỉ lệ triệu hồi NPC mạnh hơn gấp hai lần!",
         skill_type= ["passive"],
         emoji= EmojiCreation2.SUMMONING_SKILL.value,
         attack_power= 1,
@@ -321,6 +323,7 @@ list_ga_passive_skills = [
         min_level_required=1,
     ),
 ]
+list_ga_passive_skills = copy.deepcopy(list_ga_passive_skills_private)
 
 all_skill_lists = [list_ga_skills, list_ga_passive_skills]
 

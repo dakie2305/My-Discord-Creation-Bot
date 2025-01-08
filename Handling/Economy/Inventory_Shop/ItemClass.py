@@ -2,7 +2,7 @@
 from typing import List, Optional
 from datetime import datetime
 from CustomEnum.EmojiEnum import EmojiCreation2
-
+import copy
 class PlantItem:
     def __init__(self, hour_require: int, plant_date: datetime, source_item: "Item", des_item: "Item"):
         self.hour_require = hour_require
@@ -82,7 +82,7 @@ class Item:
             )
 
 #region list gift
-list_gift_items = [
+list_gift_items_p = [
     Item(
         item_id = "g_pocky",
         item_name = "Bánh Pocky",
@@ -204,9 +204,9 @@ list_gift_items = [
         rank_required = 35,
     ),
 ]
-
+list_gift_items = copy.deepcopy(list_gift_items_p)
 #region list protection
-list_protection_items = [
+list_protection_items_p = [
     Item(
         item_id = "hat_fight_1",
         item_name = "Mũ Chống Đánh",
@@ -343,9 +343,9 @@ list_protection_items = [
         rank_required = 50,
     ),
 ]
-
+list_protection_items = copy.deepcopy(list_protection_items_p)
 #region list support item
-list_support_items = [
+list_support_items_p = [
     Item(
         item_id = "rank_up_1",
         item_name = "Thần Dược",
@@ -452,8 +452,8 @@ list_support_items = [
         rank_required = 20,
     ),
 ]
-
-list_support_ga_items= [
+list_support_items = copy.deepcopy(list_support_items_p)
+list_support_ga_items_p= [
     Item(
         item_id = "ga_heal_1",
         item_name = "Lọ Hồi Máu Nhỏ",
@@ -530,8 +530,10 @@ list_support_ga_items= [
         rank_required = 1,
     ),
 ]
+list_support_ga_items = copy.deepcopy(list_support_ga_items_p)
+
 #region list attack items
-list_attack_items = [
+list_attack_items_p = [
     Item(
         item_id = "crime_evident",
         item_name = "Bằng Chứng Phạm Tội",
@@ -668,10 +670,10 @@ list_attack_items = [
         rank_required = 40,
     ),
 ]
-
+list_attack_items = copy.deepcopy(list_attack_items_p)
 #Misc
 #region Fishing rod
-list_fishing_rod = [
+list_fishing_rod_p = [
     Item(
         item_id = "fish_rod_1",
         item_name = "Cần Câu Nhựa",
@@ -824,8 +826,8 @@ list_fishing_rod = [
         rank_required = 5,
     ),
 ]
-
-list_plant = [
+list_fishing_rod = copy.deepcopy(list_fishing_rod_p)
+list_plant_p = [
     Item(
         item_id = "wheat",
         item_name = "Cây lúa",
@@ -902,9 +904,9 @@ list_plant = [
         rank_required = 1,
     ),
 ]
-
+list_plant = copy.deepcopy(list_plant_p)
 #region trash
-list_trash = [
+list_trash_p = [
     Item(
         item_id = "trash_shirt",
         item_name = "Áo rách",
@@ -996,9 +998,9 @@ list_trash = [
         rank_required = 1,
     ),
 ]
-
+list_trash = copy.deepcopy(list_trash_p)
 #region copper fish
-list_small_copper_fish = [
+list_small_copper_fish_p = [
     Item(
         item_id = "small_fish_1",
         item_name = "Cá tép",
@@ -1135,9 +1137,9 @@ list_small_copper_fish = [
         rank_required = 1,
     ),
 ]
-
+list_small_copper_fish = copy.deepcopy(list_small_copper_fish_p)
 #region silver fish
-list_silver_fish = [
+list_silver_fish_p = [
     Item(
         item_id = "medium_fish_1",
         item_name = "Cá Dory",
@@ -1319,8 +1321,9 @@ list_silver_fish = [
         rank_required = 1,
     ),
 ]
+list_silver_fish = copy.deepcopy(list_silver_fish_p)
 #region gold fish
-list_gold_fish = [
+list_gold_fish_p = [
     Item(
         item_id = "big_fish_1",
         item_name = "Cá Mập",
@@ -1457,9 +1460,9 @@ list_gold_fish = [
         rank_required = 1,
     ),
 ]
-
+list_gold_fish = copy.deepcopy(list_gold_fish_p)
 #region legend weapons
-list_legend_weapon_1 = [
+list_legend_weapon_1_p = [
     Item(
         item_id = "legend_axe",
         item_name = "Hàn Long Phủ",
@@ -1521,8 +1524,8 @@ list_legend_weapon_1 = [
         rank_required = 50,
     ),
 ]
-
-list_legend_weapon_2 = [
+list_legend_weapon_1 = copy.deepcopy(list_legend_weapon_1_p)
+list_legend_weapon_2_p = [
     Item(
         item_id = "legend_spear_1",
         item_name = "Nhất Hàn Đoản Thương",
@@ -1599,3 +1602,4 @@ list_legend_weapon_2 = [
         rank_required = 50,
     ),
 ]
+list_legend_weapon_2 = copy.deepcopy(list_legend_weapon_2_p)
