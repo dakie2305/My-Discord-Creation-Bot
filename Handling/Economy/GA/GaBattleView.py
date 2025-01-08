@@ -15,6 +15,7 @@ from datetime import datetime, timedelta
 from Handling.Misc.SelfDestructView import SelfDestructView
 import CustomFunctions
 from Handling.Economy.Inventory_Shop.ItemClass import Item, list_small_copper_fish,list_gold_fish, list_silver_fish, list_gift_items, list_trash, list_plant, list_legend_weapon_1, list_legend_weapon_2, list_support_ga_items, list_protection_items,list_attack_items,list_support_items
+import copy
 
 
 class GaBattleView(discord.ui.View):
@@ -457,7 +458,7 @@ class GaBattleView(discord.ui.View):
                     item for item in list_support_ga_items 
                     if item.item_id in ["ga_heal_1", "ga_stamina_1", "ga_mana_1"]
                 ]
-                item = random.choice(filtered_items)
+                item =  copy.deepcopy(random.choice(filtered_items))
                 item.item_worth_amount = 1000
             else:
                 amount = 1
@@ -468,7 +469,7 @@ class GaBattleView(discord.ui.View):
                     if randomitem.item_id == item_id:
                         item = randomitem
                         break
-                if item == None:item = random.choice(list_support_ga_items)
+                if item == None: item = random.choice(list_support_ga_items)
                 item.item_worth_amount = 5
             reward_text = f"x{amount} **[{item.emoji} - {item.item_name}]**"
             ProfileMongoManager.update_list_items_profile(guild_id=self.guild_id, guild_name="", user_id=info.player_profile.user_id, user_display_name="", user_name="", item=item, amount=amount)
@@ -477,7 +478,7 @@ class GaBattleView(discord.ui.View):
         roll_dice =UtilitiesFunctions.get_chance(35)
         if roll_dice:
             amount = random.randint(1, 3)
-            item = random.choice(list_support_ga_items)
+            item = random.choice(list_attack_items)
             reward_text = f"x{amount} **[{item.emoji} - {item.item_name}]**"
             ProfileMongoManager.update_list_items_profile(guild_id=self.guild_id, guild_name="", user_id=info.player_profile.user_id, user_display_name="", user_name="", item=item, amount=amount)
             return reward_text
@@ -724,7 +725,7 @@ class GaBattleView(discord.ui.View):
             #Tuỳ skill mà tung kỹ năng, vì một số skill tấn công có cách tính khác
             if skill.skill_id == "skill_black_fire":
                 #trừ máu của đối theo attack power của profile nhân với buff attack percent của skill
-                loss_health = int(self_player_info.player_ga.attack_power + self_player_info.player_ga.attack_power*(skill.buff_attack_percent/100))
+                loss_health = int(self_player_info.player_ga.attack_power + self_player_info.player_ga.attack_power*0.3)
                 opponent_alive_attack_info.player_ga.health -= loss_health
                 if opponent_alive_attack_info.player_ga.health <= 0: opponent_alive_attack_info.player_ga.health = 0
                 
@@ -919,9 +920,9 @@ class GaBattleView(discord.ui.View):
         if current_health_percent <= 25 and self_player_info.is_used_skill_critical_strike == False:
             skill = self.get_random_skill(list_skills=self_player_info.player_ga.list_skills, skill_id="skill_critical_strike")
             if skill != None:
-                #Dùng skill này sẽ lập tức tăng 25% sức tấn công cho user
-                self_player_info.player_ga.attack_power += int(self_player_info.player_ga.attack_power * 0.25)
+                #Dùng skill này sẽ lập tức tăng 40% sức tấn công cho user
+                self_player_info.player_ga.attack_power += int(self_player_info.player_ga.attack_power * 0.4)
                 self_player_info.is_used_skill_critical_strike = True
-                base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã dùng chiêu {skill.emoji} - {skill.skill_name} và hoá rồ để tăng 25% sức mạnh tấn công của bản thân!"
+                base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã dùng chiêu {skill.emoji} - {skill.skill_name} và hoá rồ để tăng sức mạnh tấn công của bản thân!"
                 return base_text
         
