@@ -451,6 +451,7 @@ class GaBattleView(discord.ui.View):
         if roll_dice:
             amount = random.randint(1, 3)
             #Roll xem trúng bình nào
+            item = copy.deepcopy(random.choice(list_support_ga_items))
             roll_dice = UtilitiesFunctions.get_chance(70)
             if roll_dice:
                 #Trúng 3 bình bình thường
