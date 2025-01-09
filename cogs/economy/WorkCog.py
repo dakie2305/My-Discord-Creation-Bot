@@ -529,7 +529,7 @@ class WorkEconomy(commands.Cog):
             #potion ga support
             dice_potion = UtilitiesFunctions.get_chance(5)
             if dice_potion:
-                item = random.choice(list_support_ga_items)
+                item = copy.deepcopy(random.choice(list_support_ga_items))
                 dice = UtilitiesFunctions.get_chance(50)
                 if dice:
                     #Trúng 3 bình bình thường
@@ -546,9 +546,9 @@ class WorkEconomy(commands.Cog):
                     if additional_dice: item_id = "ga_resurrection"
                     for randomitem in list_support_ga_items:
                         if randomitem.item_id == item_id:
-                            item = randomitem
+                            item = copy.deepcopy(randomitem)
                             break
-                if item == None: item = random.choice(list_support_ga_items)
+                if item == None: item = copy.deepcopy(random.choice(list_support_ga_items))
                 item.item_worth_amount = 5
                 return item
             dice_fish_gold = UtilitiesFunctions.get_chance(30)
@@ -570,7 +570,7 @@ class WorkEconomy(commands.Cog):
             #potion ga support
             dice_potion = UtilitiesFunctions.get_chance(10)
             if dice_potion:
-                item = random.choice(list_support_ga_items)
+                item = copy.deepcopy(random.choice(list_support_ga_items))
                 dice = UtilitiesFunctions.get_chance(50)
                 if dice:
                     #Trúng 3 bình bình thường
@@ -587,9 +587,9 @@ class WorkEconomy(commands.Cog):
                     if additional_dice: item_id = "ga_resurrection"
                     for randomitem in list_support_ga_items:
                         if randomitem.item_id == item_id:
-                            item = randomitem
+                            item = copy.deepcopy(randomitem)
                             break
-                if item == None: item = random.choice(list_support_ga_items)
+                if item == None: item = copy.deepcopy(random.choice(list_support_ga_items))
                 item.item_worth_amount = 5
                 return item
             
@@ -619,7 +619,7 @@ class WorkEconomy(commands.Cog):
             #potion ga support
             dice_potion = UtilitiesFunctions.get_chance(15)
             if dice_potion:
-                item = random.choice(list_support_ga_items)
+                item = copy.deepcopy(random.choice(list_support_ga_items))
                 dice = UtilitiesFunctions.get_chance(50)
                 if dice:
                     #Trúng 3 bình bình thường
@@ -636,9 +636,9 @@ class WorkEconomy(commands.Cog):
                     if additional_dice: item_id = "ga_resurrection"
                     for randomitem in list_support_ga_items:
                         if randomitem.item_id == item_id:
-                            item = randomitem
+                            item = copy.deepcopy(randomitem)
                             break
-                if item == None: item = random.choice(list_support_ga_items)
+                if item == None: item = copy.deepcopy(random.choice(list_support_ga_items))
                 item.item_worth_amount = 5
                 return item
             

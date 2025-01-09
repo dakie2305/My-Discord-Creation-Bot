@@ -469,7 +469,7 @@ class GaBattleView(discord.ui.View):
                     if randomitem.item_id == item_id:
                         item = randomitem
                         break
-                if item == None: item = random.choice(list_support_ga_items)
+                if item == None: item = copy.deepcopy(random.choice(list_support_ga_items))
                 item.item_worth_amount = 5
             reward_text = f"x{amount} **[{item.emoji} - {item.item_name}]**"
             ProfileMongoManager.update_list_items_profile(guild_id=self.guild_id, guild_name="", user_id=info.player_profile.user_id, user_display_name="", user_name="", item=item, amount=amount)
