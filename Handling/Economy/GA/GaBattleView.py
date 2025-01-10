@@ -785,7 +785,7 @@ class GaBattleView(discord.ui.View):
             
         current_mana_percent = int(self_player_info.player_ga.mana/self_player_info.player_ga.max_mana*100)
         skill = self.get_random_skill(list_skills=self_player_info.player_ga.list_skills, skill_id="summoning_skill")
-        if skill != None and current_mana_percent >= 50:
+        if skill != None and current_mana_percent >= 70:
             #Skill này sẽ triệu hồi một NPC vào phe của 
             #Dựa vào is_upper để xác định phe nào sẽ triệu hồi NPC
             #Nếu phe đó tổng GuardianAngelAttackClass dưới ba mới được triệu hồi
