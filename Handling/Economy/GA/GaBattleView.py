@@ -820,8 +820,8 @@ class GaBattleView(discord.ui.View):
                     else:
                         #Add vào phe attack lower
                         self.lower_attack_class.append(new_enemy)
-                    #Trừ 50% mana của bản thân
-                    own_loss_mana = int(self_player_info.player_ga.max_mana * 0.50)
+                    #Trừ % mana của bản thân
+                    own_loss_mana = int(self_player_info.player_ga.max_mana * 0.45) + skill.mana_loss
                     self_player_info.player_ga.mana -= own_loss_mana
                     if self_player_info.player_ga.mana <= 0: self_player_info.player_ga.mana = 0
                     base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã dùng chiêu {skill.emoji} - {skill.skill_name} để triệu hồi **{enemy.ga_emoji} - {enemy.ga_name}** lên gia nhập đội!"
@@ -842,8 +842,8 @@ class GaBattleView(discord.ui.View):
                     else:
                         #Add vào phe attack lower
                         self.lower_attack_class.append(new_enemy)
-                    #Trừ 50% mana của bản thân
-                    own_loss_mana = int(self_player_info.player_ga.max_mana * 0.50)
+                    #Trừ % mana của bản thân
+                    own_loss_mana = int(self_player_info.player_ga.max_mana * 0.45) + skill.mana_loss
                     self_player_info.player_ga.mana -= own_loss_mana
                     if self_player_info.player_ga.mana <= 0: self_player_info.player_ga.mana = 0
                     
