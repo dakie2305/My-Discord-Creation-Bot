@@ -507,7 +507,7 @@ class GaBattleView(discord.ui.View):
             legit_attack_classes = [attack_class for attack_class in self.upper_attack_class if attack_class.player_ga.health > 0]
             if len(legit_attack_classes) == 0: return None
             attack_classes_without_player_profile = [attack_class for attack_class in legit_attack_classes if attack_class.player_profile is None]
-            chance = UtilitiesFunctions.get_chance(60)
+            chance = UtilitiesFunctions.get_chance(55)
             #Ưu tiên chọn attack_class không có profile trước
             if chance and len(attack_classes_without_player_profile)>0: return random.choice(attack_classes_without_player_profile)
             return random.choice(legit_attack_classes)
@@ -515,7 +515,7 @@ class GaBattleView(discord.ui.View):
             legit_attack_classes = [attack_class for attack_class in self.lower_attack_class if attack_class.player_ga.health > 0]
             if len(legit_attack_classes) == 0: return None
             attack_classes_without_player_profile = [attack_class for attack_class in legit_attack_classes if attack_class.player_profile is None]
-            chance = UtilitiesFunctions.get_chance(60)
+            chance = UtilitiesFunctions.get_chance(55)
             if chance and len(attack_classes_without_player_profile)>0: return random.choice(attack_classes_without_player_profile)
             return random.choice(legit_attack_classes)
 
@@ -743,7 +743,7 @@ class GaBattleView(discord.ui.View):
             #Tuỳ skill mà tung kỹ năng, vì một số skill tấn công có cách tính khác
             if skill.skill_id == "skill_black_fire":
                 #trừ máu của đối theo attack power của profile nhân với buff attack percent của skill
-                loss_health = int(self_player_info.player_ga.attack_power + self_player_info.player_ga.attack_power*0.3)
+                loss_health = int(self_player_info.player_ga.attack_power + self_player_info.player_ga.attack_power*0.2)
                 opponent_alive_attack_info.player_ga.health -= loss_health
                 if opponent_alive_attack_info.player_ga.health <= 0: opponent_alive_attack_info.player_ga.health = 0
                 
