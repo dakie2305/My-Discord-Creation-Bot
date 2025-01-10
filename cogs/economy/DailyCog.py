@@ -1,6 +1,6 @@
 from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.EmojiEnum import EmojiCreation2
-from CustomEnum.RoleEnum import TrueHeavenRoleId
+from CustomEnum.TrueHeavenEnum import TrueHeavenEnum
 import discord
 from discord.ext import commands
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
@@ -116,59 +116,63 @@ class DailyEconomy(commands.Cog):
         #Đặc quyền server tổng
         if user.guild.id == 1256987900277690470:
             for role in user.roles:
-                if role.id == TrueHeavenRoleId.MODERATOR.value:
+                if role.id == TrueHeavenEnum.MODERATOR.value:
                     actual_money += 2000
-                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.MODERATOR.value}> : +**2000** {EmojiCreation2.COPPER.value}", inline=False)
-                if role.id == TrueHeavenRoleId.CHOSEN_ONE.value:
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenEnum.MODERATOR.value}> : +**2000** {EmojiCreation2.COPPER.value}", inline=False)
+                if role.id == TrueHeavenEnum.CHOSEN_ONE.value:
                     actual_money += 1000
-                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.CHOSEN_ONE.value}> : +**1000** {EmojiCreation2.COPPER.value}", inline=False)
-                if role.id == TrueHeavenRoleId.TOP_1_WORD_MATCHING.value or role.id == TrueHeavenRoleId.TOP_1_WORD_SORT.value:
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenEnum.CHOSEN_ONE.value}> : +**1000** {EmojiCreation2.COPPER.value}", inline=False)
+                if role.id == TrueHeavenEnum.TOP_1_WORD_MATCHING.value or role.id == TrueHeavenEnum.TOP_1_WORD_SORT.value:
                     actual_money += 1500
                     embed.add_field(name=f"", value=f"- Là <@&{role.id}> : +**1500** {EmojiCreation2.COPPER.value}", inline=False)
-                if role.id == TrueHeavenRoleId.TOP_2_WORD_MATCHING.value or role.id == TrueHeavenRoleId.TOP_2_WORD_SORT.value:
+                if role.id == TrueHeavenEnum.TOP_1_WEALTH.value:
+                    actual_money += 60000
+                    embed.add_field(name=f"", value=f"- Là <@&{role.id}> : +**60000** {EmojiCreation2.COPPER.value}", inline=False)
+                if role.id == TrueHeavenEnum.TOP_1_GUARDIAN.value:
+                    actual_money += 60000
+                    embed.add_field(name=f"", value=f"- Là <@&{role.id}> : +**60000** {EmojiCreation2.COPPER.value}", inline=False)
+                if role.id == TrueHeavenEnum.TOP_2_WORD_MATCHING.value or role.id == TrueHeavenEnum.TOP_2_WORD_SORT.value:
                     actual_money += 1200
                     embed.add_field(name=f"", value=f"- Là <@&{role.id}> : +**1200** {EmojiCreation2.COPPER.value}", inline=False)
-                if role.id == TrueHeavenRoleId.TOP_3_WORD_MATCHING.value or role.id == TrueHeavenRoleId.TOP_3_WORD_SORT.value:
+                if role.id == TrueHeavenEnum.TOP_3_WORD_MATCHING.value or role.id == TrueHeavenEnum.TOP_3_WORD_SORT.value:
                     actual_money += 1000
                     embed.add_field(name=f"", value=f"- Là <@&{role.id}> : +**1000** {EmojiCreation2.COPPER.value}", inline=False)
-                if role.id == TrueHeavenRoleId.RANK_20.value:
+                if role.id == TrueHeavenEnum.RANK_20.value:
                     actual_money += 500
-                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.RANK_20.value}> : +**500** {EmojiCreation2.COPPER.value}", inline=False)
-                if role.id == TrueHeavenRoleId.RANK_30.value:
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenEnum.RANK_20.value}> : +**500** {EmojiCreation2.COPPER.value}", inline=False)
+                if role.id == TrueHeavenEnum.RANK_30.value:
                     actual_money += 1000
-                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.RANK_30.value}> : +**1000** {EmojiCreation2.COPPER.value}", inline=False)
-                if role.id == TrueHeavenRoleId.RANK_40.value:
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenEnum.RANK_30.value}> : +**1000** {EmojiCreation2.COPPER.value}", inline=False)
+                if role.id == TrueHeavenEnum.RANK_40.value:
                     actual_money += 2000
-                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.RANK_40.value}> : +**2000** {EmojiCreation2.COPPER.value}", inline=False)
-                if role.id == TrueHeavenRoleId.RANK_50.value:
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenEnum.RANK_40.value}> : +**2000** {EmojiCreation2.COPPER.value}", inline=False)
+                if role.id == TrueHeavenEnum.RANK_50.value:
                     actual_money += 5000
-                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.RANK_50.value}> : +**5000** {EmojiCreation2.COPPER.value}", inline=False)
-                if role.id == TrueHeavenRoleId.RANK_60.value:
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenEnum.RANK_50.value}> : +**5000** {EmojiCreation2.COPPER.value}", inline=False)
+                if role.id == TrueHeavenEnum.RANK_60.value:
                     actual_money += 10000
-                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.RANK_60.value}> : +**10000** {EmojiCreation2.COPPER.value}", inline=False)
-                if role.id == TrueHeavenRoleId.RANK_70.value:
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenEnum.RANK_60.value}> : +**10000** {EmojiCreation2.COPPER.value}", inline=False)
+                if role.id == TrueHeavenEnum.RANK_70.value:
                     actual_money += 20000
-                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.RANK_70.value}> : +**20000** {EmojiCreation2.COPPER.value}", inline=False)
-                if role.id == TrueHeavenRoleId.RANK_80.value:
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenEnum.RANK_70.value}> : +**20000** {EmojiCreation2.COPPER.value}", inline=False)
+                if role.id == TrueHeavenEnum.RANK_80.value:
                     actual_money += 40000
-                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.RANK_80.value}> : +**40000** {EmojiCreation2.COPPER.value}", inline=False)
-                if role.id == TrueHeavenRoleId.RANK_90.value:
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenEnum.RANK_80.value}> : +**40000** {EmojiCreation2.COPPER.value}", inline=False)
+                if role.id == TrueHeavenEnum.RANK_90.value:
                     actual_money += 50000
-                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.RANK_90.value}> : +**50000** {EmojiCreation2.COPPER.value}", inline=False)
-                if role.id == TrueHeavenRoleId.RANK_99.value:
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenEnum.RANK_90.value}> : +**50000** {EmojiCreation2.COPPER.value}", inline=False)
+                if role.id == TrueHeavenEnum.RANK_99.value:
                     actual_money += 65000
-                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.RANK_99.value}> : +**65000** {EmojiCreation2.COPPER.value}", inline=False)
-                if role.id == TrueHeavenRoleId.RANK_100.value:
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenEnum.RANK_99.value}> : +**65000** {EmojiCreation2.COPPER.value}", inline=False)
+                if role.id == TrueHeavenEnum.RANK_100.value:
                     actual_money += 75000
-                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.RANK_100.value}> : +**75000** {EmojiCreation2.COPPER.value}", inline=False)
-                if role.id == TrueHeavenRoleId.BOOSTER.value:
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenEnum.RANK_100.value}> : +**75000** {EmojiCreation2.COPPER.value}", inline=False)
+                if role.id == TrueHeavenEnum.BOOSTER.value:
                     actual_money += 100000
-                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenRoleId.BOOSTER.value}> : +**100000** {EmojiCreation2.COPPER.value}", inline=False)
-        
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenEnum.BOOSTER.value}> : +**100000** {EmojiCreation2.COPPER.value}", inline=False)
         
         if actual_money == 0: actual_money = 200
-        embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
-        embed.add_field(name=f"", value=f"> Tổng tiền nhận từ điểm danh {SlashCommand.DAILY.value} hôm nay:   **+{int(actual_money)} {EmojiCreation2.COPPER.value} **", inline=False)
+        embed.add_field(name=f"", value=f"▬▬▬▬ι═════════>\n> Tổng tiền nhận từ điểm danh {SlashCommand.DAILY.value} hôm nay:   **+{int(actual_money)} {EmojiCreation2.COPPER.value} **", inline=False)
         embed.set_footer(text=f"{user.name} điểm danh.", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")
         #Cộng tiền cho user
         ProfileMongoManager.update_profile_money(guild_id=user.guild.id, guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name= user.display_name, copper=actual_money)

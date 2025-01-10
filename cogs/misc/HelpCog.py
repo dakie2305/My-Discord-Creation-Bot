@@ -1,6 +1,5 @@
 from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.EmojiEnum import EmojiCreation2, EmojiCreation1
-from CustomEnum.RoleEnum import TrueHeavenRoleId
 import discord
 from discord.ext import commands
 from datetime import datetime, timedelta

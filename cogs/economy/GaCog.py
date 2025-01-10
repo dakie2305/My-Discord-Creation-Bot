@@ -15,10 +15,10 @@ from Handling.Economy.GA.ConfirmSellGuardianView import ConfirmSellGuardianView
 from Handling.Economy.GA.GaSellOptionsMenuView import GaSellOptionsMenuView
 from Handling.Economy.GA.RankUpView import RankUpView
 from Handling.Economy.GA.GaBattleView import GaBattleView
-import Handling.Economy.ConversionRate.ConversionRateMongoManager as ConversionRateMongoManager
 import random
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 from discord.app_commands import Choice
+from CustomEnum.TrueHeavenEnum import TrueHeavenEnum
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(GuardianAngelCog(bot=bot))
@@ -138,15 +138,28 @@ class GuardianAngelCog(commands.Cog):
                 health = int(user_profile.guardian.max_health*50/100)
                 stamina = int(user_profile.guardian.max_stamina*50/100)
                 ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id,user_id=interaction.user.id, health=health, stamina=stamina)
+        
+        special_case = False
+        if interaction.guild_id == 1256987900277690470:
+            for role in interaction.user.roles:
+                if role.id == TrueHeavenEnum.TOP_1_GUARDIAN.value: 
+                    special_case = True
+                    break
+        
         #restore tính 40% của mana
         mana = int(user_profile.guardian.max_mana*40/100)
+        if special_case:
+            mana = user_profile.guardian.max_mana
         
         random_bonus_exp = random.randint(15, 60)
         dignity_point = 10
         embed = discord.Embed(title=f"", description=f"Tu Thiền", color=0x0ce7f2)
         embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
         embed.add_field(name=f"", value=f"Hộ Vệ Thần [{user_profile.guardian.ga_emoji} - **{user_profile.guardian.ga_name}**] đã tiến nhập thiền định.", inline=False)
-        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Hồi phục **{mana}** Mana {EmojiCreation2.MP.value}!", inline=False)
+        if special_case:
+            embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Hồi phục **toàn bộ** Mana {EmojiCreation2.MP.value}!", inline=False)
+        else:
+            embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Hồi phục **{mana}** Mana {EmojiCreation2.MP.value}!", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Cộng **{random_bonus_exp}** điểm EXP cho Hộ Vệ Thần!", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Cộng **{dignity_point}** nhân phẩm!", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
@@ -236,10 +249,22 @@ class GuardianAngelCog(commands.Cog):
                 stamina = int(user_profile.guardian.max_stamina*50/100)
                 ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id,user_id=interaction.user.id, health=health, stamina=stamina)
         
+
+        special_case = False
+        if interaction.guild_id == 1256987900277690470:
+            for role in interaction.user.roles:
+                if role.id == TrueHeavenEnum.TOP_1_GUARDIAN.value: 
+                    special_case = True
+                    break
         
         #heal tính 40% của max_health, 40% của max thể lực
         health = int(user_profile.guardian.max_health*40/100)
         stamina = int(user_profile.guardian.max_stamina*40/100)
+
+        if special_case:
+            health = user_profile.guardian.max_health
+            stamina = user_profile.guardian.max_stamina
+
         random_bonus_exp = chosen_item.bonus_exp
         dignity_point = 5
         if chosen_item.item_id == "weed":
@@ -247,8 +272,11 @@ class GuardianAngelCog(commands.Cog):
         embed = discord.Embed(title=f"", description=f"Cho ăn", color=0x0ce7f2)
         embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
         embed.add_field(name=f"", value=f"Hộ Vệ Thần {user_profile.guardian.ga_emoji} - **{user_profile.guardian.ga_name}** đã ăn [{chosen_item.emoji} - **{chosen_item.item_name}**]", inline=False)
-        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Hồi phục **{health}** {EmojiCreation2.HP.value} máu!", inline=False)
-        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Hồi phục **{stamina}** {EmojiCreation2.STAMINA.value} thể lực!", inline=False)
+        if special_case:
+            embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Hồi phục **toàn bộ** {EmojiCreation2.HP.value} máu và {EmojiCreation2.STAMINA.value} thể lực!", inline=False)
+        else:
+            embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Hồi phục **{health}** {EmojiCreation2.HP.value} máu!", inline=False)
+            embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Hồi phục **{stamina}** {EmojiCreation2.STAMINA.value} thể lực!", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Cộng **{random_bonus_exp}** điểm EXP cho Hộ Vệ Thần!", inline=False)
         if dignity_point != 0:
             embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Cộng **{dignity_point}** nhân phẩm!", inline=False)

@@ -1,6 +1,5 @@
 from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.EmojiEnum import EmojiCreation2
-from CustomEnum.RoleEnum import TrueHeavenRoleId
 import discord
 from discord.ext import commands
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
