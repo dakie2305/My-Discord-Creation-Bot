@@ -260,7 +260,6 @@ class GaBattleView(discord.ui.View):
                 flag_end_battle = True
                 self.upper_attack_won = True
                 continue
-                
             base_text = self.execute_attack(self_player_info = self_player_info, opponent_alive_attack_info = opponent_alive_attack_info)
             full_text += base_text + "\n"
             
@@ -268,7 +267,6 @@ class GaBattleView(discord.ui.View):
         for self_player_info in self.lower_attack_class:
             #Skip qua guardian đã chết
             if self_player_info.player_ga.health <= 0: continue
-            
             #Mỗi guardian trong lower sẽ chọn ngẫu nhiên một upper để đánh
             opponent_alive_attack_info = self.get_ga_stil_alive("upper")
             if opponent_alive_attack_info == None:
@@ -365,14 +363,14 @@ class GaBattleView(discord.ui.View):
         if info.player_profile == None: return ""
         #Nhân theo lượng người tham gia
         bonus_exp = int(self.bonus_exp * len(self.upper_attack_class) + self.bonus_exp*len(self.lower_attack_class))
-        if self.is_players_versus_players and bonus_exp > 350: bonus_exp = 280
         if bonus_exp > 350: bonus_exp = 350
         gold_reward = int(self.gold_reward * len(self.upper_attack_class) + self.bonus_exp*len(self.lower_attack_class))
         silver_reward = int(self.silver_reward * len(self.upper_attack_class) + self.bonus_exp*len(self.lower_attack_class))
         contribution = self.calculate_contribution(info.starting_at_round)
         text_target_profile_exist = f"<@{info.player_profile.user_id}> [{info.starting_at_round}] cống hiến **{contribution}%**, nhận: "
         calculated_exp = int(bonus_exp * (contribution / 100))
-        if calculated_exp > 0: 
+        if calculated_exp > 0:
+            if self.is_players_versus_players and calculated_exp > 280: calculated_exp = 280
             text_target_profile_exist += f"**{calculated_exp}** EXP. "
             ProfileMongoManager.update_level_progressing(guild_id=self.guild_id, user_id=info.player_profile.user_id, bonus_exp=int(calculated_exp*0.3))
             ProfileMongoManager.update_main_guardian_level_progressing(guild_id=self.guild_id, user_id=info.player_profile.user_id, bonus_exp=calculated_exp)
@@ -500,9 +498,6 @@ class GaBattleView(discord.ui.View):
     
     def update_stats_in_database(self, info: GuardianAngelAttackClass):
         if info.player_profile != None:
-            # loss_health = int(info.player_ga.max_health - info.player_ga.health)
-            # loss_stamina = int(info.player_ga.max_stamina - info.player_ga.stamina)
-            # loss_mana = int(info.player_ga.max_mana - info.player_ga.mana)
             if CustomFunctions.check_if_dev_mode(): return
             ProfileMongoManager.set_guardian_current_stats(guild_id=self.guild_id, user_id=info.player_profile.user_id,stamina=info.player_ga.stamina, health=info.player_ga.health, mana=info.player_ga.mana, is_dead=info.player_ga.is_dead)
     
@@ -510,10 +505,17 @@ class GaBattleView(discord.ui.View):
         if side == "upper":
             legit_attack_classes = [attack_class for attack_class in self.upper_attack_class if attack_class.player_ga.health > 0]
             if len(legit_attack_classes) == 0: return None
+            attack_classes_without_player_profile = [attack_class for attack_class in legit_attack_classes if attack_class.player_profile is None]
+            chance = UtilitiesFunctions.get_chance(60)
+            #Ưu tiên chọn attack_class không có profile trước
+            if chance and len(attack_classes_without_player_profile)>0: return random.choice(attack_classes_without_player_profile)
             return random.choice(legit_attack_classes)
         else:
             legit_attack_classes = [attack_class for attack_class in self.lower_attack_class if attack_class.player_ga.health > 0]
             if len(legit_attack_classes) == 0: return None
+            attack_classes_without_player_profile = [attack_class for attack_class in legit_attack_classes if attack_class.player_profile is None]
+            chance = UtilitiesFunctions.get_chance(60)
+            if chance and len(attack_classes_without_player_profile)>0: return random.choice(attack_classes_without_player_profile)
             return random.choice(legit_attack_classes)
 
     def execute_attack(self, self_player_info: GuardianAngelAttackClass, opponent_alive_attack_info: GuardianAngelAttackClass):
@@ -646,15 +648,12 @@ class GaBattleView(discord.ui.View):
         
         
         additional_loss_stats_text = ""
-        if opponent_alive_attack_info.player_ga.health <= 0:
-            opponent_alive_attack_info.player_ga.health = 0
-            additional_loss_stats_text = f" Mục tiêu đã bị hạ gục!"
-        
         #Để đảm bảo stats không bị âm        
         if opponent_alive_attack_info.player_ga.stamina <= 0: opponent_alive_attack_info.player_ga.stamina = 0
         if opponent_alive_attack_info.player_ga.mana <= 0: opponent_alive_attack_info.player_ga.mana = 0
         if opponent_alive_attack_info.player_ga.health <= 0: 
             opponent_alive_attack_info.player_ga.health = 0
+            additional_loss_stats_text = f" Mục tiêu đã bị hạ gục!"
             #Roll tỷ lệ chết nếu đánh PVE
             if self.is_players_versus_players == False and opponent_alive_attack_info.player_profile != None:
                 actual_death_chance = UtilitiesFunctions.get_chance_guardian_actual_death(level=opponent_alive_attack_info.player_ga.level)
@@ -664,6 +663,23 @@ class GaBattleView(discord.ui.View):
                     additional_loss_stats_text = f"Hộ Vệ Thần của mục tiêu đã chết vĩnh viễn!"
                     opponent_alive_attack_info.is_dead_ga = True
                     opponent_alive_attack_info.player_ga.is_dead = True
+            #Kiểm tra xem phải summoned không, có thì remove hẳn khỏi đội hình
+            if opponent_alive_attack_info.is_summoned:
+                #Remove khỏi đội hình
+                if opponent_alive_attack_info in self.upper_attack_class:
+                    self.upper_attack_class.remove(opponent_alive_attack_info)
+                if opponent_alive_attack_info in self.lower_attack_class:
+                    self.lower_attack_class.remove(opponent_alive_attack_info)
+                #Tìm owner và set lại skill
+                for a in self.upper_attack_class:
+                    if a.player_profile != None and a.player_profile.user_id == opponent_alive_attack_info.summoner_owner_id:
+                        a.has_used_summoning = False
+                        break
+                for a in self.lower_attack_class:
+                    if a.player_profile != None and a.player_profile.user_id == opponent_alive_attack_info.summoner_owner_id:
+                        a.has_used_summoning = False
+                        break
+                
         
         #Trừ -1 tẩy não khi hết lượt
         if self_player_info.brain_washed_round != None: 
@@ -785,7 +801,7 @@ class GaBattleView(discord.ui.View):
             
         current_mana_percent = int(self_player_info.player_ga.mana/self_player_info.player_ga.max_mana*100)
         skill = self.get_random_skill(list_skills=self_player_info.player_ga.list_skills, skill_id="summoning_skill")
-        if skill != None and current_mana_percent >= 70:
+        if skill != None and current_mana_percent >= 65 and self_player_info.has_used_summoning == False:
             #Skill này sẽ triệu hồi một NPC vào phe của 
             #Dựa vào is_upper để xác định phe nào sẽ triệu hồi NPC
             #Nếu phe đó tổng GuardianAngelAttackClass dưới ba mới được triệu hồi
@@ -797,7 +813,7 @@ class GaBattleView(discord.ui.View):
                     if roll_chance_legendary: calculated_level = self_player_info.player_ga.level*2
                     if calculated_level < 1: calculated_level = 1
                     enemy: GuardianAngel = ListGAAndSkills.get_random_ga_enemy_generic(level=calculated_level)
-                    new_enemy = GuardianAngelAttackClass(player_profile=None, player_ga=enemy, starting_at_round=self.round)
+                    new_enemy = GuardianAngelAttackClass(player_profile=None, player_ga=enemy, starting_at_round=self.round, is_summoned=True, summoner_owner_id=self_player_info.player_profile.user_id)
                     if is_upper:
                         #Add vào phe attack upper
                         self.upper_attack_class.append(new_enemy)
@@ -805,11 +821,11 @@ class GaBattleView(discord.ui.View):
                         #Add vào phe attack lower
                         self.lower_attack_class.append(new_enemy)
                     #Trừ 50% mana của bản thân
-                    own_loss_mana = int(self_player_info.player_ga.max_mana * 0.50) + skill.mana_loss
+                    own_loss_mana = int(self_player_info.player_ga.max_mana * 0.50)
                     self_player_info.player_ga.mana -= own_loss_mana
                     if self_player_info.player_ga.mana <= 0: self_player_info.player_ga.mana = 0
-                    
                     base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã dùng chiêu {skill.emoji} - {skill.skill_name} để triệu hồi **{enemy.ga_emoji} - {enemy.ga_name}** lên gia nhập đội!"
+                    self_player_info.has_used_summoning = True
                     return base_text
             else:
                 if len(self.lower_attack_class) < 3:
@@ -819,7 +835,7 @@ class GaBattleView(discord.ui.View):
                     if roll_chance_legendary: calculated_level = self_player_info.player_ga.level*3
                     if calculated_level < 1: calculated_level = 1
                     enemy: GuardianAngel = ListGAAndSkills.get_random_ga_enemy_generic(level=calculated_level)
-                    new_enemy = GuardianAngelAttackClass(player_profile=None, player_ga=enemy, starting_at_round=self.round)
+                    new_enemy = GuardianAngelAttackClass(player_profile=None, player_ga=enemy, starting_at_round=self.round, is_summoned=True, summoner_owner_id=self_player_info.player_profile.user_id)
                     if is_upper:
                         #Add vào phe attack upper
                         self.upper_attack_class.append(new_enemy)
@@ -827,11 +843,12 @@ class GaBattleView(discord.ui.View):
                         #Add vào phe attack lower
                         self.lower_attack_class.append(new_enemy)
                     #Trừ 50% mana của bản thân
-                    own_loss_mana = int(self_player_info.player_ga.max_mana * 0.50) + skill.mana_loss
+                    own_loss_mana = int(self_player_info.player_ga.max_mana * 0.50)
                     self_player_info.player_ga.mana -= own_loss_mana
                     if self_player_info.player_ga.mana <= 0: self_player_info.player_ga.mana = 0
                     
                     base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã dùng chiêu {skill.emoji} - {skill.skill_name} để triệu hồi **{enemy.ga_emoji} - {enemy.ga_name}** lên gia nhập đội!"
+                    self_player_info.has_used_summoning = True
                     return base_text
         
         skill = self.get_random_skill(list_skills=self_player_info.player_ga.list_skills, skill_id="brain_wash_skill")
