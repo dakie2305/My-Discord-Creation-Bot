@@ -365,6 +365,7 @@ class GaBattleView(discord.ui.View):
         bonus_exp = int(self.bonus_exp * len(self.upper_attack_class) + self.bonus_exp*len(self.lower_attack_class))
         if bonus_exp > 350: bonus_exp = 350
         gold_reward = int(self.gold_reward * len(self.upper_attack_class) + self.bonus_exp*len(self.lower_attack_class))
+        if gold_reward > 50000: gold_reward = 50000
         silver_reward = int(self.silver_reward * len(self.upper_attack_class) + self.bonus_exp*len(self.lower_attack_class))
         contribution = self.calculate_contribution(info.starting_at_round)
         text_target_profile_exist = f"<@{info.player_profile.user_id}> [{info.starting_at_round}] cống hiến **{contribution}%**, nhận: "
