@@ -814,7 +814,9 @@ class GaBattleView(discord.ui.View):
                     if roll_chance_legendary: calculated_level = self_player_info.player_ga.level*2
                     if calculated_level < 1: calculated_level = 1
                     enemy: GuardianAngel = ListGAAndSkills.get_random_ga_enemy_generic(level=calculated_level)
-                    new_enemy = GuardianAngelAttackClass(player_profile=None, player_ga=enemy, starting_at_round=self.round, is_summoned=True, summoner_owner_id=self_player_info.player_profile.user_id)
+                    new_enemy = GuardianAngelAttackClass(player_profile=None, player_ga=enemy, starting_at_round=self.round, is_summoned=True)
+                    if self_player_info.player_profile != None:
+                        new_enemy.summoner_owner_id = self_player_info.player_profile.user_id
                     if is_upper:
                         #Add vào phe attack upper
                         self.upper_attack_class.append(new_enemy)
@@ -836,7 +838,10 @@ class GaBattleView(discord.ui.View):
                     if roll_chance_legendary: calculated_level = self_player_info.player_ga.level*3
                     if calculated_level < 1: calculated_level = 1
                     enemy: GuardianAngel = ListGAAndSkills.get_random_ga_enemy_generic(level=calculated_level)
-                    new_enemy = GuardianAngelAttackClass(player_profile=None, player_ga=enemy, starting_at_round=self.round, is_summoned=True, summoner_owner_id=self_player_info.player_profile.user_id)
+                    new_enemy = GuardianAngelAttackClass(player_profile=None, player_ga=enemy, starting_at_round=self.round, is_summoned=True)
+                    if self_player_info.player_profile != None:
+                        new_enemy.summoner_owner_id = self_player_info.player_profile.user_id
+
                     if is_upper:
                         #Add vào phe attack upper
                         self.upper_attack_class.append(new_enemy)
