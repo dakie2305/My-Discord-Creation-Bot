@@ -61,12 +61,19 @@ class TrueHeavenCustomCommands(commands.Cog):
             embed.add_field(name=f"**{count}. Nghiêm cấm tuyệt đối những nội dung sau**\n**   (Forbidden topic, content)**", value=f"🚫 Bất kỳ hình ảnh, video, nội dung có liên quan đến trẻ em và truyền tải thông điệp xấu dưới bất kỳ hình thức nào.\n(Do not ever post anything bad related to minors. Do not even mentions them) \n\n🚫 Gay lọ đời thật (đừng có giở giọng gay quyền ở đây).\n  (Do not ever post anything bad related to gay. And no, I don't care about your opinions)\n\n🚫 Những nội dung tởm lợm, máu me, nghi ngờ tam quan khác.*\n  (Do not ever post gore or questionable contents)", inline=False)
             embed.add_field(name="\n", value="\n",inline=False)
             
+            count+=1
+            embed.add_field(name=f"**{count}. Nghiêm cấm tuyệt đối những nội dung NSFW, có khuynh hướng phản cảm hoặc 18+**\n**   (NSFW or 18+ content is forbidden)**", value=f"🚫 Không được phép đăng tải bất kỳ nội dung đồi truỵ, phản cảm hoặc 18+ dù có lộ ít hay nhiều. Nếu cảm thấy hình ảnh nhạy cảm, vui lòng dùng lệnh `/report` để admin và moderator giải quyết", inline=False)
+            embed.add_field(name="\n", value="\n",inline=False)
+            
+            count+=1
+            embed.add_field(name=f"**{count}. Nghiêm cấm tài khoản để tên, hoặc hình ảnh phản cảm, hoặc 18+**\n**   (Accounts showing inappropriate content are forbidden)**", value=f"🚫 Tài khoản không được phép để tên hoặc hình ảnh nhạy cảm hoặc vi phạm tiêu chuẩn cộng đồng", inline=False)
+            embed.add_field(name="\n", value="\n",inline=False)
 
             unix_time = int(datetime.now().timestamp())
             embed.add_field(name="", value=f"Update: <t:{unix_time}:D>", inline=False)
             embed.set_footer(text=f"{message.author.name}", icon_url=message.author.avatar.url)
             
-            embed_2 = discord.Embed(title=f"", description=f"**XỬ LÝ VI PHẠM**", color=0xfc0703)
+            embed_2 = discord.Embed(title=f"XỬ LÝ VI PHẠM", description=f"BÁO CÁO NGƯỜI DÙNG VI PHẠM BẰNG LỆNH `/report` của Creation 1!", color=0xfc0703)
             embed_2.add_field(name="", value="-----------------------------------------------------------------------------------")
             embed_2.add_field(name=f"\n", value=f"\n- **Vi phạm lần một:** cảnh cáo / phạt tù 30 phút.\n- **Vi phạm lần hai:** phạt tù / mute theo ngày.\n- **Vi phạm lần ba:** CÚT.", inline=False)
             embed_2.add_field(name="\n", value="\n",inline=False)
