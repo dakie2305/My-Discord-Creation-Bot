@@ -456,8 +456,8 @@ class GaBattleView(discord.ui.View):
             if roll_dice:
                 #Trúng 3 bình bình thường
                 filtered_items = [
-                    item for item in list_support_ga_items 
-                    if item.item_id in ["ga_heal_1", "ga_stamina_1", "ga_mana_1"]
+                    d for d in list_support_ga_items 
+                    if d.item_id in ["ga_heal_1", "ga_stamina_1", "ga_mana_1"]
                 ]
                 item =  copy.deepcopy(random.choice(filtered_items))
                 item.item_worth_amount = 1000
@@ -468,7 +468,7 @@ class GaBattleView(discord.ui.View):
                 if additional_dice: item_id = "ga_resurrection"
                 for randomitem in list_support_ga_items:
                     if randomitem.item_id == item_id:
-                        item = randomitem
+                        item = copy.deepcopy(randomitem)
                         break
                 if item == None: item = copy.deepcopy(random.choice(list_support_ga_items))
                 item.item_worth_amount = 5
