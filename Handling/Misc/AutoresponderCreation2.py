@@ -192,7 +192,7 @@ class AutoresponderHandling():
             embed.add_field(name="", value=f"> ACB: 9799317", inline=False)
             embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
             embed.set_footer(text=f"Cảm ơn chân thành vì đã đọc, mong tin nhắn này không làm phiền mọi người.", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")
-            view = SelfDestructView(timeout=30)
+            view = SelfDestructView(timeout=15)
             _mess = await message.channel.send(embed=embed, view=view)
             view.message= _mess
             

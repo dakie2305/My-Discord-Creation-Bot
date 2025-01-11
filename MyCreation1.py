@@ -1628,12 +1628,7 @@ async def on_ready():
                                 name="True Heavens",
                                 state = "Dùng lệnh /help để biết thêm thông tin",
                                 details = "Kiểm tra profile của từng người..",
-                                assets={
-                                            "large_image": "true_heaven",
-                                            "large_text": "True Heavens",  # Tooltip text when hovering over the image
-                                            "small_image": "00107-3430954361-photoroom",
-                                            "small_text": "Join My True Heaven",
-                                        })
+                                )
         await bot.change_presence(status=discord.Status.online, activity=activity)
     remove_old_conversation.start()
     clear_up_data_task.start()
