@@ -34,7 +34,7 @@ class Help(commands.Cog):
     
     #region keo_bua_bao command
     @discord.app_commands.command(name="help", description="Hiện danh sách lệnh của Bot!")
-    async def help(self, interaction: discord.Interaction):
+    async def help_slash(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=False)
         first_embed = self.list_all_embed[0]
         first_embed.set_footer(text=f"Trang 1/{len(self.list_all_embed)}")
