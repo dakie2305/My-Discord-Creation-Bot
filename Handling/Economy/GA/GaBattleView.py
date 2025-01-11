@@ -250,6 +250,7 @@ class GaBattleView(discord.ui.View):
         #upper attack sẽ đánh trước
         flag_end_battle = False
         full_text = ""
+        
         for self_player_info in self.upper_attack_class:
             #Skip qua guardian đã chết
             if self_player_info.player_ga.health <= 0: continue
@@ -504,6 +505,7 @@ class GaBattleView(discord.ui.View):
     
     def get_ga_stil_alive(self, side: str):
         if side == "upper":
+            if len(self.upper_attack_class) == 0: return None
             legit_attack_classes = [attack_class for attack_class in self.upper_attack_class if attack_class.player_ga.health > 0]
             if len(legit_attack_classes) == 0: return None
             attack_classes_without_player_profile = [attack_class for attack_class in legit_attack_classes if attack_class.player_profile is None]
@@ -512,6 +514,7 @@ class GaBattleView(discord.ui.View):
             if chance and len(attack_classes_without_player_profile)>0: return random.choice(attack_classes_without_player_profile)
             return random.choice(legit_attack_classes)
         else:
+            if len(self.lower_attack_class) == 0: return None
             legit_attack_classes = [attack_class for attack_class in self.lower_attack_class if attack_class.player_ga.health > 0]
             if len(legit_attack_classes) == 0: return None
             attack_classes_without_player_profile = [attack_class for attack_class in legit_attack_classes if attack_class.player_profile is None]
