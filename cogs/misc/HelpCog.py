@@ -22,6 +22,16 @@ class Help(commands.Cog):
         else: #cr 2
             self.list_all_embed = self.get_list_help_creation_2()
     
+    @commands.command()
+    async def help(self, ctx):
+        message: discord.Message = ctx.message
+        if message:
+            first_embed = self.list_all_embed[0]
+            first_embed.set_footer(text=f"Trang 1/{len(self.list_all_embed)}")
+            view = HelpPageView(list_all_embed=self.list_all_embed)
+            mess = await message.channel.send(embed=first_embed, view=view)
+            view.message = mess
+    
     #region keo_bua_bao command
     @discord.app_commands.command(name="help", description="Hiện danh sách lệnh của Bot!")
     async def help(self, interaction: discord.Interaction):

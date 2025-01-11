@@ -76,13 +76,6 @@ async def guild_extra_info(ctx):
         await ctx.send(f"Lưu thành công thông tin Guild Extra Info về server này.", ephemeral=True)
 
 @bot.command()
-@app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
-async def help(ctx):
-    message: discord.Message = ctx.message
-    if message:
-        await message.reply("Vui lòng dùng lệnh /help")    
-
-@bot.command()
 async def cuu_gia(ctx):
     message: discord.Message = ctx.message
     if message:

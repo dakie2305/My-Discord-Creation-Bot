@@ -54,12 +54,6 @@ async def global_sync_creation_1(ctx):
     else:
         await ctx.send(f"Có phải là Darkie đâu mà dùng lệnh này?")        
         
-@bot.command()
-@app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
-async def help(ctx):
-    message: discord.Message = ctx.message
-    if message:
-        await message.channel.send("Vui lòng dùng lệnh /help")
 
 @bot.command()
 @app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
