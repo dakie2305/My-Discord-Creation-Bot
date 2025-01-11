@@ -493,6 +493,7 @@ class WorkEconomy(commands.Cog):
             dice_fish_silver = UtilitiesFunctions.get_chance(10)
             if dice_fish_silver: return random.choice(list_silver_fish)
             else: return random.choice(list_small_copper_fish)
+            
         elif fish_rod.item_id == "fish_rod_2":
             dice_trash = UtilitiesFunctions.get_chance(10)
             if dice_trash: return random.choice(list_trash)
@@ -574,17 +575,17 @@ class WorkEconomy(commands.Cog):
                 if dice:
                     #Trúng 3 bình bình thường
                     filtered_items = [
-                        item for item in list_support_ga_items 
-                        if item.item_id in ["ga_heal_1", "ga_stamina_1", "ga_mana_1"]
+                        fitem for fitem in copy.deepcopy(list_support_ga_items) 
+                        if fitem.item_id in ["ga_heal_1", "ga_stamina_1", "ga_mana_1"]
                     ]
-                    item =  copy.deepcopy(random.choice(filtered_items))
+                    item = copy.deepcopy(random.choice(filtered_items))
                     item.item_worth_amount = 1000
                     return item
                 else:
                     item_id = "ga_all_restored"
                     additional_dice = UtilitiesFunctions.get_chance(35)
                     if additional_dice: item_id = "ga_resurrection"
-                    for randomitem in list_support_ga_items:
+                    for randomitem in copy.deepcopy(list_support_ga_items):
                         if randomitem.item_id == item_id:
                             item = copy.deepcopy(randomitem)
                             break
@@ -594,19 +595,16 @@ class WorkEconomy(commands.Cog):
             
             dice_fish_gold = UtilitiesFunctions.get_chance(80)
             if dice_fish_gold: 
-                fish = random.choice(list_gold_fish)
-                fish.quantity = random.randint(1, 3)
+                fish = copy.deepcopy(random.choice(list_gold_fish))
                 return fish
             else:
-                fish = random.choice(list_silver_fish)
-                fish.quantity = random.randint(1, 5)
+                fish = copy.deepcopy(random.choice(list_silver_fish))
                 return fish
             
         elif fish_rod.item_id == "fish_rod_5":
             dice_trash = UtilitiesFunctions.get_chance(10)
             if dice_trash:
                 fish = random.choice(list_trash)
-                fish.quantity = random.randint(1, 5)
                 return fish
 
             dice_attack_weapon = UtilitiesFunctions.get_chance(15)
@@ -623,8 +621,8 @@ class WorkEconomy(commands.Cog):
                 if dice:
                     #Trúng 3 bình bình thường
                     filtered_items = [
-                        item for item in list_support_ga_items 
-                        if item.item_id in ["ga_heal_1", "ga_stamina_1", "ga_mana_1"]
+                        fitem for fitem in copy.deepcopy(list_support_ga_items) 
+                        if fitem.item_id in ["ga_heal_1", "ga_stamina_1", "ga_mana_1"]
                     ]
                     item =  copy.deepcopy(random.choice(filtered_items))
                     item.item_worth_amount = 1000
@@ -644,11 +642,9 @@ class WorkEconomy(commands.Cog):
             dice_fish_gold = UtilitiesFunctions.get_chance(80)
             if dice_fish_gold: 
                 fish = random.choice(list_gold_fish)
-                fish.quantity = random.randint(1, 10)
                 return fish
             else:
                 fish = random.choice(list_silver_fish)
-                fish.quantity = random.randint(1, 15)
                 return fish
         else:
             return random.choice(list_trash)

@@ -418,13 +418,13 @@ class GaBattleView(discord.ui.View):
         if roll_dice:
             dice_check = UtilitiesFunctions.get_chance(50)
             if dice_check:
-                item = random.choice(list_legend_weapon_1)
+                item = copy.deepcopy(random.choice(list_legend_weapon_1))
                 item.item_worth_amount = 10
                 reward_text = f"x1 **[{item.emoji} - {item.item_name}]**"
                 ProfileMongoManager.update_list_items_profile(guild_id=self.guild_id, guild_name="", user_id=info.player_profile.user_id, user_display_name="", user_name="", item=item, amount=1)
                 return reward_text
             else: 
-                item = random.choice(list_legend_weapon_2)
+                item = copy.deepcopy(random.choice(list_legend_weapon_2))
                 item.item_worth_amount = 10
                 reward_text = f"x1 **[{item.emoji} - {item.item_name}]**"
                 ProfileMongoManager.update_list_items_profile(guild_id=self.guild_id, guild_name="", user_id=info.player_profile.user_id, user_display_name="", user_name="", item=item, amount=1)
