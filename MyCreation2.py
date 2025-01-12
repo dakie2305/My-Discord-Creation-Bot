@@ -101,72 +101,8 @@ async def cuu_gia(ctx):
 
 #endregion
 
-
-#region say command
-@bot.tree.command(name = "say", description="Nói gì đó ẩn danh thông qua bot, có thể gắn hình ảnh và nhắn vào Channel khác", guild=discord.Object(id=1194106864582004849)) #Học viện 2ten
-@app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
-async def say(interaction: discord.Interaction, thing_to_say : str, image: Optional[discord.Attachment] = None, chosen_channel: Optional[discord.TextChannel]= None):
-    await interaction.response.send_message(content="Đã gửi tin nhắn ẩn danh thành công", ephemeral=True)
-    #Lấy channel mà người dùng gọi ra
-    current_channel_id = interaction.channel_id
-    current_channel = bot.get_channel(current_channel_id)
-    if chosen_channel != None:
-        current_channel = bot.get_channel(chosen_channel.id)
-
-    #Lấy user-id lật ngược lại
-    reversed_id = CustomFunctions.reverse_string_loop(str(interaction.user.id))
-    
-    #tạo random id
-    characters = string.ascii_letters
-    unique_id = ''.join(random.choices(characters, k=5))
-    first = random.randint(0, 9)
-    second = random.randint(0, 9)
-    # Create embed object
-    embed = discord.Embed(title=f"Ẩn danh ({unique_id})", color=0xC3A757)  # Yellowish color
-    embed.add_field(name="______________", value= "", inline=False)  # Single-line field
-    embed.add_field(name=f"'{thing_to_say}'", value= "", inline=False)
-    if image != None:
-        embed.set_image(url= image.url)
-    embed.set_footer(text= f"Anon: {first}{reversed_id}{second}")  # Single-line field
-    # await interaction.followup.send(content= "Đã gửi tin nhắn ẩn danh thành công.", ephemeral= True)
-    await current_channel.send(embed= embed)
-    commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} used /say to say: {thing_to_say}")
-#endregion
-
-#region report command
-@bot.tree.command(name="report", description="Báo cáo user vi phạm luật về cho admin và moderator xem xét.", guild=discord.Object(id=1194106864582004849))#Học viện 2ten
-@app_commands.describe(user="Chọn user đã phạm luật để báo cáo", reason="Lý do tại sao báo cáo", message_id= "Chuột phải vào message muốn xoá, vào bấm Copy Id rồi dán vào đây", image = "Chọn hình làm bằng chứng (sẽ xử lý nhanh hơn).")
-async def report(interaction: discord.Interaction, user : discord.Member, reason: str, message_id: Optional[str] = None, image: Optional[discord.Attachment] = None):
-    await interaction.response.defer(ephemeral=True)
-    try:
-        await interaction.followup.send(f"Đã thành công gửi báo cáo {user.mention} về cho dàn admin và moderator xem xét với lý do: {reason}.", ephemeral=True)
-        channel = bot.get_channel(1264455905756446740) #sân chơi creation 2
-        if channel:
-            # Create embed object
-            embed = discord.Embed(title="Có người gửi báo cáo, admin và moderator vui lòng kiểm tra", description=f"User {interaction.user.mention} đã báo cáo {user.mention} tại <#{interaction.channel.id}>!", color=0xFC0345)
-            embed.add_field(name="Lý do báo cáo:", value=reason, inline=False)  # Single-line field
-            if message_id!= None:
-                mess = await interaction.channel.fetch_message(int(message_id))
-                if mess:
-                    embed.add_field(name="Nội dung bị báo cáo:", value=mess.content, inline=True)
-                    embed.add_field(name="Id Message:", value=f"{mess.jump_url}", inline=True)
-            if image != None:
-                embed.set_image(url= image.url)
-            embed.set_footer(text=f"User ID Invoke: {interaction.user.id}")  # Footer text
-            view = CustomButton.CustomReportButtonView() #Gắn nút report
-            await channel.send(embed=embed, view= view)
-            print(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} report user id: {user.id} with Username {user.name}.")
-            commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} report user id: {user.id} with Username {user.name}.")
-        else:
-            await interaction.followup.send(f"<@315835396305059840> Bot không tìm được channel để gửi báo cáo!")
-    except Exception as e:
-        #Tag bản thân
-        await interaction.followup.send(f"<@315835396305059840> Bot gặp exception trong lúc thực hiện lệnh. Exception: {str(e)}. Vui lòng liên hệ Darkie!", ephemeral=True)
-        commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} tried report user id {user.id} but got exception {str(e)}.")
-#endregion
-
 #region Snipe command
-@bot.tree.command(name="snipe", description="Hiện lại message mới nhất vừa bị xoá trong channel này.", guild=discord.Object(id=1194106864582004849)) #Học viện 2ten
+@bot.tree.command(name="snipe", description="Hiện lại message mới nhất vừa bị xoá trong channel này.")
 async def snipe(interaction: discord.Interaction):
     await interaction.response.defer()
     called_channel = interaction.channel
