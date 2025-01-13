@@ -27,6 +27,8 @@ import Handling.Economy.Couple.CoupleMongoManager as CoupleMongoManager
 import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
 import Handling.MiniGame.SortWord.SwMongoManager as SwMongoManager
 from CustomEnum.EmojiEnum import EmojiCreation2, EmojiCreation1
+from Handling.Misc.UnbanView import UnbanView
+from Handling.Misc.RemoveTimeoutView import RemoveTimeoutView
 
 load_dotenv()
 intents = discord.Intents.all()
@@ -1640,6 +1642,22 @@ async def on_member_update(before: discord.Member, after: discord.Member):
     model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
     channel = bot.get_channel(1259392446987632661)
     await CustomFunctions.thanking_for_boost(bot_name="creation 1", before=before, after=after, model=model, channel=channel)
+    
+    if before.timed_out_until != after.timed_out_until:
+        channel = after.guild.get_channel(1257004337989943370) #Channel great hall
+        if not channel: return
+        if after.timed_out_until:
+            embed = discord.Embed(title="Thông Tin Member Bị Timeout", description=f"{after.mention}, username {after.name}", color=0xeb0c0c)
+            embed.add_field(name=f"", value=f"- ID: {after.id}", inline=False)
+            unix_time = int(datetime.now().timestamp())
+            embed.add_field(name=f"", value=f"- Thời gian bị timeout: <t:{unix_time}:f>", inline=False)
+            unix_time_until = int(after.timed_out_until.timestamp())
+            embed.add_field(name=f"", value=f"- Sẽ bị timeout cho đến lúc: <t:{unix_time_until}:f>", inline=False)
+            embed.set_footer(text=f"Made by Darkie.", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")
+            view = RemoveTimeoutView(user=after)
+            m = await channel.send(view=view, embed=embed)
+            view.message = m
+    
 
 @bot.event
 async def on_guild_remove(self, guild: discord.Guild):
@@ -1648,6 +1666,27 @@ async def on_guild_remove(self, guild: discord.Guild):
     SwMongoManager.drop_word_matching_info_collection(guild_id=guild.id)
     print(f"Bot {bot.user.display_name} removed from guild {guild.name}. Deleted all related collection")
     
+#Khi có người bị banned
+@bot.event
+async def on_member_ban(guild: discord.Guild, user: discord.Member):
+    #Tạm thời không cần chạy trong server khác
+    if guild.id != 1256987900277690470: return
+    channel = guild.get_channel(1257004337989943370) #Channel great hall
+    if not channel:
+        return
+    ban_entry = await guild.fetch_ban(user)
+    reason = "Không có lý do."
+    if ban_entry != None:
+        reason = ban_entry.reason if ban_entry.reason else "Không có lý do."
+    embed = discord.Embed(title="Thông Tin Member Bị Ban", description=f"{user.mention}, username {user.name}", color=0xeb0c0c)
+    embed.add_field(name=f"", value=f"- ID: {user.id}", inline=False)
+    embed.add_field(name=f"", value=f"- Lý do bị ban: **{reason}**", inline=False)
+    unix_time = int(datetime.now().timestamp())
+    embed.add_field(name=f"", value=f"- Thời gian bị ban: <t:{unix_time}:f>", inline=False)
+    embed.set_footer(text=f"Made by Darkie.", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")
+    view = UnbanView(user=user, guild=guild)
+    m = await channel.send(view=view, embed=embed)
+    view.message = m
 
 @bot.event
 async def on_message(message: discord.Message):

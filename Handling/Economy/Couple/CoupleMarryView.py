@@ -47,7 +47,6 @@ class CoupleMarryView(discord.ui.View):
     async def trigger_result(self):
         if self.old_message == None: return
         try:
-            print("in here")
             date_created = self.couple.date_created
             unix_time = int(date_created.timestamp())
             embed = discord.Embed(title=f"Đám Cưới Tân Uyên Ương",color=discord.Color.blue())
