@@ -581,7 +581,7 @@ async def on_member_remove(member: discord.Member):
         print(f"Member {member.name} left server {guild.name} so their couple is deleted!")
     
 @bot.event
-async def on_guild_remove(self, guild: discord.Guild):
+async def on_guild_remove(guild: discord.Guild):
     #drop collection quest và profile
     ProfileMongoManager.drop_profile_collection(guild_id=guild.id)
     QuestMongoManager.drop_quest_collection(guild_id=guild.id)
