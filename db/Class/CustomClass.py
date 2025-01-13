@@ -35,7 +35,7 @@ class UserInfo:
 #region Guild Info
 
 class GuildExtraInfo:
-    def __init__(self, guild_id: int, guild_name :str, allowed_ai_bot: bool, list_channels_ai_talk: List[int] = None, enabled_ai_until: datetime = None, therapy_channel: int = None, list_channels_quests: List[int] = None, custom_parameter_1 = None, custom_parameter_2 = None):
+    def __init__(self, guild_id: int, guild_name :str, allowed_ai_bot: bool, list_channels_ai_talk: List[int] = None, enabled_ai_until: datetime = None, therapy_channel: int = None, list_channels_quests: List[int] = None, custom_parameter_1 = None, custom_parameter_2 = None, disable_donation_text_until: datetime = None):
         self.guild_id = guild_id
         self.guild_name = guild_name
         self.allowed_ai_bot = allowed_ai_bot
@@ -45,6 +45,7 @@ class GuildExtraInfo:
         self.enabled_ai_until = enabled_ai_until
         self.custom_parameter_1 = custom_parameter_1
         self.custom_parameter_2 = custom_parameter_2
+        self.disable_donation_text_until = disable_donation_text_until
 
     def to_dict(self):
         return {
@@ -56,7 +57,8 @@ class GuildExtraInfo:
             "custom_parameter_2": self.custom_parameter_2,
             "list_channels_quests": [data for data in self.list_channels_quests],
             "list_channels_ai_talk": [data for data in self.list_channels_ai_talk],
-            "enabled_ai_until": self.enabled_ai_until.isoformat() if self.enabled_ai_until else None
+            "enabled_ai_until": self.enabled_ai_until.isoformat() if self.enabled_ai_until else None,
+            "disable_donation_text_until": self.disable_donation_text_until if self.disable_donation_text_until else None,
         }
 
     @staticmethod
@@ -68,6 +70,7 @@ class GuildExtraInfo:
             therapy_channel=data.get("therapy_channel", None),
             custom_parameter_1=data.get("custom_parameter_1", None),
             custom_parameter_2=data.get("custom_parameter_2", None),
+            disable_donation_text_until=data.get("disable_donation_text_until", None),
             list_channels_quests = [item for item in data.get("list_channels_quests", [])],
             list_channels_ai_talk = [item for item in data.get("list_channels_ai_talk", [])],
             enabled_ai_until=datetime.fromisoformat(data["enabled_ai_until"]) if data["enabled_ai_until"] else None

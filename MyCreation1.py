@@ -1731,6 +1731,7 @@ init_extension = [
                   "cogs.misc.TherapyAICog",
                   "cogs.misc.TrueHeavenCustomCommandsCog",
                   "cogs.misc.HelpCog",
+                  "cogs.misc.DonationCog",
                   ]
 bot.tree.add_command(delete_message_context)
 bot.run(bot_token)
