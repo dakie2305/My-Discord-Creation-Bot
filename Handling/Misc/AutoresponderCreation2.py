@@ -189,7 +189,7 @@ class AutoresponderHandling():
         
         elif message.guild.id != 1194106864582004849 and CustomFunctions.contains_substring(message.content.lower(), donate):
             check_exist = db.find_guild_extra_info_by_id(message.guild.id)
-            if check_exist == None or check_exist.disable_donation_text_until == None and datetime.now() > check_exist.disable_donation_text_until:
+            if check_exist == None or check_exist.disable_donation_text_until == None or datetime.now() > check_exist.disable_donation_text_until:
                 flag = True
                 embed = discord.Embed(title=f"**Donate Darkie**", description=f"Xin lỗi vì đã làm phiền nhé! Tin nhắn này sẽ biến mất chỉ sau 1-2 phút thôi nhé!", color=0xc379e0)
                 embed.set_image(url="https://i.imgur.com/Zsoel4d.png")
