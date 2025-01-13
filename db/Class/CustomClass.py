@@ -45,7 +45,7 @@ class GuildExtraInfo:
         self.enabled_ai_until = enabled_ai_until
         self.custom_parameter_1 = custom_parameter_1
         self.custom_parameter_2 = custom_parameter_2
-        self.disable_donation_text_until = disable_donation_text_until
+        self.disable_donation_text_until = disable_donation_text_until if disable_donation_text_until else datetime.now()
 
     def to_dict(self):
         return {
