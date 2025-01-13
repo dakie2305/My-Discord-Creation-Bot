@@ -198,6 +198,11 @@ class EmojiCreation2(Enum):
     ASUNA = "<a:Asuna_SAO:1324069383080771677>"
     ARYA = "<:arya_waifu:1324069367897653419>"
     MEGUMIN = "<a:megumin:1326224295613038603>"
+    SINON = "<a:sinon:1328172192424398991>"
+    KURUMI = "<a:kurumi:1328173187716087820>"
+    HSR = "<:hsr_acheron:1328174851977904188>"
+    RAIDEN_SHOGUN = "<a:Raiden_Shogun:1328183710427910206>"
+    BOCCHI = "<a:Bocchi:1328184588908105728>"
     
     
     BLIZZARD = "<:blizzard:1320096021962952725>"

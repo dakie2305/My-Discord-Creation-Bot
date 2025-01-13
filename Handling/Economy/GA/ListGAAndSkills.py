@@ -163,7 +163,21 @@ list_ga_shop_private = [
       worth_amount = 50, 
       worth_type = "D",
     ),
-    
+    GuardianAngel(
+      ga_id = "raiden_shogun",
+      ga_name= "Lôi Thần Raiden Ei",
+      ga_emoji= EmojiCreation2.RAIDEN_SHOGUN.value,
+      stamina = 80,
+      max_stamina= 80,
+      health= 100,
+      max_health= 100,
+      mana= 100,
+      max_mana= 100,
+      buff_attack_percent = 0,
+      attack_power= 15,
+      worth_amount = 50, 
+      worth_type = "D",
+    ),
     GuardianAngel(
       ga_id = "arya",
       ga_name= "Arya",
@@ -174,6 +188,66 @@ list_ga_shop_private = [
       max_health= 100,
       mana= 80,
       max_mana= 80,
+      buff_attack_percent = 0,
+      attack_power= 15,
+      worth_amount = 50, 
+      worth_type = "D",
+    ),
+    GuardianAngel(
+      ga_id = "sinon",
+      ga_name= "Sinon",
+      ga_emoji= EmojiCreation2.SINON.value,
+      stamina = 80,
+      max_stamina= 80,
+      health= 100,
+      max_health= 100,
+      mana= 100,
+      max_mana= 100,
+      buff_attack_percent = 0,
+      attack_power= 15,
+      worth_amount = 50, 
+      worth_type = "D",
+    ),
+    GuardianAngel(
+      ga_id = "kurumi",
+      ga_name= "Tokisaki Kurumi (Nightmare)",
+      ga_emoji= EmojiCreation2.KURUMI.value,
+      stamina = 80,
+      max_stamina= 80,
+      health= 90,
+      max_health= 90,
+      mana= 120,
+      max_mana= 120,
+      buff_attack_percent = 0,
+      attack_power= 15,
+      worth_amount = 50, 
+      worth_type = "D",
+    ),
+    GuardianAngel(
+      ga_id = "bocchi",
+      ga_name= "Bocchi",
+      ga_emoji= EmojiCreation2.BOCCHI.value,
+      stamina = 80,
+      max_stamina= 80,
+      health= 90,
+      max_health= 90,
+      mana= 120,
+      max_mana= 120,
+      buff_attack_percent = 0,
+      attack_power= 15,
+      worth_amount = 50, 
+      worth_type = "D",
+    ),
+    GuardianAngel(
+      ga_id = "acheron",
+      ga_name= "Raiden Bosenmori Mei",
+      ga_emoji= EmojiCreation2.HSR.value,
+      stamina = 80,
+      max_stamina= 80,
+      health= 90,
+      max_health= 90,
+      mana= 120,
+      max_mana= 120,
       buff_attack_percent = 0,
       attack_power= 15,
       worth_amount = 50, 
@@ -436,6 +510,51 @@ def get_list_back_ground_on_ga_id(ga_id: str):
           "https://i.imgur.com/MDuDDqU.gif",
           "https://i.imgur.com/otds392.gif",
           "https://i.imgur.com/YHxQRW3.gif",
+      ]
+    elif ga_id == "sinon":
+        background_urls = [
+          "https://i.imgur.com/mfK6VO9.gif",
+          "https://i.imgur.com/HrEfEin.gif",
+          "https://i.imgur.com/5E8PS2P.gif",
+          "https://i.imgur.com/MNPXmwO.gif",
+          "https://i.imgur.com/PvugtRT.gif",
+      ]
+    elif ga_id == "kurumi":
+        background_urls = [
+          "https://i.imgur.com/VipwvbX.gif",
+          "https://i.imgur.com/2EC7Rna.gif",
+          "https://i.imgur.com/Y6SnZyz.gif",
+          "https://i.imgur.com/qvg07tV.gif",
+          "https://i.imgur.com/PNWfSnU.gif",
+      ]
+    elif ga_id == "bocchi":
+        background_urls = [
+          "https://i.imgur.com/UbgIkur.gif",
+          "https://i.imgur.com/3coxE09.gif",
+          "https://i.imgur.com/AUucKgg.gif",
+          "https://i.imgur.com/Righ4eG.gif",
+          "https://i.imgur.com/VdBw3zn.gif",
+          "https://i.imgur.com/b8QtGJL.gif",
+      ]
+        
+    elif ga_id == "acheron":
+        background_urls = [
+          "https://i.pinimg.com/originals/ab/c3/83/abc3834108d988cb0e798c4962f2317c.gif",
+          "https://i.pinimg.com/originals/2e/71/f5/2e71f5dc05797aefc00ab7ebfe42d253.gif",
+          "https://steamuserimages-a.akamaihd.net/ugc/2476494829524673254/486E1BF9CD53948FB4135D7726C44EE044E6CF3F/?imw=637&imh=358&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=true",
+          "https://i.pinimg.com/originals/23/98/c4/2398c4cea3a7f072ecf614f127422b91.gif",
+          "https://c4.wallpaperflare.com/wallpaper/980/181/137/honkai-star-rail-robin-honkai-star-rail-red-lipstick-anime-girls-paper-umbrellas-hd-wallpaper-preview.jpg",
+      ]
+    elif ga_id == "raiden_shogun":
+        background_urls = [
+            "https://i.imgur.com/aIB624X.gif",
+            "https://i.imgur.com/oIjq031.gif",
+            "https://i.imgur.com/mwhZYDP.gif",
+            "https://i.imgur.com/2iZOjxd.gif",
+      ]
+    elif ga_id == "":
+        background_urls = [
+            "https://i.imgur.com/aIB624X.gif",
       ]
     return background_urls
 
