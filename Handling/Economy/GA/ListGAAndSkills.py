@@ -302,6 +302,36 @@ list_ga_skills_private = [
         buff_attack_percent=5,
         min_level_required=1,
     ),
+    GuardianAngelSkill(
+        skill_id = "skill_mass_stun",
+        skill_name= "Mộc Khắc",
+        skill_desc="Triệu hồi sức mạnh đánh sốc cả tổ đội của đối thủ và không cho tổ đội đối thủ tấn công trong lượt đó, kỹ năng này sẽ mất nhiều mana mỗi khi dùng!",
+        skill_type= ["attack"],
+        emoji= EmojiCreation2.MASS_STUN_SKILL.value,
+        attack_power= 20,
+        item_worth_amount= 40000,
+        item_worth_type= "G",
+        percent_min_mana_req= 50,
+        mana_loss= 40,
+        buff_defense_percent=0,
+        buff_attack_percent=5,
+        min_level_required=1,
+    ),
+    GuardianAngelSkill(
+        skill_id = "skill_explosion_spell",
+        skill_name= "Bộc Liệt Ma Pháp",
+        skill_desc="Kỹ năng độc nhất của Megumin, hy sinh tất cả mana và thể lực để dồn vào một chiêu Bộc Phá duy nhất với sức mạnh khủng khiếp!",
+        skill_type= ["attack"],
+        emoji= EmojiCreation2.EXPLOSION_SPELL_SKILL.value,
+        attack_power= 20,
+        item_worth_amount= 60000,
+        item_worth_type= "G",
+        percent_min_mana_req= 50,
+        mana_loss= 35,
+        buff_defense_percent=0,
+        buff_attack_percent=5,
+        min_level_required=1,
+    ),
 ]
 list_ga_skills = copy.deepcopy(list_ga_skills_private)
 
@@ -353,7 +383,7 @@ list_ga_passive_skills_private = [
     ),
     GuardianAngelSkill(
         skill_id = "mass_heal_skill",
-        skill_name= "Đại Hồi Phục",
+        skill_name= "Phục Sức Pháp",
         skill_desc="Khi tổ đội còn thấp máu sẽ hồi phục 15% máu cho cả tổ đội khi cả tổ đội yếu máu! Kỹ năng này tốn rất nhiều mana!",
         skill_type= ["passive"],
         emoji= EmojiCreation2.MASS_HEAL_SKILL.value,
@@ -399,7 +429,57 @@ list_ga_passive_skills_private = [
 ]
 list_ga_passive_skills = copy.deepcopy(list_ga_passive_skills_private)
 
-all_skill_lists = [list_ga_skills, list_ga_passive_skills]
+list_ga_passive_skills_private_2 = [
+  GuardianAngelSkill(
+        skill_id = "skill_resurrection",
+        skill_name= "Trỗi Dậy",
+        skill_desc="Hồi sinh tất cả đồng đội đã gục ngã trong tổ đội và hồi 30% chỉ số, phe địch sẽ được hồi 50% máu! Chỉ dùng được một lần trong trận chiến!",
+        skill_type= ["passive"],
+        emoji= EmojiCreation2.RESURRECTION_SKILL.value,
+        attack_power= 1,
+        item_worth_amount= 50000,
+        item_worth_type= "G",
+        percent_min_mana_req= 10,
+        mana_loss= 45,
+        buff_defense_percent=0,
+        buff_attack_percent=1,
+        min_level_required=1,
+    ),
+  GuardianAngelSkill(
+        skill_id = "skill_spike_arnour",
+        skill_name= "Thống Khổ Giáp",
+        skill_desc="Sẽ phản lại 35% sát thương đã nhận từ đòn tấn công bình thường, và 10% khả năng gây choáng kẻ địch. Kỹ năng này sẽ mất mana mỗi khi trúng đòn!",
+        skill_type= ["passive"],
+        emoji= EmojiCreation2.SPIKE_AMOUR.value,
+        attack_power= 1,
+        item_worth_amount= 50000,
+        item_worth_type= "G",
+        percent_min_mana_req= 20,
+        mana_loss= 20,
+        buff_defense_percent=0,
+        buff_attack_percent=1,
+        min_level_required=1,
+    ),
+  GuardianAngelSkill(
+        skill_id = "skill_self_explosion",
+        skill_name= "Tự Kích",
+        skill_desc="Khi máu dưới 10% sẽ tự động kích nổ bản thân, gây sát thương lên tất cả mọi người trong cuộc chiến, và làm giảm 40% phần thưởng nhận được!",
+        skill_type= ["passive"],
+        emoji= EmojiCreation2.SELF_EXPLOSION_SKILL.value,
+        attack_power= 1,
+        item_worth_amount= 50000,
+        item_worth_type= "G",
+        percent_min_mana_req= 20,
+        mana_loss= 20,
+        buff_defense_percent=0,
+        buff_attack_percent=1,
+        min_level_required=1,
+    ),
+]
+list_ga_passive_skills_2 = copy.deepcopy(list_ga_passive_skills_private_2)
+
+
+all_skill_lists = [list_ga_skills, list_ga_passive_skills, list_ga_passive_skills_2]
 
 def get_list_back_ground_on_ga_id(ga_id: str):
     background_urls = None

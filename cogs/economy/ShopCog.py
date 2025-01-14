@@ -18,6 +18,7 @@ import Handling.Economy.ConversionRate.ConversionRateMongoManager as ConversionR
 import random
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 import copy
+from CustomEnum.TrueHeavenEnum import TrueHeavenEnum
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(ShopEconomy(bot=bot))
@@ -112,6 +113,12 @@ class ShopEconomy(commands.Cog):
             check_passed = True
         elif interaction.user.id == 315835396305059840:
             check_passed = True
+        
+        if interaction.guild_id == 1256987900277690470:
+            for role in interaction.user.roles:
+                if role.id == TrueHeavenEnum.TOP_1_WEALTH.value: 
+                    check_passed = True
+                    break
         
         if check_passed:
             dice = UtilitiesFunctions.get_chance(50)
@@ -319,7 +326,10 @@ class ShopEconomy(commands.Cog):
         
         list_temp = copy.deepcopy(ListGAAndSkills.list_ga_passive_skills)
         list_all_shops_guardian_skill["Cửa Hàng Kỹ Năng Nội Tại"] = list_temp
-
+        
+        list_temp = copy.deepcopy(ListGAAndSkills.list_ga_passive_skills_2)
+        list_all_shops_guardian_skill["Cửa Hàng Kỹ Năng Nội Tại 2"] = list_temp
+        
         keys = list(list_all_shops_guardian_skill.keys())
         
         embed = discord.Embed(title=f"**Cửa Hàng Kỹ Năng Tấn Công**", description=f"Tỷ giá hiện tại: {shop_rate}", color=discord.Color.blue())
