@@ -526,6 +526,8 @@ def get_list_back_ground_on_ga_id(ga_id: str):
           "https://i.imgur.com/Y6SnZyz.gif",
           "https://i.imgur.com/qvg07tV.gif",
           "https://i.imgur.com/PNWfSnU.gif",
+          "https://i.imgur.com/h3M7iMJ.gif",
+          "https://i.imgur.com/ZhE1NhQ.gif",
       ]
     elif ga_id == "bocchi":
         background_urls = [

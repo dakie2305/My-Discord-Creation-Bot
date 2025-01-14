@@ -216,6 +216,11 @@ class EmojiCreation2(Enum):
     BRAINWASH_SKILL = "<a:brainwash_skill:1325474525219131465>"
     MASS_HEAL_SKILL = "<:mass_heal_skill:1325474563579973713>"
     MASS_MANA_SKILL = "<:amulet_skill:1326223950052589610>"
+    RESURRECTION_SKILL = "<:resurrection_skill:1328651484853960704>"
+    MASS_STUN_SKILL = "<:mass_stun_skill:1328652451712339989>"
+    SPIKE_AMOUR = "<:spike_arnour:1328652900519645195>"
+    SELF_EXPLOSION_SKILL = "<a:self_explosion_skill:1328653440557125688>"
+    EXPLOSION_SPELL_SKILL = "<a:explosion_spell_skill:1328653554105192520>"
     
     HP = "<:HP:1320777603358920724>"
     MP = "<:MP:1320777612926386256>"
