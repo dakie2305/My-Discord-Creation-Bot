@@ -46,15 +46,18 @@ class InventoryUseView(discord.ui.View):
             return
         
         await interaction.followup.send(f'Bạn đã dùng vật phẩm [{self.selected_item.emoji} - **{self.selected_item.item_name}**]', ephemeral=True)
-        # if self.message != None: 
-        #     await self.message.delete()
+
         
         
         #Thực hiện hiệu ứng của item
         if self.selected_item.item_type == "self_protection":
             await self.using_protection_item(interaction=interaction)
+            if self.message != None: 
+                await self.message.delete()
         elif self.selected_item.item_type == "attack":
             await self.using_attack_item(interaction=interaction)
+            if self.message != None: 
+                await self.message.delete()
         elif self.selected_item.item_type == "self_support":
             await self.using_support_item(interaction=interaction)
         else:
