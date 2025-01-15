@@ -320,7 +320,7 @@ list_ga_skills_private = [
     GuardianAngelSkill(
         skill_id = "skill_explosion_spell",
         skill_name= "Bộc Liệt Ma Pháp",
-        skill_desc="Kỹ năng độc nhất của Megumin, hy sinh tất cả mana và thể lực để dồn vào một chiêu Bộc Phá duy nhất với sức mạnh khủng khiếp!",
+        skill_desc="Kỹ năng quen thuộc của Megumin, hy sinh tất cả mana và thể lực để dồn vào một chiêu Bộc Phá duy nhất với sức mạnh khủng khiếp!",
         skill_type= ["attack"],
         emoji= EmojiCreation2.EXPLOSION_SPELL_SKILL.value,
         attack_power= 100,
@@ -350,7 +350,7 @@ list_ga_skills_private = [
     GuardianAngelSkill(
         skill_id = "skill_trade_stats",
         skill_name= "Tiễn Chỉ Số",
-        skill_desc="Kỹ năng này sẽ dùng Thể Lực hoặc Mana của bản thân để phá Thể Lực và Mana của kẻ địch để khắc chế!",
+        skill_desc="Kỹ năng này sẽ dùng Thể Lực hoặc Mana của bản thân để phá Thể Lực hoặc Mana của kẻ địch để khắc chế!",
         skill_type= ["attack"],
         emoji= EmojiCreation2.TRADE_STATS_SKILL.value,
         attack_power= 25,
