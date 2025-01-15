@@ -250,7 +250,6 @@ async def random_quizz_embed():
                 random_quest_channel_id = random.choice(list_channels_quests)
                 quest_channel = guild.get_channel(random_quest_channel_id)
         if quest_channel != None:
-            
             random_quizz = random.choice(random_quizzes)
             view = RandomQuizzView(quizz=random_quizz)
             endtime = datetime.now() + timedelta(seconds=120)
@@ -348,6 +347,35 @@ async def clear_up_data_task():
             #drop collection
             db.drop_snipe_channel_info_collection(guild_id=guild.id)
 
+@tasks.loop(minutes = 30)
+async def dungeon_spawn_enemy_embed():
+    guilds = bot.guilds
+    for guild in guilds:
+        #Kiểm tra quest channel của server, nếu có thì mới chọn
+        guild_info = db.find_guild_extra_info_by_id(guild_id=guild.id)
+        if guild_info == None: continue
+        if guild_info.list_channels_dungeon == None or len(guild_info.list_channels_dungeon) <= 0: continue
+        list_channels_dungeon = guild_info.list_channels_dungeon
+        random_quest_channel_id = random.choice(list_channels_dungeon)
+        quest_channel = guild.get_channel(random_quest_channel_id)
+        if quest_channel == None:
+            #Xoá channel_id lỗi
+            list_channels_dungeon.remove(random_quest_channel_id)
+            db.update_guild_extra_info_list_channels_dungeon(guild_id=guild.id, list_channels_dungeon=list_channels_dungeon)
+            #Chọn channel khác không bị lỗi
+            random_quest_channel_id = random.choice(list_channels_dungeon)
+            quest_channel = guild.get_channel(random_quest_channel_id)
+            if quest_channel == None:
+                list_channels_dungeon.remove(random_quest_channel_id)
+                db.update_guild_extra_info_list_channels_dungeon(guild_id=guild.id, list_channels_dungeon=list_channels_dungeon)
+                continue
+        if quest_channel != None:
+            
+            embed = discord.Embed(title=f"", description=f"{EmojiCreation2.QUESTION_MARK.value} **Hỏi Nhanh Có Thưởng** {EmojiCreation2.QUESTION_MARK.value}", color=0x0ce7f2)
+            embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
+            embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
+            embed.set_footer(text=f"Ai chưa hiểu cách thức hoạt động của Hầm Ngục Hộ Vệ Thần thì cứ nhắn\ngd help")
+            m = await quest_channel.send(embed=embed)
 
 
 async def sub_function_ai_response(message: discord.Message, speakFlag: bool = True):

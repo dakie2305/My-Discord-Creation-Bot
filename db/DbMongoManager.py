@@ -6,9 +6,10 @@ from datetime import datetime, timedelta
 from db.Class.CustomClass import UserInfo, GuildExtraInfo, UserConversationInfo, ConversationInfo, SnipeChannelInfo, SnipeMessage, SnipeMessageAttachments, PreDeleteAttachmentsInfo
 from db.Class.WordMatchingClass import WordMatchingInfo, PlayerProfile, SpecialItem, PlayerEffect, PlayerBan
 from db.Class.UserCountClass import UserCount
-import discord
 import CustomFunctions
 from pathlib import Path
+from Handling.Economy.Quest.DungeonQuestChannelClass import DungeonQuestChannel
+
 
 #region User Info Database
 
@@ -137,7 +138,18 @@ def update_guild_extra_info(guild_id: int, update_data):
     collection = db_specific['guild_extra_info']
     result = collection.update_one({"guild_id": guild_id}, {"$set": update_data})
     return result
-  
+
+def update_guild_extra_info_list_channels_dungeon(guild_id: int, list_channels_dungeon: List[DungeonQuestChannel] = None):
+    db_specific = client['guild_database']
+    collection = db_specific['guild_extra_info']
+    existing_data = find_guild_extra_info_by_id(guild_id=guild_id)
+    if existing_data == None: return
+    
+    
+    result = collection.update_one({"guild_id": guild_id}, {"$set": {"list_channels_dungeon": [data.to_dict() for data in list_channels_dungeon],}})
+    return result
+
+
 def delete_user_convo_info(guild_id:int):
     db_specific = client['guild_database']
     collection = db_specific['guild_extra_info']

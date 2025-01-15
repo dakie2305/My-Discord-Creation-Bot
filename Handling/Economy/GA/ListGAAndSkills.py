@@ -4,6 +4,7 @@ from Handling.Economy.GA.GuardianAngelClass import GuardianAngel, GuardianAngelS
 from CustomEnum.EmojiEnum import EmojiCreation2
 import random
 import copy
+from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 
 list_ga_shop_private = [
     GuardianAngel(
@@ -688,7 +689,7 @@ def get_random_skill(skill_id: str = None, blacklist_ids: List[str]= None):
   return None
 
 
-def get_random_ga_enemy_generic(level: int = 1):
+def get_random_ga_enemy_generic(level: int = 1, guardian_chance: int = 0):
     data = GuardianAngel(
         ga_id = "enemy_generic",
         ga_name= "",
@@ -797,6 +798,16 @@ def get_random_ga_enemy_generic(level: int = 1):
     if level > 50:
         skill = get_random_skill(blacklist_ids=["summoning_skill"])
         if skill != None: data.list_skills.append(skill)
+        #random xem có ra guardian không
+        if guardian_chance <= 0: guardian_chance = 15
+        dice = UtilitiesFunctions.get_chance(guardian_chance)
+        if dice:
+            random_guardian = copy.deepcopy(random.choice(list_ga_shop))
+            data.ga_name = random_guardian.ga_name
+            data.ga_emoji = random_guardian.ga_emoji
+            skill = get_random_skill()
+            if skill != None: data.list_skills.append(skill)
+
     if data.level > 80:
         #Quái trên 80 thì đương nhiên hưởng thêm skill nữa
         skill = get_random_skill(blacklist_ids=["summoning_skill"])

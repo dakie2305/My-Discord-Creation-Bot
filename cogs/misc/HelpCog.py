@@ -161,7 +161,7 @@ class Help(commands.Cog):
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value}`/work`: làm việc để kiếm tiền và nhân phẩm. Mỗi một tiếng được dùng lệnh một lần.", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value}`/daily`: điểm danh server để kiếm tiền và nhân phẩm. Mỗi một ngày được dùng lệnh một lần.", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value}`/crime`: làm việc xấu để kiếm tiền, nhưng sẽ mất điểm nhân phẩm. Mỗi một tiếng được dùng lệnh một lần.", inline=False)
-        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value}`/quest`: làm nhiệm vụ server để kiếm tiền. Hai ngày sẽ reset quest nếu không hoàn thành.", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value}`/quest`: làm nhiệm vụ server để kiếm tiền. Hai ngày sẽ reset quest nếu không hoàn thành. Nhớ dùng lệnh `/quests channel` để tạo channel nhận lệnh", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value}`/authority riot`: bạo động chính quyền. Nếu thành công sẽ nhận được rất nhiều tiền! Mỗi một ngày được bạo động một lần.", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
         embed.add_field(name=f"", value=f"*Cẩn thận đừng để Chính Quyền bắt khi dùng lệnh `/crime` hoặc `/authority riot` nhé!*", inline=False)
@@ -177,12 +177,13 @@ class Help(commands.Cog):
         list_embed.append(embed)
         
         #Shop
-        embed = discord.Embed(title=f"Lệnh mua đồ và dùng đồ", description=f"Các lệnh về shop, inventory...", color=0xddede7)
+        embed = discord.Embed(title=f"Lệnh mua đồ và dùng đồ", description=f"Các lệnh về shop, kho đồ...", color=0xddede7)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value}`/shop global`: dùng tiền {EmojiCreation2.COPPER.value} | {EmojiCreation2.SILVER.value} | {EmojiCreation2.GOLD.value} | {EmojiCreation2.DARKIUM.value} để mua vật phẩm đặc biệt, với giá thay đổi hằng ngày!", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value}Tỷ giá shop sẽ thay đổi hằng ngày, hoặc được chính quyền reset!", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value}`/inventory use`: chọn vật phẩm cần dùng sau khi mua từ shop!", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value}`/inventory sell`: bán các vật phẩm để kiếm tiền!", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value}`/gift`: để tặng quà cho người khác, giúp họ tăng kinh nghiệm và tăng nhân phẩm!", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
         list_embed.append(embed)
         
