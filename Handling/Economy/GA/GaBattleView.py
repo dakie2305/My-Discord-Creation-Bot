@@ -817,7 +817,63 @@ class GaBattleView(discord.ui.View):
                 base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã tung chiêu {skill.emoji} - {skill.skill_name} cực mạnh, làm nổ tung mất {loss_health} máu của [{opponent_alive_attack_info.player_ga.ga_emoji} - {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist}!"
                 return base_text
             
-            else: 
+            elif skill.skill_id == "skill_potion_destroyer" and opponent_alive_attack_info.player_profile != None and opponent_alive_attack_info.player_profile.list_items != None and len(opponent_alive_attack_info.player_profile.list_items) > 0:
+                #phá random bình hồi phục nếu có
+                filtered_items = [
+                    d for d in opponent_alive_attack_info.player_profile.list_items 
+                    if d.item_id in ["ga_heal_1", "ga_stamina_1", "ga_mana_1", "ga_all_restored"]
+                ]
+                if filtered_items != None and len(filtered_items)>0:
+                    rand_potion_filtered = copy.deepcopy(random.choice(filtered_items))
+                    amount_destroy = random.randint(1,4)
+                    if rand_potion_filtered.item_id == "ga_all_restored": amount_destroy = 1
+
+
+                    #Trừ máu kẻ địch dựa trên kỹ năng
+                    loss_health = int(skill.attack_power + (skill.attack_power * skill.buff_attack_percent/100))
+                    opponent_alive_attack_info.player_ga.health -= loss_health
+                    if opponent_alive_attack_info.player_ga.health <= 0: opponent_alive_attack_info.player_ga.health = 0
+                    
+                    #trừ mana của người dùng theo tỉ lệ skill
+                    loss_own_mana = int(self_player_info.player_ga.max_mana * skill.mana_loss/100) - skill.mana_loss #Không hẳn là trừ quá nhiều, vì thường magic sẽ mạnh hơn, nên buff một tý cho chắc. Để balance sau
+                    if loss_own_mana <= 10: loss_own_mana = 20
+                    self_player_info.player_ga.mana -= loss_own_mana
+                    if self_player_info.player_ga.mana <= 0: self_player_info.player_ga.mana = 0
+                    ProfileMongoManager.update_list_items_profile(guild_id=self.guild_id, guild_name="", user_id= opponent_alive_attack_info.player_profile.user_id, user_display_name="", user_name="", item=rand_potion_filtered, amount=-amount_destroy)
+                    base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã dùng chiêu {skill.emoji} - {skill.skill_name} khiến {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist} mất {loss_health} máu và mất x{amount_destroy} [{rand_potion_filtered.item_name}]"
+                    return base_text
+            
+            elif skill.skill_id == "skill_trade_stats":
+                #Dùng lượng mana hoặc thể lực của bản thân để phá mana hoặc thể lực của đối thủ
+                amount_loss = 0
+                choose_mana = UtilitiesFunctions.get_chance(50)
+                additional_t = "Thể Lực"
+                if choose_mana:
+                    amount_loss = self_player_info.player_ga.mana
+                    if amount_loss > opponent_alive_attack_info.player_ga.mana: amount_loss = opponent_alive_attack_info.player_ga.mana
+                    opponent_alive_attack_info.player_ga.mana -= amount_loss
+                    self_player_info.player_ga.mana -= amount_loss
+                    additional_t = "Mana"
+                else:
+                    amount_loss = self_player_info.player_ga.stamina
+                    if amount_loss > opponent_alive_attack_info.player_ga.stamina: amount_loss = opponent_alive_attack_info.player_ga.stamina
+                    opponent_alive_attack_info.player_ga.stamina -= amount_loss
+                    self_player_info.player_ga.stamina -= amount_loss
+
+                #Trừ máu kẻ địch dựa trên kỹ năng
+                loss_health = int(skill.attack_power + (skill.attack_power * skill.buff_attack_percent/100))
+                if loss_health > opponent_alive_attack_info.player_ga.max_health: 
+                    loss_health = opponent_alive_attack_info.player_ga.max_health - 50
+                opponent_alive_attack_info.player_ga.health -= loss_health
+
+                if opponent_alive_attack_info.player_ga.health <= 0: opponent_alive_attack_info.player_ga.health = 0
+                if opponent_alive_attack_info.player_ga.mana <= 0: opponent_alive_attack_info.player_ga.mana = 0
+                if opponent_alive_attack_info.player_ga.stamina <= 0: opponent_alive_attack_info.player_ga.stamina = 0
+                
+                base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã dùng chiêu {skill.emoji} - {skill.skill_name} làm mất {loss_health} máu và {amount_loss} {additional_t} của [{opponent_alive_attack_info.player_ga.ga_emoji} - {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist}!"
+                return base_text
+
+            else:
                 #Những skill còn lại thì sẽ quy hết vào cách tính tổng sát thương bên dưới
                 #trừ máu của đối thủ theo tỉ lệ của skill
                 loss_health = int(skill.attack_power + skill.attack_power*(skill.buff_attack_percent/100))

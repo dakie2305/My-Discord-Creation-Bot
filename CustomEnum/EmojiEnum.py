@@ -221,6 +221,8 @@ class EmojiCreation2(Enum):
     SPIKE_AMOUR = "<:spike_arnour:1328652900519645195>"
     SELF_EXPLOSION_SKILL = "<a:self_explosion_skill:1328653440557125688>"
     EXPLOSION_SPELL_SKILL = "<a:explosion_spell_skill:1328653554105192520>"
+    POTION_DESTROYER_SKILL = "<:potion_destroyer_skill:1328910109467738152>"
+    TRADE_STATS_SKILL = "<:trade_stats_skill:1328910123128586342>"
     
     HP = "<:HP:1320777603358920724>"
     MP = "<:MP:1320777612926386256>"

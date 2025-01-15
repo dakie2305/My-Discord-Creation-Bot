@@ -263,7 +263,7 @@ list_ga_skills_private = [
         skill_desc="Triệu hồi bão tuyết cực mạnh để tấn công kẻ địch! Tăng 5% sức mạnh tấn công và sẽ làm giảm mana của địch!",
         skill_type= ["attack"],
         emoji= EmojiCreation2.BLIZZARD.value,
-        attack_power= 20,
+        attack_power= 30,
         item_worth_amount= 20000,
         item_worth_type= "G",
         percent_min_mana_req= 15,
@@ -308,8 +308,8 @@ list_ga_skills_private = [
         skill_desc="Triệu hồi sức mạnh đánh sốc cả tổ đội của đối thủ và không cho tổ đội đối thủ tấn công trong lượt đó, kỹ năng này sẽ mất nhiều mana mỗi khi dùng!",
         skill_type= ["attack"],
         emoji= EmojiCreation2.MASS_STUN_SKILL.value,
-        attack_power= 20,
-        item_worth_amount= 40000,
+        attack_power= 1,
+        item_worth_amount= 60000,
         item_worth_type= "G",
         percent_min_mana_req= 50,
         mana_loss= 40,
@@ -323,7 +323,37 @@ list_ga_skills_private = [
         skill_desc="Kỹ năng độc nhất của Megumin, hy sinh tất cả mana và thể lực để dồn vào một chiêu Bộc Phá duy nhất với sức mạnh khủng khiếp!",
         skill_type= ["attack"],
         emoji= EmojiCreation2.EXPLOSION_SPELL_SKILL.value,
-        attack_power= 20,
+        attack_power= 100,
+        item_worth_amount= 60000,
+        item_worth_type= "G",
+        percent_min_mana_req= 50,
+        mana_loss= 35,
+        buff_defense_percent=0,
+        buff_attack_percent=5,
+        min_level_required=1,
+    ),
+    GuardianAngelSkill(
+        skill_id = "skill_potion_destroyer",
+        skill_name= "Phá Dược Tiễn",
+        skill_desc="Kỹ năng này sẽ phá hủy một số lượng ngẫu nhiên các bình hồi phục của kẻ địch để ngăn kẻ địch lạm dụng chúng!",
+        skill_type= ["attack"],
+        emoji= EmojiCreation2.POTION_DESTROYER_SKILL.value,
+        attack_power= 25,
+        item_worth_amount= 60000,
+        item_worth_type= "G",
+        percent_min_mana_req= 45,
+        mana_loss= 35,
+        buff_defense_percent=0,
+        buff_attack_percent=5,
+        min_level_required=1,
+    ),
+    GuardianAngelSkill(
+        skill_id = "skill_trade_stats",
+        skill_name= "Tiễn Chỉ Số",
+        skill_desc="Kỹ năng này sẽ dùng Thể Lực hoặc Mana của bản thân để phá Thể Lực và Mana của kẻ địch để khắc chế!",
+        skill_type= ["attack"],
+        emoji= EmojiCreation2.TRADE_STATS_SKILL.value,
+        attack_power= 25,
         item_worth_amount= 60000,
         item_worth_type= "G",
         percent_min_mana_req= 50,
@@ -451,7 +481,7 @@ list_ga_passive_skills_private_2 = [
         skill_desc="Sẽ phản lại 35% sát thương đã nhận từ đòn tấn công bình thường, và 10% khả năng gây choáng kẻ địch. Kỹ năng này sẽ mất mana mỗi khi trúng đòn!",
         skill_type= ["passive"],
         emoji= EmojiCreation2.SPIKE_AMOUR.value,
-        attack_power= 1,
+        attack_power= 15,
         item_worth_amount= 50000,
         item_worth_type= "G",
         percent_min_mana_req= 20,
@@ -466,7 +496,7 @@ list_ga_passive_skills_private_2 = [
         skill_desc="Khi máu dưới 10% sẽ tự động kích nổ bản thân, gây sát thương lên tất cả mọi người trong cuộc chiến, và làm giảm 40% phần thưởng nhận được!",
         skill_type= ["passive"],
         emoji= EmojiCreation2.SELF_EXPLOSION_SKILL.value,
-        attack_power= 1,
+        attack_power= 100,
         item_worth_amount= 50000,
         item_worth_type= "G",
         percent_min_mana_req= 20,
@@ -688,6 +718,7 @@ def get_random_ga_enemy_generic(level: int = 1):
         ("Sĩ Binh", "👩‍🏭"),
         ("Địch Nhân", "🥷"),
         ("Ma Cà Rồng", "🧛‍♂️"),
+        ("Triệu Hồi Cà Rồng", "🧛‍♂️"),
         ("Quái Vật", "👾"),
         ("Quái Thú", "👾"),
         ("Tà Quỷ", "👿"),
@@ -701,8 +732,10 @@ def get_random_ga_enemy_generic(level: int = 1):
         ("Quái Nhân", "🧌"),
         ("Pháp Sư", "🧙‍♂️"),
         ("Đại Pháp Sư", "🧙‍♂️"),
-        ("Nhất Viên Sư", "🧙"),
+        ("Nhất Viên Pháp Sư", "🧙"),
+        ("Đại Thần Pháp Sư", "🧙"),
         ("Tiên Quỷ", "🧚‍♂️"),
+        ("Pháp Sư Tiên", "🧚‍♂️"),
         ("Big Foot", "👣"),
         ("Xác Sống", "🧟‍♂️"),
         ("Báo Đời Đom Đóm", "🐆"),
@@ -744,7 +777,7 @@ def get_random_ga_enemy_generic(level: int = 1):
     data.max_health = base + bonus_base*int(percent_boost * data.level / 100)
     data.health = data.max_health
     
-    percent_boost = 5
+    percent_boost = 8
     base = 50
     bonus_base = 105
     data.max_mana = base + bonus_base*int(percent_boost * data.level / 100)
@@ -777,5 +810,12 @@ def get_random_ga_enemy_generic(level: int = 1):
         skill = get_random_skill("summoning_skill")
         data.list_skills.append(skill)
     
+    if "Pháp Sư" in data.ga_name and level >= 25:
+        #Tăng mana
+        data.max_mana += base + base*int(percent_boost * data.level / 100)
+        data.mana = data.max_mana
+        #Cộng skill
+        skill = get_random_skill(blacklist_ids=["summoning_skill"])
+        if skill != None: data.list_skills.append(skill)
 
     return data
