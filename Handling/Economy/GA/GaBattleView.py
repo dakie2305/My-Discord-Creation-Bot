@@ -1001,9 +1001,9 @@ class GaBattleView(discord.ui.View):
                     e.player_ga.health = int(e.player_ga.max_health*0.3)
                     e.player_ga.stamina = int(e.player_ga.max_stamina*0.3)
                     e.player_ga.mana = int(e.player_ga.max_mana*0.3)
-                for enemy in opponent_team:
+                for e in opponent_team:
                     #Hồi phục 50% máu cho phe địch
-                    enemy.health = int(enemy.max_health*0.5)
+                    e.player_ga.health = int(e.player_ga.max_health*0.5)
             
                 #Trừ hết mana của bản thân chiếu theo skill
                 self_player_info.player_ga.mana = 0
