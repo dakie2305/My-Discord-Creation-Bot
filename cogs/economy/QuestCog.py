@@ -274,7 +274,10 @@ class QuestEconomy(commands.Cog):
                     is_remove = True
                     list_channels_dungeon.remove(dungeon)
                     break
-                
+            if is_remove == False:
+                data = DungeonQuestChannel(channel_id=interaction.channel_id, channel_name=interaction.channel.name, difficulty_level=level_as_int)
+                list_channels_dungeon.append(data)
+            
             DbMongoManager.update_guild_extra_info_list_channels_dungeon(guild_id=interaction.guild.id, list_channels_dungeon=list_channels_dungeon)
             if is_remove == False:
                 await interaction.followup.send(f"Đã chọn channel này vào Hệ Thống Hầm Ngục Hộ Vệ Thần trong server này. Độ khó: **{self.get_cap_do_quest(input=level_as_int)}**", ephemeral= True)

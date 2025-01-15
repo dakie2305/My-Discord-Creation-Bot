@@ -19,7 +19,7 @@ import copy
 
 
 class GaBattleView(discord.ui.View):
-    def __init__(self, user_profile: Profile, user: discord.Member,enemy_ga: GuardianAngel, guild_id: int, is_players_versus_players: bool, target_profile: Profile = None, target: discord.Member = None, allowed_multiple_players: bool = False, max_players:int = 1, embed_title: str = "", gold_reward: int = 0, silver_reward: int= 0, dignity_point: int = 10, bonus_exp: int = 200):
+    def __init__(self, user_profile: Profile, user: discord.Member,enemy_ga: GuardianAngel, guild_id: int, is_players_versus_players: bool, target_profile: Profile = None, target: discord.Member = None, allowed_multiple_players: bool = False, max_players:int = 1, embed_title: str = "", gold_reward: int = 0, silver_reward: int= 0, dignity_point: int = 10, bonus_exp: int = 200, enemy_ga_2: GuardianAngel = None):
         super().__init__(timeout=180)
         self.message : discord.Message = None
         self.user: discord.Member = user
@@ -27,6 +27,7 @@ class GaBattleView(discord.ui.View):
         self.user_profile = user_profile
         self.target_profile = target_profile
         self.enemy_ga = enemy_ga
+        self.enemy_ga_2 = enemy_ga_2
         self.allowed_multiple_players = allowed_multiple_players
         self.max_players = max_players
         self.is_players_versus_players = is_players_versus_players
@@ -46,6 +47,7 @@ class GaBattleView(discord.ui.View):
         self.silver_reward = silver_reward
         self.bonus_exp = bonus_exp
         self.minus_all_reward_percent: int = None
+        self.bonus_all_reward_percent: int = None
         
         self.guild_id = guild_id
         
@@ -76,6 +78,10 @@ class GaBattleView(discord.ui.View):
             second_player_class = GuardianAngelAttackClass(player_ga=enemy_ga)
             self.lower_attack_class.append(second_player_class)
             self.joined_player_id.append(user.id)
+            
+            if enemy_ga_2 != None:
+                second_player_class = GuardianAngelAttackClass(player_ga=enemy_ga_2)
+                self.lower_attack_class.append(second_player_class)
         
             
     async def on_timeout(self):
@@ -364,8 +370,6 @@ class GaBattleView(discord.ui.View):
         if info.player_profile == None: return ""
         #Nhân theo lượng người tham gia
         bonus_exp = int(self.bonus_exp * len(self.upper_attack_class) + self.bonus_exp*len(self.lower_attack_class))
-        if self.minus_all_reward_percent != None:
-            bonus_exp = bonus_exp * self.minus_all_reward_percent / 100
         if bonus_exp > 350: bonus_exp = 350
         gold_reward = int(self.gold_reward * len(self.upper_attack_class) + self.bonus_exp*len(self.lower_attack_class))
         if self.minus_all_reward_percent != None:
@@ -378,6 +382,8 @@ class GaBattleView(discord.ui.View):
         text_target_profile_exist = f"<@{info.player_profile.user_id}> [{info.starting_at_round}] cống hiến **{contribution}%**, nhận: "
         calculated_exp = int(bonus_exp * (contribution / 100))
         if calculated_exp > 0:
+            if self.minus_all_reward_percent != None:
+                calculated_exp = calculated_exp * self.minus_all_reward_percent / 100
             if self.is_players_versus_players and calculated_exp > 280: calculated_exp = 280
             text_target_profile_exist += f"**{calculated_exp}** EXP. "
             ProfileMongoManager.update_level_progressing(guild_id=self.guild_id, user_id=info.player_profile.user_id, bonus_exp=int(calculated_exp*0.3))
@@ -1067,12 +1073,18 @@ class GaBattleView(discord.ui.View):
                 loss_percent = 0.3
                 for e in self.upper_attack_class:
                     e.player_ga.health -= int(e.player_ga.max_health*loss_percent)
+                    if e.player_ga.health <0:e.player_ga.health = 0
                     e.player_ga.stamina -= int(e.player_ga.max_health*loss_percent)
+                    if e.player_ga.stamina <0:e.player_ga.stamina = 0
                     e.player_ga.mana -= int(e.player_ga.max_health*loss_percent)
+                    if e.player_ga.mana <0:e.player_ga.mana = 0
                 for e in self.lower_attack_class:
                     e.player_ga.health -= int(e.player_ga.max_health*loss_percent)
+                    if e.player_ga.health <0:e.player_ga.health = 0
                     e.player_ga.stamina -= int(e.player_ga.max_health*loss_percent)
+                    if e.player_ga.stamina <0:e.player_ga.stamina = 0
                     e.player_ga.mana -= int(e.player_ga.max_health*loss_percent)
+                    if e.player_ga.mana <0:e.player_ga.mana = 0
                 base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} không còn gì để mất, và quyết định ra đi với chiêu {skill.emoji} -{skill.skill_name} khủng bố khiến mọi người đều dính sát thương!"
                 return base_text
         

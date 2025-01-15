@@ -3,7 +3,7 @@ from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.EmojiEnum import EmojiCreation2
 from Handling.Economy.Profile.ProfileClass import Profile
 import random
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 import os
 import CustomFunctions as CustomFunctions
 
@@ -157,6 +157,7 @@ class UtilitiesFunctions():
         if loai_tien == "S": return EmojiCreation2.SILVER.value
         return EmojiCreation2.COPPER.value
     
+    @staticmethod
     def check_if_within_time_delta(input: datetime, time_window: timedelta):
         now = datetime.now()
         if now - time_window <= input <= now + time_window:
@@ -164,6 +165,27 @@ class UtilitiesFunctions():
         else:
             return False
     
+    @staticmethod
+    def is_within_time_range(from_time: time = time(2, 0), to_time: time = time(5, 0)):
+        now = datetime.now().time()
+        # Handle time range that does not cross midnight
+        if from_time <= to_time:
+            return from_time <= now <= to_time
+        # Handle time range that crosses midnight
+        return from_time <= now or now <= to_time
+    
+    @staticmethod
+    def get_cap_do_quest(input: int):
+        text = "Dễ"
+        if input == 1:
+            text = "Dễ"
+        elif input == 2:
+            text = "Vừa Phải"
+        elif input == 3:
+            text = "Khó"
+        elif input == 4:
+            text = "Huyền Thoại"
+        return text
     
     @staticmethod
     def get_heart_emoji_on_rank(rank: int):

@@ -747,17 +747,17 @@ def get_random_ga_enemy_generic(level: int = 1, guardian_chance: int = 0):
     #dựa trên level để tăng giảm stats của kẻ địch
     random_level_bonus = random.randint(-3, 7)
     if level < 10:
-        random_level_bonus = random.randint(-1, 4)
+        random_level_bonus = random.randint(-1, 2)
     elif level > 10 and level < 20:
-        random_level_bonus = random.randint(4, 7)
+        random_level_bonus = random.randint(2, 5)
     elif level > 20 and level < 30:
-        random_level_bonus = random.randint(4, 10)
+        random_level_bonus = random.randint(1, 7)
     elif level > 30 and level < 40:
-        random_level_bonus = random.randint(3, 10)
+        random_level_bonus = random.randint(2, 9)
     elif level > 40 and level < 50:
-        random_level_bonus = random.randint(5, 12)
+        random_level_bonus = random.randint(3, 9)
     else:
-        random_level_bonus = random.randint(4, 15)
+        random_level_bonus = random.randint(3, 12)
     
     data.level = level + random_level_bonus
     if data.level <= 0: data.level = 1
@@ -820,7 +820,11 @@ def get_random_ga_enemy_generic(level: int = 1, guardian_chance: int = 0):
     if "Triệu Hồi" in data.ga_name:
         skill = get_random_skill("summoning_skill")
         data.list_skills.append(skill)
-    
+        
+    if "Megumin" in data.ga_name:
+      skill = get_random_skill("skill_explosion_spell")
+      if skill: data.list_skills.append(skill)
+      
     if "Pháp Sư" in data.ga_name and level >= 25:
         #Tăng mana
         data.max_mana += base + base*int(percent_boost * data.level / 100)
@@ -828,5 +832,4 @@ def get_random_ga_enemy_generic(level: int = 1, guardian_chance: int = 0):
         #Cộng skill
         skill = get_random_skill(blacklist_ids=["summoning_skill"])
         if skill != None: data.list_skills.append(skill)
-
     return data
