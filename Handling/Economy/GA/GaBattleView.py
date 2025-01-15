@@ -45,6 +45,7 @@ class GaBattleView(discord.ui.View):
         self.gold_reward = gold_reward
         self.silver_reward = silver_reward
         self.bonus_exp = bonus_exp
+        self.minus_all_reward_percent: int = None
         
         self.guild_id = guild_id
         
@@ -302,8 +303,6 @@ class GaBattleView(discord.ui.View):
             embed.add_field(name=f"", value=f"🦾: **{self_player_info.player_ga.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=self_player_info.player_ga.health, max_value=self_player_info.player_ga.max_health, emoji=EmojiCreation2.HP.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=self_player_info.player_ga.stamina, max_value=self_player_info.player_ga.max_stamina, emoji=EmojiCreation2.STAMINA.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=self_player_info.player_ga.mana, max_value=self_player_info.player_ga.max_mana, emoji=EmojiCreation2.MP.value)}", inline=False)
         
         formatted_string = "\n".join(f"Lượt thứ **{key}**.\n{value}\n" for key, value in self.round_number_text_report.items())
-        if len(formatted_string) > 2000:
-            formatted_string = f"Lượt thứ **{self.round}**"
         try:
             await self.message.edit(embed=embed, content=formatted_string)
         except Exception as e:
@@ -311,7 +310,7 @@ class GaBattleView(discord.ui.View):
         if flag_end_battle: await self.end_battle()
         else:
             max_limit = 2
-            if len(self.upper_attack_class) > 3 or len(self.lower_attack_class) > 3: max_limit = 1
+            if len(self.upper_attack_class) >= 3 or len(self.lower_attack_class) >= 3: max_limit = 1
             if self.round > max_limit:
                 #Bỏ đi round đầu để tiếp kiệm chỗ
                 first_key = list(self.round_number_text_report.keys())[0]
@@ -365,10 +364,16 @@ class GaBattleView(discord.ui.View):
         if info.player_profile == None: return ""
         #Nhân theo lượng người tham gia
         bonus_exp = int(self.bonus_exp * len(self.upper_attack_class) + self.bonus_exp*len(self.lower_attack_class))
+        if self.minus_all_reward_percent != None:
+            bonus_exp = bonus_exp * self.minus_all_reward_percent / 100
         if bonus_exp > 350: bonus_exp = 350
         gold_reward = int(self.gold_reward * len(self.upper_attack_class) + self.bonus_exp*len(self.lower_attack_class))
+        if self.minus_all_reward_percent != None:
+            gold_reward = gold_reward * self.minus_all_reward_percent / 100
         if gold_reward > 50000: gold_reward = 50000
         silver_reward = int(self.silver_reward * len(self.upper_attack_class) + self.bonus_exp*len(self.lower_attack_class))
+        if self.minus_all_reward_percent != None:
+            silver_reward = silver_reward * self.minus_all_reward_percent / 100
         contribution = self.calculate_contribution(info.starting_at_round)
         text_target_profile_exist = f"<@{info.player_profile.user_id}> [{info.starting_at_round}] cống hiến **{contribution}%**, nhận: "
         calculated_exp = int(bonus_exp * (contribution / 100))
@@ -1002,7 +1007,7 @@ class GaBattleView(discord.ui.View):
                 self_player_info.player_ga.health = 0
                 self_player_info.player_ga.mana = 0
                 self_player_info.player_ga.stamina = 0
-                
+                self.minus_all_reward_percent = 40
                 loss_percent = 0.3
                 for e in self.upper_attack_class:
                     e.player_ga.health -= int(e.player_ga.max_health*loss_percent)
