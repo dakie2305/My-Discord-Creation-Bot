@@ -541,13 +541,11 @@ client = discord.Client(intents=intents)
 async def on_ready():
     print(f'We have logged in as {bot.user}')
     interaction_logger.info(f"Successfully logged in as {bot.user}")
-    dungeon_spawn_enemy_embed.start()
-    
     if CustomFunctions.check_if_dev_mode()==False:
         automatic_speak_randomly.start()
         random_dropbox.start()
         random_quizz_embed.start()
-        
+        dungeon_spawn_enemy_embed.start()
         activity = discord.Activity(type=discord.ActivityType.watching, 
                                 name="True Heavens",
                                 state = "Dùng lệnh /help để biết thêm thông tin",
