@@ -19,7 +19,7 @@ import copy
 
 
 class GaBattleView(discord.ui.View):
-    def __init__(self, user_profile: Profile, user: discord.Member,enemy_ga: GuardianAngel, guild_id: int, is_players_versus_players: bool, target_profile: Profile = None, target: discord.Member = None, allowed_multiple_players: bool = False, max_players:int = 1, embed_title: str = "", gold_reward: int = 0, silver_reward: int= 0, dignity_point: int = 10, bonus_exp: int = 200, enemy_ga_2: GuardianAngel = None, bonus_all_reward_percent: int = None):
+    def __init__(self, user_profile: Profile, user: discord.Member,enemy_ga: GuardianAngel, guild_id: int, is_players_versus_players: bool, target_profile: Profile = None, target: discord.Member = None, allowed_multiple_players: bool = False, max_players:int = 1, embed_title: str = "", gold_reward: int = 0, silver_reward: int= 0, dignity_point: int = 10, bonus_exp: int = 200, enemy_ga_2: GuardianAngel = None, bonus_all_reward_percent: int = None, footer_text: str = ""):
         super().__init__(timeout=180)
         self.message : discord.Message = None
         self.user: discord.Member = user
@@ -39,6 +39,7 @@ class GaBattleView(discord.ui.View):
         self.round = 1
         self.text = ""
         self.embed_title = embed_title
+        self.footer_text = footer_text
         self.joined_player_id : List[int]= []
         
         self.upper_attack_won = False
@@ -308,6 +309,7 @@ class GaBattleView(discord.ui.View):
             embed.add_field(name=f"", value=text_target_profile_exist, inline=False)
             embed.add_field(name=f"", value=f"🦾: **{self_player_info.player_ga.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=self_player_info.player_ga.health, max_value=self_player_info.player_ga.max_health, emoji=EmojiCreation2.HP.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=self_player_info.player_ga.stamina, max_value=self_player_info.player_ga.max_stamina, emoji=EmojiCreation2.STAMINA.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=self_player_info.player_ga.mana, max_value=self_player_info.player_ga.max_mana, emoji=EmojiCreation2.MP.value)}", inline=False)
         
+        embed.set_footer(text=self.footer_text)
         formatted_string = "\n".join(f"Lượt thứ **{key}**.\n{value}\n" for key, value in self.round_number_text_report.items())
         try:
             await self.message.edit(embed=embed, content=formatted_string)

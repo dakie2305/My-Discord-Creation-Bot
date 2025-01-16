@@ -423,9 +423,10 @@ async def dungeon_spawn_enemy_embed():
                 embed.add_field(name=f"", value=text, inline=False)
                 embed.add_field(name=f"", value=f"🦾: **{enemy.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.health, max_value=enemy.max_health, emoji=EmojiCreation2.HP.value, mysterious_stats=mysterious_stats)}\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.stamina, max_value=enemy.max_stamina, emoji=EmojiCreation2.STAMINA.value, mysterious_stats=mysterious_stats)}\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.mana, max_value=enemy.max_mana, emoji=EmojiCreation2.MP.value, mysterious_stats=mysterious_stats)}", inline=False)
             embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
-            embed.set_footer(text=f"Ai chưa hiểu cách thức hoạt động của Hầm Ngục Hộ Vệ Thần thì cứ nhắn\ngd help")
+            footer_text = f"Ai chưa hiểu cách thức hoạt động của Hầm Ngục Hộ Vệ Thần thì cứ nhắn\ngd help"
+            embed.set_footer(text=footer_text)
             print(f"Spawning enemy with base level around {level} at channel {quest_channel.name} in guild {guild.name}. Difficult dungeon: {random_quest_channel_id.difficulty_level}")
-            view = GaDugeonView(guild_id=guild.id, enemy_ga=enemy, enemy_ga_2=enemy_2, title=f"{EmojiCreation2.STUN_SKILL.value} **Hầm Ngục {UtilitiesFunctions.get_cap_do_quest(random_quest_channel_id.difficulty_level)}** {EmojiCreation2.STUN_SKILL.value}", bonus_percent=bonus_percent, difficulty=random_quest_channel_id.difficulty_level)
+            view = GaDugeonView(guild_id=guild.id, enemy_ga=enemy, enemy_ga_2=enemy_2, title=f"{EmojiCreation2.STUN_SKILL.value} **Hầm Ngục {UtilitiesFunctions.get_cap_do_quest(random_quest_channel_id.difficulty_level)}** {EmojiCreation2.STUN_SKILL.value}", bonus_percent=bonus_percent, difficulty=random_quest_channel_id.difficulty_level, footer_text=footer_text)
             m = await quest_channel.send(embed=embed, view=view)
             view.message = m
 

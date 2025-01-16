@@ -18,7 +18,7 @@ from Handling.Economy.Inventory_Shop.ItemClass import Item, list_small_copper_fi
 from Handling.Economy.GA.GaBattleView import GaBattleView
 
 class GaDugeonView(discord.ui.View):
-    def __init__(self, guild_id: int, enemy_ga: GuardianAngel, enemy_ga_2: GuardianAngel = None, title: str = "", bonus_percent: int = None, difficulty: int = 1):
+    def __init__(self, guild_id: int, enemy_ga: GuardianAngel, enemy_ga_2: GuardianAngel = None, title: str = "", bonus_percent: int = None, difficulty: int = 1, footer_text: str = ""):
         super().__init__(timeout=300)
         self.message : discord.Message = None
         
@@ -29,6 +29,7 @@ class GaDugeonView(discord.ui.View):
         self.enemy_ga_2 = enemy_ga_2
         self.bonus_percent = bonus_percent
         self.difficulty = difficulty
+        self.footer_text = footer_text
         self.battle_button = discord.ui.Button(label="⚔️ Chiến Đấu", style=discord.ButtonStyle.primary)
         self.battle_button.callback = self.battle_button_event
         self.add_item(self.battle_button)
@@ -125,8 +126,8 @@ class GaDugeonView(discord.ui.View):
             embed.add_field(name=f"", value=text, inline=False)
             embed.add_field(name=f"", value="", inline=False)
             embed.add_field(name=f"", value=f"🦾: **{self.enemy_ga_2.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=self.enemy_ga_2.health, max_value=self.enemy_ga_2.max_health, emoji=EmojiCreation2.HP.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=self.enemy_ga_2.stamina, max_value=self.enemy_ga_2.max_stamina, emoji=EmojiCreation2.STAMINA.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=self.enemy_ga_2.mana, max_value=self.enemy_ga_2.max_mana, emoji=EmojiCreation2.MP.value)}", inline=False)
-        
-        view = GaBattleView(user=interaction.user, user_profile=new_player_profile, is_players_versus_players=False, max_players=3, enemy_ga=self.enemy_ga, enemy_ga_2=self.enemy_ga_2, guild_id=interaction.guild_id, gold_reward=gold_reward, silver_reward=silver_reward, bonus_exp=exp_reward, dignity_point=dignity_point_reward, embed_title=self.title, bonus_all_reward_percent=self.bonus_percent)
+        embed.set_footer(text=self.footer_text)
+        view = GaBattleView(user=interaction.user, user_profile=new_player_profile, is_players_versus_players=False, max_players=3, enemy_ga=self.enemy_ga, enemy_ga_2=self.enemy_ga_2, guild_id=interaction.guild_id, gold_reward=gold_reward, silver_reward=silver_reward, bonus_exp=exp_reward, dignity_point=dignity_point_reward, embed_title=self.title, bonus_all_reward_percent=self.bonus_percent, footer_text=self.footer_text)
         mess = await self.message.edit(embed=embed, view=view)
         view.message = mess
         print(f"Username {interaction.user.name} has started guardian battle in guild {interaction.guild.name} at channel {interaction.channel.name}!")
