@@ -19,7 +19,7 @@ import copy
 
 
 class GaBattleView(discord.ui.View):
-    def __init__(self, user_profile: Profile, user: discord.Member,enemy_ga: GuardianAngel, guild_id: int, is_players_versus_players: bool, target_profile: Profile = None, target: discord.Member = None, allowed_multiple_players: bool = False, max_players:int = 1, embed_title: str = "", gold_reward: int = 0, silver_reward: int= 0, dignity_point: int = 10, bonus_exp: int = 200, enemy_ga_2: GuardianAngel = None):
+    def __init__(self, user_profile: Profile, user: discord.Member,enemy_ga: GuardianAngel, guild_id: int, is_players_versus_players: bool, target_profile: Profile = None, target: discord.Member = None, allowed_multiple_players: bool = False, max_players:int = 1, embed_title: str = "", gold_reward: int = 0, silver_reward: int= 0, dignity_point: int = 10, bonus_exp: int = 200, enemy_ga_2: GuardianAngel = None, bonus_all_reward_percent: int = None):
         super().__init__(timeout=180)
         self.message : discord.Message = None
         self.user: discord.Member = user
@@ -47,7 +47,7 @@ class GaBattleView(discord.ui.View):
         self.silver_reward = silver_reward
         self.bonus_exp = bonus_exp
         self.minus_all_reward_percent: int = None
-        self.bonus_all_reward_percent: int = None
+        self.bonus_all_reward_percent: int = bonus_all_reward_percent
         
         self.guild_id = guild_id
         
@@ -374,10 +374,15 @@ class GaBattleView(discord.ui.View):
         gold_reward = int(self.gold_reward * len(self.upper_attack_class) + self.bonus_exp*len(self.lower_attack_class))
         if self.minus_all_reward_percent != None:
             gold_reward = gold_reward * self.minus_all_reward_percent / 100
+        if self.bonus_all_reward_percent != None:
+            gold_reward += gold_reward * self.bonus_all_reward_percent / 100
+        
         if gold_reward > 50000: gold_reward = 50000
         silver_reward = int(self.silver_reward * len(self.upper_attack_class) + self.bonus_exp*len(self.lower_attack_class))
         if self.minus_all_reward_percent != None:
             silver_reward = silver_reward * self.minus_all_reward_percent / 100
+        if self.bonus_all_reward_percent != None:
+            silver_reward += silver_reward * self.bonus_all_reward_percent / 100
         contribution = self.calculate_contribution(info.starting_at_round)
         text_target_profile_exist = f"<@{info.player_profile.user_id}> [{info.starting_at_round}] cống hiến **{contribution}%**, nhận: "
         calculated_exp = int(bonus_exp * (contribution / 100))
@@ -819,6 +824,9 @@ class GaBattleView(discord.ui.View):
                 #chiêu này tốn 100% mana và cả stamina của bản thân
                 self_player_info.player_ga.mana = 0
                 self_player_info.player_ga.stamina = 0
+                
+                #Tự stun bản thân một round
+                self_player_info.stunned_round = 1
                 
                 base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã tung chiêu {skill.emoji} - {skill.skill_name} cực mạnh, làm nổ tung mất {loss_health} máu của [{opponent_alive_attack_info.player_ga.ga_emoji} - {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist}!"
                 return base_text
