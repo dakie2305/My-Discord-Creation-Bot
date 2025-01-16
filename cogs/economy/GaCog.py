@@ -69,6 +69,8 @@ class GuardianAngelCog(commands.Cog):
             money = int(user_profile.guardian.worth_amount * 30 / 100)
             if user_profile.guardian.level > 30 and user_profile.guardian.is_dead == False:
                 money += int(user_profile.guardian.worth_amount*user_profile.guardian.level/100)
+                #Cộng tổng chỉ số chia 100
+                money += int(int(user_profile.guardian.attack_power + user_profile.guardian.max_health + user_profile.guardian.max_mana + user_profile.guardian.max_stamina) / 15)
             if money > 500 and user_profile.guardian.worth_type == "D": money = 500
             embed = discord.Embed(title=f"", description=f"Bán Hộ Vệ Thần", color=0x0ce7f2)
             embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)

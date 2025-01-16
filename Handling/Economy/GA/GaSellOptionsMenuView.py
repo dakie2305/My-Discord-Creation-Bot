@@ -32,6 +32,8 @@ class GaSellOptionsMenuView(discord.ui.View):
         money = int(self.user_profile.guardian.worth_amount * 30 / 100)
         if self.user_profile.guardian.level > 30:
             money += int(self.user_profile.guardian.worth_amount*self.user_profile.guardian.level/100)
+            #Cộng tổng chỉ số chia 100
+            money += int(int(self.user_profile.guardian.attack_power + self.user_profile.guardian.max_health + self.user_profile.guardian.max_mana + self.user_profile.guardian.max_stamina) / 15)
         if money > 500 and self.user_profile.guardian.worth_type == "D": money = 500 
         embed = discord.Embed(title=f"", description=f"Bán Hộ Vệ Thần", color=0x0ce7f2)
         embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
