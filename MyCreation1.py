@@ -1497,7 +1497,7 @@ async def word_matching(message: discord.Message):
         #Bắt đầu chơi
         message_tu_hien_tai = f"\nTừ hiện tại là: `'{word_matching_channel.current_word}'`, và có **{word_matching_channel.remaining_word if word_matching_channel.remaining_word else 0}** bắt đầu bằng chữ cái `{word_matching_channel.last_character if word_matching_channel.last_character else 0}`"
         if selected_ban:
-            await message.reply(f"Bạn đã bị khoá mõm trong vòng **{selected_ban.ban_remaining}** lượt chơi tới. Vui lòng chờ đi.")
+            await message.reply(f"Bạn đã bị khoá mõm trong vòng **{selected_ban.ban_remaining}** lượt chơi tới. Vui lòng chờ đi.\nOwner server có thể dùng lệnh `!wm_give_ban {message.author.mention} 0` để mở khoá giam")
             return
         if word_matching_channel.current_player_id == message.author.id:
             await message.reply(f"Bạn đã nối từ rồi, vui lòng né qua để cho người khác chơi đi. {message_tu_hien_tai}")

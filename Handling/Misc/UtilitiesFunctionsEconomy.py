@@ -332,7 +332,14 @@ class UtilitiesFunctions():
         return f'{bar} **{int(percentage)}%**'
 
     @staticmethod
-    def progress_bar_stat(input_value: int, max_value: int, emoji: str, bar_length=15):
+    def replace_with_question_marks(number):
+        # Convert the number to a string to determine its length
+        length = len(str(number))
+        # Return the string of '?' repeated for the length of the number
+        return '?' * length
+
+    @staticmethod
+    def progress_bar_stat(input_value: int, max_value: int, emoji: str, bar_length=15, mysterious_stats = False):
         # Calculate the percentage of progress
         percentage = (input_value / max_value) * 100
         # Determine the number of filled (█) characters
@@ -340,7 +347,10 @@ class UtilitiesFunctions():
         # Create the progress bar string
         bar = '█' * filled_length + '░' * (bar_length - filled_length)
         # Format the output with percentage
-        return f'{emoji}: {bar} ({input_value}/{max_value})'
+        if mysterious_stats:
+            return f'{emoji}: {bar} ({(UtilitiesFunctions.replace_with_question_marks(input_value))}/{UtilitiesFunctions.replace_with_question_marks(max_value)})'
+        else:
+            return f'{emoji}: {bar} ({input_value}/{max_value})'
 
     @staticmethod
     def get_chance_guardian_actual_death(level: int):
