@@ -39,6 +39,7 @@ class GaDugeonView(discord.ui.View):
         if self.message != None and self.is_attacked == False and self.is_message_deleted == False: 
             await self.message.delete()
             self.is_message_deleted = True
+            print(f"Enemy spawned at guild {self.guild_id} has disappear")
             return
 
     async def battle_button_event(self, interaction: discord.Interaction):
@@ -130,6 +131,7 @@ class GaDugeonView(discord.ui.View):
         embed.set_footer(text=self.footer_text)
         view = GaBattleView(user=interaction.user, user_profile=new_player_profile, is_players_versus_players=False, max_players=3, enemy_ga=self.enemy_ga, enemy_ga_2=self.enemy_ga_2, guild_id=interaction.guild_id, gold_reward=gold_reward, silver_reward=silver_reward, bonus_exp=exp_reward, dignity_point=dignity_point_reward, embed_title=self.title, bonus_all_reward_percent=self.bonus_percent, footer_text=self.footer_text)
         mess = await self.message.edit(embed=embed, view=view)
+        ProfileMongoManager.update_main_guardian_profile_time(guild_id=interaction.guild_id,user_id=interaction.user.id, data_type="last_joined_battle", date_value=datetime.now())
         view.message = mess
         print(f"Username {interaction.user.name} has started guardian battle in guild {interaction.guild.name} at channel {interaction.channel.name}!")
         await view.commence_battle()

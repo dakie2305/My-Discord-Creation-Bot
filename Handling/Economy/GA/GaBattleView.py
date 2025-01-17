@@ -701,10 +701,13 @@ class GaBattleView(discord.ui.View):
             #Kiểm tra xem phải summoned không, có thì remove hẳn khỏi đội hình
             if opponent_alive_attack_info.is_summoned:
                 #Remove khỏi đội hình
-                if opponent_alive_attack_info in self.upper_attack_class:
-                    self.upper_attack_class.remove(opponent_alive_attack_info)
-                if opponent_alive_attack_info in self.lower_attack_class:
-                    self.lower_attack_class.remove(opponent_alive_attack_info)
+                try:
+                    if opponent_alive_attack_info in self.upper_attack_class:
+                        self.upper_attack_class.remove(opponent_alive_attack_info)
+                    elif opponent_alive_attack_info in self.lower_attack_class:
+                        self.lower_attack_class.remove(opponent_alive_attack_info)
+                except Exception as e:
+                    print(f"Exception when checking remove summoned ga from team, {e}")
                 #Tìm owner và set lại skill
                 for a in self.upper_attack_class:
                     if a.player_profile != None and a.player_profile.user_id == opponent_alive_attack_info.summoner_owner_id:
@@ -722,23 +725,29 @@ class GaBattleView(discord.ui.View):
             #Khi còn 0 thì đổi phe
             if self_player_info.brain_washed_round <= 0:
                 self_player_info.brain_washed_round = None
-                if self_player_info in self.upper_attack_class:
-                    self.upper_attack_class.remove(self_player_info)
-                    self.lower_attack_class.append(self_player_info)
-                else:
-                    self.lower_attack_class.remove(self_player_info)
-                    self.upper_attack_class.append(self_player_info)
+                try:
+                    if self_player_info in self.upper_attack_class:
+                        self.upper_attack_class.remove(self_player_info)
+                        self.lower_attack_class.append(self_player_info)
+                    else:
+                        self.lower_attack_class.remove(self_player_info)
+                        self.upper_attack_class.append(self_player_info)
+                except Exception as e:
+                    print(f"Exception when remove brain washed ga from team, {e}")
         if opponent_alive_attack_info.brain_washed_round != None:
             #Khi còn 0 thì đổi phe
             opponent_alive_attack_info.brain_washed_round -= 1
             if opponent_alive_attack_info.brain_washed_round <= 0:
                 opponent_alive_attack_info.brain_washed_round = None
-                if opponent_alive_attack_info in self.upper_attack_class:
-                    self.upper_attack_class.remove(opponent_alive_attack_info)
-                    self.lower_attack_class.append(opponent_alive_attack_info)
-                else:
-                    self.lower_attack_class.remove(opponent_alive_attack_info)
-                    self.upper_attack_class.append(opponent_alive_attack_info)
+                try:
+                    if opponent_alive_attack_info in self.upper_attack_class:
+                        self.upper_attack_class.remove(opponent_alive_attack_info)
+                        self.lower_attack_class.append(opponent_alive_attack_info)
+                    else:
+                        self.lower_attack_class.remove(opponent_alive_attack_info)
+                        self.upper_attack_class.append(opponent_alive_attack_info)
+                except Exception as ex:
+                    print(f"Exception when remove brain washed ga from team, {ex}")
         
         base_text+= additional_loss_stats_text
         
@@ -993,12 +1002,15 @@ class GaBattleView(discord.ui.View):
             
             #Nếu phe ta tổng GuardianAngelAttackClass dưới ba và phe địch trên hai mới được kích hoạt
             if len(self_player_team) < 3 and len(opponent_team) > 1:
-                if opponent_alive_attack_info in self.lower_attack_class:
-                    self.lower_attack_class.remove(opponent_alive_attack_info)
-                    self.upper_attack_class.append(opponent_alive_attack_info)
-                elif opponent_alive_attack_info in self.upper_attack_class:
-                    self.upper_attack_class.remove(opponent_alive_attack_info)
-                    self.lower_attack_class.append(opponent_alive_attack_info)
+                try:
+                    if opponent_alive_attack_info in self.lower_attack_class:
+                        self.lower_attack_class.remove(opponent_alive_attack_info)
+                        self.upper_attack_class.append(opponent_alive_attack_info)
+                    elif opponent_alive_attack_info in self.upper_attack_class:
+                        self.upper_attack_class.remove(opponent_alive_attack_info)
+                        self.lower_attack_class.append(opponent_alive_attack_info)
+                except Exception as e:
+                    print(f"Exception when remove brain washed ga from team, {e}")
                 opponent_alive_attack_info.brain_washed_round = 4
                 
                 #Trừ % mana của bản thân chiếu theo skill
@@ -1022,12 +1034,14 @@ class GaBattleView(discord.ui.View):
             if count_dead_member >= 1:
                 for e in self_player_team:
                     #Hồi phục 35% chỉ số cho phe mình
-                    e.player_ga.health = int(e.player_ga.max_health*0.3)
-                    e.player_ga.stamina = int(e.player_ga.max_stamina*0.3)
-                    e.player_ga.mana = int(e.player_ga.max_mana*0.3)
+                    if e.player_ga.health <= 0:
+                        e.player_ga.health = int(e.player_ga.max_health*0.3)
+                        e.player_ga.stamina = int(e.player_ga.max_stamina*0.3)
+                        e.player_ga.mana = int(e.player_ga.max_mana*0.3)
                 for e in opponent_team:
                     #Hồi phục 50% máu cho phe địch
-                    e.player_ga.health = int(e.player_ga.max_health*0.5)
+                    e.player_ga.health += int(e.player_ga.max_health*0.4)
+                    if e.player_ga.health > e.player_ga.max_health: e.player_ga.health = e.player_ga.max_health
             
                 #Trừ hết mana của bản thân chiếu theo skill
                 self_player_info.player_ga.mana = 0
@@ -1114,10 +1128,13 @@ class GaBattleView(discord.ui.View):
                 if CustomFunctions.check_if_dev_mode() == False:
                     ProfileMongoManager.set_guardian_current_stats(guild_id=self.guild_id, user_id=self_player_info.player_profile.user_id,stamina=0, health=self_player_info.player_ga.health, mana=0)
                 #Kiểm tra trong upper hay lower
-                if self_player_info in self.upper_attack_class:
-                    self.upper_attack_class.remove(self_player_info)
-                if self_player_info in self.lower_attack_class:
-                    self.lower_attack_class.remove(self_player_info)
+                try:
+                    if self_player_info in self.upper_attack_class:
+                        self.upper_attack_class.remove(self_player_info)
+                    if self_player_info in self.lower_attack_class:
+                        self.lower_attack_class.remove(self_player_info)
+                except Exception as e:
+                    print(f"Exception when ga run away from team, {e}")
                 base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} cảm thấy không ổn với trận chiến, và đã dùng chiêu {skill.emoji} -{skill.skill_name} để sủi ngay lập tức!"
                 return base_text
         

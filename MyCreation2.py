@@ -363,7 +363,7 @@ async def dungeon_spawn_enemy_embed():
         if guild_info.list_channels_dungeon == None or len(guild_info.list_channels_dungeon) <= 0: continue
         list_channels_dungeon = guild_info.list_channels_dungeon
         random_quest_channel_id = random.choice(list_channels_dungeon)
-        if guild.id == {TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value}:
+        if guild.id == TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value:
             for quest_channel in list_channels_dungeon:
                 await spawning_enemy_embed_in_dungeon(guild=guild, random_quest_channel_id=quest_channel, list_channels_dungeon=list_channels_dungeon)
                 await asyncio.sleep(5)
