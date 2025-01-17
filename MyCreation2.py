@@ -429,7 +429,6 @@ async def dungeon_spawn_enemy_embed():
             view = GaDugeonView(guild_id=guild.id, enemy_ga=enemy, enemy_ga_2=enemy_2, title=f"{EmojiCreation2.STUN_SKILL.value} **Hầm Ngục {UtilitiesFunctions.get_cap_do_quest(random_quest_channel_id.difficulty_level)}** {EmojiCreation2.STUN_SKILL.value}", bonus_percent=bonus_percent, difficulty=random_quest_channel_id.difficulty_level, footer_text=footer_text)
             m = await quest_channel.send(embed=embed, view=view)
             view.message = m
-            await view.countdown()
 
 async def sub_function_ai_response(message: discord.Message, speakFlag: bool = True):
     if speakFlag == False: return

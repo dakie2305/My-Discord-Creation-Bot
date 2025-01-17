@@ -23,7 +23,6 @@ class GaDugeonView(discord.ui.View):
         self.message : discord.Message = None
         self.seconds_left = timeout
         self.is_attacked = False
-        self.is_message_deleted = False
         self.title = title
         self.guild_id = guild_id
         self.enemy_ga = enemy_ga
@@ -37,15 +36,6 @@ class GaDugeonView(discord.ui.View):
 
     async def on_timeout(self):
         #Delete
-        if self.message != None and self.is_attacked == False and self.is_message_deleted == False: 
-            await self.message.delete()
-            self.is_message_deleted = True
-            return
-
-    async def countdown(self):
-        while self.seconds_left > 0:
-            self.seconds_left -= 1
-            await asyncio.sleep(1)
         if self.message != None and self.is_attacked == False and self.is_message_deleted == False: 
             await self.message.delete()
             self.is_message_deleted = True
