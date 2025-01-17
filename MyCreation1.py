@@ -1534,7 +1534,7 @@ async def word_matching(message: discord.Message):
             #Coi như pass hết
             await message.add_reaction('👍')
             #Nếu trong game việt nam, gặp những từ có đuôi như sau thì đánh special case để xử lý tiếp
-            special_words = ["ữ","ã", "ẵ", "ẫ", "õ", "ẽ", "ó", "ọ", "ờ","ớ", "ỡ", "ỗ", "ĩ", "ỉ","í", "ũ", "ỹ", "ỳ", "ỵ", "ử", "ự", "ộ","ẻ","è", "ể", "ề", "ễ", "ệ", "ẹ", "ạ", "ợ"]
+            special_words = ["à", "ả","ã", "ạ", "ẳ", "ẵ","ặ", "ẫ", "ẩ", "ậ", "õ", "ẽ", "ó", "ọ", "ờ","ớ", "ỡ", "ỗ", "ĩ", "ỉ","í", "ị", "ì", "ũ", "ỹ", "ỳ", "ỵ", "ử", "ự", "ộ","ẻ","è", "ể", "ề", "ễ", "ệ", "ẹ", "ợ", "ữ"]
             special_case = False
             if lan == 'vn' and message.content[-1].lower() in special_words:
                 special_case = True
