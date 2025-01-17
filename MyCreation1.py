@@ -1005,7 +1005,10 @@ async def unjail(interaction: discord.Interaction, user : discord.Member, reason
         for role in search_user.roles:
             get_role_from_server = discord.utils.get(user.guild.roles, id = role["role_id"])
             if get_role_from_server:
-                await user.add_roles(get_role_from_server)
+                try:
+                    await user.add_roles(get_role_from_server)
+                except Exception:
+                    continue
         #Xoá row khỏi database
         db.delete_user_by_id(user_id= user.id, chosen_collection= jail_db)
         # Create embed object
