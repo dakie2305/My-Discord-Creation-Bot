@@ -19,18 +19,20 @@ import copy
 
 
 class GaBattleView(discord.ui.View):
-    def __init__(self, user_profile: Profile, user: discord.Member,enemy_ga: GuardianAngel, guild_id: int, is_players_versus_players: bool, target_profile: Profile = None, target: discord.Member = None, allowed_multiple_players: bool = False, max_players:int = 1, embed_title: str = "", gold_reward: int = 0, silver_reward: int= 0, dignity_point: int = 10, bonus_exp: int = 200, enemy_ga_2: GuardianAngel = None, bonus_all_reward_percent: int = None, footer_text: str = ""):
+    def __init__(self, user_profile: Profile, user: discord.Member,enemy_ga: GuardianAngel, guild_id: int, is_players_versus_players: bool, target_profile: Profile = None, target: discord.Member = None, allowed_multiple_players: bool = False, max_players:int = 1, embed_title: str = "", gold_reward: int = 0, silver_reward: int= 0, dignity_point: int = 10, bonus_exp: int = 200, enemy_ga_2: GuardianAngel = None, bonus_all_reward_percent: int = None, footer_text: str = "", difficulty: int = 1, is_dungeon = False):
         super().__init__(timeout=180)
         self.message : discord.Message = None
         self.user: discord.Member = user
         self.target: discord.Member = target
         self.user_profile = user_profile
         self.target_profile = target_profile
+        self.difficulty = difficulty
         self.enemy_ga = enemy_ga
         self.enemy_ga_2 = enemy_ga_2
         self.allowed_multiple_players = allowed_multiple_players
         self.max_players = max_players
         self.is_players_versus_players = is_players_versus_players
+        self.is_dungeon = is_dungeon
         
         self.upper_attack_class: List['GuardianAngelAttackClass'] = []
         self.lower_attack_class: List['GuardianAngelAttackClass'] = []

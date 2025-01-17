@@ -357,6 +357,7 @@ async def dungeon_spawn_enemy_embed():
     if is_inside_disable_time: return
     guilds = bot.guilds
     for guild in guilds:
+        if CustomFunctions.check_if_dev_mode()==True and guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value: continue
         #Kiểm tra quest channel của server, nếu có thì mới chọn
         guild_info = db.find_guild_extra_info_by_id(guild_id=guild.id)
         if guild_info == None: continue

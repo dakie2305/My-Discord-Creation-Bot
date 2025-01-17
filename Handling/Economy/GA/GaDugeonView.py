@@ -18,10 +18,9 @@ from Handling.Economy.Inventory_Shop.ItemClass import Item, list_small_copper_fi
 from Handling.Economy.GA.GaBattleView import GaBattleView
 
 class GaDugeonView(discord.ui.View):
-    def __init__(self, guild_id: int, enemy_ga: GuardianAngel, enemy_ga_2: GuardianAngel = None, title: str = "", bonus_percent: int = None, difficulty: int = 1, footer_text: str = "", timeout = 300):
+    def __init__(self, guild_id: int, enemy_ga: GuardianAngel, enemy_ga_2: GuardianAngel = None, title: str = "", bonus_percent: int = None, difficulty: int = 1, footer_text: str = "", timeout = 200):
         super().__init__(timeout=timeout)
         self.message : discord.Message = None
-        self.seconds_left = timeout
         self.is_attacked = False
         self.title = title
         self.guild_id = guild_id
@@ -36,9 +35,8 @@ class GaDugeonView(discord.ui.View):
 
     async def on_timeout(self):
         #Delete
-        if self.message != None and self.is_attacked == False and self.is_message_deleted == False: 
+        if self.message != None and self.is_attacked == False: 
             await self.message.delete()
-            self.is_message_deleted = True
             print(f"Enemy spawned at guild {self.guild_id} has disappear")
             return
 
