@@ -38,3 +38,5 @@ class SlashCommand(Enum):
     GA_FEED = "</ga feed:1322835450397986867>"
     GA_RANKUP = "</ga rankup:1322835450397986867>"
     GA_BATTLE = "</ga battle:1322835450397986867>"
+
+    QUEST_DUNGEON = "</quests dungeon_channels:1315721623340318875>"
