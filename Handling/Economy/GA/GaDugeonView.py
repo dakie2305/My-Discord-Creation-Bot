@@ -18,11 +18,12 @@ from Handling.Economy.Inventory_Shop.ItemClass import Item, list_small_copper_fi
 from Handling.Economy.GA.GaBattleView import GaBattleView
 
 class GaDugeonView(discord.ui.View):
-    def __init__(self, guild_id: int, enemy_ga: GuardianAngel, enemy_ga_2: GuardianAngel = None, title: str = "", bonus_percent: int = None, difficulty: int = 1, footer_text: str = ""):
-        super().__init__(timeout=300)
+    def __init__(self, guild_id: int, enemy_ga: GuardianAngel, enemy_ga_2: GuardianAngel = None, title: str = "", bonus_percent: int = None, difficulty: int = 1, footer_text: str = "", timeout = 300):
+        super().__init__(timeout=timeout)
         self.message : discord.Message = None
-        
+        self.seconds_left = timeout
         self.is_attacked = False
+        self.is_message_deleted = False
         self.title = title
         self.guild_id = guild_id
         self.enemy_ga = enemy_ga
@@ -36,8 +37,18 @@ class GaDugeonView(discord.ui.View):
 
     async def on_timeout(self):
         #Delete
-        if self.message != None and self.is_attacked == False: 
+        if self.message != None and self.is_attacked == False and self.is_message_deleted == False: 
             await self.message.delete()
+            self.is_message_deleted = True
+            return
+
+    async def countdown(self):
+        while self.seconds_left > 0:
+            self.seconds_left -= 1
+            await asyncio.sleep(1)
+        if self.message != None and self.is_attacked == False and self.is_message_deleted == False: 
+            await self.message.delete()
+            self.is_message_deleted = True
             return
 
     async def battle_button_event(self, interaction: discord.Interaction):
