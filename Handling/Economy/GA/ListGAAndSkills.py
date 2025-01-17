@@ -748,14 +748,18 @@ def get_random_ga_enemy_generic(level: int = 1, guardian_chance: int = 0):
     random_level_bonus = random.randint(-3, 7)
     if level < 10:
         random_level_bonus = random.randint(-1, 2)
-    elif level > 10 and level < 20:
+    elif level >= 10 and level < 20:
         random_level_bonus = random.randint(2, 5)
-    elif level > 20 and level < 30:
-        random_level_bonus = random.randint(1, 7)
-    elif level > 30 and level < 40:
-        random_level_bonus = random.randint(2, 9)
-    elif level > 40 and level < 50:
-        random_level_bonus = random.randint(3, 9)
+    elif level >= 20 and level < 30:
+        random_level_bonus = random.randint(1, 6)
+    elif level >= 30 and level < 40:
+        random_level_bonus = random.randint(2, 7)
+    elif level >= 40 and level < 50:
+        random_level_bonus = random.randint(3, 7)
+    elif level >= 50 and level < 75:
+        random_level_bonus = random.randint(4, 6)
+    elif level >= 75 and level < 85:
+        random_level_bonus = random.randint(3, 7)
     else:
         random_level_bonus = random.randint(3, 12)
     

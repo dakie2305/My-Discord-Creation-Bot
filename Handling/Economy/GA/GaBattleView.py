@@ -337,11 +337,19 @@ class GaBattleView(discord.ui.View):
             for info in self.upper_attack_class:
                 additional_stats = self.get_result_addition_stats(info)
                 result_text += additional_stats
+            #Cho phép bên thua một tý EXP
+            for lose_info in self.lower_attack_class:
+                if lose_info.player_profile != None:
+                    ProfileMongoManager.update_main_guardian_level_progressing(guild_id=self.guild_id, user_id=lose_info.player_profile.user_id)
         else:
             result_text += f"Phe dưới thắng!\n"
             for info in self.lower_attack_class:
                 additional_stats = self.get_result_addition_stats(info)
                 result_text += additional_stats
+            #Cho phép bên thua một tý EXP
+            for lose_info in self.upper_attack_class:
+                if lose_info.player_profile != None:
+                    ProfileMongoManager.update_main_guardian_level_progressing(guild_id=self.guild_id, user_id=lose_info.player_profile.user_id)
         try:
             await self.message.reply(content=result_text)
             await self.message.edit(view=None)
