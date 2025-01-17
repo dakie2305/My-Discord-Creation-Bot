@@ -348,7 +348,7 @@ async def clear_up_data_task():
             #drop collection
             db.drop_snipe_channel_info_collection(guild_id=guild.id)
 
-@tasks.loop(minutes = 17)
+@tasks.loop(minutes = 13)
 async def dungeon_spawn_enemy_embed():
     is_inside_disable_time = UtilitiesFunctions.is_within_time_range()
     #Không chạy trong khoảng thời gian trên
