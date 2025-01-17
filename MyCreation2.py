@@ -30,6 +30,8 @@ import Handling.Economy.Couple.CoupleMongoManager as CoupleMongoManager
 import Handling.MiniGame.RockPaperScissor.RpsMongoManager as RpsMongoManager
 import Handling.Economy.GA.ListGAAndSkills as ListGAAndSkills
 from Handling.Economy.GA.GaDugeonView import GaDugeonView
+from Handling.Economy.Quest.DungeonQuestChannelClass import DungeonQuestChannel
+from CustomEnum.TrueHeavenEnum import TrueHeavenEnum
 
 load_dotenv()
 intents = discord.Intents.all()
@@ -361,74 +363,83 @@ async def dungeon_spawn_enemy_embed():
         if guild_info.list_channels_dungeon == None or len(guild_info.list_channels_dungeon) <= 0: continue
         list_channels_dungeon = guild_info.list_channels_dungeon
         random_quest_channel_id = random.choice(list_channels_dungeon)
-        quest_channel = guild.get_channel_or_thread(random_quest_channel_id.channel_id)
-        if quest_channel == None:
-            #Xoá channel_id lỗi
-            list_channels_dungeon.remove(random_quest_channel_id)
-            db.update_guild_extra_info_list_channels_dungeon(guild_id=guild.id, list_channels_dungeon=list_channels_dungeon)
-            continue
-        if quest_channel != None:
-            level = random.randint(10, 30)
+        if guild.id == {TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value}:
+            for quest_channel in list_channels_dungeon:
+                await spawning_enemy_embed_in_dungeon(guild=guild, random_quest_channel_id=quest_channel, list_channels_dungeon=list_channels_dungeon)
+                await asyncio.sleep(5)
+        else:
+            await spawning_enemy_embed_in_dungeon(guild=guild, random_quest_channel_id=random_quest_channel_id, list_channels_dungeon=list_channels_dungeon)
+
+async def spawning_enemy_embed_in_dungeon(guild: discord.Guild, random_quest_channel_id: DungeonQuestChannel, list_channels_dungeon):
+    quest_channel = guild.get_channel_or_thread(random_quest_channel_id.channel_id)
+    if quest_channel == None:
+        #Xoá channel_id lỗi
+        list_channels_dungeon.remove(random_quest_channel_id)
+        db.update_guild_extra_info_list_channels_dungeon(guild_id=guild.id, list_channels_dungeon=list_channels_dungeon)
+        return
+    if quest_channel != None:
+        level = random.randint(10, 30)
+        guardian_chance = 15
+        double_enemy_chance = 0
+        mysterious_stats = False
+        bonus_percent = 10
+        
+        if random_quest_channel_id.difficulty_level == 2:
+            level = random.randint(30, 50)
             guardian_chance = 15
-            double_enemy_chance = 0
-            mysterious_stats = False
-            bonus_percent = 10
-            
-            if random_quest_channel_id.difficulty_level == 2:
-                level = random.randint(30, 50)
-                guardian_chance = 15
-                double_enemy_chance = 20
-                bonus_percent = 15
-            elif random_quest_channel_id.difficulty_level == 3:
-                level = random.randint(50, 90)
-                guardian_chance = 20
-                double_enemy_chance = 20
-                mysterious_stats = True
-                bonus_percent = 25
-            elif random_quest_channel_id.difficulty_level == 4:
-                dice_harder = UtilitiesFunctions.get_chance(25)
-                double_enemy_chance = 25
-                bonus_percent = 45
-                mysterious_stats = True
-                if dice_harder:
-                    level = random.randint(95, 250)
-                else:
-                    level = random.randint(90, 150)
-                guardian_chance = 25
-            embed = discord.Embed(title=f"", description=f"{EmojiCreation2.STUN_SKILL.value} **Hầm Ngục {UtilitiesFunctions.get_cap_do_quest(random_quest_channel_id.difficulty_level)}** {EmojiCreation2.STUN_SKILL.value}", color=0x0ce7f2)
-            embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
-            
-            double_enemy_dice = UtilitiesFunctions.get_chance(double_enemy_chance)
-            enemy = ListGAAndSkills.get_random_ga_enemy_generic(level=level, guardian_chance=guardian_chance)
-            enemy_2 = None
-            
-            if double_enemy_dice:
-                enemy = ListGAAndSkills.get_random_ga_enemy_generic(level=int(level/2), guardian_chance=guardian_chance)
-                text = f"Kẻ thù {enemy.ga_emoji} - **{enemy.ga_name}** (Cấp {enemy.level})"
-                if random_quest_channel_id.difficulty_level > 3:
-                    text = f"Kẻ thù {enemy.ga_emoji} - **{enemy.ga_name}** (Cấp {UtilitiesFunctions.replace_with_question_marks(enemy.level)})"
-                embed.add_field(name=f"", value=text, inline=False)
-                embed.add_field(name=f"", value=f"🦾: **{enemy.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.health, max_value=enemy.max_health, emoji=EmojiCreation2.HP.value, mysterious_stats=mysterious_stats)}\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.stamina, max_value=enemy.max_stamina, emoji=EmojiCreation2.STAMINA.value, mysterious_stats=mysterious_stats)}\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.mana, max_value=enemy.max_mana, emoji=EmojiCreation2.MP.value, mysterious_stats=mysterious_stats)}", inline=False)
-                
-                enemy_2 = ListGAAndSkills.get_random_ga_enemy_generic(level=int(level/3), guardian_chance=guardian_chance)
-                text = f"Kẻ thù {enemy_2.ga_emoji} - **{enemy_2.ga_name}** (Cấp {enemy_2.level})"
-                if random_quest_channel_id.difficulty_level > 3:
-                    text = f"Kẻ thù {enemy_2.ga_emoji} - **{enemy_2.ga_name}** (Cấp {UtilitiesFunctions.replace_with_question_marks(enemy_2.level)})"
-                embed.add_field(name=f"", value=text, inline=False)
-                embed.add_field(name=f"", value=f"🦾: **{enemy_2.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy_2.health, max_value=enemy_2.max_health, emoji=EmojiCreation2.HP.value, mysterious_stats=mysterious_stats)}\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy_2.stamina, max_value=enemy_2.max_stamina, emoji=EmojiCreation2.STAMINA.value, mysterious_stats=mysterious_stats)}\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy_2.mana, max_value=enemy_2.max_mana, emoji=EmojiCreation2.MP.value, mysterious_stats=mysterious_stats)}", inline=False)
+            double_enemy_chance = 20
+            bonus_percent = 15
+        elif random_quest_channel_id.difficulty_level == 3:
+            level = random.randint(50, 90)
+            guardian_chance = 20
+            double_enemy_chance = 20
+            mysterious_stats = True
+            bonus_percent = 25
+        elif random_quest_channel_id.difficulty_level == 4:
+            dice_harder = UtilitiesFunctions.get_chance(25)
+            double_enemy_chance = 25
+            bonus_percent = 45
+            mysterious_stats = True
+            if dice_harder:
+                level = random.randint(95, 250)
             else:
-                text = f"Kẻ thù {enemy.ga_emoji} - **{enemy.ga_name}** (Cấp {enemy.level})"
-                if random_quest_channel_id.difficulty_level > 3:
-                    text = f"Kẻ thù {enemy.ga_emoji} - **{enemy.ga_name}** (Cấp {UtilitiesFunctions.replace_with_question_marks(enemy.level)})"
-                embed.add_field(name=f"", value=text, inline=False)
-                embed.add_field(name=f"", value=f"🦾: **{enemy.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.health, max_value=enemy.max_health, emoji=EmojiCreation2.HP.value, mysterious_stats=mysterious_stats)}\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.stamina, max_value=enemy.max_stamina, emoji=EmojiCreation2.STAMINA.value, mysterious_stats=mysterious_stats)}\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.mana, max_value=enemy.max_mana, emoji=EmojiCreation2.MP.value, mysterious_stats=mysterious_stats)}", inline=False)
-            embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
-            footer_text = f"Ai chưa hiểu cách thức hoạt động của Hầm Ngục Hộ Vệ Thần thì cứ nhắn\ngd help"
-            embed.set_footer(text=footer_text)
-            print(f"Spawning enemy with base level around {level} at channel {quest_channel.name} in guild {guild.name}. Difficult dungeon: {random_quest_channel_id.difficulty_level}")
-            view = GaDugeonView(guild_id=guild.id, enemy_ga=enemy, enemy_ga_2=enemy_2, title=f"{EmojiCreation2.STUN_SKILL.value} **Hầm Ngục {UtilitiesFunctions.get_cap_do_quest(random_quest_channel_id.difficulty_level)}** {EmojiCreation2.STUN_SKILL.value}", bonus_percent=bonus_percent, difficulty=random_quest_channel_id.difficulty_level, footer_text=footer_text)
-            m = await quest_channel.send(embed=embed, view=view)
-            view.message = m
+                level = random.randint(90, 150)
+            guardian_chance = 25
+        embed = discord.Embed(title=f"", description=f"{EmojiCreation2.STUN_SKILL.value} **Hầm Ngục {UtilitiesFunctions.get_cap_do_quest(random_quest_channel_id.difficulty_level)}** {EmojiCreation2.STUN_SKILL.value}", color=0x0ce7f2)
+        embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
+        
+        double_enemy_dice = UtilitiesFunctions.get_chance(double_enemy_chance)
+        enemy = ListGAAndSkills.get_random_ga_enemy_generic(level=level, guardian_chance=guardian_chance)
+        enemy_2 = None
+        
+        if double_enemy_dice:
+            enemy = ListGAAndSkills.get_random_ga_enemy_generic(level=int(level/2), guardian_chance=guardian_chance)
+            text = f"Kẻ thù {enemy.ga_emoji} - **{enemy.ga_name}** (Cấp {enemy.level})"
+            if random_quest_channel_id.difficulty_level > 3:
+                text = f"Kẻ thù {enemy.ga_emoji} - **{enemy.ga_name}** (Cấp {UtilitiesFunctions.replace_with_question_marks(enemy.level)})"
+            embed.add_field(name=f"", value=text, inline=False)
+            embed.add_field(name=f"", value=f"🦾: **{enemy.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.health, max_value=enemy.max_health, emoji=EmojiCreation2.HP.value, mysterious_stats=mysterious_stats)}\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.stamina, max_value=enemy.max_stamina, emoji=EmojiCreation2.STAMINA.value, mysterious_stats=mysterious_stats)}\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.mana, max_value=enemy.max_mana, emoji=EmojiCreation2.MP.value, mysterious_stats=mysterious_stats)}", inline=False)
+            
+            enemy_2 = ListGAAndSkills.get_random_ga_enemy_generic(level=int(level/3), guardian_chance=guardian_chance)
+            text = f"Kẻ thù {enemy_2.ga_emoji} - **{enemy_2.ga_name}** (Cấp {enemy_2.level})"
+            if random_quest_channel_id.difficulty_level > 3:
+                text = f"Kẻ thù {enemy_2.ga_emoji} - **{enemy_2.ga_name}** (Cấp {UtilitiesFunctions.replace_with_question_marks(enemy_2.level)})"
+            embed.add_field(name=f"", value=text, inline=False)
+            embed.add_field(name=f"", value=f"🦾: **{enemy_2.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy_2.health, max_value=enemy_2.max_health, emoji=EmojiCreation2.HP.value, mysterious_stats=mysterious_stats)}\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy_2.stamina, max_value=enemy_2.max_stamina, emoji=EmojiCreation2.STAMINA.value, mysterious_stats=mysterious_stats)}\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy_2.mana, max_value=enemy_2.max_mana, emoji=EmojiCreation2.MP.value, mysterious_stats=mysterious_stats)}", inline=False)
+        else:
+            text = f"Kẻ thù {enemy.ga_emoji} - **{enemy.ga_name}** (Cấp {enemy.level})"
+            if random_quest_channel_id.difficulty_level > 3:
+                text = f"Kẻ thù {enemy.ga_emoji} - **{enemy.ga_name}** (Cấp {UtilitiesFunctions.replace_with_question_marks(enemy.level)})"
+            embed.add_field(name=f"", value=text, inline=False)
+            embed.add_field(name=f"", value=f"🦾: **{enemy.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.health, max_value=enemy.max_health, emoji=EmojiCreation2.HP.value, mysterious_stats=mysterious_stats)}\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.stamina, max_value=enemy.max_stamina, emoji=EmojiCreation2.STAMINA.value, mysterious_stats=mysterious_stats)}\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.mana, max_value=enemy.max_mana, emoji=EmojiCreation2.MP.value, mysterious_stats=mysterious_stats)}", inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
+        footer_text = f"Ai chưa hiểu cách thức hoạt động của Hầm Ngục Hộ Vệ Thần thì cứ nhắn\ngd help"
+        embed.set_footer(text=footer_text)
+        print(f"Spawning enemy with base level around {level} at channel {quest_channel.name} in guild {guild.name}. Difficult dungeon: {random_quest_channel_id.difficulty_level}")
+        view = GaDugeonView(guild_id=guild.id, enemy_ga=enemy, enemy_ga_2=enemy_2, title=f"{EmojiCreation2.STUN_SKILL.value} **Hầm Ngục {UtilitiesFunctions.get_cap_do_quest(random_quest_channel_id.difficulty_level)}** {EmojiCreation2.STUN_SKILL.value}", bonus_percent=bonus_percent, difficulty=random_quest_channel_id.difficulty_level, footer_text=footer_text)
+        m = await quest_channel.send(embed=embed, view=view)
+        view.message = m
+    return
 
 async def sub_function_ai_response(message: discord.Message, speakFlag: bool = True):
     if speakFlag == False: return
