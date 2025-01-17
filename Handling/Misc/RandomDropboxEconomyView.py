@@ -81,7 +81,7 @@ class RandomDropboxEconomyView(discord.ui.View):
         
         await interaction.followup.send(f"Bạn đã nhận hộp quà!",ephemeral=True)
         called_channel = interaction.channel
-        view = SelfDestructView(600)
+        view = SelfDestructView(243)
         m = await called_channel.send(embed=embed, view= view)
         view.message = m
         return
