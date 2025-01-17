@@ -355,9 +355,10 @@ class UtilitiesFunctions():
     @staticmethod
     def get_chance_guardian_actual_death(level: int):
         chance = 0
-        if level <= 25: chance = 1
-        if level > 25 and level < 50: chance = 9
-        if level >= 50 and level < 75: chance = 8
-        if level >= 75 and level < 99: chance = 6
-        else: chance = 5
+        if level <= 10: chance = 1
+        if level >10 and level < 25: chance = 5
+        if level >= 25 and level < 50: chance = 7
+        if level >= 50 and level < 75: chance = 10
+        if level >= 75 and level < 99: chance = 15
+        else: chance = 20
         return chance
