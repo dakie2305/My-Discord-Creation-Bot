@@ -171,14 +171,18 @@ class TextInputModal(discord.ui.Modal):
             tax_text = f"Đương nhiên là bị trừ **{tax}** {tax_emoji} để đóng thuế cho Chính Quyền!"
             if tax_emoji == EmojiCreation2.COPPER.value:
                 ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, copper=tax)
+                ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name= interaction.guild.name, user_id= interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, copper= -tax)
             elif tax_emoji == EmojiCreation2.SILVER.value:
                 ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, silver=tax)
+                ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name= interaction.guild.name, user_id= interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, silver= -tax)
             elif tax_emoji == EmojiCreation2.GOLD.value:
                 ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, gold=tax)
+                ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name= interaction.guild.name, user_id= interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, gold= -tax)
             elif tax_emoji == EmojiCreation2.DARKIUM.value:
                 ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, darkium=tax)
+                ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name= interaction.guild.name, user_id= interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, darkium= -tax)
             
-            ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name= interaction.guild.name, user_id= interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, copper= -tax)
+            
         extra_text = f""
         if suffix == "C" or suffix == "c":
             extra_text = f"Số {CurrencyEmoji.COPPER.value} còn lại: **{self.shortened_currency(profile_user.copper)}**"
