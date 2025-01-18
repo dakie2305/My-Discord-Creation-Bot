@@ -357,7 +357,7 @@ async def dungeon_spawn_enemy_embed():
     if is_inside_disable_time: return
     guilds = bot.guilds
     for guild in guilds:
-        if CustomFunctions.check_if_dev_mode()==True and guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value: continue
+        if CustomFunctions.check_if_dev_mode()==True and guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value and guild.id != 1293554240593330241: continue
         #Kiểm tra quest channel của server, nếu có thì mới chọn
         guild_info = db.find_guild_extra_info_by_id(guild_id=guild.id)
         if guild_info == None: continue
@@ -416,7 +416,7 @@ async def spawning_enemy_embed_in_dungeon(guild: discord.Guild, random_quest_cha
         if double_enemy_dice:
             enemy = ListGAAndSkills.get_random_ga_enemy_generic(level=int(level/2), guardian_chance=guardian_chance)
             text = f"Kẻ thù {enemy.ga_emoji} - **{enemy.ga_name}** (Cấp {enemy.level})"
-            if random_quest_channel_id.difficulty_level > 3:
+            if random_quest_channel_id.difficulty_level >= 3:
                 text = f"Kẻ thù {enemy.ga_emoji} - **{enemy.ga_name}** (Cấp {UtilitiesFunctions.replace_with_question_marks(enemy.level)})"
             embed.add_field(name=f"", value=text, inline=False)
             embed.add_field(name=f"", value=f"🦾: **{enemy.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.health, max_value=enemy.max_health, emoji=EmojiCreation2.HP.value, mysterious_stats=mysterious_stats)}\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.stamina, max_value=enemy.max_stamina, emoji=EmojiCreation2.STAMINA.value, mysterious_stats=mysterious_stats)}\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.mana, max_value=enemy.max_mana, emoji=EmojiCreation2.MP.value, mysterious_stats=mysterious_stats)}", inline=False)
@@ -429,7 +429,7 @@ async def spawning_enemy_embed_in_dungeon(guild: discord.Guild, random_quest_cha
             embed.add_field(name=f"", value=f"🦾: **{enemy_2.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy_2.health, max_value=enemy_2.max_health, emoji=EmojiCreation2.HP.value, mysterious_stats=mysterious_stats)}\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy_2.stamina, max_value=enemy_2.max_stamina, emoji=EmojiCreation2.STAMINA.value, mysterious_stats=mysterious_stats)}\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy_2.mana, max_value=enemy_2.max_mana, emoji=EmojiCreation2.MP.value, mysterious_stats=mysterious_stats)}", inline=False)
         else:
             text = f"Kẻ thù {enemy.ga_emoji} - **{enemy.ga_name}** (Cấp {enemy.level})"
-            if random_quest_channel_id.difficulty_level > 3:
+            if random_quest_channel_id.difficulty_level >= 3:
                 text = f"Kẻ thù {enemy.ga_emoji} - **{enemy.ga_name}** (Cấp {UtilitiesFunctions.replace_with_question_marks(enemy.level)})"
             embed.add_field(name=f"", value=text, inline=False)
             embed.add_field(name=f"", value=f"🦾: **{enemy.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.health, max_value=enemy.max_health, emoji=EmojiCreation2.HP.value, mysterious_stats=mysterious_stats)}\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.stamina, max_value=enemy.max_stamina, emoji=EmojiCreation2.STAMINA.value, mysterious_stats=mysterious_stats)}\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.mana, max_value=enemy.max_mana, emoji=EmojiCreation2.MP.value, mysterious_stats=mysterious_stats)}", inline=False)
@@ -440,6 +440,7 @@ async def spawning_enemy_embed_in_dungeon(guild: discord.Guild, random_quest_cha
         view = GaDugeonView(guild_id=guild.id, enemy_ga=enemy, enemy_ga_2=enemy_2, title=f"{EmojiCreation2.STUN_SKILL.value} **Hầm Ngục {UtilitiesFunctions.get_cap_do_quest(random_quest_channel_id.difficulty_level)}** {EmojiCreation2.STUN_SKILL.value}", bonus_percent=bonus_percent, difficulty=random_quest_channel_id.difficulty_level, footer_text=footer_text)
         m = await quest_channel.send(embed=embed, view=view)
         view.message = m
+        await view.catch_random_player_profile()
     return
 
 async def sub_function_ai_response(message: discord.Message, speakFlag: bool = True):
@@ -554,11 +555,12 @@ client = discord.Client(intents=intents)
 async def on_ready():
     print(f'We have logged in as {bot.user}')
     interaction_logger.info(f"Successfully logged in as {bot.user}")
+    dungeon_spawn_enemy_embed.start()
+    
     if CustomFunctions.check_if_dev_mode()==False:
         automatic_speak_randomly.start()
         random_dropbox.start()
         random_quizz_embed.start()
-        dungeon_spawn_enemy_embed.start()
         activity = discord.Activity(type=discord.ActivityType.watching, 
                                 name="True Heavens",
                                 state = "Dùng lệnh /help để biết thêm thông tin",
@@ -649,7 +651,7 @@ async def on_reaction_add(reaction, user):
         if check_quest_message == True:
             view = SelfDestructView(30)
             quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
-            m = await message.channel.send(embed=quest_embed, view=view, content=f"{message.author.mention}")
+            m = await message.channel.send(embed=quest_embed, view=view, content=f"{user.mention}")
             view.message = m
     return
 
@@ -748,4 +750,7 @@ init_extension = ["cogs.games.RockPaperScissorCog",
                   ]
 
 bot_token = os.getenv("BOT_TOKEN_NO2")
+if CustomFunctions.check_if_dev_mode():
+    bot_token = os.getenv("BOT_TOKEN_NO2_DEV")
+
 bot.run(bot_token)

@@ -360,5 +360,5 @@ class UtilitiesFunctions():
         if level >= 25 and level < 50: chance = 7
         if level >= 50 and level < 75: chance = 10
         if level >= 75 and level < 99: chance = 15
-        else: chance = 20
+        else: chance = 15
         return chance

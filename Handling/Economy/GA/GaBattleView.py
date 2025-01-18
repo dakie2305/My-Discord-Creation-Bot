@@ -388,13 +388,15 @@ class GaBattleView(discord.ui.View):
             gold_reward = gold_reward * self.minus_all_reward_percent / 100
         if self.bonus_all_reward_percent != None:
             gold_reward += gold_reward * self.bonus_all_reward_percent / 100
-        
         if gold_reward > 50000: gold_reward = 50000
+        
+        
         silver_reward = int(self.silver_reward * len(self.upper_attack_class) + self.bonus_exp*len(self.lower_attack_class))
         if self.minus_all_reward_percent != None:
             silver_reward = silver_reward * self.minus_all_reward_percent / 100
         if self.bonus_all_reward_percent != None:
             silver_reward += silver_reward * self.bonus_all_reward_percent / 100
+            
         contribution = self.calculate_contribution(info.starting_at_round)
         text_target_profile_exist = f"<@{info.player_profile.user_id}> [{info.starting_at_round}] cống hiến **{contribution}%**, nhận: "
         calculated_exp = int(bonus_exp * (contribution / 100))
@@ -402,6 +404,13 @@ class GaBattleView(discord.ui.View):
             if self.minus_all_reward_percent != None:
                 calculated_exp = calculated_exp * self.minus_all_reward_percent / 100
             if self.is_players_versus_players and calculated_exp > 280: calculated_exp = 280
+            
+            #Chỉ áp dụng cho người bắt hầm ngục
+            if self.difficulty < 3 and info.player_ga.level > self.enemy_ga.level and self.is_dungeon and self.user_profile.user_id == info.player_profile.user_id:
+                calculated_exp = 100
+                silver_reward = silver_reward * 0.4
+                gold_reward = gold_reward * 0.4
+            
             text_target_profile_exist += f"**{calculated_exp}** EXP. "
             ProfileMongoManager.update_level_progressing(guild_id=self.guild_id, user_id=info.player_profile.user_id, bonus_exp=int(calculated_exp*0.3))
             ProfileMongoManager.update_main_guardian_level_progressing(guild_id=self.guild_id, user_id=info.player_profile.user_id, bonus_exp=calculated_exp)
@@ -792,8 +801,13 @@ class GaBattleView(discord.ui.View):
                 opponent_alive_attack_info.player_ga.health -= loss_health
                 if opponent_alive_attack_info.player_ga.health <= 0: opponent_alive_attack_info.player_ga.health = 0
                 
-                #chiêu này tốn 45% mana của bản thân
-                own_loss_mana = int(self_player_info.player_ga.max_mana * 0.45) - skill.mana_loss
+                #dùng hàm mới để tính toán số mana sẽ mất
+                # own_loss_mana = int(self_player_info.player_ga.max_mana * 0.45) - skill.mana_loss
+                
+                own_loss_mana = self.calculate_mana_loss_for_guardian(max_mana=self_player_info.player_ga.max_mana, skill_mana_loss=skill.mana_loss)
+                
+                if own_loss_mana < 0:
+                    own_loss_mana *= (-1)
                 self_player_info.player_ga.mana -= own_loss_mana
                 if self_player_info.player_ga.mana <= 0: self_player_info.player_ga.mana = 0
                 
@@ -808,7 +822,10 @@ class GaBattleView(discord.ui.View):
                 opponent_alive_attack_info.stunned_round = 1
                 
                 #trừ mana của người dùng theo tỉ lệ skill
-                loss_own_mana = int(self_player_info.player_ga.max_mana * skill.mana_loss/100) - skill.mana_loss #Không hẳn là trừ quá nhiều, vì thường magic sẽ mạnh hơn, nên buff một tý cho chắc. Để balance sau
+                # loss_own_mana = int(self_player_info.player_ga.max_mana * skill.mana_loss/100) - skill.mana_loss #Không hẳn là trừ quá nhiều, vì thường magic sẽ mạnh hơn, nên buff một tý cho chắc. Để balance sau
+                
+                loss_own_mana = self.calculate_mana_loss_for_guardian(max_mana=self_player_info.player_ga.max_mana, skill_mana_loss=skill.mana_loss)
+                
                 if loss_own_mana <= 10: loss_own_mana = 20
                 self_player_info.player_ga.mana -= loss_own_mana
                 if self_player_info.player_ga.mana <= 0: self_player_info.player_ga.mana = 0
@@ -826,7 +843,11 @@ class GaBattleView(discord.ui.View):
                         e.stunned_round = 1
                 
                 #trừ mana của người dùng theo tỉ lệ skill
-                loss_own_mana = int(self_player_info.player_ga.max_mana * skill.mana_loss/100) - skill.mana_loss #Không hẳn là trừ quá nhiều, vì thường magic sẽ mạnh hơn, nên buff một tý cho chắc. Để balance sau
+                # loss_own_mana = int(self_player_info.player_ga.max_mana * skill.mana_loss/100) - skill.mana_loss #Không hẳn là trừ quá nhiều, vì thường magic sẽ mạnh hơn, nên buff một tý cho chắc. Để balance sau
+                
+                loss_own_mana = self.calculate_mana_loss_for_guardian(max_mana=self_player_info.player_ga.max_mana, skill_mana_loss=skill.mana_loss)
+                
+                
                 if loss_own_mana <= 10: loss_own_mana = 20
                 self_player_info.player_ga.mana -= loss_own_mana
                 if self_player_info.player_ga.mana <= 0: self_player_info.player_ga.mana = 0
@@ -870,7 +891,12 @@ class GaBattleView(discord.ui.View):
                     if opponent_alive_attack_info.player_ga.health <= 0: opponent_alive_attack_info.player_ga.health = 0
                     
                     #trừ mana của người dùng theo tỉ lệ skill
-                    loss_own_mana = int(self_player_info.player_ga.max_mana * skill.mana_loss/100) - skill.mana_loss #Không hẳn là trừ quá nhiều, vì thường magic sẽ mạnh hơn, nên buff một tý cho chắc. Để balance sau
+                    # loss_own_mana = int(self_player_info.player_ga.max_mana * skill.mana_loss/100) - skill.mana_loss #Không hẳn là trừ quá nhiều, vì thường magic sẽ mạnh hơn, nên buff một tý cho chắc. Để balance sau
+                    
+                    loss_own_mana = self.calculate_mana_loss_for_guardian(max_mana=self_player_info.player_ga.max_mana, skill_mana_loss=skill.mana_loss)
+                    
+                    
+                    
                     if loss_own_mana <= 10: loss_own_mana = 20
                     self_player_info.player_ga.mana -= loss_own_mana
                     if self_player_info.player_ga.mana <= 0: self_player_info.player_ga.mana = 0
@@ -920,7 +946,10 @@ class GaBattleView(discord.ui.View):
                 if opponent_alive_attack_info.player_ga.mana <= 0: opponent_alive_attack_info.player_ga.mana = 0
                 
                 #trừ mana của người dùng theo tỉ lệ skill
-                loss_own_mana = int(self_player_info.player_ga.max_mana * (skill.mana_loss/100)) - skill.attack_power #Không hẳn là trừ quá nhiều, vì thường magic sẽ mạnh hơn, nên buff một tý cho chắc. Để balance sau
+                # loss_own_mana = int(self_player_info.player_ga.max_mana * (skill.mana_loss/100)) - skill.attack_power #Không hẳn là trừ quá nhiều, vì thường magic sẽ mạnh hơn, nên buff một tý cho chắc. Để balance sau
+                
+                loss_own_mana = self.calculate_mana_loss_for_guardian(max_mana=self_player_info.player_ga.max_mana, skill_mana_loss=skill.mana_loss)
+                
                 if loss_own_mana <= 10: loss_own_mana = 20
                 self_player_info.player_ga.mana -= loss_own_mana
                 if self_player_info.player_ga.mana <= 0: self_player_info.player_ga.mana = 0
@@ -1181,3 +1210,27 @@ class GaBattleView(discord.ui.View):
                 base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã đánh mất **{loss_health}** Máu của [{opponent_alive_attack_info.player_ga.ga_emoji} - {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist} nhưng bị phản đòn ngược lại và bị choáng!"
             return base_text
         return base_text
+    
+    
+    def calculate_mana_loss_for_guardian(self, max_mana: int, skill_mana_loss: int, reference_mana: int = 100) -> int:
+        additional_scaling = 2.0
+        scaling_factor = (reference_mana / max_mana) * additional_scaling
+        effective_mana_loss = skill_mana_loss * scaling_factor
+        
+        if max_mana <= reference_mana:
+            return int(skill_mana_loss*scaling_factor)
+        
+        if max_mana >= 2000:
+            skill_mana_loss = int(skill_mana_loss * 2.0)
+        if max_mana >= 900:
+            skill_mana_loss = int(skill_mana_loss * 1.9)
+        if max_mana >= 700:
+            skill_mana_loss = int(skill_mana_loss * 1.8)
+        if max_mana >= 600:
+            skill_mana_loss = int(skill_mana_loss * 1.7)
+        elif max_mana >= 400:
+            skill_mana_loss = int(skill_mana_loss * 1.5)
+        elif max_mana >= 350:
+            skill_mana_loss = int(skill_mana_loss * 1.5)
+        
+        return max(skill_mana_loss, min(int(effective_mana_loss), skill_mana_loss * 2))

@@ -251,39 +251,55 @@ class QuestEconomy(commands.Cog):
         Choice(name="Độ khó: Khó", value="3"),
         Choice(name="Độ khó: Huyền Thoại", value="4"),
     ])
-    async def quest_dungeon_channels_slash(self, interaction: discord.Interaction, level: str):
+    async def quest_dungeon_channels_slash(self, interaction: discord.Interaction, level: str = None):
         await interaction.response.defer(ephemeral=False)
         #Không cho dùng bot nếu không phải user
         if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
             embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
             await interaction.followup.send(embed=embed, ephemeral=True)
             return
-        #Lệnh dành riêng cho server owner
-        if interaction.user.id != interaction.guild.owner_id and interaction.user.id != UserEnum.UserId.DARKIE.value:
-            await interaction.followup.send(content="Lệnh chỉ dành riêng cho Owner Server thôi!", ephemeral=True)
-            return
+        
+        if level == None: level = "1"
         level_as_int = int(level)
 
         check_exist = DbMongoManager.find_guild_extra_info_by_id(interaction.guild.id)
         if check_exist:
             list_channels_dungeon = check_exist.list_channels_dungeon
+            if (list_channels_dungeon == None or len(list_channels_dungeon) == 0) and (interaction.user.id != interaction.guild.owner_id and interaction.user.id != UserEnum.UserId.DARKIE.value):
+                await interaction.followup.send(content="Vui lòng nhờ Owner Server dùng lệnh này để thêm channel này vào danh sách Hầm Ngục Hộ Vệ Thần!", ephemeral=True)
+                return
             is_remove = False
-            for dungeon in list_channels_dungeon:
-                if dungeon.channel_id == interaction.channel_id:
-                    #Xóa
-                    is_remove = True
-                    list_channels_dungeon.remove(dungeon)
-                    break
-            if is_remove == False:
-                data = DungeonQuestChannel(channel_id=interaction.channel_id, channel_name=interaction.channel.name, difficulty_level=level_as_int)
-                list_channels_dungeon.append(data)
+            text = ""
+            if interaction.user.id == interaction.guild.owner_id or interaction.user.id == UserEnum.UserId.DARKIE.value:
+                for dungeon in list_channels_dungeon:
+                    if dungeon.channel_id == interaction.channel_id:
+                        #Xóa
+                        is_remove = True
+                        list_channels_dungeon.remove(dungeon)
+                        break
+                if is_remove == False:
+                    data = DungeonQuestChannel(channel_id=interaction.channel_id, channel_name=interaction.channel.name, difficulty_level=level_as_int)
+                    list_channels_dungeon.append(data)
+                    text = f"Đã chọn channel này vào Hệ Thống Hầm Ngục Hộ Vệ Thần trong server này. Độ khó: **{self.get_cap_do_quest(input=level_as_int)}**"
+                else:
+                    text = f"Đã xóa channel này khỏi Hệ Thống Hầm Ngục Hộ Vệ Thần trong server này."
+                DbMongoManager.update_guild_extra_info_list_channels_dungeon(guild_id=interaction.guild.id, list_channels_dungeon=list_channels_dungeon)
             
-            DbMongoManager.update_guild_extra_info_list_channels_dungeon(guild_id=interaction.guild.id, list_channels_dungeon=list_channels_dungeon)
-            if is_remove == False:
-                await interaction.followup.send(f"Đã chọn channel này vào Hệ Thống Hầm Ngục Hộ Vệ Thần trong server này. Độ khó: **{self.get_cap_do_quest(input=level_as_int)}**", ephemeral= True)
-            else:
-                await interaction.followup.send(f"Đã xóa channel này khỏi Hệ Thống Hầm Ngục Hộ Vệ Thần trong server này.", ephemeral= True)
+            embed = discord.Embed(title="Danh sách hầm ngục", description=f"Có tổng cộng **{len(list_channels_dungeon)} hầm ngục**", color=0xddede7)
+            count = 0
+            for value in list_channels_dungeon:
+                count+=1
+                embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Hầm Ngục: <#{value.channel_id}>. Độ khó: **{self.get_cap_do_quest(input=value.difficulty_level)}**", inline=False)
+                if count > 19:
+                    embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Và còn nhiều hầm ngục khác nữa!", inline=False)
+                    break
+                
+            await interaction.followup.send(content=text, embed=embed)
         else:
+            #nếu không phải là server owner thì làm như dưới
+            if interaction.user.id != interaction.guild.owner_id and interaction.user.id != UserEnum.UserId.DARKIE.value:
+                await interaction.followup.send(content="Vui lòng nhờ Owner Server dùng lệnh này để thêm channel này vào danh sách Hầm Ngục Hộ Vệ Thần!", ephemeral=True)
+                return
             list_channels_dungeon= []
             data = DungeonQuestChannel(channel_id=interaction.channel_id, channel_name=interaction.channel.name, difficulty_level=level_as_int)
             list_channels_dungeon.append(data)

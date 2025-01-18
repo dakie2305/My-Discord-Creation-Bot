@@ -90,14 +90,14 @@ class GaDugeonView(discord.ui.View):
             if new_player_profile.guardian.level >= 80 or self.enemy_ga.level < new_player_profile.guardian.level:
                 text_name = self.enemy_ga.ga_name
                 text_emoji = self.enemy_ga.ga_emoji
-                self.enemy_ga = ListGAAndSkills.get_random_ga_enemy_generic(level=new_player_profile.guardian.level+10)
+                self.enemy_ga = ListGAAndSkills.get_random_ga_enemy_generic(level=new_player_profile.guardian.level+10, override_emoji=text_emoji, override_name=text_name)
                 self.enemy_ga.ga_name = text_name
                 self.enemy_ga.ga_emoji = text_emoji
                 
                 if self.enemy_ga_2 != None:
                     text_name = self.enemy_ga_2.ga_name
                     text_emoji = self.enemy_ga_2.ga_emoji
-                    self.enemy_ga_2 = ListGAAndSkills.get_random_ga_enemy_generic(level=new_player_profile.guardian.level+10)
+                    self.enemy_ga_2 = ListGAAndSkills.get_random_ga_enemy_generic(level=new_player_profile.guardian.level+10, override_emoji=text_emoji, override_name=text_name)
                     self.enemy_ga_2.ga_name = text_name
                     self.enemy_ga_2.ga_emoji = text_emoji
         
@@ -127,9 +127,98 @@ class GaDugeonView(discord.ui.View):
             embed.add_field(name=f"", value="", inline=False)
             embed.add_field(name=f"", value=f"🦾: **{self.enemy_ga_2.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=self.enemy_ga_2.health, max_value=self.enemy_ga_2.max_health, emoji=EmojiCreation2.HP.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=self.enemy_ga_2.stamina, max_value=self.enemy_ga_2.max_stamina, emoji=EmojiCreation2.STAMINA.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=self.enemy_ga_2.mana, max_value=self.enemy_ga_2.max_mana, emoji=EmojiCreation2.MP.value)}", inline=False)
         embed.set_footer(text=self.footer_text)
-        view = GaBattleView(user=interaction.user, user_profile=new_player_profile, is_players_versus_players=False, max_players=3, enemy_ga=self.enemy_ga, enemy_ga_2=self.enemy_ga_2, guild_id=interaction.guild_id, gold_reward=gold_reward, silver_reward=silver_reward, bonus_exp=exp_reward, dignity_point=dignity_point_reward, embed_title=self.title, bonus_all_reward_percent=self.bonus_percent, footer_text=self.footer_text)
+        view = GaBattleView(user=interaction.user, user_profile=new_player_profile, is_players_versus_players=False, max_players=3, enemy_ga=self.enemy_ga, enemy_ga_2=self.enemy_ga_2, guild_id=interaction.guild_id, gold_reward=gold_reward, silver_reward=silver_reward, bonus_exp=exp_reward, dignity_point=dignity_point_reward, embed_title=self.title, bonus_all_reward_percent=self.bonus_percent, footer_text=self.footer_text, is_dungeon= True, difficulty=self.difficulty)
         mess = await self.message.edit(embed=embed, view=view)
         ProfileMongoManager.update_main_guardian_profile_time(guild_id=interaction.guild_id,user_id=interaction.user.id, data_type="last_joined_battle", date_value=datetime.now())
         view.message = mess
         print(f"Username {interaction.user.name} has started guardian battle in guild {interaction.guild.name} at channel {interaction.channel.name}!")
         await view.commence_battle()
+        
+    async def catch_random_player_profile(self):
+        
+        if self.difficulty < 4: return
+        dice = UtilitiesFunctions.get_chance(100)
+        if dice == False: return
+        
+        if self.message == None or self.message.channel == None: return
+        recent_messages = await self.message.channel.history(limit=10)
+        if recent_messages == None or len(recent_messages) == 0: return
+        
+        users = {message.author for message in recent_messages if not message.author.bot}
+        valid_users = []
+        processed_user_ids = set()
+        for user in users:
+            if user.id in processed_user_ids: continue
+            
+            # Fetch the profile from your database
+            user_profile = ProfileMongoManager.find_profile_by_id(guild_id=self.guild_id, user_id=user.id)
+            
+            if user_profile == None or user_profile.guardian == None: continue
+            
+            if user_profile.guardian != None and user_profile.guardian.is_dead == False and user_profile.guardian.health > 10:
+                valid_users.append((user,user_profile, user_profile.guardian))
+                processed_user_ids.add(user.id)
+        
+        # Không có user hợp lệ thì khỏi
+        if not valid_users: return
+        
+        selected_user: discord.Member = None 
+        selected_user_profile: Profile = None 
+        selected_guardian: GuardianAngel = None
+        
+        user, selected_user_profile, selected_guardian = random.choice(valid_users)
+        
+        if user == None or selected_user_profile == None or selected_guardian == None: return
+        
+        #Bắt đầu chiến
+        self.is_attacked = True
+        if self.difficulty >= 3:
+            #Nếu self.difficulty trên 3 thì roll lại kẻ địch theo stats của player ga nếu player ga trên cấp 80 hoặc enemy thấp cấp hơn
+            #Thì scale theo level của player
+            if selected_user_profile.guardian.level >= 80 or self.enemy_ga.level < selected_user_profile.guardian.level:
+                text_name = self.enemy_ga.ga_name
+                text_emoji = self.enemy_ga.ga_emoji
+                self.enemy_ga = ListGAAndSkills.get_random_ga_enemy_generic(level=selected_user_profile.guardian.level+10, override_emoji=text_emoji, override_name=text_name)
+                self.enemy_ga.ga_name = text_name
+                self.enemy_ga.ga_emoji = text_emoji
+                
+                if self.enemy_ga_2 != None:
+                    text_name = self.enemy_ga_2.ga_name
+                    text_emoji = self.enemy_ga_2.ga_emoji
+                    self.enemy_ga_2 = ListGAAndSkills.get_random_ga_enemy_generic(level=selected_user_profile.guardian.level+10, override_emoji=text_emoji, override_name=text_name)
+                    self.enemy_ga_2.ga_name = text_name
+                    self.enemy_ga_2.ga_emoji = text_emoji
+        
+        gold_reward = 50
+        silver_reward = 100
+        exp_reward = 80
+        dignity_point_reward = 10
+        
+        #Tính lại theo enemy_ga
+        gold_reward = int(gold_reward + gold_reward*self.enemy_ga.level*0.2)
+        silver_reward = int(silver_reward + silver_reward*self.enemy_ga.level*0.3)
+        exp_reward = int(exp_reward + exp_reward*self.enemy_ga.level*0.1)
+        
+        embed = discord.Embed(title=f"", description=self.title, color=0x0ce7f2)
+        
+        embed.add_field(name=f"", value=f"Hộ Vệ Thần {selected_user_profile.guardian.ga_emoji} - **{selected_user_profile.guardian.ga_name}** (Cấp {selected_user_profile.guardian.level}) của {selected_user.mention}", inline=False)
+        embed.add_field(name=f"", value=f"🦾: **{selected_user_profile.guardian.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=selected_user_profile.guardian.health, max_value=selected_user_profile.guardian.max_health, emoji=EmojiCreation2.HP.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=selected_user_profile.guardian.stamina, max_value=selected_user_profile.guardian.max_stamina, emoji=EmojiCreation2.STAMINA.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=selected_user_profile.guardian.mana, max_value=selected_user_profile.guardian.max_mana, emoji=EmojiCreation2.MP.value)}", inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬▬▬ι═══════════>", inline=False)
+        
+        text = f"Kẻ thù {self.enemy_ga.ga_emoji} - **{self.enemy_ga.ga_name}** (Cấp {self.enemy_ga.level})"
+        embed.add_field(name=f"", value=text, inline=False)
+        embed.add_field(name=f"", value="", inline=False)
+        embed.add_field(name=f"", value=f"🦾: **{self.enemy_ga.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=self.enemy_ga.health, max_value=self.enemy_ga.max_health, emoji=EmojiCreation2.HP.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=self.enemy_ga.stamina, max_value=self.enemy_ga.max_stamina, emoji=EmojiCreation2.STAMINA.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=self.enemy_ga.mana, max_value=self.enemy_ga.max_mana, emoji=EmojiCreation2.MP.value)}", inline=False)
+        if self.enemy_ga_2 != None:
+            text = f"Kẻ thù {self.enemy_ga_2.ga_emoji} - **{self.enemy_ga_2.ga_name}** (Cấp {self.enemy_ga_2.level})"
+            embed.add_field(name=f"", value=text, inline=False)
+            embed.add_field(name=f"", value="", inline=False)
+            embed.add_field(name=f"", value=f"🦾: **{self.enemy_ga_2.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=self.enemy_ga_2.health, max_value=self.enemy_ga_2.max_health, emoji=EmojiCreation2.HP.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=self.enemy_ga_2.stamina, max_value=self.enemy_ga_2.max_stamina, emoji=EmojiCreation2.STAMINA.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=self.enemy_ga_2.mana, max_value=self.enemy_ga_2.max_mana, emoji=EmojiCreation2.MP.value)}", inline=False)
+        embed.set_footer(text=self.footer_text)
+        view = GaBattleView(user=selected_user, user_profile=selected_user_profile, is_players_versus_players=False, max_players=3, enemy_ga=self.enemy_ga, enemy_ga_2=self.enemy_ga_2, guild_id=self.guild_id, gold_reward=gold_reward, silver_reward=silver_reward, bonus_exp=exp_reward, dignity_point=dignity_point_reward, embed_title=self.title, bonus_all_reward_percent=self.bonus_percent, footer_text=self.footer_text, is_dungeon= True, difficulty=self.difficulty)
+        mess = await self.message.edit(embed=embed, view=view)
+        ProfileMongoManager.update_main_guardian_profile_time(guild_id=self.guild_id,user_id=selected_user.id, data_type="last_joined_battle", date_value=datetime.now())
+        view.message = mess
+        print(f"Username {selected_user.name} has been caught for guardian battle in guild {self.guild_id} at channel {self.message.channel.name}!")
+        await view.commence_battle()
+        return

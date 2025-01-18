@@ -689,7 +689,7 @@ def get_random_skill(skill_id: str = None, blacklist_ids: List[str]= None):
   return None
 
 
-def get_random_ga_enemy_generic(level: int = 1, guardian_chance: int = 0):
+def get_random_ga_enemy_generic(level: int = 1, guardian_chance: int = 0, override_name: str = None, override_emoji: str = None):
     data = GuardianAngel(
         ga_id = "enemy_generic",
         ga_name= "",
@@ -797,6 +797,11 @@ def get_random_ga_enemy_generic(level: int = 1, guardian_chance: int = 0):
     name, emoji = random.choice(list_name_emojis)
     data.ga_name = name
     data.ga_emoji = emoji
+    
+    if override_name != None:
+      data.ga_name = override_name
+    if override_emoji != None:
+      data.ga_emoji = override_emoji
     
     #Nếu level của bản thân đã trên 50 thì mọi kẻ địch đều sẽ sở hữu ít nhất một skill
     if level > 50:
