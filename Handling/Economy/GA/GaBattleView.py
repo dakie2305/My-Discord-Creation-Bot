@@ -441,6 +441,7 @@ class GaBattleView(discord.ui.View):
     def get_result_additional_reward(self, info: GuardianAngelAttackClass):
         if info.player_profile == None: return ""
         reward_text = ""
+        amount = 1
         
         #point
         roll_dice = UtilitiesFunctions.get_chance(15)
@@ -453,6 +454,7 @@ class GaBattleView(discord.ui.View):
         
         #legendary weapon chance
         roll_dice = UtilitiesFunctions.get_chance(5)
+        if self.is_dungeon == True and self.difficulty < 4: roll_dice = False
         if roll_dice:
             dice_check = UtilitiesFunctions.get_chance(50)
             if dice_check:
@@ -1169,7 +1171,7 @@ class GaBattleView(discord.ui.View):
                 base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} cảm thấy không ổn với trận chiến, và đã dùng chiêu {skill.emoji} -{skill.skill_name} để sủi ngay lập tức!"
                 return base_text
         
-        if current_health_percent <= 25 and self_player_info.is_used_skill_critical_strike == False:
+        if current_health_percent <= 30 and self_player_info.is_used_skill_critical_strike == False:
             skill = self.get_random_skill(list_skills=self_player_info.player_ga.list_skills, skill_id="skill_critical_strike")
             if skill != None:
                 #Dùng skill này sẽ lập tức tăng 40% sức tấn công cho user
@@ -1220,17 +1222,13 @@ class GaBattleView(discord.ui.View):
         if max_mana <= reference_mana:
             return int(skill_mana_loss*scaling_factor)
         
-        if max_mana >= 2000:
-            skill_mana_loss = int(skill_mana_loss * 2.0)
         if max_mana >= 900:
             skill_mana_loss = int(skill_mana_loss * 1.9)
         if max_mana >= 700:
-            skill_mana_loss = int(skill_mana_loss * 1.8)
-        if max_mana >= 600:
             skill_mana_loss = int(skill_mana_loss * 1.7)
-        elif max_mana >= 400:
+        if max_mana >= 600:
             skill_mana_loss = int(skill_mana_loss * 1.5)
-        elif max_mana >= 350:
-            skill_mana_loss = int(skill_mana_loss * 1.5)
+        elif max_mana >= 500:
+            skill_mana_loss = int(skill_mana_loss * 1.3)
         
         return max(skill_mana_loss, min(int(effective_mana_loss), skill_mana_loss * 2))
