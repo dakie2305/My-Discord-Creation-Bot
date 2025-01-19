@@ -402,7 +402,7 @@ class GaBattleView(discord.ui.View):
         calculated_exp = int(bonus_exp * (contribution / 100))
         if calculated_exp > 0:
             if self.minus_all_reward_percent != None:
-                calculated_exp = calculated_exp * self.minus_all_reward_percent / 100
+                calculated_exp = int(calculated_exp * self.minus_all_reward_percent / 100)
             if self.is_players_versus_players and calculated_exp > 280: calculated_exp = 280
             
             #Chỉ áp dụng cho người bắt hầm ngục
