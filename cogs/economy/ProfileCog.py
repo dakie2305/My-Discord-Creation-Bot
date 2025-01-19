@@ -136,6 +136,9 @@ class ProfileEconomy(commands.Cog):
         data = ProfileMongoManager.find_profile_by_id(guild_id=guild_id, user_id=user.id)
         if data == None:
             data = ProfileMongoManager.create_profile(guild_id=guild_id, user_id=user.id, guild_name=user.guild.name, user_name=user.name, user_display_name=user.display_name)
+            if data == None:
+                embed = discord.Embed(title=f"", description=f"Không thể tạo profile! Vui lòng thử lại!", color=0xddede7)
+                return embed, None
         
         if data.guardian!= None and data.guardian.time_to_recover!= None:
             if data.guardian.time_to_recover < datetime.now():
