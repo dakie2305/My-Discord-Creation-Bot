@@ -385,7 +385,7 @@ list_ga_passive_skills_private = [
     GuardianAngelSkill(
         skill_id = "skill_critical_strike",
         skill_name= "Ngưỡng Máu Tử",
-        skill_desc="Khi Hộ Vệ Thần còn máu dưới 25% thì các đòn tấn công tiếp theo sẽ tăng sát thương, chỉ kích hoạt một lần!",
+        skill_desc="Khi Hộ Vệ Thần còn máu dưới 30% thì các đòn tấn công tiếp theo sẽ tăng sát thương, chỉ kích hoạt một lần!",
         skill_type= ["passive"],
         emoji= EmojiCreation2.CRITICAL_DAMAGE.value,
         attack_power= 15,

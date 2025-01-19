@@ -135,13 +135,15 @@ class GaDugeonView(discord.ui.View):
         await view.commence_battle()
         
     async def catch_random_player_profile(self):
-        
-        if self.difficulty < 4: return
-        dice = UtilitiesFunctions.get_chance(100)
+        await asyncio.sleep(5)
+        if self.difficulty < 3: return
+        dice = UtilitiesFunctions.get_chance(50 if self.difficulty == 3 else 65)
         if dice == False: return
         
         if self.message == None or self.message.channel == None: return
-        recent_messages = await self.message.channel.history(limit=10)
+        recent_messages = []
+        async for message in self.message.channel.history(limit=10):
+            recent_messages.append(message)
         if recent_messages == None or len(recent_messages) == 0: return
         
         users = {message.author for message in recent_messages if not message.author.bot}
@@ -166,9 +168,9 @@ class GaDugeonView(discord.ui.View):
         selected_user_profile: Profile = None 
         selected_guardian: GuardianAngel = None
         
-        user, selected_user_profile, selected_guardian = random.choice(valid_users)
+        selected_user, selected_user_profile, selected_guardian = random.choice(valid_users)
         
-        if user == None or selected_user_profile == None or selected_guardian == None: return
+        if selected_user == None or selected_user_profile == None or selected_guardian == None: return
         
         #Bắt đầu chiến
         self.is_attacked = True
@@ -220,5 +222,9 @@ class GaDugeonView(discord.ui.View):
         ProfileMongoManager.update_main_guardian_profile_time(guild_id=self.guild_id,user_id=selected_user.id, data_type="last_joined_battle", date_value=datetime.now())
         view.message = mess
         print(f"Username {selected_user.name} has been caught for guardian battle in guild {self.guild_id} at channel {self.message.channel.name}!")
-        await view.commence_battle()
+        try:
+            await self.message.channel.send(content=f"{selected_user.mention} quá sơ hở, đã bị kẻ thù {self.enemy_ga.ga_emoji} - **{self.enemy_ga.ga_name}** bắt được!")
+            await view.commence_battle()
+        except Exception as e:
+            print(f"Exception at auto catching user {e}")
         return
