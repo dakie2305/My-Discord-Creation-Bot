@@ -472,6 +472,7 @@ class GaBattleView(discord.ui.View):
         
         #darkium
         roll_dice =UtilitiesFunctions.get_chance(10)
+        if self.is_dungeon == True and self.difficulty < 4: roll_dice = False
         if roll_dice:
             amount = random.randint(1, 3)
             reward_text = f"**{amount}** {EmojiCreation2.DARKIUM.value}"
@@ -493,6 +494,7 @@ class GaBattleView(discord.ui.View):
             #Roll xem trúng bình nào
             item = copy.deepcopy(random.choice(list_support_ga_items))
             roll_dice = UtilitiesFunctions.get_chance(70)
+            if self.is_dungeon == True and self.difficulty < 3: roll_dice = True
             if roll_dice:
                 #Trúng 3 bình bình thường
                 filtered_items = [
