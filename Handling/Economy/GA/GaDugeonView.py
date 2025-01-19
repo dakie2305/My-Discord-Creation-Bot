@@ -137,7 +137,7 @@ class GaDugeonView(discord.ui.View):
     async def catch_random_player_profile(self):
         await asyncio.sleep(5)
         if self.difficulty < 3: return
-        dice = UtilitiesFunctions.get_chance(50 if self.difficulty == 3 else 65)
+        dice = UtilitiesFunctions.get_chance(50 if self.difficulty == 3 else 85)
         if dice == False: return
         
         if self.message == None or self.message.channel == None: return
