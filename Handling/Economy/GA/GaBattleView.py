@@ -261,6 +261,16 @@ class GaBattleView(discord.ui.View):
         flag_end_battle = False
         full_text = ""
         
+        check_all_dead_upper = self.all_guardians_dead(self.upper_attack_class)
+        if check_all_dead_upper:
+            flag_end_battle = True
+            self.upper_attack_won = False
+            
+        check_all_dead_lower = self.all_guardians_dead(self.lower_attack_class)
+        if check_all_dead_lower:
+            flag_end_battle = True
+            self.upper_attack_won = True
+        
         for self_player_info in self.upper_attack_class:
             #Skip qua guardian đã chết
             if self_player_info.player_ga.health <= 0: continue
@@ -323,8 +333,9 @@ class GaBattleView(discord.ui.View):
             if len(self.upper_attack_class) >= 3 or len(self.lower_attack_class) >= 3: max_limit = 1
             if self.round > max_limit:
                 #Bỏ đi round đầu để tiếp kiệm chỗ
-                first_key = list(self.round_number_text_report.keys())[0]
-                del self.round_number_text_report[first_key]
+                if self.round_number_text_report:
+                    first_key = list(self.round_number_text_report.keys())[0]
+                    del self.round_number_text_report[first_key]
             self.round += 1
             await self.commence_battle()
         return
@@ -377,6 +388,9 @@ class GaBattleView(discord.ui.View):
     
     def is_empty_or_whitespace(self, s: str):
         return not s.strip()
+    
+    def all_guardians_dead(self, guardians: List['GuardianAngelAttackClass']) -> bool:
+        return all(guardian.player_ga.health <= 0 for guardian in guardians)
     
     def get_result_addition_stats(self, info: GuardianAngelAttackClass):
         if info.player_profile == None: return ""
