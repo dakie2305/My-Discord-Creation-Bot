@@ -28,7 +28,7 @@ def find_all_profiles(guild_id: int):
 
 def drop_profile_collection(guild_id: int):
     collection = db_specific[f'profile_{guild_id}']
-    if collection:
+    if collection != None:
         collection.drop()
 
 def create_profile(guild_id: int, guild_name: str, user_id: int, user_name: str, user_display_name: str):

@@ -19,7 +19,7 @@ def find_rps_info_by_id(guild_id: int):
 
 def drop_rps_collection(guild_id: int):
     collection = db_specific[f'rps_{guild_id}']
-    if collection:
+    if collection != None:
         collection.drop()
         
 def create_rps_info(guild_id: int, guild_name: str):

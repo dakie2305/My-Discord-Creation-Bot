@@ -268,7 +268,7 @@ def replace_snipe_message_info(guild_id: int, channel_id: int, snipe_messages: L
 def drop_snipe_channel_info_collection(guild_id: int):
     db_specific = client['guild_database']
     collection = db_specific[f'snipe_info_guild_{guild_id}']
-    if collection:
+    if collection != None:
         collection.drop()
 
 def delete_snipe_channel_info(channel_id:int, guild_id: int):
@@ -402,10 +402,10 @@ def delete_word_matching_info(channel_id: int, guild_id: int, language: str):
 def drop_word_matching_info_collection(guild_id: int):
     db_specific = client['word_matching_database']
     collection = db_specific[f'en_word_matching_guild_{guild_id}']
-    if collection:
+    if collection != None:
         collection.drop()
     collection = db_specific[f'vn_word_matching_guild_{guild_id}']
-    if collection:
+    if collection != None:
         collection.drop()
 
 def update_special_point_word_matching_info(channel_id: int, guild_id: int, language: str, special_point: int):

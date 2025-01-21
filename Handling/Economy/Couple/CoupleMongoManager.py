@@ -29,7 +29,7 @@ def find_all_couples(guild_id: int):
 
 def drop_couple_collection(guild_id: int):
     collection = db_specific[f'couple_{guild_id}']
-    if collection:
+    if collection != None:
         collection.drop()
 
 def create_couple(guild_id: int, guild_name: str, first_user_id: int, first_user_name: str, first_user_display_name: str, second_user_id: int, second_user_name: str, second_user_display_name: str):

@@ -26,7 +26,7 @@ def find_quest_by_user_id(guild_id: int, user_id: int):
 
 def drop_quest_collection(guild_id: int):
     collection = db_specific[f'quest_{guild_id}']
-    if collection:
+    if collection != None:
         collection.drop()
 
 def find_all_profiles(guild_id: int):

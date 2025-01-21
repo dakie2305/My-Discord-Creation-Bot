@@ -156,6 +156,11 @@ class GaDugeonView(discord.ui.View):
             user_profile = ProfileMongoManager.find_profile_by_id(guild_id=self.guild_id, user_id=user.id)
             
             if user_profile == None or user_profile.guardian == None: continue
+            #Kiểm tra xem có vừa chiến đấu chưa
+            if user_profile.guardian.last_joined_battle != None:
+                time_window = timedelta(minutes=1)
+                check = UtilitiesFunctions.check_if_within_time_delta(input=user_profile.guardian.last_joined_battle, time_window=time_window)
+                if check: continue
             
             if user_profile.guardian != None and user_profile.guardian.is_dead == False and user_profile.guardian.health > 10:
                 valid_users.append((user,user_profile, user_profile.guardian))

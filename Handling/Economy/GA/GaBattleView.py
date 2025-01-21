@@ -261,16 +261,7 @@ class GaBattleView(discord.ui.View):
         flag_end_battle = False
         full_text = ""
         
-        check_all_dead_upper = self.all_guardians_dead(self.upper_attack_class)
-        if check_all_dead_upper:
-            flag_end_battle = True
-            self.upper_attack_won = False
-            
-        check_all_dead_lower = self.all_guardians_dead(self.lower_attack_class)
-        if check_all_dead_lower:
-            flag_end_battle = True
-            self.upper_attack_won = True
-        
+
         for self_player_info in self.upper_attack_class:
             #Skip qua guardian đã chết
             if self_player_info.player_ga.health <= 0: continue
@@ -297,6 +288,17 @@ class GaBattleView(discord.ui.View):
                 continue
             base_text = self.execute_attack(self_player_info = self_player_info, opponent_alive_attack_info = opponent_alive_attack_info)
             full_text += base_text + "\n"
+        
+        check_all_dead_upper = self.all_guardians_dead(self.upper_attack_class)
+        if check_all_dead_upper:
+            flag_end_battle = True
+            self.upper_attack_won = False
+            
+        check_all_dead_lower = self.all_guardians_dead(self.lower_attack_class)
+        if check_all_dead_lower:
+            flag_end_battle = True
+            self.upper_attack_won = True
+        
         
         if not self.is_empty_or_whitespace(full_text):
             self.round_number_text_report.update({self.round: full_text.strip()})
@@ -561,7 +563,7 @@ class GaBattleView(discord.ui.View):
     
     def get_ga_stil_alive(self, side: str):
         if side == "upper":
-            if len(self.upper_attack_class) == 0: return None
+            if self.upper_attack_class == None or len(self.upper_attack_class) == 0: return None
             legit_attack_classes = [attack_class for attack_class in self.upper_attack_class if attack_class.player_ga.health > 0]
             if len(legit_attack_classes) == 0: return None
             attack_classes_without_player_profile = [attack_class for attack_class in legit_attack_classes if attack_class.player_profile is None]
@@ -570,7 +572,7 @@ class GaBattleView(discord.ui.View):
             if chance and len(attack_classes_without_player_profile)>0: return random.choice(attack_classes_without_player_profile)
             return random.choice(legit_attack_classes)
         else:
-            if len(self.lower_attack_class) == 0: return None
+            if self.lower_attack_class == None or len(self.lower_attack_class) == 0: return None
             legit_attack_classes = [attack_class for attack_class in self.lower_attack_class if attack_class.player_ga.health > 0]
             if len(legit_attack_classes) == 0: return None
             attack_classes_without_player_profile = [attack_class for attack_class in legit_attack_classes if attack_class.player_profile is None]
@@ -724,7 +726,7 @@ class GaBattleView(discord.ui.View):
                 roll_dice_death = UtilitiesFunctions.get_chance(actual_death_chance)
                 if roll_dice_death:
                     #Coi như chết
-                    additional_loss_stats_text = f"Hộ Vệ Thần của mục tiêu đã chết vĩnh viễn!"
+                    additional_loss_stats_text = f" Hộ Vệ Thần của mục tiêu đã chết vĩnh viễn!"
                     opponent_alive_attack_info.is_dead_ga = True
                     opponent_alive_attack_info.player_ga.is_dead = True
             #Kiểm tra xem phải summoned không, có thì remove hẳn khỏi đội hình
