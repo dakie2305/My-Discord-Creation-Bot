@@ -12,7 +12,10 @@ from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 
 
 # Connect to the MongoDB server
-client = MongoClient(f"mongodb://{UtilitiesFunctions.USER_NAME_MONGODB}:{UtilitiesFunctions.PASSWORD_MONGODB}@localhost:27017/") if UtilitiesFunctions.USER_NAME_MONGODB != "" and UtilitiesFunctions.PASSWORD_MONGODB != "" else MongoClient(f"mongodb://localhost:27017/")
+if UtilitiesFunctions.USER_NAME_MONGODB != "" and UtilitiesFunctions.USER_NAME_MONGODB != None and UtilitiesFunctions.PASSWORD_MONGODB != "" and UtilitiesFunctions.PASSWORD_MONGODB != None:
+    client = MongoClient(f"mongodb://{UtilitiesFunctions.USER_NAME_MONGODB}:{UtilitiesFunctions.PASSWORD_MONGODB}@localhost:27017/")
+else:
+    client = MongoClient("mongodb://localhost:27017/")
 # Create or switch to the database
 db_specific = client["economy_database"]
 

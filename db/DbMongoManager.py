@@ -743,7 +743,10 @@ set_database = "misc_database"
 # Connect to the MongoDB server
 USER_NAME_MONGODB = get_env_variable('USER_NAME_MONGODB')
 PASSWORD_MONGODB = get_env_variable('PASSWORD_MONGODB')
-client = MongoClient(f"mongodb://{USER_NAME_MONGODB}:{PASSWORD_MONGODB}@localhost:27017/") if USER_NAME_MONGODB != "" and PASSWORD_MONGODB != "" else MongoClient(f"mongodb://localhost:27017/")
+if USER_NAME_MONGODB != "" and USER_NAME_MONGODB != None and PASSWORD_MONGODB != "" and PASSWORD_MONGODB != None:
+    client = MongoClient(f"mongodb://{USER_NAME_MONGODB}:{PASSWORD_MONGODB}@localhost:27017/")
+else:
+    client = MongoClient("mongodb://localhost:27017/")
 # Create or switch to the database
 db = client["user_database"]
 db_specific = client[set_database]
