@@ -120,9 +120,11 @@ class AutoresponderHandling():
             flag = True
             embed = discord.Embed(title=f"", description=f"Hướng dẫn Hầm Ngục Hộ Vệ Thần", color=0xc379e0)
             embed.add_field(name="", value="-------------------------------------", inline=False)
-            embed.add_field(name="", value=f"- Dùng lệnh {SlashCommand.QUEST_DUNGEON.value} để chọn một kênh làm Hầm Ngục (Chỉ Dành Cho Owner Server). Ở kênh này, mỗi 15 phút thì sẽ tạo ra một con quái có cấp độ tương ứng với độ khó của Hầm Ngục!", inline=False)
+            embed.add_field(name="", value=f"- Dùng lệnh {SlashCommand.QUEST_DUNGEON.value} để xem danh sách hầm ngục trong Server. Nếu là Server Owner thì sẽ chọn một kênh làm Hầm Ngục (Chỉ Dành Cho Owner Server).", inline=False)
+            embed.add_field(name="", value=f"- Ở kênh này, mỗi 15 phút thì sẽ tạo ra một con quái có cấp độ tương ứng với độ khó của Hầm Ngục!", inline=False)
             embed.add_field(name="", value=f"- Bất kỳ ai có Hộ Vệ Thần đều có thể chiến đấu, giống như {SlashCommand.GA_BATTLE.value}!", inline=False)
             embed.add_field(name="", value=f"- Quái từ Hầm Ngục có độ khó **Khó** và **Huyền Thoại** sẽ có cấp độ mạnh tương đương với Hộ Vệ Thần!", inline=False)
+            embed.add_field(name="", value=f"- Quái từ Hầm Ngục có độ khó **Khó** và **Huyền Thoại** sẽ có thể bắt ngẫu nhiên bất kỳ ai trong channel!", inline=False)
             embed.add_field(name="", value=f"- Phần thưởng trong chiến đấu Hầm Ngục sẽ cao hơn {SlashCommand.GA_BATTLE.value}!", inline=False)
             embed.add_field(name="", value="-------------------------------------", inline=False)
             embed.set_footer(text=f"Đừng quên mỗi Hộ Vệ Thần có tỉ lệ chết vĩnh viễn nếu để trọng thương khi đánh với quái nhé! Tỉ lệ rất thấp, nhưng đừng khinh suất!", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")
