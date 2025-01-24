@@ -1510,7 +1510,7 @@ list_legend_weapon_1_p = [
     ),
     Item(
         item_id = "legend_scythe",
-        item_name = "Vô Đại Cực Liềm",
+        item_name = "Vô Cực Đại Liềm",
         item_description = f"Lưỡi liềm tử thần với sức mạnh hỗn cực có thể hoàn toàn gặt nát hết cả khu vườn lẫn hạt giống của kẻ địch!",
         item_type = "attack",
         quantity = 1,
