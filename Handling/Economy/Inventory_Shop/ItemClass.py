@@ -1523,6 +1523,21 @@ list_legend_weapon_1_p = [
         bonus_dignity = 0,
         rank_required = 50,
     ),
+    Item(
+        item_id = "legend_crossbow",
+        item_name = "Phá Vệ Nỏ",
+        item_description = f"Nỏ thần với sức mạnh bắn nát các vật phẩm bổ trợ của Hộ Vệ Thần của kẻ địch và sẽ gây sát thương cho Hộ Vệ Thần nếu không có vật phẩm bổ trợ!",
+        item_type = "attack",
+        quantity = 1,
+        emoji = EmojiCreation2.LEGEND_SCYTHES.value,
+        item_worth_amount = 5000,
+        item_worth_type= "D",
+        item_require_target = True,
+        is_self_usable = False,
+        bonus_exp = 0,
+        bonus_dignity = 0,
+        rank_required = 50,
+    ),
 ]
 list_legend_weapon_1 = copy.deepcopy(list_legend_weapon_1_p)
 list_legend_weapon_2_p = [

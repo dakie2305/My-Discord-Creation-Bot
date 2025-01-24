@@ -853,6 +853,29 @@ class GaBattleView(discord.ui.View):
                 base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã tung chiêu {skill.emoji} - {skill.skill_name} khiến [{opponent_alive_attack_info.player_ga.ga_emoji} - {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist} mất {loss_health} máu và mất một lượt!"
                 return base_text
             
+            elif skill.skill_id == "skill_mass_damage":
+
+                if opponent_alive_attack_info in self.upper_attack_class:
+                    for e in self.upper_attack_class:
+                        loss_health = int(skill.attack_power + (self_player_info.player_ga.attack_power*skill.buff_attack_percent/100))
+                        e.player_ga.health -= loss_health
+                        if e.player_ga.health <= 0: opponent_alive_attack_info.player_ga.health = 0
+                else:
+                    for e in self.lower_attack_class:
+                        loss_health = int(skill.attack_power + (self_player_info.player_ga.attack_power*skill.buff_attack_percent/100))
+                        e.player_ga.health -= loss_health
+                        if e.player_ga.health <= 0: opponent_alive_attack_info.player_ga.health = 0
+
+
+                loss_own_mana = self.calculate_mana_loss_for_guardian(max_mana=self_player_info.player_ga.max_mana, skill_mana_loss=skill.mana_loss)
+                
+                if loss_own_mana <= 10: loss_own_mana = 20
+                self_player_info.player_ga.mana -= loss_own_mana
+                if self_player_info.player_ga.mana <= 0: self_player_info.player_ga.mana = 0
+                
+                base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã triệu hồi {skill.emoji} - {skill.skill_name} để thiêu đốt toàn bộ đội hình phe địch!"
+                return base_text
+            
             elif skill.skill_id == "skill_mass_stun":
                 #tăng stunned_round của tất cả kẻ địch
                 if opponent_alive_attack_info in self.upper_attack_class:

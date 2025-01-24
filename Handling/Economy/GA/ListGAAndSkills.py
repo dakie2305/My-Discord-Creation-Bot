@@ -363,6 +363,21 @@ list_ga_skills_private = [
         buff_attack_percent=5,
         min_level_required=1,
     ),
+    GuardianAngelSkill(
+        skill_id = "skill_mass_damage",
+        skill_name= "Hỏa Trụ",
+        skill_desc="Triệu hồi cột lửa thiêu đốt cả tổ đội của đối thủ, kỹ năng này sẽ mất nhiều mana mỗi khi dùng!",
+        skill_type= ["attack"],
+        emoji= EmojiCreation2.FIRE_COLL.value,
+        attack_power= 1,
+        item_worth_amount= 60000,
+        item_worth_type= "G",
+        percent_min_mana_req= 50,
+        mana_loss= 50,
+        buff_defense_percent=0,
+        buff_attack_percent=5,
+        min_level_required=1,
+    ),
 ]
 list_ga_skills = copy.deepcopy(list_ga_skills_private)
 

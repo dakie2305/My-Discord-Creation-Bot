@@ -183,6 +183,7 @@ class EmojiCreation2(Enum):
     LEGEND_SWORD_1 = "<:legend_sword_1:1314994809789874237>"
     LEGEND_SWORD_2 = "<a:legend_sword_2:1314994822469386240>"
     LEGEND_SWORD_3 = "<:legend_sword_3:1314994832476737676>"
+    LEGEND_CROSSBOW = "<:legend_sword_3:1314994832476737676>"
     
     CERT_CLOWNS = "<:certificate_1:1315707049958576229>"
     CERT_2 = "<:certificate_2:1315707058762416209>"
@@ -223,6 +224,7 @@ class EmojiCreation2(Enum):
     EXPLOSION_SPELL_SKILL = "<a:explosion_spell_skill:1328653554105192520>"
     POTION_DESTROYER_SKILL = "<:potion_destroyer_skill:1328910109467738152>"
     TRADE_STATS_SKILL = "<:trade_stats_skill:1328910123128586342>"
+    FIRE_COLL = "<:flame_coll:1332178177589514322>"
     
     HP = "<:HP:1320777603358920724>"
     MP = "<:MP:1320777612926386256>"

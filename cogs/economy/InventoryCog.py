@@ -749,6 +749,7 @@ class InventoryEconomy(commands.Cog):
             CoupleMongoManager.set_love_progressing_value(guild_id=interaction.guild_id, user_id=target.id, love_progressing=0)
             embed.add_field(name=f"", value=text, inline=False)
             embed.add_field(name=f"", value=result, inline=False)
+        
         elif user_profile.attack_item.item_id == "legend_sword_3":
             text = f"Với tốc độ thần sầu, {interaction.user.mention} vung thanh **{user_profile.attack_item.item_name}** với tất cả sức mạnh của mình và cắt nát toàn bộ vật phẩm quà tặng của {target.mention}!"
             result = f"{target.mention} gào thét trong đau đớn, nhưng {interaction.user.mention} vẫn không dừng lại, lưỡi kiếm tiếp tục đâm sâu hơn!"
@@ -760,6 +761,65 @@ class InventoryEconomy(commands.Cog):
             embed.add_field(name=f"", value=text, inline=False)
             embed.add_field(name=f"", value=result, inline=False)
         
+        elif user_profile.attack_item.item_id == "legend_crossbow":
+            text = f"Với tốc độ khủng bố, {interaction.user.mention} cầm thanh **{user_profile.attack_item.item_name}** và nhắm thẳng vào Hộ Vệ Thần của {target.mention}!"
+            if target_profile.list_items != None and len(target_profile.list_items) > 0:
+                #Tìm xem có item bổ trợ hộ vệ thần không
+                list_id = ["ga_heal_1", "ga_stamina_1", "ga_mana_1", "ga_all_restored", "ga_resurrection"]
+                list_id_only_normal_potion = ["ga_heal_1", "ga_stamina_1", "ga_mana_1"]
+                #phá random trong list
+                filtered_items = [
+                    d for d in target_profile.list_items 
+                    if d.item_id in list_id
+                ]
+                filtered_items_normal = [
+                    d for d in target_profile.list_items 
+                    if d.item_id in list_id_only_normal_potion
+                ]
+                if filtered_items != None and len(filtered_items)>0:
+                    #phá
+                    dice_chance_ga_resurrection = UtilitiesFunctions.get_chance(5)
+                    destroy_item_ga_support = None
+                    if destroy_item_ga_support == None and dice_chance_ga_resurrection:
+                        for d in filtered_items:
+                            if d.item_id == "ga_resurrection":
+                                destroy_item_ga_support = d
+                                break
+                    dice_chance_ga_all_restored = UtilitiesFunctions.get_chance(20)
+                    if destroy_item_ga_support == None and dice_chance_ga_all_restored:
+                        for d in filtered_items:
+                            if d.item_id == "ga_all_restored":
+                                destroy_item_ga_support = d
+                                break
+                    #Phá ba bình còn lại
+                    if destroy_item_ga_support == None and filtered_items_normal != None and len(filtered_items_normal)>0:
+                        destroy_item_ga_support = random.choice(filtered_items_normal)
+                    #Nếu vẫn không tìm được thì random đại trong list filter
+                    if destroy_item_ga_support == None:
+                        destroy_item_ga_support = random.choice(filtered_items)
+                    #None nữa thì chịu
+                    if destroy_item_ga_support != None:
+                        ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=target.id, user_name=target.name, user_display_name=target.display_name, item=destroy_item_ga_support, amount= -99)
+                        result = f"{target.mention} bàng hoàng phát hiện bản thân đã mất hết **x{destroy_item_ga_support.quantity} {destroy_item_ga_support.emoji} - {destroy_item_ga_support.item_name}**!"
+                    else:
+                        result = f"Nhưng {interaction.user.mention} đã chọn sai đối thủ, {target.mention} nhếch mép cười thầm vì làm gì có vật phẩm bổ trợ Hộ Vệ Thần đâu mà sợ!"
+                else:
+                    #đả thương 10% máu hộ vệ thần nếu có hộ vệ thần
+                    if target_profile.guardian != None:
+                        loss_health = int(target_profile.guardian.health*0.1)
+                        if loss_health < 10: loss_health = 20
+                        target_profile.guardian.health -= loss_health
+                        if target_profile.guardian.health <0: target_profile.guardian.health = 0
+                        result = f"Hộ Vệ Thần {target_profile.guardian.ga_emoji}-**{target_profile.guardian.ga_name}** đã bị bắn xuyên ngực, và đã mất **{loss_health}** máu!"
+                    else:
+                        result = f"Nhưng {interaction.user.mention} đã chọn sai đối thủ, {target.mention} nhếch mép cười thầm vì làm gì có Hộ Vệ Thần đâu mà sợ!"
+
+
+
+
+            embed.add_field(name=f"", value=text, inline=False)
+            embed.add_field(name=f"", value=result, inline=False)
+
         else:
             await interaction.channel.send(content=f"Darkie chưa code công dụng của vũ khí [{user_profile.attack_item.emoji} - **{user_profile.attack_item.item_name}**]")
             return
@@ -788,3 +848,26 @@ class InventoryEconomy(commands.Cog):
         await message.edit(embed=embed, view=None, content=f"{target.mention}")
         return
     
+    def choose_random_item_with_chance(self, filtered_items):
+        item_chances = {
+            "ga_resurrection": 5,  # 5% 
+            "ga_all_restored": 15, # 15% 
+            "ga_heal_1": 27,       
+            "ga_stamina_1": 27,
+            "ga_mana_1": 26
+        }
+
+        # Create a list of valid items from filtered_items that match the set IDs
+        valid_items = [item for item in filtered_items if item.item_id in item_chances]
+        
+        if not valid_items:
+            return None  # No valid items found
+
+        # Build a weighted list for random selection
+        weighted_items = []
+        for item in valid_items:
+            chance = item_chances.get(item.item_id, 0)
+            weighted_items.extend([item] * chance)
+        
+        # Choose a random item based on the weighted list
+        return random.choice(weighted_items)
