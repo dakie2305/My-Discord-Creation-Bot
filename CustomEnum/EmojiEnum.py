@@ -235,6 +235,7 @@ class EmojiCreation2(Enum):
     POTION_MANA_1 = "<:potion_mana_1:1322946332767555655>"
     POTION_STAMINA_1 = "<:potion_stamina_1:1322946339629301760>"
     MAGIC_DV = "<a:magic_dv:1323334240674517147>"
+    LIXI = "<:li_xi:1333024689248800858>"
     
     
     

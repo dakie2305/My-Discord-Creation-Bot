@@ -35,7 +35,7 @@ class UserInfo:
 #region Guild Info
 
 class GuildExtraInfo:
-    def __init__(self, guild_id: int, guild_name :str, allowed_ai_bot: bool, list_channels_ai_talk: List[int] = None, enabled_ai_until: datetime = None, therapy_channel: int = None, list_channels_quests: List[int] = None, custom_parameter_1 = None, custom_parameter_2 = None, disable_donation_text_until: datetime = None, list_channels_dungeon : Optional[List['DungeonQuestChannel']] = None):
+    def __init__(self, guild_id: int, guild_name :str, allowed_ai_bot: bool, list_channels_ai_talk: List[int] = None, enabled_ai_until: datetime = None, therapy_channel: int = None, list_channels_quests: List[int] = None, custom_parameter_1 = None, custom_parameter_2 = None, disable_donation_text_until: datetime = None, list_channels_dungeon : Optional[List['DungeonQuestChannel']] = None, list_li_xi: List[int] = None):
         self.guild_id = guild_id
         self.guild_name = guild_name
         self.allowed_ai_bot = allowed_ai_bot
@@ -48,6 +48,7 @@ class GuildExtraInfo:
         self.disable_donation_text_until = disable_donation_text_until if disable_donation_text_until else datetime.now()
 
         self.list_channels_dungeon: List[DungeonQuestChannel] = list_channels_dungeon if list_channels_dungeon else []
+        self.list_li_xi: List[int] = list_li_xi if list_li_xi else []
 
     def to_dict(self):
         return {
@@ -59,6 +60,7 @@ class GuildExtraInfo:
             "custom_parameter_2": self.custom_parameter_2,
             "list_channels_quests": [data for data in self.list_channels_quests],
             "list_channels_ai_talk": [data for data in self.list_channels_ai_talk],
+            "list_li_xi": [data for data in self.list_li_xi],
             "enabled_ai_until": self.enabled_ai_until.isoformat() if self.enabled_ai_until else None,
             "disable_donation_text_until": self.disable_donation_text_until if self.disable_donation_text_until else None,
 
@@ -77,6 +79,7 @@ class GuildExtraInfo:
             disable_donation_text_until=data.get("disable_donation_text_until", None),
             list_channels_quests = [item for item in data.get("list_channels_quests", [])],
             list_channels_ai_talk = [item for item in data.get("list_channels_ai_talk", [])],
+            list_li_xi = [item for item in data.get("list_li_xi", [])],
             enabled_ai_until=datetime.fromisoformat(data["enabled_ai_until"]) if data["enabled_ai_until"] else None,
 
             list_channels_dungeon = [DungeonQuestChannel.from_dict(item) for item in data.get("list_channels_dungeon", [])],
