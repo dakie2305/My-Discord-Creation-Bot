@@ -237,7 +237,7 @@ class UtilitiesFunctions():
     def get_text_on_love_rank(rank: int):
         text = "Mới Quen"
         if rank >= 20:
-            text= "Bạn Đời Vĩnh Cữu"
+            text= "Bạn Đời Vĩnh Cửu"
         elif rank >= 19:
             text= "Đôi Tri Kỉ"
         elif rank >= 16:
