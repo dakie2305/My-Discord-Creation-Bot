@@ -108,13 +108,13 @@ class LiXiCog(commands.Cog):
                 #random trong khoảng
                 allowed_values = [1, 2, 5, 10, 20, 30, 40, 50, 60, 70,80,90,100,120,140,160,180,200,220,240,260,280,300,320,340,360,380,400,420,440,460,480,500, 600, 700, 800, 900, 1000, 1200, 1400, 1600, 1800, 2000, 2500, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000]
                 amount = random.choice(allowed_values)
-                ProfileMongoManager.update_profile_money(guild_id=message.author.id, guild_name=message.author.guild.name, user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, darkium=amount)
+                ProfileMongoManager.update_profile_money(guild_id=message.guild.id, guild_name=message.author.guild.name, user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, darkium=amount)
                 emoji = EmojiCreation2.DARKIUM.value
             else:
                 #random trong khoảng
                 allowed_values = [1000, 2000, 3000, 4000, 5000, 7500, 8000, 9000, 10000, 15000, 12000, 13000, 17000, 18000, 19000, 20000, 25000, 30000, 35000, 40000, 45000, 50000, 60000, 70000, 80000, 90000, 100000, 150000, 200000, 250000, 300000, 350000, 400000, 450000, 500000, 55000, 600000, 650000, 700000, 800000, 900000, 1000000]
                 amount = random.choice(allowed_values)
-                ProfileMongoManager.update_profile_money(guild_id=message.author.id, guild_name=message.author.guild.name, user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, gold=amount)
+                ProfileMongoManager.update_profile_money(guild_id=message.guild.id, guild_name=message.author.guild.name, user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, gold=amount)
             list_li_xi = check_exist.list_li_xi
             list_li_xi.append(message.author.id)
             data_updated = {"list_li_xi": list_li_xi}
