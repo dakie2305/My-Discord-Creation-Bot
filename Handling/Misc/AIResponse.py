@@ -14,7 +14,7 @@ class AIResponseHandling():
         self.bot = bot
         self.interaction_logger = DailyLogger.get_logger("Creation2_Interaction") if bot.user.id == 1257713292445618239 else DailyLogger.get_logger("Creation1_Interaction")
         self.commands_logger = DailyLogger.get_logger("Creation2_Commands") if bot.user.id == 1257713292445618239 else DailyLogger.get_logger("Creation1_Interaction") #ID của creation 1
-        self.bot_name = "Creation 1" if bot.user.id == 1257713292445618239 else "Creation 2"
+        self.bot_name = "Creation 2" if bot.user.id == 1257713292445618239 else "Creation 1"
 
     async def sub_function_ai_response(self, message: discord.Message, speakFlag: bool = True):
         if speakFlag == False: return
@@ -24,7 +24,7 @@ class AIResponseHandling():
         bots_creation_2_name = ["creation 2", "creation số 2", "creation no 2", "creatiom 2", "creation no. 2"]
         bots_creation_1_name = ["creation 1", "creation số 1", "creation no 1", "creation no. 1"]
         
-        bots_creation_name = bots_creation_1_name if self.bot.user.id == 1257713292445618239 else bots_creation_2_name
+        bots_creation_name = bots_creation_2_name if self.bot.user.id == 1257713292445618239 else bots_creation_1_name
         is_reply_message = False
         referenced_message = None
         if message.reference is not None and message.reference.resolved is not None:
