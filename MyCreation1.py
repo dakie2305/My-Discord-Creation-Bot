@@ -29,6 +29,7 @@ import Handling.MiniGame.SortWord.SwMongoManager as SwMongoManager
 from CustomEnum.EmojiEnum import EmojiCreation2, EmojiCreation1
 from Handling.Misc.UnbanView import UnbanView
 from Handling.Misc.RemoveTimeoutView import RemoveTimeoutView
+from Handling.Misc.AIResponse import AIResponseHandling
 
 load_dotenv()
 intents = discord.Intents.all()
@@ -1720,7 +1721,9 @@ async def on_message(message: discord.Message):
     if word_matching_channel_en != None or word_matching_channel_vn!= None:
         speakFlag = False
     
-    await sub_function_ai_response(message=message, speakFlag=speakFlag)
+    ai_handling_response = AIResponseHandling(bot=bot)
+    await ai_handling_response.sub_function_ai_response(message=message, speakFlag=speakFlag)
+    
     await bot.process_commands(message)
 
 bot_token = os.getenv("BOT_TOKENN")
