@@ -15,22 +15,11 @@ class AIResponseHandling():
         self.interaction_logger = DailyLogger.get_logger("Creation2_Interaction") if bot.user.id == 1257713292445618239 else DailyLogger.get_logger("Creation1_Interaction")
         self.commands_logger = DailyLogger.get_logger("Creation2_Commands") if bot.user.id == 1257713292445618239 else DailyLogger.get_logger("Creation1_Interaction") #ID của creation 1
         self.bot_name = "Creation 1" if bot.user.id == 1257713292445618239 else "Creation 2"
-        self.ai_request_queue = asyncio.Queue()
-        self.processing = False
-        self.bot.loop.create_task(self.process_ai_queue())
 
     async def sub_function_ai_response(self, message: discord.Message, speakFlag: bool = True):
         if speakFlag == False: return
-        await self.ai_request_queue.put(message)
+        await self.generate_ai_response(message)
         
-    async def process_ai_queue(self):
-        while True:
-            message = await self.ai_request_queue.get()  # Get next request
-            if message is None: break
-
-            await self.generate_ai_response(message)
-            self.ai_request_queue.task_done()  # Đánh dấu task xong
-
     async def generate_ai_response(self, message: discord.Message):
         bots_creation_2_name = ["creation 2", "creation số 2", "creation no 2", "creatiom 2", "creation no. 2"]
         bots_creation_1_name = ["creation 1", "creation số 1", "creation no 1", "creation no. 1"]
@@ -70,7 +59,7 @@ class AIResponseHandling():
         #pass hết, cho phép bot trả lời
         try:
             async with message.channel.typing():
-                await asyncio.sleep(3)  # Delay
+                await asyncio.sleep(4)  # Delay
                 system_instruction = ""
                 if self.bot_name == "Creation 1":
                     system_instruction = f"{CustomFunctions.initial_instruction} {CustomFunctions.background_creation_1} {CustomFunctions.shared_background}"
