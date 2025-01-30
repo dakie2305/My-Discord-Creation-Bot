@@ -5,15 +5,12 @@ import db.DbMongoManager as db
 import CustomFunctions
 import os
 import google.generativeai as genai
-import DailyLogger
 import PIL.Image
 import asyncio
 
 class AIResponseHandling():
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.interaction_logger = DailyLogger.get_logger("Creation2_Interaction") if bot.user.id == 1257713292445618239 else DailyLogger.get_logger("Creation1_Interaction")
-        self.commands_logger = DailyLogger.get_logger("Creation2_Commands") if bot.user.id == 1257713292445618239 else DailyLogger.get_logger("Creation1_Interaction") #ID của creation 1
         self.bot_name = "Creation 2" if bot.user.id == 1257713292445618239 else "Creation 1"
 
     async def sub_function_ai_response(self, message: discord.Message, speakFlag: bool = True):
@@ -53,8 +50,7 @@ class AIResponseHandling():
         flag, mess = await CustomFunctions.check_message_nsfw(message, self.bot)
         if flag != 0:
             await message.reply(mess)
-            self.interaction_logger.info(f"Username {message.author.name}, Display user name {message.author.display_name} violated chat when talking to {self.bot.user}")
-            self.interaction_logger.info(f"Username {message.author.name} violated chat {message.content} when talking to {self.bot.user}")
+            print(f"Username {message.author.name}, Display user name {message.author.display_name} violated chat when talking to {self.bot.user}")
             return
         #pass hết, cho phép bot trả lời
         try:
@@ -91,7 +87,6 @@ class AIResponseHandling():
                 if 'record' in message.content.lower():
                     await CustomFunctions.bot_sending_sound(bot_name='Creation_2', bot_reponse=bot_response, message=message)
                     print(f"Username {message.author.name}, Display user name {message.author.display_name} tell {self.bot.user} to send record")
-                    self.interaction_logger.info(f"Username {message.author.name}, Display user name {message.author.display_name} tell {self.bot.user} to send record")
                     return
                 
                 #Nếu là bot thì đương nhiên không reply, chỉ nhắn bình thường thôi
@@ -105,9 +100,7 @@ class AIResponseHandling():
                         await message.channel.send(f"{message.author.mention} {bot_response}")
                 CustomFunctions.save_user_convo_data(message=message, bot_reponse= bot_response, bot_name= self.bot_name)
                 print(f"Username {message.author.name}, Display user name {message.author.display_name} replied {self.bot.user}")
-                self.interaction_logger.info(f"Username {message.author.name}, Display user name {message.author.display_name} replied {self.bot.user}")
                 return
         except Exception as e:
             print(f"Username {message.author.name}, Display user name {message.author.display_name} replied {self.bot.user} but with error: {e}")
-            self.interaction_logger.error(f"Username {message.author.name}, Display user name {message.author.display_name} replied {self.bot.user} bot but with error: {e}")
         return
