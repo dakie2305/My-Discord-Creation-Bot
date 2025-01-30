@@ -36,6 +36,7 @@ from Handling.Misc.AIResponse import AIResponseHandling
 
 load_dotenv()
 intents = discord.Intents.all()
+intents.presences = False
 API_KEY = os.getenv("GOOGLE_CLOUD_KEY_2")
 genai.configure(api_key=API_KEY)
 
