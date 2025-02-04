@@ -29,9 +29,11 @@ import Handling.MiniGame.SortWord.SwMongoManager as SwMongoManager
 from CustomEnum.EmojiEnum import EmojiCreation2, EmojiCreation1
 from Handling.Misc.UnbanView import UnbanView
 from Handling.Misc.RemoveTimeoutView import RemoveTimeoutView
+from Handling.Misc.AIResponse import AIResponseHandling
 
 load_dotenv()
 intents = discord.Intents.all()
+intents.presences = False
 API_KEY = os.getenv("GOOGLE_CLOUD_KEY")
 genai.configure(api_key=API_KEY)
 
@@ -1094,15 +1096,17 @@ async def delete_message_context(interaction: discord.Interaction, message: disc
         return
     try:
             user_reported = message.author
+            is_user_admin = False
             if user_reported != None:
-                is_user_admin = any(role.name in req_roles for role in user_reported.roles)
-                if is_user_admin and interaction.user.id != 315835396305059840:        #Chỉ Darkie mới được quyền xoá tin nhắn của admin, moderator
-                    await interaction.followup.send("Không thể xoá tin nhắn của admin/moderator. Vui lòng liên hệ <@315835396305059840>.")
-                    return
+                if isinstance(user_reported, discord.Member):
+                    is_user_admin = any(role.name in req_roles for role in user_reported.roles)
+                    if is_user_admin and interaction.user.id != 315835396305059840:        #Chỉ Darkie mới được quyền xoá tin nhắn của admin, moderator
+                        await interaction.followup.send("Không thể xoá tin nhắn của admin/moderator. Vui lòng liên hệ <@315835396305059840>.")
+                        return
             if len(message.content) > 1000:
                 message.content = message.content[:1000] + "..."
             # Create embed object
-            embed = discord.Embed(title="Một tin nhắn đã bị xoá", description=f"User {interaction.user.mention} đã xoá một tin nhắn của {message.author.mention} đăng tại <#{message.channel.id}>!", color=0xFC0345)
+            embed = discord.Embed(title="Một tin nhắn đã bị xoá", description=f"User {interaction.user.mention} đã xoá một tin nhắn của {user_reported.mention if user_reported != None else 'Người Dùng Đã Thoát Server'} đăng tại <#{message.channel.id}>!", color=0xFC0345)
             embed.add_field(name="Lý do xoá tin nhắn:", value="Không có. Hình thức xoá thông qua context menu", inline=False)
             embed.add_field(name="Nội dung tin nhắn bị xoá:", value=message.content, inline=False)
             temp_files = []
@@ -1118,8 +1122,8 @@ async def delete_message_context(interaction: discord.Interaction, message: disc
             await interaction.followup.send(f"Đã xoá tin nhắn ID: {message.id}.", ephemeral=True)
             channel = bot.get_channel(1257150347017850990) #Log-text
             await channel.send(embed=embed, files=temp_files)
-            print(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} delete message of {message.author.display_name}.")
-            print(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} delete message of {message.author.display_name}.")
+            print(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} delete message of {user_reported.display_name if user_reported!=None else 'Out Server'}.")
+            print(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} delete message of {user_reported.display_name if user_reported!=None else 'Out Server'}.")
     except discord.NotFound:
             await interaction.followup.send(f"Không tìm được tin nhắn với ID {message.id}. Vui lòng thử lại!", ephemeral=True)
             print(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} tried to delete message id{message.id} but not found.")
@@ -1720,7 +1724,9 @@ async def on_message(message: discord.Message):
     if word_matching_channel_en != None or word_matching_channel_vn!= None:
         speakFlag = False
     
-    await sub_function_ai_response(message=message, speakFlag=speakFlag)
+    ai_handling_response = AIResponseHandling(bot=bot)
+    await ai_handling_response.sub_function_ai_response(message=message, speakFlag=speakFlag)
+    
     await bot.process_commands(message)
 
 bot_token = os.getenv("BOT_TOKENN")

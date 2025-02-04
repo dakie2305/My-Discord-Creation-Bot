@@ -75,12 +75,13 @@ class UtilitiesFunctions():
             text= "Trung Lưu"
         elif total_wealth > 20000000:
             text= "Hạ Lưu"
-        elif total_wealth > -60000 and total_wealth < 0:
+        else:
+            text = "Rác Rưởi Tột Cùng"
+            
+        if total_wealth > -60000 and total_wealth < 0:
             text= "Đáy Xã Hội"
         elif total_wealth > -80000 and total_wealth <= -60000:
             text= "Rác Rưởi Tột Cùng"
-        else:
-            text = "Hạ Đẳng"
         return text
     
     @staticmethod
@@ -236,7 +237,7 @@ class UtilitiesFunctions():
     def get_text_on_love_rank(rank: int):
         text = "Mới Quen"
         if rank >= 20:
-            text= "Bạn Đời Vĩnh Cữu"
+            text= "Bạn Đời Vĩnh Cửu"
         elif rank >= 19:
             text= "Đôi Tri Kỉ"
         elif rank >= 16:

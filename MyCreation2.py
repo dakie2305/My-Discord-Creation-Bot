@@ -32,9 +32,11 @@ import Handling.Economy.GA.ListGAAndSkills as ListGAAndSkills
 from Handling.Economy.GA.GaDugeonView import GaDugeonView
 from Handling.Economy.Quest.DungeonQuestChannelClass import DungeonQuestChannel
 from CustomEnum.TrueHeavenEnum import TrueHeavenEnum
+from Handling.Misc.AIResponse import AIResponseHandling
 
 load_dotenv()
 intents = discord.Intents.all()
+intents.presences = False
 API_KEY = os.getenv("GOOGLE_CLOUD_KEY_2")
 genai.configure(api_key=API_KEY)
 
@@ -443,124 +445,18 @@ async def spawning_enemy_embed_in_dungeon(guild: discord.Guild, random_quest_cha
         await view.catch_random_player_profile()
     return
 
-async def sub_function_ai_response(message: discord.Message, speakFlag: bool = True):
-    if speakFlag == False: return
-    bots_creation_name = ["creation 2", "creation số 2", "creation no 2", "creatiom 2", "creation no. 2"]
-    guild_info = db.find_guild_extra_info_by_id(message.guild.id)
-    if message.reference is not None and message.reference.resolved is not None:
-        if message.reference.resolved.author == bot.user or CustomFunctions.contains_substring(message.content.lower(), bots_creation_name):
-            if message.guild.id != 1256987900277690470 and message.guild.id != 1194106864582004849: #Chỉ True Heaven, Học Viện 2ten mới không bị dính
-                if CustomFunctions.is_inside_working_time() == False:
-                    await message.channel.send(f"Tính năng AI của Bot chỉ hoạt động đến 12h đêm, vui lòng đợi đến 8h sáng hôm sau.")
-                    return
-            elif message.guild.id == 1194106864582004849 and message.channel.id != 1264455905756446740: #Học viện 2ten/ channel #sân-chơi-creation-2
-                return
-            flag, mess = await CustomFunctions.check_message_nsfw(message, bot)
-            if flag != 0:
-                await message.reply(mess)
-                interaction_logger.info(f"Username {message.author.name}, Display user name {message.author.display_name} violated chat when talking to {bot.user}")
-                interaction_logger.info(f"Username {message.author.name} violated chat {message.content} when talking to {bot.user}")
-                return
-            referenced_message = await message.channel.fetch_message(message.reference.message_id)
-            if referenced_message.embeds: return
-            async with message.channel.typing():
-                model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
-                prompt = await CustomFunctions.get_proper_prompt(message,"Creation 2", referenced_message)
-                print(f"Prompt generated from {bot.user}: {prompt}")
-                file_image_path = None
-                if len(message.attachments)>0:
-                    #Lấy ảnh đầu tiên thôi
-                    for att in message.attachments:
-                        if 'image' in att.content_type:
-                            file_image_path = await CustomFunctions.download_image_file_from_url(url=att.url, content_type=att.content_type,filename= att.filename)
-                            break
-                if file_image_path!= None:
-                    response = model.generate_content([f"{prompt}", PIL.Image.open(file_image_path)])
-                    #Xoá file
-                    os.remove(file_image_path)
-                else:
-                    response = model.generate_content(f"{prompt}")
-                bot_response = CustomFunctions.remove_creation_name_prefix(f"{response.text}")
-
-                #Kiểm tra xem bot reponse có nhiều emoji không, nếu nhiều quá thì remove emoji
-                if CustomFunctions.count_emojis_in_text(bot_response) > 4:
-                    bot_response = CustomFunctions.remove_emojis_from_text(bot_response)
-                
-                #Nếu có chữ record thì tạo file và gửi ghi âm
-                if 'record' in message.content.lower():
-                    await CustomFunctions.bot_sending_sound(bot_name='Creation_2', bot_reponse=bot_response, message=message)
-                    print(f"Username {message.author.name}, Display user name {message.author.display_name} tell {bot.user} to send record")
-                    interaction_logger.info(f"Username {message.author.name}, Display user name {message.author.display_name} tell {bot.user} to send record")
-                    return
-                
-                #Nếu là bot thì đương nhiên không reply, chỉ nhắn bình thường thôi
-                if(message.author.id == CustomFunctions.user_cr_1["user_id"] or message.author.id == CustomFunctions.user_cr_2["user_id"] or message.author.id == CustomFunctions.user_cr_3["user_id"]):
-                    await message.channel.send(f"{message.author.mention} {bot_response}")
-                else:
-                    await message.reply(f"{bot_response}")
-                CustomFunctions.save_user_convo_data(message=message, bot_reponse= bot_response, bot_name= "Creation 2")
-                print(f"Username {message.author.name}, Display user name {message.author.display_name} replied {bot.user}")
-                interaction_logger.info(f"Username {message.author.name}, Display user name {message.author.display_name} replied {bot.user}")
-            
-    elif CustomFunctions.contains_substring(message.content.lower(), bots_creation_name):
-        if message.guild.id != 1256987900277690470 and message.guild.id != 1194106864582004849 and CustomFunctions.is_inside_working_time() == False: #Chỉ True Heaven, học viện 2ten mới không bị dính
-            await message.channel.send(f"Tính năng AI của Bot chỉ hoạt động đến 12h đêm, vui lòng đợi đến 8h sáng hôm sau.")
-            return
-        elif message.guild.id == 1194106864582004849 and message.channel.id != 1264455905756446740: #Học viện 2ten/ channel #sân-chơi-creation-2
-            await message.channel.send(f"Bạn ơi vui lòng xuống <#1264455905756446740> để nói chuyện với mình nha, ở đây mình không muốn nói chuyện.")
-            return
-        async with message.channel.typing():
-            flag, mess = await CustomFunctions.check_message_nsfw(message, bot)
-            if flag != 0:
-                await message.channel.send(mess)
-            else:
-                model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
-                prompt = await CustomFunctions.get_proper_prompt(message,"Creation 2")
-                print(f"Prompt generated from {bot.user}: {prompt}")
-                file_image_path = None
-                if len(message.attachments)>0:
-                    #Lấy ảnh đầu tiên thôi
-                    for att in message.attachments:
-                        if 'image' in att.content_type:
-                            file_image_path = await CustomFunctions.download_image_file_from_url(url=att.url, content_type=att.content_type,filename= att.filename)
-                            break
-                if file_image_path!= None:
-                    response = model.generate_content([f"{prompt}", PIL.Image.open(file_image_path)])
-                    #Xoá file
-                    os.remove(file_image_path)
-                else:
-                    response = model.generate_content(f"{prompt}")
-                bot_response = CustomFunctions.remove_creation_name_prefix(f"{response.text}")
-                #Kiểm tra xem bot reponse có nhiều emoji không, nếu nhiều quá thì remove emoji
-                if CustomFunctions.count_emojis_in_text(bot_response) > 4:
-                    bot_response = CustomFunctions.remove_emojis_from_text(bot_response)
-                
-                #Nếu có chữ record thì tạo file và gửi ghi âm
-                if 'record' in message.content.lower():
-                    await CustomFunctions.bot_sending_sound(bot_name='Creation_2', bot_reponse=bot_response, message=message)
-                    print(f"Username {message.author.name}, Display user name {message.author.display_name} tell {bot.user} to send record")
-                    interaction_logger.info(f"Username {message.author.name}, Display user name {message.author.display_name} tell {bot.user} to send record")
-                    return
-                
-                await message.channel.send(f"{message.author.mention} {bot_response}")
-                CustomFunctions.save_user_convo_data(message=message, bot_reponse= bot_response, bot_name= "Creation 2")
-                print(f"Username {message.author.name}, Display user name {message.author.display_name} directly call {bot.user}")
-                interaction_logger.info(f"Username {message.author.name}, Display user name {message.author.display_name} directly call {bot.user}")
-    return
-
-
 
 client = discord.Client(intents=intents)
 @bot.event
 async def on_ready():
     print(f'We have logged in as {bot.user}')
     interaction_logger.info(f"Successfully logged in as {bot.user}")
-    dungeon_spawn_enemy_embed.start()
     
     if CustomFunctions.check_if_dev_mode()==False:
         automatic_speak_randomly.start()
         random_dropbox.start()
         random_quizz_embed.start()
+        dungeon_spawn_enemy_embed.start()
         activity = discord.Activity(type=discord.ActivityType.watching, 
                                 name="True Heavens",
                                 state = "Dùng lệnh /help để biết thêm thông tin",
@@ -579,7 +475,6 @@ async def on_ready():
     for ext in init_extension:
         await bot.load_extension(ext)
     
-    
 
 @bot.event
 async def on_message(message: discord.Message):
@@ -590,7 +485,10 @@ async def on_message(message: discord.Message):
     if await auto_rep.handling_auto_responder(message=message):
         speakFlag = False
     
-    await sub_function_ai_response(message=message, speakFlag=speakFlag)
+    ai_handling_response = AIResponseHandling(bot=bot)
+    await ai_handling_response.sub_function_ai_response(message=message, speakFlag=speakFlag)
+    # await sub_function_ai_response(message=message, speakFlag=speakFlag)
+    
     quest = QuestHandling(bot=bot)
     await quest.handling_quest_progress(message=message)
     auto_level = AutoLevelupProfileHandling(bot=bot)
@@ -744,6 +642,7 @@ init_extension = ["cogs.games.RockPaperScissorCog",
                   "cogs.economy.InventoryCog",
                   "cogs.economy.CoupleCog",
                   "cogs.economy.GaCog",
+                  "cogs.economy.LiXiCog",
                   
                   "cogs.misc.HelpCog",
                   "cogs.misc.DonationCog",
@@ -752,5 +651,4 @@ init_extension = ["cogs.games.RockPaperScissorCog",
 bot_token = os.getenv("BOT_TOKEN_NO2")
 if CustomFunctions.check_if_dev_mode():
     bot_token = os.getenv("BOT_TOKEN_NO2_DEV")
-
 bot.run(bot_token)

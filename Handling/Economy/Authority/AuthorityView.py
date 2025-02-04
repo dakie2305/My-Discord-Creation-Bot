@@ -16,8 +16,8 @@ class AuthorityView(discord.ui.View):
 
     @discord.ui.button(label="👍 Có", style=discord.ButtonStyle.success)
     async def yes_button(self, interaction: discord.Interaction, button: Button):
-        if interaction.user.id == self.target_user.id:
-            #Nếu tự bầu thì phải tự counter bản thân
+        if interaction.user.id == self.target_user.id and interaction.user.id != interaction.guild.owner_id:
+            #Nếu tự bầu thì phải tự counter bản thân nếu không phải server owner
             self.no_votes.add(1257713292445618239)
         user = interaction.user
         # Nếu user đã bầu Không thì xoá khỏi list No votes

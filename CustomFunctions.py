@@ -145,14 +145,15 @@ async def get_proper_prompt(message: discord.Message, bot_name: str, extra_messa
         channel_and_guild_name = f"**Hiện tại thì các ngươi đang ở chính nhà của mình, server True Heaven, và bản thân ngươi đang ở trong một phòng có tên là {message.channel.name}**\n"
     else:
         channel_and_guild_name = f"**Hiện tại thì các ngươi đang ở một server khác rất xa nhà mình, một server lạ rất đặc biệt, tên là {message.guild.name}, và bản thân ngươi đang ở trong một phòng có tên là {message.channel.name}**\n"
-    if lowered_botname == "creation 1":
-        background = background_creation_1 + shared_background
-    else:
-        background = background_creation_2 + shared_background
+    # if lowered_botname == "creation 1":
+    #     background = background_creation_1 + shared_background
+    # else:
+    #     background = background_creation_2 + shared_background
     background += channel_and_guild_name
     #Thông tin về quan hệ
     relationship = get_special_relationship_custom(message=message, bot_name=bot_name)
-    roleplay_ele = f"{initial_instruction} {background} {relationship}"
+    # roleplay_ele = f"{initial_instruction} {background} {relationship}"
+    roleplay_ele = f"{background} {relationship}"
     last_convo = ""
     
     #Áp thêm đoạn hội thoại về quá khứ
@@ -170,11 +171,11 @@ async def get_proper_prompt(message: discord.Message, bot_name: str, extra_messa
     #Chưa có thì coi như đây là một convo khác trong quá khứ
     if last_convo == "" and extra_message!= None:
         #Chưa có convo information về user này
-        roleplay_ele += f"**Ngươi và đối phương đã từng nói chuyện với nhau trước đây, \"{message.author.display_name}\" đã từng nói như dưới đây:*\n*{message.author.display_name}: ...*\n*\"{bot_name}\": {extra_message.content}*"
+        roleplay_ele += f"**Đối phương và {extra_message.author.display_name} đã từng nói chuyện với nhau trước đây, như thế này:*\n*{message.author.display_name}: ...*\n*\"{extra_message.author.display_name}\": {extra_message.content}*"
     elif last_convo != "" and extra_message!= None:
         #Nếu extra message mà hao hao giống với last convo thì khỏi cần thêm
         if compare_strings_intersected_words(last_convo, extra_message.content) == False:
-            roleplay_ele += f"\"{message.author.display_name}\":....*\n*\"{bot_name}\": {extra_message.content}*"
+            roleplay_ele += f"\"{message.author.display_name}\":....*\n*\"{extra_message.author.display_name}\": {extra_message.content}*"
     
     #lọc lại những mention trong message.content
     formated_content = await replace_mentions_with_names(message=message)
