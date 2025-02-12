@@ -689,10 +689,11 @@ class GaBattleView(discord.ui.View):
                 if base_text != None: return base_text
         
         #Tính tỉ lệ evasion
+        loss_amount = int(self_player_info.player_ga.attack_power * 0.5)
         opponent_evasion_chance = self.calculate_evasion_chance(current_stamina=opponent_alive_attack_info.player_ga.stamina, max_stamina=opponent_alive_attack_info.player_ga.max_stamina, level=opponent_alive_attack_info.player_ga.level)
         if opponent_evasion_chance > 85: opponent_evasion_chance = 85
         evasion_dice = UtilitiesFunctions.get_chance(opponent_evasion_chance)
-        if evasion_dice:
+        if evasion_dice and opponent_alive_attack_info.player_ga.stamina >= loss_amount: #Phải có đủ thể lực cần thiết mới né được
             #Chỉ trừ stamina của lower, tỉ lệ thấp hơn, tầm 50% của info.player_ga.attack_power
             loss_amount = int(self_player_info.player_ga.attack_power * 0.5)
             opponent_alive_attack_info.player_ga.stamina -= loss_amount

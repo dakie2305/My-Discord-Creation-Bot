@@ -196,13 +196,6 @@ class AutoresponderHandling():
             _mess = await message.channel.send(embed=embed, view=view)
             view.message= _mess
             
-        elif CustomFunctions.contains_substring(message.content.lower(), bbb_warning) and message.channel.id != 1297787832986767381 and message.guild.id == 1256987900277690470:
-            flag = True
-            view = SelfDestructView(timeout=5)
-            _mess = await message.channel.send(content=f"Shhhhh... We do not talk about this topic here.", view=view)
-            view.message= _mess
-            await message.delete()
-        
         elif message.guild.id != 1194106864582004849 and CustomFunctions.contains_substring(message.content.lower(), donate):
             check_exist = db.find_guild_extra_info_by_id(message.guild.id)
             if check_exist == None or check_exist.disable_donation_text_until == None or datetime.now() > check_exist.disable_donation_text_until:
