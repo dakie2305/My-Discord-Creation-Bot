@@ -59,6 +59,11 @@ class DailyEconomy(commands.Cog):
         
         if user_profile == None:
             user_profile = ProfileMongoManager.create_profile(guild_id=user.guild.id, guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name)
+        #nếu vẫn None thì báo lỗi
+        if user_profile == None:
+            embed = discord.Embed(title=f"", description=f"🚫 Có lỗi xảy ra, vui lòng thử lại lệnh!", color=0xc379e0)
+            return embed
+        
         
         if user_profile != None:
             if user_profile.last_attendance != None and user_profile.last_attendance.date() == today:
