@@ -135,13 +135,13 @@ class GaDugeonView(discord.ui.View):
         await view.commence_battle()
         
     async def catch_random_player_profile(self):
-        await asyncio.sleep(5)
         if self.difficulty < 3: return
+        await asyncio.sleep(5)
         dice = UtilitiesFunctions.get_chance(50 if self.difficulty == 3 else 85)
         if dice == False: return
-        
         if self.message == None or self.message.channel == None: return
         recent_messages = []
+        if self.is_attacked: return
         async for message in self.message.channel.history(limit=10):
             recent_messages.append(message)
         if recent_messages == None or len(recent_messages) == 0: return
