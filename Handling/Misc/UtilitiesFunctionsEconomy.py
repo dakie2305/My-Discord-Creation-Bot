@@ -76,8 +76,7 @@ class UtilitiesFunctions():
         elif total_wealth > 20000000:
             text= "Hạ Lưu"
         else:
-            text = "Rác Rưởi Tột Cùng"
-            
+            text = "Hạ Đẳng"
         if total_wealth > -60000 and total_wealth < 0:
             text= "Đáy Xã Hội"
         elif total_wealth > -80000 and total_wealth <= -60000:
