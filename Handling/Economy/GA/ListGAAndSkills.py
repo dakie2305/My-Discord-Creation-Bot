@@ -843,15 +843,16 @@ def get_list_back_ground_on_ga_id(ga_id: str):
       ]
     elif ga_id == "anya_forger":
         background_urls = [
-            "https://i.pinimg.com/originals/60/a4/70/60a470560abdbd4a87f4c98c1c833997.gif",
-            "https://i.pinimg.com/736x/d0/d7/05/d0d70541488e74b90b95b43cf9495933.jpg",
-            "https://i.pinimg.com/736x/04/8e/94/048e94e81111a3e444ec3fb307e4ede3.jpg",
-            "http://i.pinimg.com/736x/49/69/c3/4969c3a64c3ba8b6a1435e6b3ab81f33.jpg",
-            "https://i.pinimg.com/736x/82/79/3f/82793f76f13f98053fcffe3645a569ae.jpg",
-            "https://i.pinimg.com/736x/7e/f6/b3/7ef6b32044a8c10e945513f7303de7ef.jpg",
-            "https://i.pinimg.com/736x/4c/06/84/4c06849f39713ed0f86230e481496312.jpg",
-            "https://i.pinimg.com/736x/10/50/4d/10504d8f97c4964c89355a1c9f7e6f0b.jpg",
-            "https://i.pinimg.com/736x/95/0d/7d/950d7d4a21bc0c25ab4669a0a9a7590f.jpg",
+            "https://i.pinimg.com/originals/02/cf/88/02cf8875806bec9103812a01e49f1ef6.gif",
+            "http://i.pinimg.com/originals/0a/9e/1b/0a9e1b377e2bd71d6ea8e609c71713a5.gif",
+            "https://i.pinimg.com/originals/76/6f/c9/766fc9c92f70b9d3549de24169ca0618.gif",
+            "https://i.pinimg.com/originals/d2/c8/f7/d2c8f707201f1a95455dc304c21e7679.gif",
+            "https://i.pinimg.com/originals/8e/74/80/8e74802ee2a3df7d3db9cde1d760800c.gif",
+            "https://i.pinimg.com/originals/52/a0/94/52a0949db5a90b7da4f9bddcf66b2a0c.gif",
+            "https://i.pinimg.com/originals/09/8b/43/098b43adc37e2ad95c1b0004ccaf7f03.gif",
+            "https://i.pinimg.com/originals/9b/7a/83/9b7a83a7b07a9944dabf496faa63561a.gif",
+            "https://i.pinimg.com/originals/4a/06/12/4a06128ce1f9c3ec27cde0ebf5dc857a.gif",
+            "https://i.pinimg.com/originals/69/c1/6e/69c16e9e2b83dd9698190ab80adc04de.gif",
       ]
         
     elif ga_id == "":
