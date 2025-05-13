@@ -150,6 +150,54 @@ list_ga_shop_private = [
     ),
     
     GuardianAngel(
+      ga_id = "gojo_satoru",
+      ga_name= "Gojo Satoru",
+      ga_emoji= EmojiCreation2.GOJO_SATORU.value,
+      stamina = 50,
+      max_stamina= 50,
+      health= 50,
+      max_health= 50,
+      mana= 200,
+      max_mana= 200,
+      buff_attack_percent = 0,
+      attack_power= 15,
+      worth_amount = 50, 
+      worth_type = "D",
+    ),
+    
+    GuardianAngel(
+      ga_id = "son_goku",
+      ga_name= "Son Goku",
+      ga_emoji= EmojiCreation2.SON_GOKU.value,
+      stamina = 30,
+      max_stamina= 30,
+      health= 220,
+      max_health= 220,
+      mana= 30,
+      max_mana= 30,
+      buff_attack_percent = 0,
+      attack_power= 15,
+      worth_amount = 50, 
+      worth_type = "D",
+    ),
+    
+    GuardianAngel(
+      ga_id = "killua_zol",
+      ga_name= "Killua Zoldyck",
+      ga_emoji= EmojiCreation2.KILLUA_ZOLDYCK.value,
+      stamina = 50,
+      max_stamina= 50,
+      health= 50,
+      max_health= 50,
+      mana= 120,
+      max_mana= 120,
+      buff_attack_percent = 0,
+      attack_power= 15,
+      worth_amount = 50, 
+      worth_type = "D",
+    ),
+    
+    GuardianAngel(
       ga_id = "hatori_chise",
       ga_name= "Hatori Chise",
       ga_emoji= EmojiCreation2.Hatori_Chise.value,
@@ -164,6 +212,55 @@ list_ga_shop_private = [
       worth_amount = 50, 
       worth_type = "D",
     ),
+    
+    GuardianAngel(
+      ga_id = "gon_freecss",
+      ga_name= "Gon Freecss",
+      ga_emoji= EmojiCreation2.GON_FREECSS.value,
+      stamina = 110,
+      max_stamina= 110,
+      health= 100,
+      max_health= 100,
+      mana= 80,
+      max_mana= 80,
+      buff_attack_percent = 0,
+      attack_power= 15,
+      worth_amount = 50, 
+      worth_type = "D",
+    ),
+    
+    GuardianAngel(
+      ga_id = "sho_kusakabe",
+      ga_name= "Sho Kusakabe",
+      ga_emoji= EmojiCreation2.SHO_KUSAKABE.value,
+      stamina = 110,
+      max_stamina= 110,
+      health= 100,
+      max_health= 100,
+      mana= 80,
+      max_mana= 80,
+      buff_attack_percent = 0,
+      attack_power= 15,
+      worth_amount = 50, 
+      worth_type = "D",
+    ),
+    
+    GuardianAngel(
+      ga_id = "anya_forger",
+      ga_name= "Anya Forger",
+      ga_emoji= EmojiCreation2.ANYA_FORGER.value,
+      stamina = 180,
+      max_stamina= 180,
+      health= 50,
+      max_health= 50,
+      mana= 60,
+      max_mana= 60,
+      buff_attack_percent = 0,
+      attack_power= 15,
+      worth_amount = 50, 
+      worth_type = "D",
+    ),
+    
     GuardianAngel(
       ga_id = "raiden_shogun",
       ga_name= "Lôi Thần Raiden Ei",
@@ -680,6 +777,83 @@ def get_list_back_ground_on_ga_id(ga_id: str):
             "https://i.imgur.com/mwhZYDP.gif",
             "https://i.imgur.com/2iZOjxd.gif",
       ]
+        
+    elif ga_id == "gojo_satoru":
+        background_urls = [
+            "https://i.pinimg.com/originals/34/fa/e5/34fae51e2f9e5636fa499c8219ed77e3.gif",
+            "https://i.pinimg.com/originals/c1/c2/42/c1c242a44d69301f62d60d14b162b62c.gif",
+            "https://i.pinimg.com/originals/51/67/7b/51677b3a55ae1578470f8ed59b775f17.gif",
+            "https://i.pinimg.com/originals/87/12/8c/87128c97de0490527a28ffeb9faab102.gif",
+            "https://i.pinimg.com/originals/6e/f4/f6/6ef4f69e4c1892f74572bae685eec47d.gif",
+            "https://i.pinimg.com/originals/a5/46/63/a5466327439c91d28f889a75846434ea.gif",
+            "https://i.pinimg.com/originals/a7/b8/ff/a7b8ffc141f58391291d2a0c37e6447a.gif",
+            "https://i.pinimg.com/originals/a3/f2/0f/a3f20f2ee16cee43a9b85d40fc0a45f9.gif",
+            "https://i.pinimg.com/originals/ad/9c/cd/ad9ccdbb48c43b5c8b4812b0d210e9c0.gif",
+            "https://i.pinimg.com/originals/5c/a7/03/5ca703956747cdf703a885a7febd0d14.gif",
+      ]
+    elif ga_id == "son_goku":
+        background_urls = [
+            "https://i.pinimg.com/originals/7f/3e/c0/7f3ec08a7ee6a0b94c3d0e0dc33147e3.gif",
+            "https://i.pinimg.com/originals/1c/2b/4d/1c2b4d69a6899b8366d554af6d254831.gif",
+            "https://i.pinimg.com/originals/b7/7f/9f/b77f9f2fc744405538bd79a7ea7bd561.gif",
+            "https://i.pinimg.com/originals/d9/9b/bc/d99bbc582665ad43b314357c906ed491.gif",
+            "https://i.pinimg.com/originals/ec/92/1e/ec921e096081a1e2e4459165f42657f0.gif",
+            "https://i.pinimg.com/originals/8e/cd/a7/8ecda7539cbafee18d45be56232f8337.gif",
+            "https://i.pinimg.com/originals/95/d0/07/95d0074753908c754a4cbfea7d0d7f28.gif",
+            "https://i.pinimg.com/originals/33/31/f4/3331f4d9dc9f0dd43442c3228e663c27.gif",
+            "https://i.pinimg.com/originals/93/38/22/933822add62c82791827d8b18d8de93a.gif",
+            "https://i.pinimg.com/originals/98/e2/71/98e2713afe6a2169ba5083706beb1ca8.gif",
+      ]
+    elif ga_id == "killua_zol":
+        background_urls = [
+            "https://i.pinimg.com/originals/ea/75/5c/ea755cdedec76a482842c10bab7f006f.gif",
+            "https://i.pinimg.com/originals/6d/54/e6/6d54e627881efe2a9f152dbdeb1b6332.gif",
+            "https://i.pinimg.com/originals/73/73/52/7373528127c85ce8f780626781e7f055.gif",
+            "https://i.pinimg.com/originals/87/d2/30/87d23063d1190c2497ea02c86e0e509f.gif",
+            "https://i.pinimg.com/originals/04/a5/1c/04a51c39296e909e95f2b094892af11d.gif",
+            "https://i.pinimg.com/originals/3a/20/a8/3a20a86e8bb1cb249f5eb3c4742508b8.gif",
+            "https://i.pinimg.com/originals/90/34/c4/9034c4589c1d13e78109ca284d720c81.gif",
+            "https://i.pinimg.com/originals/c4/ee/a9/c4eea9b540594908c909d57660cce55d.gif",
+            "https://i.pinimg.com/originals/2b/1b/0c/2b1b0cd42d7c1d18480f931e5bc7e34a.gif",
+      ]
+    elif ga_id == "gon_freecss":
+        background_urls = [
+            "https://i.pinimg.com/originals/c5/0d/a9/c50da9aebcb1634d7b7b8a142ddab35d.gif",
+            "https://i.pinimg.com/originals/06/4c/13/064c1391af68fa700e44bb399203d4c9.gif",
+            "https://i.pinimg.com/originals/9c/c5/3d/9cc53d773b11df8bf93737eef1b0757b.gif",
+            "https://i.pinimg.com/originals/9d/f3/a7/9df3a736e4cbb67373886b6e5ce05877.gif",
+            "https://i.pinimg.com/originals/b4/91/45/b49145dd02279bae1fbf9c0ed152a915.gif",
+            "https://i.pinimg.com/originals/a0/90/a4/a090a4238ba1aa93f1f6eb68ceb545bb.gif",
+            "https://i.pinimg.com/originals/6e/20/37/6e203721c61ad2dad64a530c3cd4263e.gif",
+            "https://i.pinimg.com/originals/61/f8/d1/61f8d1c3221023059bdb6a046ada8e9f.gif",
+            "https://i.pinimg.com/originals/ce/e6/a0/cee6a0c673ee8bf85ccd7ea69f3017fa.gif",
+      ]
+        
+    elif ga_id == "sho_kusakabe":
+        background_urls = [
+            "https://i.pinimg.com/originals/60/a4/70/60a470560abdbd4a87f4c98c1c833997.gif",
+            "https://i.pinimg.com/736x/d0/d7/05/d0d70541488e74b90b95b43cf9495933.jpg",
+            "https://i.pinimg.com/736x/04/8e/94/048e94e81111a3e444ec3fb307e4ede3.jpg",
+            "http://i.pinimg.com/736x/49/69/c3/4969c3a64c3ba8b6a1435e6b3ab81f33.jpg",
+            "https://i.pinimg.com/736x/82/79/3f/82793f76f13f98053fcffe3645a569ae.jpg",
+            "https://i.pinimg.com/736x/7e/f6/b3/7ef6b32044a8c10e945513f7303de7ef.jpg",
+            "https://i.pinimg.com/736x/4c/06/84/4c06849f39713ed0f86230e481496312.jpg",
+            "https://i.pinimg.com/736x/10/50/4d/10504d8f97c4964c89355a1c9f7e6f0b.jpg",
+            "https://i.pinimg.com/736x/95/0d/7d/950d7d4a21bc0c25ab4669a0a9a7590f.jpg",
+      ]
+    elif ga_id == "anya_forger":
+        background_urls = [
+            "https://i.pinimg.com/originals/60/a4/70/60a470560abdbd4a87f4c98c1c833997.gif",
+            "https://i.pinimg.com/736x/d0/d7/05/d0d70541488e74b90b95b43cf9495933.jpg",
+            "https://i.pinimg.com/736x/04/8e/94/048e94e81111a3e444ec3fb307e4ede3.jpg",
+            "http://i.pinimg.com/736x/49/69/c3/4969c3a64c3ba8b6a1435e6b3ab81f33.jpg",
+            "https://i.pinimg.com/736x/82/79/3f/82793f76f13f98053fcffe3645a569ae.jpg",
+            "https://i.pinimg.com/736x/7e/f6/b3/7ef6b32044a8c10e945513f7303de7ef.jpg",
+            "https://i.pinimg.com/736x/4c/06/84/4c06849f39713ed0f86230e481496312.jpg",
+            "https://i.pinimg.com/736x/10/50/4d/10504d8f97c4964c89355a1c9f7e6f0b.jpg",
+            "https://i.pinimg.com/736x/95/0d/7d/950d7d4a21bc0c25ab4669a0a9a7590f.jpg",
+      ]
+        
     elif ga_id == "":
         background_urls = [
             "https://i.imgur.com/aIB624X.gif",
