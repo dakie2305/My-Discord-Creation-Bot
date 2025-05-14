@@ -210,6 +210,9 @@ class EmojiCreation2(Enum):
     GON_FREECSS = "<a:GonFreecss:1371858689039798455>"
     SHO_KUSAKABE = "<a:ShoKusakabe:1371859673740873759>"
     ANYA_FORGER = "<a:anya:1371859774161027104>"
+    NAGISA = "<a:nagisa:1372197598018011187>"
+    MAGI_GA = "<a:magi:1372197604330569792>"
+    SONIC_HEDGEHOG = "<a:sonic_hedgehog:1372197617299226705>"
     
     
     BLIZZARD = "<:blizzard:1320096021962952725>"

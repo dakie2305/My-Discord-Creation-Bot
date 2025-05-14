@@ -351,6 +351,51 @@ list_ga_shop_private = [
       worth_amount = 50, 
       worth_type = "D",
     ),
+    GuardianAngel(
+      ga_id = "nagisa_shiota",
+      ga_name= "Nagisa Shiota",
+      ga_emoji= EmojiCreation2.NAGISA.value,
+      stamina = 80,
+      max_stamina= 80,
+      health= 90,
+      max_health= 90,
+      mana= 120,
+      max_mana= 120,
+      buff_attack_percent = 0,
+      attack_power= 15,
+      worth_amount = 50, 
+      worth_type = "D",
+    ),
+    GuardianAngel(
+      ga_id = "aladdin_magi",
+      ga_name= "Aladdin Magi",
+      ga_emoji= EmojiCreation2.MAGI_GA.value,
+      stamina = 50,
+      max_stamina= 50,
+      health= 50,
+      max_health= 50,
+      mana= 180,
+      max_mana= 180,
+      buff_attack_percent = 0,
+      attack_power= 15,
+      worth_amount = 50, 
+      worth_type = "D",
+    ),
+    GuardianAngel(
+      ga_id = "sonic_hedgehog",
+      ga_name= "Sonic Siêu Thanh",
+      ga_emoji= EmojiCreation2.SONIC_HEDGEHOG.value,
+      stamina = 80,
+      max_stamina= 80,
+      health= 90,
+      max_health= 90,
+      mana= 120,
+      max_mana= 120,
+      buff_attack_percent = 0,
+      attack_power= 15,
+      worth_amount = 50, 
+      worth_type = "D",
+    ),
 ]
 list_ga_shop = copy.deepcopy(list_ga_shop_private)
 
@@ -853,6 +898,42 @@ def get_list_back_ground_on_ga_id(ga_id: str):
             "https://i.pinimg.com/originals/9b/7a/83/9b7a83a7b07a9944dabf496faa63561a.gif",
             "https://i.pinimg.com/originals/4a/06/12/4a06128ce1f9c3ec27cde0ebf5dc857a.gif",
             "https://i.pinimg.com/originals/69/c1/6e/69c16e9e2b83dd9698190ab80adc04de.gif",
+      ]
+    elif ga_id == "nagisa_shiota":
+        background_urls = [
+            "https://i.pinimg.com/originals/98/1e/9e/981e9ec0f67cc4abb2525e4b66dbfb51.gif",
+            "https://i.pinimg.com/originals/c3/a8/7f/c3a87f5261202f31991651b8c627c33c.gif",
+            "https://i.pinimg.com/originals/7e/ef/9a/7eef9aa893f12da058d5e105365abbef.gif",
+            "https://i.pinimg.com/originals/06/de/3a/06de3a0af78355bf7d4774cda4e4180e.gif",
+            "https://i.pinimg.com/originals/74/c2/de/74c2de14a0fbc3f3fb32dba41a6738f2.gif",
+            "https://i.pinimg.com/originals/55/42/39/5542396c8c6117cbd7a60a7c00b68738.gif",
+            "https://i.pinimg.com/originals/be/43/f2/be43f2e3760af96cdc7cd7f21a1ba865.gif",
+            "https://i.pinimg.com/originals/9d/f4/bc/9df4bcba1a18b526e527a078fae09717.gif",
+            "https://i.pinimg.com/originals/04/a7/46/04a746aa3d86160ee2bc5a365b769970.gif",
+      ]
+    elif ga_id == "aladdin_magi":
+        background_urls = [
+            "https://i.pinimg.com/originals/2b/c4/80/2bc4809db3f9543d889ae4e8a4210bec.gif",
+            "https://i.pinimg.com/originals/1c/34/83/1c3483273a2f87d7a477e7bdf356afea.gif",
+            "https://i.pinimg.com/originals/38/d5/fc/38d5fc0b9ae6c115ab65cc9234c567f3.gif",
+            "https://i.pinimg.com/originals/6d/f0/65/6df065440f1d9f6fd4502a06ee01668c.gif",
+            "https://i.pinimg.com/originals/1b/ee/92/1bee924510c3e042dd14bd194aef5825.gif",
+            "https://i.pinimg.com/originals/de/a6/68/dea668eb6e4f2cbc83d284dfef803c47.gif",
+            "https://i.pinimg.com/originals/c0/2a/2c/c02a2c23c83b932946674d6355242318.gif",
+            "https://i.pinimg.com/originals/83/a9/6c/83a96c6d062cff17c69b0b93fc424874.gif",
+            "https://i.pinimg.com/originals/ab/31/f0/ab31f01ec71d70c7232bcf6bd067c388.gif",
+      ]
+    elif ga_id == "sonic_hedgehog":
+        background_urls = [
+            "https://i.pinimg.com/originals/3b/9e/f0/3b9ef07482294e85db28e395f42e84e2.gif",
+            "https://i.pinimg.com/originals/b8/f7/cb/b8f7cb0032ed9beea29d75ded002f66b.gif",
+            "https://i.pinimg.com/originals/0b/4a/aa/0b4aaa3bc06939d06600154fc6c4fc81.gif",
+            "https://i.pinimg.com/originals/6e/4f/1e/6e4f1ee6a7f94435fe4136765aa24cdf.gif",
+            "https://i.pinimg.com/originals/cb/e0/44/cbe044c0ca2b02a9a8ec9b6365b9a32e.gif",
+            "https://i.pinimg.com/originals/02/65/61/02656148296e5b02e27927d36e661923.gif",
+            "https://i.pinimg.com/originals/75/50/54/75505419399a8079e9590266e4066cc4.gif",
+            "https://i.pinimg.com/originals/00/9c/e3/009ce35c5bfae7b58721f16520b899b3.gif",
+            "https://i.pinimg.com/originals/bd/16/0c/bd160cb85a77256c95b1e88dfe077c73.gif",
       ]
         
     elif ga_id == "":
