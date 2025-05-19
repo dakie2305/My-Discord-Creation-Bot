@@ -234,6 +234,7 @@ class EmojiCreation2(Enum):
     POTION_DESTROYER_SKILL = "<:potion_destroyer_skill:1328910109467738152>"
     TRADE_STATS_SKILL = "<:trade_stats_skill:1328910123128586342>"
     FIRE_COLL = "<:flame_coll:1332178177589514322>"
+    HEALTH_SACRIFICE = "<:health_sacrifice:1373947029486702696>"
     
     HP = "<:HP:1320777603358920724>"
     MP = "<:MP:1320777612926386256>"

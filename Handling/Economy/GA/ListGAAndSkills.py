@@ -663,6 +663,22 @@ list_ga_passive_skills_private_2 = [
         buff_attack_percent=1,
         min_level_required=1,
     ),
+    
+  GuardianAngelSkill(
+        skill_id = "skill_health_sacrifice",
+        skill_name= "Bo Kích Huyết",
+        skill_desc="Khi mana dưới 50% sẽ huỷ 5% máu của bản thân, và trừ máu của cả hai phe để nạp lại một lượng mana tương ứng tất cả số máu đã mất!",
+        skill_type= ["passive"],
+        emoji= EmojiCreation2.HEALTH_SACRIFICE.value,
+        attack_power= 1,
+        item_worth_amount= 60000,
+        item_worth_type= "G",
+        percent_min_mana_req= 20,
+        mana_loss= 20,
+        buff_defense_percent=0,
+        buff_attack_percent=1,
+        min_level_required=1,
+    ),
 ]
 list_ga_passive_skills_2 = copy.deepcopy(list_ga_passive_skills_private_2)
 

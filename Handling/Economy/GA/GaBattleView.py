@@ -1011,6 +1011,7 @@ class GaBattleView(discord.ui.View):
             is_upper = True
             
         current_mana_percent = int(self_player_info.player_ga.mana/self_player_info.player_ga.max_mana*100)
+        current_health_percent = int(self_player_info.player_ga.health/self_player_info.player_ga.max_health*100)
         skill = self.get_random_skill(list_skills=self_player_info.player_ga.list_skills, skill_id="summoning_skill")
         if skill != None and current_mana_percent >= 65 and self_player_info.has_used_summoning == False:
             #Skill này sẽ triệu hồi một NPC vào phe của 
@@ -1125,7 +1126,6 @@ class GaBattleView(discord.ui.View):
                 self_player_info.is_used_skill_resurrection = True
                 return base_text
         
-        current_health_percent = int(self_player_info.player_ga.health/self_player_info.player_ga.max_health*100)
         skill = self.get_random_skill(list_skills=self_player_info.player_ga.list_skills, skill_id="mass_heal_skill")
         if skill != None and current_mana_percent >= skill.percent_min_mana_req and current_health_percent <= 50:
             #Chỉ kích hoạt khi cả máu dưới 50%
@@ -1168,8 +1168,43 @@ class GaBattleView(discord.ui.View):
             base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã dùng chiêu {skill.emoji} - {skill.skill_name} để hồi phục Mana cho cả đội!"
             return base_text
         
+        #Khi mana dưới 50% thì kích hoạt chiêu Bo Kích Huyết nếu có
+        skill = self.get_random_skill(list_skills=self_player_info.player_ga.list_skills, skill_id="skill_health_sacrifice")
+        if skill != None and current_mana_percent >= skill.percent_min_mana_req and current_mana_percent <= 50:
+            #Dùng skill này sẽ huỷ 5% máu của bản thân, và trừ tất cả máu của cả hai phe, sau đó
+            #cộng mana lên tương ứng với lượng máu đã mất
+            mana_to_add = 0
+            loss_percent = 0.05
+            loss_health = int(self_player_info.player_ga.max_health*loss_percent)
+            if loss_health < 20: loss_health = 20 #Tối thiểu 20 máu
+            self_player_info.player_ga.health -= loss_health
+            if self_player_info.player_ga.health <0:self_player_info.player_ga.health = 0
+            for e in self.upper_attack_class:
+                #skip qua self_player_info
+                if e.player_profile != None and e.player_profile.user_id == self_player_info.player_profile.user_id: continue
+                e.player_ga.health -= loss_health
+                mana_to_add += loss_health
+                if e.player_ga.health <0:e.player_ga.health = 0
+            for e in self.lower_attack_class:
+                #skip qua self_player_info
+                if e.player_profile != None and e.player_profile.user_id == self_player_info.player_profile.user_id: continue
+                e.player_ga.health -= loss_health
+                mana_to_add += loss_health
+                if e.player_ga.health <0:e.player_ga.health = 0
+
+            #Cộng mana lên tương ứng với tất cả số lượng máu đã mất
+            self_player_info.player_ga.mana += mana_to_add
+            if self_player_info.player_ga.mana > self_player_info.player_ga.max_mana: self_player_info.player_ga.mana = self_player_info.player_ga.max_mana
+            #Trừ % mana của bản thân chiếu theo skill
+            own_loss_mana = int(self_player_info.player_ga.max_mana * skill.mana_loss / 100)
+            self_player_info.player_ga.mana -= own_loss_mana
+            if self_player_info.player_ga.mana <= 0: self_player_info.player_ga.mana = 0
+
+            base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã dùng {skill.emoji} -{skill.skill_name}, trừ đi **{loss_health}** máu của tất cả mọi người và nhận về **{mana_to_add}** Mana!"
+            return base_text
+        
         #Khi máu dưới 10% thì kích hoạt chiêu tự kích nếu có
-        if current_mana_percent <= 10:
+        if current_health_percent <= 10:
             skill = self.get_random_skill(list_skills=self_player_info.player_ga.list_skills, skill_id="skill_self_explosion")
             if skill != None:
                 #Dùng skill này sẽ tự huỷ mọi thứ và gây damage lên toàn bộ người dùng, tốn tất cả mana và stamina, máu
@@ -1194,9 +1229,11 @@ class GaBattleView(discord.ui.View):
                     if e.player_ga.mana <0:e.player_ga.mana = 0
                 base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} không còn gì để mất, và quyết định ra đi với chiêu {skill.emoji} -{skill.skill_name} khủng bố khiến mọi người đều dính sát thương!"
                 return base_text
+            
+        
         
         #Khi máu dưới 15% thì kích hoạt chiêu chạy trốn nếu có
-        if current_mana_percent <= 15:
+        if current_health_percent <= 15:
             skill = self.get_random_skill(list_skills=self_player_info.player_ga.list_skills, skill_id="skill_run_away")
             if skill != None and self_player_info.player_profile != None:
                 #Dùng skill này sẽ remove ra khỏi list list attack class ngay lập tức, tốn tất cả mana và stamina
