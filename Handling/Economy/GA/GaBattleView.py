@@ -1181,13 +1181,13 @@ class GaBattleView(discord.ui.View):
             if self_player_info.player_ga.health <0:self_player_info.player_ga.health = 0
             for e in self.upper_attack_class:
                 #skip qua self_player_info
-                if e.player_profile != None and e.player_profile.user_id == self_player_info.player_profile.user_id: continue
+                if e.player_profile != None and self_player_info.player_profile != None and e.player_profile.user_id == self_player_info.player_profile.user_id: continue
                 e.player_ga.health -= loss_health
                 mana_to_add += loss_health
                 if e.player_ga.health <0:e.player_ga.health = 0
             for e in self.lower_attack_class:
                 #skip qua self_player_info
-                if e.player_profile != None and e.player_profile.user_id == self_player_info.player_profile.user_id: continue
+                if e.player_profile != None and self_player_info.player_profile != None and e.player_profile.user_id == self_player_info.player_profile.user_id: continue
                 e.player_ga.health -= loss_health
                 mana_to_add += loss_health
                 if e.player_ga.health <0:e.player_ga.health = 0
