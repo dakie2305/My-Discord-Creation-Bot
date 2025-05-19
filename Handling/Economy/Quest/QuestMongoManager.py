@@ -27,15 +27,21 @@ def find_quest_by_user_id(guild_id: int, user_id: int):
         return QuestProfile.from_dict(data)
     return None
 
-def drop_quest_collection(guild_id: int):
+def drop_quest_collection_if_empty(guild_id: int):
     collection = db_specific[f'quest_{guild_id}']
-    if collection != None:
+    if collection is not None and collection.estimated_document_count() == 0:
         collection.drop()
+        print(f"Collection 'quest_{guild_id}' dropped because it was empty.")
 
 def find_all_profiles(guild_id: int):
     collection = db_specific[f'quest_{guild_id}']
     data = list(collection.find())
     return [QuestProfile.from_dict(quest) for quest in data]
+
+def delete_quest(guild_id: int, user_id: int):
+    collection = db_specific[f'quest_{guild_id}']
+    result = collection.delete_one({"id": "quest", "user_id": user_id})
+    return result
 
 def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_name: str, user_display_name: str, channel_id: int, channel_name: str, data_profile: Profile = None):
     #Mỗi server là một collection, chia theo server id
@@ -301,11 +307,6 @@ def get_value(lengend: int, hard: int, avarage: int):
     if dice: return 2
     return 1
 
-
-def delete_quest(guild_id: int, user_id: int):
-    collection = db_specific[f'quest_{guild_id}']
-    result = collection.delete_one({"id": "quest", "user_id": user_id})
-    return result
 
 #region Quest truth dare
 def increase_truth_dare_count(guild_id: int, user_id: int, is_truth: bool):

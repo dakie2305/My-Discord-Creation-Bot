@@ -1365,9 +1365,8 @@ async def clear_up_data_task():
                     QuestMongoManager.delete_quest(guild_id=guild.id, user_id=quest.user_id)
                     count+=1
             print(f"clear_up_data_task started. Deleted {count} quest data in guild {guild.name}")
-        else:
-            #Drop quest collection
-            QuestMongoManager.drop_quest_collection(guild_id=guild.id)
+        #Drop quest collection nếu trống
+        QuestMongoManager.drop_quest_collection_if_empty(guild_id=guild.id)
         #Kiểm tra snipe message cũ, xóa đi nếu cần
         all_snipe_channels = db.find_all_snipe_channel_info(guild_id=guild.id)
         if all_snipe_channels != None:
@@ -1387,9 +1386,8 @@ async def clear_up_data_task():
                 else:
                     #Xóa channell
                     db.delete_snipe_channel_info(guild_id=guild.id, channel_id=snipe_channel.channel_id)
-        else:
-            #drop collection
-            db.drop_snipe_channel_info_collection(guild_id=guild.id)
+        #drop collection nếu trống
+        db.drop_snipe_channel_info_collection_if_empty(guild_id=guild.id)
 
 
 #region Response AI

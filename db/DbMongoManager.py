@@ -265,11 +265,12 @@ def replace_snipe_message_info(guild_id: int, channel_id: int, snipe_messages: L
     result = collection.update_one({"channel_id": channel_id}, {"$set": {"snipe_messages": [conv.to_dict() for conv in snipe_messages]}})
     return result
 
-def drop_snipe_channel_info_collection(guild_id: int):
+def drop_snipe_channel_info_collection_if_empty(guild_id: int):
     db_specific = client['guild_database']
     collection = db_specific[f'snipe_info_guild_{guild_id}']
-    if collection != None:
+    if collection is not None and collection.estimated_document_count() == 0:
         collection.drop()
+        print(f"Collection 'snipe_info_guild_{guild_id}' dropped because it was empty.")
 
 def delete_snipe_channel_info(channel_id:int, guild_id: int):
     db_specific = client['guild_database']

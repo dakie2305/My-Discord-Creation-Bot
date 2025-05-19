@@ -303,9 +303,9 @@ async def clear_up_data_task():
                     QuestMongoManager.delete_quest(guild_id=guild.id, user_id=quest.user_id)
                     count+=1
             print(f"clear_up_data_task started. Deleted {count} quest data in guild {guild.name}")
-        else:
-            #Drop quest collection
-            QuestMongoManager.drop_quest_collection(guild_id=guild.id)
+        #Drop quest collection
+        QuestMongoManager.drop_quest_collection_if_empty(guild_id=guild.id)
+
         #Kiểm tra snipe message cũ, xóa đi nếu cần
         all_snipe_channels = db.find_all_snipe_channel_info(guild_id=guild.id)
         if all_snipe_channels != None:
@@ -320,14 +320,13 @@ async def clear_up_data_task():
                         if datetime.now() > overdue_date:
                             snipe_messages.remove(deleted_mess)
                             count+=1
+                            print(f"clear_up_data_task started. Deleted {count} snipe message in {guild.name}")
                     db.replace_snipe_message_info(guild_id=guild.id, channel_id=snipe_channel.channel_id, snipe_messages=snipe_messages)
-                    print(f"clear_up_data_task started. Deleted {count} snipe message in {guild.name}")
                 else:
                     #Xóa channell
                     db.delete_snipe_channel_info(guild_id=guild.id, channel_id=snipe_channel.channel_id)
-        else:
-            #drop collection
-            db.drop_snipe_channel_info_collection(guild_id=guild.id)
+        #drop collection khi trống
+        db.drop_snipe_channel_info_collection_if_empty(guild_id=guild.id)
 
 @tasks.loop(minutes = 13)
 async def dungeon_spawn_enemy_embed():
@@ -553,11 +552,11 @@ async def on_member_remove(member: discord.Member):
 async def on_guild_remove(guild: discord.Guild):
     #drop collection quest và profile
     ProfileMongoManager.drop_profile_collection(guild_id=guild.id)
-    QuestMongoManager.drop_quest_collection(guild_id=guild.id)
+    QuestMongoManager.drop_quest_collection_if_empty(guild_id=guild.id)
     #Drop extra info
     db.delete_guild_extra_info_by_id(guild_id=guild.id)
     #Drop snipe của guild
-    db.drop_snipe_channel_info_collection(guild_id=guild.id)
+    db.drop_snipe_channel_info_collection_if_empty(guild_id=guild.id)
     #Drop rps
     RpsMongoManager.drop_rps_collection(guild_id=guild.id)
     print(f"Bot {bot.user.display_name} removed from guild {guild.name}. Deleted all related collection")
