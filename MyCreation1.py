@@ -1358,17 +1358,18 @@ async def clear_up_data_task():
     for guild in guilds:
         #Kiểm tra quest cũ, xóa đi nếu cần
         all_quest_data = QuestMongoManager.find_all_profiles(guild_id=guild.id)
+        count = 0
         if all_quest_data != None:
-            count = 0
             for quest in all_quest_data:
                 if datetime.now() > quest.reset_date: 
                     QuestMongoManager.delete_quest(guild_id=guild.id, user_id=quest.user_id)
                     count+=1
-            print(f"clear_up_data_task started. Deleted {count} quest data in guild {guild.name}")
+        print(f"clear_up_data_task started. Deleted {count} quest data in guild {guild.name}")
         #Drop quest collection nếu trống
         QuestMongoManager.drop_quest_collection_if_empty(guild_id=guild.id)
         #Kiểm tra snipe message cũ, xóa đi nếu cần
         all_snipe_channels = db.find_all_snipe_channel_info(guild_id=guild.id)
+        count = 0
         if all_snipe_channels != None:
             count = 0
             for snipe_channel in all_snipe_channels:
@@ -1382,10 +1383,10 @@ async def clear_up_data_task():
                             snipe_messages.remove(deleted_mess)
                             count+=1
                     db.replace_snipe_message_info(guild_id=guild.id, channel_id=snipe_channel.channel_id, snipe_messages=snipe_messages)
-                    print(f"clear_up_data_task started. Deleted {count} snipe message in {guild.name}")
                 else:
-                    #Xóa channell
+                    #Xóa channel
                     db.delete_snipe_channel_info(guild_id=guild.id, channel_id=snipe_channel.channel_id)
+        print(f"clear_up_data_task started. Deleted {count} snipe message in {guild.name}")
         #drop collection nếu trống
         db.drop_snipe_channel_info_collection_if_empty(guild_id=guild.id)
 
