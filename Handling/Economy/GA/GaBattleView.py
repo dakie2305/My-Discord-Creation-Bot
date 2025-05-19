@@ -795,6 +795,14 @@ class GaBattleView(discord.ui.View):
         if opponent_alive_attack_info.player_ga.mana < 0: opponent_alive_attack_info.player_ga.mana = 0
         if opponent_alive_attack_info.player_ga.stamina < 0: opponent_alive_attack_info.player_ga.stamina = 0
         
+        #Đảm bảo stats không lố max
+        if self_player_info.player_ga.health > self_player_info.player_ga.max_health: self_player_info.player_ga.health = self_player_info.player_ga.max_health
+        if self_player_info.player_ga.mana > self_player_info.player_ga.max_mana: self_player_info.player_ga.mana = self_player_info.player_ga.max_mana
+        if self_player_info.player_ga.stamina > self_player_info.player_ga.max_stamina: self_player_info.player_ga.stamina = self_player_info.player_ga.max_stamina
+        if opponent_alive_attack_info.player_ga.health > opponent_alive_attack_info.player_ga.max_health: opponent_alive_attack_info.player_ga.health = opponent_alive_attack_info.player_ga.max_health
+        if opponent_alive_attack_info.player_ga.mana > opponent_alive_attack_info.player_ga.max_mana: opponent_alive_attack_info.player_ga.mana = opponent_alive_attack_info.player_ga.max_mana
+        if opponent_alive_attack_info.player_ga.stamina > opponent_alive_attack_info.player_ga.max_stamina: opponent_alive_attack_info.player_ga.stamina = opponent_alive_attack_info.player_ga.max_stamina
+        
         return base_text
         
     def calculate_evasion_chance(self, current_stamina, max_stamina, level, max_evasion=85, level_bonus=0.5):
@@ -1130,7 +1138,7 @@ class GaBattleView(discord.ui.View):
         
         #Khi mana dưới 50% thì kích hoạt chiêu Bo Kích Huyết nếu có
         skill = self.get_random_skill(list_skills=self_player_info.player_ga.list_skills, skill_id="skill_health_sacrifice")
-        if skill != None and current_mana_percent >= skill.percent_min_mana_req and current_mana_percent <= 50:
+        if skill != None and current_mana_percent >= skill.percent_min_mana_req and current_mana_percent <= 50 and current_health_percent > 10: #Phải có máu trên 10%
             #Dùng skill này sẽ huỷ 5% máu của bản thân, và trừ tất cả máu của cả hai phe, sau đó
             #cộng mana lên tương ứng với lượng máu đã mất
             mana_to_add = 0
