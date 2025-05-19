@@ -338,6 +338,10 @@ class UtilitiesFunctions():
 
     @staticmethod
     def progress_bar_stat(input_value: int, max_value: int, emoji: str, bar_length=15, mysterious_stats = False):
+        # Clamp values to ensure safety
+        if input_value > max_value: input_value = max_value
+        input_value = max(0, input_value)
+        max_value = max(1, max_value)  # Prevent divide by zero
         # Calculate the percentage of progress
         percentage = (input_value / max_value) * 100
         # Determine the number of filled (█) characters

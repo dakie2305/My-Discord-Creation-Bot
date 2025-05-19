@@ -314,6 +314,7 @@ class GaBattleView(discord.ui.View):
             embed.add_field(name=f"", value=text_own_profile_exist, inline=False)
             embed.add_field(name=f"", value=f"🦾: **{self_player_info.player_ga.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=self_player_info.player_ga.health, max_value=self_player_info.player_ga.max_health, emoji=EmojiCreation2.HP.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=self_player_info.player_ga.stamina, max_value=self_player_info.player_ga.max_stamina, emoji=EmojiCreation2.STAMINA.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=self_player_info.player_ga.mana, max_value=self_player_info.player_ga.max_mana, emoji=EmojiCreation2.MP.value)}", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬▬▬ι═══════════>", inline=False)
+        
         for self_player_info in self.lower_attack_class:
             text_target_profile_exist = f"Kẻ Thù {self_player_info.player_ga.ga_emoji} - **{self_player_info.player_ga.ga_name}** (Cấp {self_player_info.player_ga.level})"
             if self_player_info.player_profile != None:
@@ -791,6 +792,7 @@ class GaBattleView(discord.ui.View):
         if self_player_info.player_ga.health < 0: self_player_info.player_ga.health = 0
         if self_player_info.player_ga.mana < 0: self_player_info.player_ga.mana = 0
         if self_player_info.player_ga.stamina < 0: self_player_info.player_ga.stamina = 0
+        
         if opponent_alive_attack_info.player_ga.health < 0: opponent_alive_attack_info.player_ga.health = 0
         if opponent_alive_attack_info.player_ga.mana < 0: opponent_alive_attack_info.player_ga.mana = 0
         if opponent_alive_attack_info.player_ga.stamina < 0: opponent_alive_attack_info.player_ga.stamina = 0
