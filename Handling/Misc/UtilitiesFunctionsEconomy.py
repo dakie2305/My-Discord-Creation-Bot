@@ -145,10 +145,8 @@ class UtilitiesFunctions():
     @staticmethod
     def get_chance(chance: int):
         rand_num = random.randint(0, 100)
-        if rand_num < chance:
-            return True
-        else:
-            return False
+        return rand_num <= chance
+
     
     @staticmethod
     def get_emoji_from_loai_tien(loai_tien:str):
@@ -354,11 +352,15 @@ class UtilitiesFunctions():
 
     @staticmethod
     def get_chance_guardian_actual_death(level: int):
-        chance = 0
-        if level <= 10: chance = 1
-        if level >10 and level < 25: chance = 5
-        if level >= 25 and level < 50: chance = 7
-        if level >= 50 and level < 75: chance = 10
-        if level >= 75 and level < 99: chance = 15
-        else: chance = 15
-        return chance
+        if level <= 10:
+            return 1
+        elif level < 25:
+            return 5
+        elif level < 50:
+            return 7
+        elif level < 75:
+            return 10
+        elif level < 99:
+            return 15
+        else:  # level >= 99
+            return 17
