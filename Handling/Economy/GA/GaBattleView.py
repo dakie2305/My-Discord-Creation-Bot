@@ -1120,7 +1120,7 @@ class GaBattleView(discord.ui.View):
             return base_text
         
         skill = self.get_random_skill(list_skills=self_player_info.player_ga.list_skills, skill_id="max_mass_restored_mana_skill")
-        if skill != None and current_mana_percent >= skill.percent_min_mana_req and current_mana_percent <= 25 and self_player_info.max_mass_restored_mana_skill > 0:
+        if skill != None and current_mana_percent <= 25 and self_player_info.max_mass_restored_mana_skill > 0:
             #Chỉ kích hoạt khi cả mana dưới 25%
             #Hồi phục 20% mana cho cả đội
             if is_upper:
