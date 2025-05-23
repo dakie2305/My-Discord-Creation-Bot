@@ -14,6 +14,7 @@ from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 from Handling.Economy.Profile.InventoryBackToProfileView import ProfileToInventoryView, InventoryBackToProfileView
 import Handling.Economy.Couple.CoupleMongoManager as CoupleMongoManager
 from datetime import datetime, timedelta
+from CustomEnum.TrueHeavenEnum import TrueHeavenEnum
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(ProfileEconomy(bot=bot))
@@ -166,6 +167,27 @@ class ProfileEconomy(commands.Cog):
             CoupleMongoManager.delete_couple_by_id(guild_id=guild_id, user_id=user.id)
         
         cq = ""
+        #Đặc quyền server tổng
+        if user.guild.id == TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value:
+            for role in user.roles:
+                if role.id == TrueHeavenEnum.TOP_1_QUEST.value:
+                    cq = "Huyền Thoại Thợ Săn Tiền Thưởng"
+                elif role.id == TrueHeavenEnum.TOP_1_WEALTH.value:
+                    cq = "Tài Sản Giàu Nứt Vách Đổ Tường"
+                elif role.id == TrueHeavenEnum.TOP_1_GUARDIAN.value:
+                    cq = "Huyển Thoại Hộ Vệ Thần Đỉnh Cấp"
+                elif role.id == TrueHeavenEnum.TOP_1_WORD_MATCHING.value:
+                    cq = "Kẻ Nối Từ Đỉnh Cấp Nhất"
+                elif role.id == TrueHeavenEnum.TOP_1_WORD_SORT.value:
+                    cq = "Kẻ Đoán Từ Đỉnh Cấp Nhất"
+                elif role.id == TrueHeavenEnum.TOP_1_WORD_SORT.value:
+                    cq = "Kẻ Đoán Từ Đỉnh Cấp Nhất"
+                elif role.id == TrueHeavenEnum.DRAGON_WARRIOR_DONATOR.value:
+                    cq = "Thần Long Đại Hiệp"
+                elif role.id == TrueHeavenEnum.LONG.value:
+                    cq = "Long Đại Thần"
+                elif role.id == TrueHeavenEnum.ULTIMATE_SUGAR_DADDY.value:
+                    cq = "Bố Đường Tối Thượng"
         if data.is_authority:
             cq = "Chính Quyền Tối Cao"
         embed = discord.Embed(title=cq, description=f"**Profile {user.mention}**", color=0xddede7)
