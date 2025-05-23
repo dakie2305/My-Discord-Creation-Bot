@@ -396,6 +396,36 @@ list_ga_shop_private = [
       worth_amount = 50, 
       worth_type = "D",
     ),
+    GuardianAngel(
+      ga_id = "kamen_rider",
+      ga_name= "Kamen Rider DECADE",
+      ga_emoji= EmojiCreation2.KAMEN_RIDER.value,
+      stamina = 100,
+      max_stamina= 100,
+      health= 150,
+      max_health= 150,
+      mana= 50,
+      max_mana= 50,
+      buff_attack_percent = 0,
+      attack_power= 15,
+      worth_amount = 50, 
+      worth_type = "D",
+    ),
+    GuardianAngel(
+      ga_id = "dio",
+      ga_name= "Dio Brando",
+      ga_emoji= EmojiCreation2.DIO.value,
+      stamina = 100,
+      max_stamina= 100,
+      health= 150,
+      max_health= 150,
+      mana= 50,
+      max_mana= 50,
+      buff_attack_percent = 0,
+      attack_power= 15,
+      worth_amount = 50, 
+      worth_type = "D",
+    ),
 ]
 list_ga_shop = copy.deepcopy(list_ga_shop_private)
 
@@ -951,7 +981,28 @@ def get_list_back_ground_on_ga_id(ga_id: str):
             "https://i.pinimg.com/originals/00/9c/e3/009ce35c5bfae7b58721f16520b899b3.gif",
             "https://i.pinimg.com/originals/bd/16/0c/bd160cb85a77256c95b1e88dfe077c73.gif",
       ]
-        
+    elif ga_id == "dio":
+        background_urls = [
+            "https://i.postimg.cc/2S8MM5cP/t-i-xu-ng.gif",
+            "https://i.postimg.cc/L6VGxPTt/246ffc974075d1fd2de527fe63f9c087.gif",
+            "https://i.postimg.cc/TPcywCqy/dd50f8bf7657ee59e525402d3af155c5.gif",
+            "https://i.postimg.cc/vZrTq3KP/221954.gif",
+            "https://i.postimg.cc/pXYyks4s/da2.gif",
+            "https://i.postimg.cc/GtRdyCLd/DIO-Jo-Jo-The-World.gif",
+      ]
+    elif ga_id == "kamen_rider":
+        background_urls = [
+            "https://i.pinimg.com/originals/ee/bb/cf/eebbcfe83858720abee19e9d21ad5581.gif",
+            "https://i.pinimg.com/originals/fe/4e/9b/fe4e9b89b19f8c11ec4ba0c2b1eb20ba.gif",
+            "https://i.pinimg.com/originals/35/c9/08/35c90865265c8d00185a151dcb1de011.gif",
+            "https://i.postimg.cc/3RbqBGpk/1.gif",
+            "https://i.postimg.cc/bJ25mJRL/2.gif",
+            "https://i.postimg.cc/rsM95FZD/3.webp",
+            "https://i.postimg.cc/T3KmBWZV/4.gif",
+            "https://i.postimg.cc/GhG9DxwS/5.gif",
+            "https://i.postimg.cc/RV4xP7JY/6.gif",
+            "https://i.postimg.cc/BQqR5Jd9/7.gif",
+      ]   
     elif ga_id == "":
         background_urls = [
             "https://i.imgur.com/aIB624X.gif",

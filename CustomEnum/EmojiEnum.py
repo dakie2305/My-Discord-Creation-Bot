@@ -213,6 +213,8 @@ class EmojiCreation2(Enum):
     NAGISA = "<a:nagisa:1372197598018011187>"
     MAGI_GA = "<a:magi:1372197604330569792>"
     SONIC_HEDGEHOG = "<a:sonic_hedgehog:1372197617299226705>"
+    DIO = "<a:dio:1375325787015872564>"
+    KAMEN_RIDER = "<a:kamenrider:1375325795349954620>"
     
     
     BLIZZARD = "<:blizzard:1320096021962952725>"
