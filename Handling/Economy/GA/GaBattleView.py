@@ -729,7 +729,7 @@ class GaBattleView(discord.ui.View):
             additional_loss_stats_text = f" Mục tiêu đã bị hạ gục!"
             #Roll tỷ lệ chết nếu đánh PVE
             if self.is_players_versus_players == False and opponent_alive_attack_info.player_profile != None:
-                actual_death_chance = UtilitiesFunctions.get_chance_guardian_actual_death(level=opponent_alive_attack_info.player_ga.level)
+                actual_death_chance = UtilitiesFunctions.guardian_death_chance(level=opponent_alive_attack_info.player_ga.level)
                 roll_dice_death = UtilitiesFunctions.get_chance(actual_death_chance)
                 if roll_dice_death:
                     #Coi như chết

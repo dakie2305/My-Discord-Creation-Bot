@@ -27,14 +27,8 @@ class GaSellOptionsMenuView(discord.ui.View):
     
     @discord.ui.button(label="Bán Hộ Vệ Thần", style=discord.ButtonStyle.blurple)
     async def sell_guardian(self, interaction: discord.Interaction, button: discord.ui.Button):
-        
         #Tính toán số tiền bán hộ vệ thần
-        money = int(self.user_profile.guardian.worth_amount * 30 / 100)
-        if self.user_profile.guardian.level > 30:
-            money += int(self.user_profile.guardian.worth_amount*self.user_profile.guardian.level/100)
-            #Cộng tổng chỉ số chia 100
-            money += int(int(self.user_profile.guardian.attack_power + self.user_profile.guardian.max_health + self.user_profile.guardian.max_mana + self.user_profile.guardian.max_stamina) / 15)
-        if money > 500 and self.user_profile.guardian.worth_type == "D": money = 500 
+        money = UtilitiesFunctions.calculate_guardian_sell_money(self.user_profile.guardian.worth_amount, self.user_profile.guardian.level, self.user_profile.guardian.is_dead, self.user_profile.guardian.attack_power, self.user_profile.guardian.max_health, self.user_profile.guardian.max_mana, self.user_profile.guardian.max_stamina)
         embed = discord.Embed(title=f"", description=f"Bán Hộ Vệ Thần", color=0x0ce7f2)
         embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
         embed.add_field(name=f"", value=f"Bạn có sẵn sàng bán Hộ Vệ Thần [{self.user_profile.guardian.ga_emoji} - **{self.user_profile.guardian.ga_name}**] với giá **{money}** {UtilitiesFunctions.get_emoji_from_loai_tien(self.user_profile.guardian.worth_type)} không?", inline=False)

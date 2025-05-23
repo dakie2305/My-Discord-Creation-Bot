@@ -66,12 +66,7 @@ class GuardianAngelCog(commands.Cog):
             view.message = mess
         else:
             #Tính toán số tiền bán hộ vệ thần
-            money = int(user_profile.guardian.worth_amount * 30 / 100)
-            if user_profile.guardian.level > 30 and user_profile.guardian.is_dead == False:
-                money += int(user_profile.guardian.worth_amount*user_profile.guardian.level/100)
-                #Cộng tổng chỉ số chia 100
-                money += int(int(user_profile.guardian.attack_power + user_profile.guardian.max_health + user_profile.guardian.max_mana + user_profile.guardian.max_stamina) / 15)
-            if money > 500 and user_profile.guardian.worth_type == "D": money = 500
+            money = UtilitiesFunctions.calculate_guardian_sell_money(user_profile.guardian.worth_amount, user_profile.guardian.level, user_profile.guardian.is_dead, user_profile.guardian.attack_power, user_profile.guardian.max_health, user_profile.guardian.max_mana, user_profile.guardian.max_stamina)
             embed = discord.Embed(title=f"", description=f"Bán Hộ Vệ Thần", color=0x0ce7f2)
             embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
             embed.add_field(name=f"", value=f"Bạn có sẵn sàng bán Hộ Vệ Thần [{user_profile.guardian.ga_emoji} - **{user_profile.guardian.ga_name}**] với giá **{money}** {UtilitiesFunctions.get_emoji_from_loai_tien(user_profile.guardian.worth_type)} không?", inline=False)
@@ -81,6 +76,44 @@ class GuardianAngelCog(commands.Cog):
             mess = await interaction.followup.send(embed=embed, view=view, ephemeral=False)
             view.message = mess
         return
+    
+    def calculate_guardian_money(self, worth_amount: int, level: int, is_dead: bool = True, attack_power: int = 0, max_health: int = 0, max_mana: int = 0, max_stamina: int = 0) -> int:
+        if level < 65:
+            multiplier = 0.30
+        elif level < 80:
+            multiplier = 0.75
+        elif level < 100:
+            multiplier = 1.0
+        elif level < 115:
+            multiplier = 2.5
+        elif level < 125:
+            multiplier = 4.5
+        elif level < 140:
+            multiplier = 6.0
+        elif level < 150:
+            multiplier = 8.0
+        elif level < 165:
+            multiplier = 9.0
+        elif level < 180:
+            multiplier = 10.0
+        elif level < 190:
+            multiplier = 11.0
+        elif level < 200:
+            multiplier = 12.0
+        else:
+            # Level 225+ thì tiền tăng cao
+            multiplier = 15.5 + ((level - 225) * 0.1)
+        money = int(worth_amount * multiplier)
+        # Bonus chỉ số khi level trên nhiêu đây
+        if level > 100:
+            total_stats = attack_power + max_health + max_mana + max_stamina
+            money += int(total_stats / 5)
+            # Bonus còn sống
+            if not is_dead:
+                money += int(worth_amount * level / 100)
+        return money
+
+
         
     @ga_sell_slash_command.error
     async def ga_sell_slash_command_error(self, interaction: discord.Interaction, error):

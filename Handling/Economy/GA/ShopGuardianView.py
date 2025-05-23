@@ -111,7 +111,8 @@ class ShopGuardianView(discord.ui.View):
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, darkium=-cost_money)
                 if profile_user.is_authority != True:
                     ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, darkium=money_for_authority)
-            
+            #Giá của Hộ Vệ Thần bây giờ sẽ bằng giá khi mua để khi bán ra sẽ có thể lời
+            self.current_ga.worth_amount = cost_money
             ProfileMongoManager.set_main_guardian_profile(guild_id=interaction.guild_id, user_id=interaction.user.id, guardian=self.current_ga)
                 
             authority_text = f"Chính Quyền đã nhận được một nửa số tiền trên!"
