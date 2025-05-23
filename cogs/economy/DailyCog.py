@@ -175,6 +175,9 @@ class DailyEconomy(commands.Cog):
                 if role.id == TrueHeavenEnum.BOOSTER.value:
                     actual_money += 100000
                     embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenEnum.BOOSTER.value}> : +**100000** {EmojiCreation2.COPPER.value}", inline=False)
+                if role.id == TrueHeavenEnum.TOP_1_QUEST.value:
+                    actual_money += 50000
+                    embed.add_field(name=f"", value=f"- Là <@&{TrueHeavenEnum.TOP_1_QUEST.value}> : +**50000** {EmojiCreation2.COPPER.value}", inline=False)
         
         if actual_money == 0: actual_money = 200
         embed.add_field(name=f"", value=f"▬▬▬▬ι═════════>\n> Tổng tiền nhận từ điểm danh {SlashCommand.DAILY.value} hôm nay:   **+{int(actual_money)} {EmojiCreation2.COPPER.value} **", inline=False)
