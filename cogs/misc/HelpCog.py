@@ -105,6 +105,7 @@ class Help(commands.Cog):
         embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Dự án bot Creations sẽ luôn được phát triển theo thời gian, và sẽ luôn có feature mới, và đảm bảo fix bug phát sinh!", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Tham gia server True Heavens để được hướng dẫn và trải nghiệm tốt nhất nhé!", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
+        embed.set_image(url="https://i.pinimg.com/736x/d2/4c/86/d24c86825933e130584b76d249718d83.jpg")
         list_embed.append(embed)
         
         return list_embed
@@ -274,6 +275,7 @@ class Help(commands.Cog):
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Dự án bot Creations sẽ luôn được phát triển theo thời gian, và sẽ luôn có feature mới, và đảm bảo fix bug phát sinh!", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Tham gia server True Heavens để được hướng dẫn và trải nghiệm tốt nhất nhé!", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
+        embed.set_image(url="https://i.pinimg.com/736x/d2/4c/86/d24c86825933e130584b76d249718d83.jpg")
         list_embed.append(embed)
         
         return list_embed
