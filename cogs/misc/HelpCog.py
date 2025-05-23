@@ -103,6 +103,7 @@ class Help(commands.Cog):
         embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Kích hoạt AI của Creation 1 rất dễ, cứ gọi tên \"Creation 1\" trong tin nhắn, hoặc reply tin nhắn của bot là nó sẽ tự động trả lời bạn.", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Bot Creation 1 có thể hoạt động độc lập, nhưng chỉ phát huy tốt tác dụng khi dùng kèm với bot Creation 2, em gái của nó.", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Dự án bot Creations sẽ luôn được phát triển theo thời gian, và sẽ luôn có feature mới, và đảm bảo fix bug phát sinh!", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Tham gia server True Heavens để được hướng dẫn và trải nghiệm tốt nhất nhé!", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
         list_embed.append(embed)
         
@@ -123,6 +124,8 @@ class Help(commands.Cog):
         embed.add_field(name=f"", value=f"- **Trang {count}**: Tổng hợp thông tin về Bank.", inline=False)
         count+=1
         embed.add_field(name=f"", value=f"- **Trang {count}**: Tổng hợp thông tin về Shop và Kho Đồ.", inline=False)
+        count+=1
+        embed.add_field(name=f"", value=f"- **Trang {count}**: Tổng hợp thông tin về Thất Truyền Huyền Khí.", inline=False)
         count+=1
         embed.add_field(name=f"", value=f"- **Trang {count}**: Tổng hợp lệnh Chính Quyền.", inline=False)
         count+=1
@@ -187,6 +190,17 @@ class Help(commands.Cog):
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
         list_embed.append(embed)
         
+        #Legend Weapon
+        embed = discord.Embed(title=f"Thất Truyền Huyền Khí", description=f"Thông tin chung về Thất Truyền Huyền Khí...", color=0xddede7)
+        embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value}Chúng là tập hợp các vũ khí huyền thoại từng làm điên đảo thế gian, và đã thất lạc đến ngàn đời sau!", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value}Mỗi vũ khí đều là vũ khí độc nhất với kỹ năng tối thượng cực mạnh và xuyên phá tất cả giáp mà kẻ địch đang mang!", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value}Có thể câu được chúng bằng các cần câu cùi, tỉ lệ 5%!", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value}Có thể mua được chúng trong {SlashCommand.SHOP_GLOBAL.value} vào đúng duy nhất 00:00 đêm hoặc 12:00!", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value}Hoặc kêu Server Owner dùng lệnh {SlashCommand.SHOP_GLOBAL.value} để mở shop đặc biệt!", inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
+        list_embed.append(embed)
+
         #Authority
         embed = discord.Embed(title=f"Lệnh Chính Quyền", description=f"Các lệnh dành cho Chính Quyền", color=0xddede7)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
@@ -204,7 +218,7 @@ class Help(commands.Cog):
         embed = discord.Embed(title=f"Thông tin về Chính Quyền", description=f"Đặc quyền cực mạnh dành cho Chính Quyền", color=0xddede7)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
         embed.add_field(name=f"", value=f"**Ưu điểm:**", inline=False)
-        embed.add_field(name=f"", value=f"- Chính Quyền sẽ hưởng 10% tiền thuế từ nhiều lệnh khác, tất cả tiền đều đổ vào túi Chính Quyền", inline=False)
+        embed.add_field(name=f"", value=f"- Chính Quyền sẽ hưởng rất nhiều tiền thuế từ nhiều lệnh khác, tiền thuế đều đổ vào túi Chính Quyền", inline=False)
         embed.add_field(name=f"", value=f"- Chính Quyền được miễn không phải đóng bất kỳ thuế gì", inline=False)
         embed.add_field(name=f"", value=f"- Chính Quyền được phép bắt giam tất cả user nếu phát hiện đang phạm tội", inline=False)
         embed.add_field(name=f"", value=f"- Chính Quyền được phép dùng các lệnh độc quyền dành riêng cho Chính Quyền", inline=False)
@@ -225,6 +239,7 @@ class Help(commands.Cog):
         embed.add_field(name="", value=f"- Mỗi hộ vệ thần có các chỉ số chính: Máu, Thể Lực, Mana và Sức Tấn Công", inline=False)
         embed.add_field(name="", value=f"- Máu cao sẽ trụ được lâu, Thể Lực cao sẽ né được nhiều đòn, Mana cao sẽ tung được kỹ năng nhiều lần!", inline=False)
         embed.add_field(name="", value=f"- Đừng quên dùng lệnh {SlashCommand.GA_FEED.value}, {SlashCommand.GA_MEDITATE.value} hoặc mua bình hồi phục trong {SlashCommand.SHOP_GLOBAL.value} để hồi phục chỉ số!", inline=False)
+        embed.add_field(name="", value=f"- Bán hộ vệ thần với lệnh {SlashCommand.GA_SELL.value}, level trên 100 và chỉ số càng mạnh thì càng nhận được nhiều tiền!", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
         list_embed.append(embed)
         
@@ -257,6 +272,7 @@ class Help(commands.Cog):
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Kích hoạt AI của Creation 2 rất dễ, cứ gọi tên \"Creation 2\" trong tin nhắn, hoặc reply tin nhắn của bot là nó sẽ tự động trả lời bạn.", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Bot Creation 2 có thể hoạt động độc lập, nhưng chỉ phát huy tốt tác dụng khi dùng kèm với bot Creation 1, anh trai của nó.", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Dự án bot Creations sẽ luôn được phát triển theo thời gian, và sẽ luôn có feature mới, và đảm bảo fix bug phát sinh!", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Tham gia server True Heavens để được hướng dẫn và trải nghiệm tốt nhất nhé!", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
         list_embed.append(embed)
         
