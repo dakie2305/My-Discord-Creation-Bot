@@ -140,7 +140,6 @@ class TextShopInputModal(discord.ui.Modal):
                 amount = 1
                 
             cost_money = amount * int(item.item_worth_amount*self.rate)
-            
             if item.item_worth_type == "C" and profile_user.copper < cost_money:
                 await interaction.followup.send(f"Bạn không đủ {EmojiCreation2.COPPER.value}!", ephemeral=True)
                 return
@@ -183,15 +182,29 @@ class TextShopInputModal(discord.ui.Modal):
             maintenance_money = 3500
             maintenance_emoji = EmojiCreation2.COPPER.value
 
-            if item.item_worth_type == "D" and profile_user.darkium > 30:
-                maintenance_money = 1
-                maintenance_emoji = EmojiCreation2.DARKIUM.value
-                ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, darkium=-maintenance_money)
-            elif item.item_worth_type == "D" and profile_user.darkium < 30:
-                #Sẽ lấy 500 gold
-                maintenance_money = 500
-                maintenance_emoji = EmojiCreation2.GOLD.value
-                ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, gold=-maintenance_money)
+            if item.item_worth_type == "D":
+                if profile_user.darkium > 100:
+                    if profile_user.darkium > 1000:
+                        #Giàu thì 20% giá trị của item
+                        maintenance_money = int(cost_money * 0.2)
+                        maintenance_emoji = EmojiCreation2.DARKIUM.value
+                        if maintenance_money <= 0: maintenance_money = 1
+                        if maintenance_money > 10000: maintenance_money = 10000
+                        ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, darkium=-maintenance_money)
+                    else:
+                        #Giàu thì 10% giá trị của item
+                        maintenance_money = int(cost_money * 0.1)
+                        maintenance_emoji = EmojiCreation2.DARKIUM.value
+                        if maintenance_money <= 0: maintenance_money = 1
+                        if maintenance_money > 10000: maintenance_money = 10000
+                        ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, darkium=-maintenance_money)
+                else:
+                    #Sẽ lấy 10% tiền tính theo gold
+                    maintenance_money = int(cost_money * 10000 * 0.1)
+                    maintenance_emoji = EmojiCreation2.GOLD.value
+                    if maintenance_money <= 0: maintenance_money = 1
+                    if maintenance_money > 10000: maintenance_money = 10000
+                    ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, gold=-maintenance_money)
             elif item.item_worth_type == "G":
                 #mặc định 5% giá trị của item
                 maintenance_money = int(cost_money * 5 / 100)
@@ -215,7 +228,7 @@ class TextShopInputModal(discord.ui.Modal):
                 maintenance_emoji = EmojiCreation2.COPPER.value
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, copper=-maintenance_money)
                 
-            maintenance_text = f"\nNgoài ra, {interaction.user.mention} phải đóng thuế VAT là **{maintenance_money}** {maintenance_emoji}!"
+            maintenance_text = f"\nNgoài ra, {interaction.user.mention} phải đóng phí bảo hiểm là **{maintenance_money}** {maintenance_emoji}!"
             authority_text = f"Chính Quyền đã nhận được **{money_for_authority}** {self.get_emoji_money_from_type(item.item_worth_type)}!"
             if profile_user.is_authority == True:
                 authority_text = ""
