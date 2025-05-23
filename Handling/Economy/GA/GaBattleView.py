@@ -694,12 +694,12 @@ class GaBattleView(discord.ui.View):
         
         #Tính tỉ lệ evasion
         loss_amount = int(self_player_info.player_ga.attack_power * 0.5)
-        opponent_evasion_chance = self.calculate_evasion_chance(current_stamina=opponent_alive_attack_info.player_ga.stamina, max_stamina=opponent_alive_attack_info.player_ga.max_stamina, level=opponent_alive_attack_info.player_ga.level)
+        opponent_evasion_chance = self.calculate_chance_by_stats(current_stat=opponent_alive_attack_info.player_ga.stamina, max_stat=opponent_alive_attack_info.player_ga.max_stamina, level=opponent_alive_attack_info.player_ga.level)
         if opponent_evasion_chance > 85: opponent_evasion_chance = 85
         evasion_dice = UtilitiesFunctions.get_chance(opponent_evasion_chance)
         if evasion_dice and opponent_alive_attack_info.player_ga.stamina >= loss_amount: #Phải có đủ thể lực cần thiết mới né được
             #Chỉ trừ stamina của lower, tỉ lệ thấp hơn, tầm 50% của info.player_ga.attack_power
-            loss_amount = int(self_player_info.player_ga.attack_power * 0.5)
+            loss_amount = int(self_player_info.player_ga.attack_power * 0.3)
             opponent_alive_attack_info.player_ga.stamina -= loss_amount
             if opponent_alive_attack_info.player_ga.stamina <= 0: opponent_alive_attack_info.player_ga.stamina = 0
             base_text = f"- **[{self_player_info.player_ga.ga_emoji} - {self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã lao đến đánh {opponent_alive_attack_info.player_ga.ga_name} {text_target_profile_exist} nhưng mục tiêu đã kịp né tránh, và chỉ mất **{loss_amount}** thể lực!"
@@ -807,10 +807,10 @@ class GaBattleView(discord.ui.View):
         
         return base_text
         
-    def calculate_evasion_chance(self, current_stamina, max_stamina, level, max_evasion=85, level_bonus=0.5):
-        if level > 80: level = 80
-        evasion_chance = ((current_stamina / max_stamina) * max_evasion) + (level * level_bonus)
-        return int(min(evasion_chance, max_evasion))
+    def calculate_chance_by_stats(self, current_stat, max_stat, level, max_percent=90, level_bonus=0.8):
+        level = min(level, 80)
+        evasion_chance = ((current_stat / max_stat) * max_percent) + (level * level_bonus)
+        return int(min(evasion_chance, max_percent))
 
     def get_random_skill(self, list_skills: List["GuardianAngelSkill"], skill_types: List[str] = None, skill_id: str = None):
         #Nếu có skill name thì ưu tiên tìm xem có skill name không
@@ -833,7 +833,7 @@ class GaBattleView(discord.ui.View):
         current_mana_percent = int(self_player_info.player_ga.mana/self_player_info.player_ga.max_mana*100)
         if current_mana_percent >= skill.percent_min_mana_req:
             #roll chance dùng skill
-            use_magic_int = self.calculate_evasion_chance(current_stamina=self_player_info.player_ga.mana, max_stamina=self_player_info.player_ga.max_mana, level=opponent_alive_attack_info.player_ga.level)
+            use_magic_int = self.calculate_chance_by_stats(current_stat=self_player_info.player_ga.mana, max_stat=self_player_info.player_ga.max_mana, level=opponent_alive_attack_info.player_ga.level)
             first_chance = UtilitiesFunctions.get_chance(use_magic_int)
             second_chance = UtilitiesFunctions.get_chance(use_magic_int)
             if first_chance == False or second_chance == False: return None #Nếu cả 2 lần không trúng thì không dùng skill

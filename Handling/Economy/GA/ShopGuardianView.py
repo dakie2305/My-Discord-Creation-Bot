@@ -115,7 +115,7 @@ class ShopGuardianView(discord.ui.View):
             self.current_ga.worth_amount = cost_money
             ProfileMongoManager.set_main_guardian_profile(guild_id=interaction.guild_id, user_id=interaction.user.id, guardian=self.current_ga)
                 
-            authority_text = f"Chính Quyền đã nhận được một nửa số tiền trên!"
+            authority_text = f"Chính Quyền đã nhận được một nửa số tiền trên để làm thuế!"
             if profile_user.is_authority == True:
                 authority_text = ""
             await interaction.followup.send(f"{interaction.user.mention} đã chọn mua [{self.current_ga.ga_emoji}- **{self.current_ga.ga_name}**] với giá {cost_money} {UtilitiesFunctions.get_emoji_from_loai_tien(self.current_ga.worth_type)}!\n{authority_text}", ephemeral=False)

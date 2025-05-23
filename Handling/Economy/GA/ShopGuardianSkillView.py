@@ -174,7 +174,7 @@ class TextShopInputModal(discord.ui.Modal):
             if "legend_" in item.skill_id:
                 item.item_worth_amount = item.item_worth_amount/2
             ProfileMongoManager.update_list_skills_guardian(guild_id=interaction.guild_id, user_id=interaction.user.id, skill=item)
-            authority_text = f"Chính Quyền đã nhận được **{money_for_authority}** {self.get_emoji_money_from_type(item.item_worth_type)}!"
+            authority_text = f"Trong giao dịch này, Chính Quyền đã nhận được **{money_for_authority}** {self.get_emoji_money_from_type(item.item_worth_type)} để làm tiền thuế!"
             if profile_user.is_authority == True:
                 authority_text = ""
             await interaction.followup.send(f"{interaction.user.mention} đã chọn mua kỹ năng [{item.emoji}- **{item.skill_name}**] với giá {cost_money} {self.get_emoji_money_from_type(item.item_worth_type)}! {authority_text}", ephemeral=False)
