@@ -9,7 +9,7 @@ from Handling.Economy.GA.GuardianAngelClass import GuardianAngel, GuardianAngelS
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 
 class ShopGuardianView(discord.ui.View):
-    def __init__(self, list_ga = List[GuardianAngel], rate = 1.0):
+    def __init__(self, list_ga: List[GuardianAngel], rate = 1.0):
         super().__init__(timeout=30)
         self.message: discord.Message = None
         self.list_ga: List[GuardianAngel]  = list_ga
@@ -17,24 +17,7 @@ class ShopGuardianView(discord.ui.View):
         self.current_ga: GuardianAngel = None
         self.total_pages = len(self.list_ga)
         self.rate = rate
-        self.update_buttons()
 
-    def update_buttons(self):
-        if(self.total_pages == 1):
-            self.next_button.disabled = True
-            self.prev_button.disabled = True
-        elif self.current_page + 1 == self.total_pages:
-            #Trang cuối, ẩn nút next
-            self.next_button.disabled = True
-            self.prev_button.disabled = False
-        elif self.current_page == 0:
-            #Trang đầu, ẩn nút prev
-            self.next_button.disabled = False
-            self.prev_button.disabled = True
-        else:
-            self.next_button.disabled = False
-            self.prev_button.disabled = False
-    
     def create_embed(self):
         ga = self.list_ga[self.current_page]
         embed = discord.Embed(title=f"**Cửa Hàng Hộ Vệ Thần**", description=f"", color=discord.Color.blue())
@@ -60,10 +43,10 @@ class ShopGuardianView(discord.ui.View):
     
     @discord.ui.button(label="Trước", style=discord.ButtonStyle.primary)
     async def prev_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if self.current_page > 0:
-            self.current_page -= 1
-            self.update_buttons()
-            await interaction.response.edit_message(embed=self.create_embed(), view=self)
+        self.current_page = (self.current_page - 1) % self.total_pages
+        await interaction.response.edit_message(embed=self.create_embed(), view=self)
+        
+
     
     @discord.ui.button(label="Mua", style=discord.ButtonStyle.green)
     async def buy_button(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -124,12 +107,15 @@ class ShopGuardianView(discord.ui.View):
             await interaction.followup.send(f"Chỉ nhập số hợp lệ!", ephemeral=True)
             return    
 
+    @discord.ui.button(label="Đi tới trang khác", style=discord.ButtonStyle.grey)
+    async def go_to_page_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_modal(TextGoToPageInputModal(shop_view=self, list_ga=self.list_ga, message=self.message))
+        return
+
     @discord.ui.button(label="Sau", style=discord.ButtonStyle.primary)
     async def next_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if self.current_page < self.total_pages - 1:
-            self.current_page += 1
-            self.update_buttons()
-            await interaction.response.edit_message(embed=self.create_embed(), view=self)
+        self.current_page = (self.current_page + 1) % self.total_pages
+        await interaction.response.edit_message(embed=self.create_embed(), view=self)
         
     async def on_timeout(self):
         if self.message != None:
@@ -137,3 +123,38 @@ class ShopGuardianView(discord.ui.View):
                 await self.message.delete()
             except Exception:
                 return
+            
+
+class TextGoToPageInputModal(discord.ui.Modal):
+    def __init__(self, shop_view: ShopGuardianView, list_ga: List[GuardianAngel], message: discord.Message):
+        super().__init__(title="Chọn trang mà bạn muốn đi tới")
+        self.message: discord.Message = message
+        self.list_ga = list_ga
+        self.input_index_page_field = discord.ui.TextInput(
+            label="Nhập số trang mà bạn muốn tới",
+            placeholder="VD: 1, 2, 3, 4,...",
+            required=True,
+            default = "1",
+            max_length=2
+        )
+        self.add_item(self.input_index_page_field)
+        self.shop_view = shop_view
+    
+    async def on_submit(self, interaction: discord.Interaction):
+        #
+        input_value = self.input_index_page_field.value
+        try:
+            index = int(input_value) - 1
+            #Đảm bảo giá trị hợp lệ
+            if index < 0:
+                index = 0
+            elif index >= self.shop_view.total_pages:
+                index = self.shop_view.total_pages - 1
+            #Chuyển page đến trang người dùng muốn
+            self.shop_view.current_page = index
+            await interaction.response.edit_message(embed=self.shop_view.create_embed(), view=self.shop_view)
+        except Exception:
+            await interaction.followup.send(f"Chỉ nhập số hợp lệ!", ephemeral=True)
+            return
+        
+        return
