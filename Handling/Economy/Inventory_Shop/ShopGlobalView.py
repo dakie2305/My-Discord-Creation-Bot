@@ -181,7 +181,6 @@ class TextShopInputModal(discord.ui.Modal):
             maintenance_text = ""
             maintenance_money = 3500
             maintenance_emoji = EmojiCreation2.COPPER.value
-
             if item.item_worth_type == "D":
                 if profile_user.darkium > 100:
                     if profile_user.darkium > 1000:
@@ -228,11 +227,11 @@ class TextShopInputModal(discord.ui.Modal):
                 maintenance_emoji = EmojiCreation2.COPPER.value
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, copper=-maintenance_money)
                 
-            maintenance_text = f"\nNgoài ra, {interaction.user.mention} phải đóng phí bảo hiểm là **{maintenance_money}** {maintenance_emoji}!"
-            authority_text = f"Chính Quyền đã nhận được **{money_for_authority}** {self.get_emoji_money_from_type(item.item_worth_type)}!"
+            maintenance_text = f" và mất thêm **{maintenance_money}** {maintenance_emoji} tiền phí bảo hiểm"
+            authority_text = f"Ngoài ra, Chính Quyền Server đã được nhận **{money_for_authority}** {self.get_emoji_money_from_type(item.item_worth_type)} để làm tiền thuế!"
             if profile_user.is_authority == True:
                 authority_text = ""
-            await interaction.followup.send(f"{interaction.user.mention} đã chọn mua **{amount}** [{item.emoji}- **{item.item_name}**] với giá {cost_money} {self.get_emoji_money_from_type(item.item_worth_type)}! {authority_text}{maintenance_text}", ephemeral=False)
+            await interaction.followup.send(f"{interaction.user.mention} đã chọn mua **{amount}** [{item.emoji}- **{item.item_name}**] với giá {cost_money} {self.get_emoji_money_from_type(item.item_worth_type)}{maintenance_text}!\n{authority_text}", ephemeral=False)
             ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=interaction.user.id)
             if legend_check:
                 if self.message != None: await self.message.delete()
