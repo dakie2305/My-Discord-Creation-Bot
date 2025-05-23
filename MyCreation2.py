@@ -330,11 +330,11 @@ async def clear_up_data_task():
 
 @tasks.loop(minutes = 13)
 async def dungeon_spawn_enemy_embed():
-    is_inside_disable_time = UtilitiesFunctions.is_within_time_range()
-    #Không chạy trong khoảng thời gian trên
-    if is_inside_disable_time: return
     guilds = bot.guilds
     for guild in guilds:
+        is_inside_disable_time = UtilitiesFunctions.is_within_time_range()
+        #Không chạy trong khoảng thời gian trên, trừ server True Heavens
+        if is_inside_disable_time and guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value: return
         if CustomFunctions.check_if_dev_mode()==True and guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value and guild.id != 1293554240593330241: continue
         #Kiểm tra quest channel của server, nếu có thì mới chọn
         guild_info = db.find_guild_extra_info_by_id(guild_id=guild.id)
