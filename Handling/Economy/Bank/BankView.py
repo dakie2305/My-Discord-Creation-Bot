@@ -135,17 +135,29 @@ class TextInputModal(discord.ui.Modal):
         profile_user = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
         tax = 250
         tax_emoji = EmojiCreation2.COPPER.value
-        
         #Chuyển đến loại tiền nào thì đánh thuế loại tiền đó
-        if profile_user.darkium > 15 and to_emoji == EmojiCreation2.DARKIUM.value:
-            tax = 1
-            tax_emoji = EmojiCreation2.DARKIUM.value
-        if profile_user.darkium < 15 and to_emoji == EmojiCreation2.DARKIUM.value:
-            #mặc định 5% số tiền quy đổi Gold
-            tax = int(new_money_value * 5 / 100)
-            tax_emoji = EmojiCreation2.GOLD.value
-            if tax <= 0: tax = 1
-            if tax > 10000: tax = 10000
+        #Riêng Darkium thì kiểm tra xem độ giàu cỡ nào
+        if to_emoji == EmojiCreation2.DARKIUM.value:
+            if profile_user.darkium > 100 and to_emoji == EmojiCreation2.DARKIUM.value:
+                #Nếu sở hữu quá nhiều tiền thì cứ việc đánh thuế bình thường
+                if profile_user.darkium > 1000:
+                    #mặc định 5% số tiền quy đổi
+                    tax = int(new_money_value * 5 / 100)
+                    tax_emoji = EmojiCreation2.DARKIUM.value
+                    if tax <= 0: tax = 1
+                    if tax > 5000000: tax = 5000000
+                else:
+                    #Nếu sở hữu ít hơn 1000 darkium thì đánh thuế 3% số tiền quy đổi
+                    tax = int(new_money_value * 3 / 100)
+                    tax_emoji = EmojiCreation2.DARKIUM.value
+                    if tax <= 0: tax = 1
+                    if tax > 5000000: tax = 5000000
+            else:
+                #mặc định 5% số tiền quy đổi Gold
+                tax = int(new_money_value * 5 / 100)
+                tax_emoji = EmojiCreation2.GOLD.value
+                if tax <= 0: tax = 1
+                if tax > 10000: tax = 10000
         elif to_emoji == EmojiCreation2.GOLD.value:
             #mặc định 5% số tiền quy đổi
             tax = int(new_money_value * 5 / 100)
@@ -164,8 +176,11 @@ class TextInputModal(discord.ui.Modal):
             tax_emoji = EmojiCreation2.COPPER.value
             if tax <= 0: tax = 1
             if tax > 10000000: tax = 10000000
+        else:
+            tax = 250
+            tax_emoji = EmojiCreation2.COPPER.value
             
-        #Cộng tiền 200 Copper cho chính quyền nếu user_profile không phải là chính quyền
+        #Cộng tiền thuế cho chính quyền nếu user_profile không phải là chính quyền
         tax_text = ""
         if profile_user.is_authority == False:
             tax_text = f"Đương nhiên là bị trừ **{tax}** {tax_emoji} để đóng thuế cho Chính Quyền!"
@@ -181,7 +196,6 @@ class TextInputModal(discord.ui.Modal):
             elif tax_emoji == EmojiCreation2.DARKIUM.value:
                 ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, darkium=tax)
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name= interaction.guild.name, user_id= interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, darkium= -tax)
-            
             
         extra_text = f""
         if suffix == "C" or suffix == "c":

@@ -77,44 +77,6 @@ class GuardianAngelCog(commands.Cog):
             view.message = mess
         return
     
-    def calculate_guardian_money(self, worth_amount: int, level: int, is_dead: bool = True, attack_power: int = 0, max_health: int = 0, max_mana: int = 0, max_stamina: int = 0) -> int:
-        if level < 65:
-            multiplier = 0.30
-        elif level < 80:
-            multiplier = 0.75
-        elif level < 100:
-            multiplier = 1.0
-        elif level < 115:
-            multiplier = 2.5
-        elif level < 125:
-            multiplier = 4.5
-        elif level < 140:
-            multiplier = 6.0
-        elif level < 150:
-            multiplier = 8.0
-        elif level < 165:
-            multiplier = 9.0
-        elif level < 180:
-            multiplier = 10.0
-        elif level < 190:
-            multiplier = 11.0
-        elif level < 200:
-            multiplier = 12.0
-        else:
-            # Level 225+ thì tiền tăng cao
-            multiplier = 15.5 + ((level - 225) * 0.1)
-        money = int(worth_amount * multiplier)
-        # Bonus chỉ số khi level trên nhiêu đây
-        if level > 100:
-            total_stats = attack_power + max_health + max_mana + max_stamina
-            money += int(total_stats / 5)
-            # Bonus còn sống
-            if not is_dead:
-                money += int(worth_amount * level / 100)
-        return money
-
-
-        
     @ga_sell_slash_command.error
     async def ga_sell_slash_command_error(self, interaction: discord.Interaction, error):
         if isinstance(error, discord.app_commands.CommandOnCooldown):
