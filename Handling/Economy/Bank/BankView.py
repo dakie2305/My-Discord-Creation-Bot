@@ -154,7 +154,7 @@ class TextInputModal(discord.ui.Modal):
                     if tax > 5000000: tax = 5000000
             else:
                 #mặc định 5% số tiền quy đổi Gold
-                tax = int(new_money_value * 5 / 100)
+                tax = int(new_money_value * 8000 * 0.5)
                 tax_emoji = EmojiCreation2.GOLD.value
                 if tax <= 0: tax = 1
                 if tax > 10000: tax = 10000
