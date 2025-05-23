@@ -19,7 +19,7 @@ list_ga_shop_private = [
       max_mana= 120,
       attack_power= 20,
       buff_attack_percent = 1,
-      worth_amount = 50, 
+      worth_amount = 80, 
       worth_type = "D",
     ),
     
@@ -35,7 +35,7 @@ list_ga_shop_private = [
       max_mana= 120,
       attack_power= 20,
       buff_attack_percent = 1,
-      worth_amount = 50, 
+      worth_amount = 75, 
       worth_type = "D",
     ),
     
@@ -51,7 +51,7 @@ list_ga_shop_private = [
       max_mana= 90,
       buff_attack_percent = 0,
       attack_power= 15,
-      worth_amount = 50, 
+      worth_amount = 70, 
       worth_type = "D",
     ),
     GuardianAngel(
@@ -66,7 +66,7 @@ list_ga_shop_private = [
       max_mana= 80,
       buff_attack_percent = 0,
       attack_power= 15,
-      worth_amount = 50, 
+      worth_amount = 70, 
       worth_type = "D",
     ),
     
@@ -82,7 +82,7 @@ list_ga_shop_private = [
       max_mana= 80,
       buff_attack_percent = 0,
       attack_power= 15,
-      worth_amount = 50, 
+      worth_amount = 90, 
       worth_type = "D",
     ),
     
@@ -98,7 +98,7 @@ list_ga_shop_private = [
       max_mana= 80,
       buff_attack_percent = 0,
       attack_power= 15,
-      worth_amount = 50, 
+      worth_amount = 60, 
       worth_type = "D",
     ),
     GuardianAngel(
@@ -113,7 +113,7 @@ list_ga_shop_private = [
       max_mana= 130,
       buff_attack_percent = 1,
       attack_power= 20,
-      worth_amount = 50, 
+      worth_amount = 90, 
       worth_type = "D",
     ),
     
@@ -129,7 +129,7 @@ list_ga_shop_private = [
       max_mana= 80,
       buff_attack_percent = 0,
       attack_power= 15,
-      worth_amount = 50, 
+      worth_amount = 85, 
       worth_type = "D",
     ),
     
@@ -145,7 +145,7 @@ list_ga_shop_private = [
       max_mana= 80,
       buff_attack_percent = 0,
       attack_power= 15,
-      worth_amount = 50, 
+      worth_amount = 60, 
       worth_type = "D",
     ),
     
@@ -161,7 +161,7 @@ list_ga_shop_private = [
       max_mana= 200,
       buff_attack_percent = 0,
       attack_power= 15,
-      worth_amount = 50, 
+      worth_amount = 75, 
       worth_type = "D",
     ),
     
@@ -177,7 +177,7 @@ list_ga_shop_private = [
       max_mana= 30,
       buff_attack_percent = 0,
       attack_power= 15,
-      worth_amount = 50, 
+      worth_amount = 90, 
       worth_type = "D",
     ),
     
@@ -193,7 +193,7 @@ list_ga_shop_private = [
       max_mana= 120,
       buff_attack_percent = 0,
       attack_power= 15,
-      worth_amount = 50, 
+      worth_amount = 85, 
       worth_type = "D",
     ),
     
@@ -209,7 +209,7 @@ list_ga_shop_private = [
       max_mana= 80,
       buff_attack_percent = 0,
       attack_power= 15,
-      worth_amount = 50, 
+      worth_amount = 85, 
       worth_type = "D",
     ),
     
@@ -225,7 +225,7 @@ list_ga_shop_private = [
       max_mana= 80,
       buff_attack_percent = 0,
       attack_power= 15,
-      worth_amount = 50, 
+      worth_amount = 85, 
       worth_type = "D",
     ),
     
@@ -241,7 +241,7 @@ list_ga_shop_private = [
       max_mana= 80,
       buff_attack_percent = 0,
       attack_power= 15,
-      worth_amount = 50, 
+      worth_amount = 85, 
       worth_type = "D",
     ),
     
@@ -257,7 +257,7 @@ list_ga_shop_private = [
       max_mana= 60,
       buff_attack_percent = 0,
       attack_power= 15,
-      worth_amount = 50, 
+      worth_amount = 95, 
       worth_type = "D",
     ),
     
@@ -273,7 +273,7 @@ list_ga_shop_private = [
       max_mana= 100,
       buff_attack_percent = 0,
       attack_power= 15,
-      worth_amount = 50, 
+      worth_amount = 90, 
       worth_type = "D",
     ),
     GuardianAngel(
@@ -288,7 +288,7 @@ list_ga_shop_private = [
       max_mana= 80,
       buff_attack_percent = 0,
       attack_power= 15,
-      worth_amount = 50, 
+      worth_amount = 85, 
       worth_type = "D",
     ),
     GuardianAngel(
@@ -303,7 +303,7 @@ list_ga_shop_private = [
       max_mana= 100,
       buff_attack_percent = 0,
       attack_power= 15,
-      worth_amount = 50, 
+      worth_amount = 90, 
       worth_type = "D",
     ),
     GuardianAngel(
@@ -318,7 +318,7 @@ list_ga_shop_private = [
       max_mana= 120,
       buff_attack_percent = 0,
       attack_power= 15,
-      worth_amount = 50, 
+      worth_amount = 80, 
       worth_type = "D",
     ),
     GuardianAngel(
@@ -333,7 +333,7 @@ list_ga_shop_private = [
       max_mana= 120,
       buff_attack_percent = 0,
       attack_power= 15,
-      worth_amount = 50, 
+      worth_amount = 80, 
       worth_type = "D",
     ),
     GuardianAngel(
@@ -348,7 +348,7 @@ list_ga_shop_private = [
       max_mana= 120,
       buff_attack_percent = 0,
       attack_power= 15,
-      worth_amount = 50, 
+      worth_amount = 80, 
       worth_type = "D",
     ),
     GuardianAngel(
@@ -363,7 +363,7 @@ list_ga_shop_private = [
       max_mana= 120,
       buff_attack_percent = 0,
       attack_power= 15,
-      worth_amount = 50, 
+      worth_amount = 80, 
       worth_type = "D",
     ),
     GuardianAngel(
@@ -378,7 +378,7 @@ list_ga_shop_private = [
       max_mana= 180,
       buff_attack_percent = 0,
       attack_power= 15,
-      worth_amount = 50, 
+      worth_amount = 80, 
       worth_type = "D",
     ),
     GuardianAngel(
@@ -393,7 +393,7 @@ list_ga_shop_private = [
       max_mana= 120,
       buff_attack_percent = 0,
       attack_power= 15,
-      worth_amount = 50, 
+      worth_amount = 75, 
       worth_type = "D",
     ),
     GuardianAngel(
@@ -408,7 +408,7 @@ list_ga_shop_private = [
       max_mana= 50,
       buff_attack_percent = 0,
       attack_power= 15,
-      worth_amount = 50, 
+      worth_amount = 90, 
       worth_type = "D",
     ),
     GuardianAngel(
@@ -423,7 +423,7 @@ list_ga_shop_private = [
       max_mana= 50,
       buff_attack_percent = 0,
       attack_power= 15,
-      worth_amount = 50, 
+      worth_amount = 90, 
       worth_type = "D",
     ),
 ]
