@@ -86,7 +86,7 @@ class TrueHeavenCustomCommands(commands.Cog):
     #region sd_th
     @commands.command()
     @discord.app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
-    async def sd_th(self, ctx, user: discord.Member, text: str):
+    async def sd_th(self, ctx, user: discord.Member, *, text: str):
         message: discord.Message = ctx.message
         if message:
             if message.author.id != 315835396305059840 or message.guild.id != 1256987900277690470:
