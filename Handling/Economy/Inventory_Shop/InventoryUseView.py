@@ -255,7 +255,7 @@ class InventoryUseView(discord.ui.View):
                     await self.message.delete()
                 except Exception as e:
                     print(f"Failed to delete message in channel {interaction.channel.name} in guild {interaction.guild.name} after using GA summoning book.\n{e}")
-            await self.handline_summoning_ga_book(interaction=interaction)
+            await self.handline_summoning_ga_book(interaction=interaction, level=self.user_profile.guardian.level if self.user_profile.guardian else 1)
         else:
             #Không xoá
             flag_delete_item = False
@@ -266,8 +266,8 @@ class InventoryUseView(discord.ui.View):
         return
     
     
-    async def handline_summoning_ga_book(self, interaction: discord.Interaction):
-        level = random.randint(10, 30)
+    async def handline_summoning_ga_book(self, interaction: discord.Interaction, level: int):
+        level = max(level, 110) # Cấp tối thiểu là 110
         guardian_chance = 100
         mysterious_stats = True
         bonus_percent = 15

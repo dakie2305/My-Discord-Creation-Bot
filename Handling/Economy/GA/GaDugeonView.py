@@ -87,12 +87,11 @@ class GaDugeonView(discord.ui.View):
         if self.difficulty >= 3:
             #Nếu self.difficulty trên 3 thì roll lại kẻ địch theo stats của player ga nếu player ga trên cấp 80 hoặc enemy thấp cấp hơn
             #Thì scale theo level của player
-            
             scale_level = new_player_profile.guardian.level + 10
             if self.difficulty >= 4:
                 scale_level = max(scale_level, 110) # Độ khó trên 4 thì cấp tối thiểu là 110
             
-            if new_player_profile.guardian.level >= 80 or self.enemy_ga.level < new_player_profile.guardian.level:
+            if self.enemy_ga.level < new_player_profile.guardian.level:
                 text_name = self.enemy_ga.ga_name
                 text_emoji = self.enemy_ga.ga_emoji
                 self.enemy_ga = ListGAAndSkills.get_random_ga_enemy_generic(level=scale_level, override_emoji=text_emoji, override_name=text_name)
