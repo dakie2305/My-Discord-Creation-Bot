@@ -127,7 +127,7 @@ class ProfileEconomy(commands.Cog):
             if len(quote) > 800:
                 await message.reply(content="Độ dài quá ký tự cho phép")
                 return
-            embed = discord.Embed(title=f"", description=f"Đã cập nhật quote thành công. Vui lòng dùng lệnh {SlashCommand.PROFILE.value} để xem profile.", color=0xddede7)
+            embed = discord.Embed(title=f"", description=f"Đã cập nhật quote thành công. Vui lòng dùng lệnh {SlashCommand.PROFILE.value} để xem profile.", color=0xffffff)
             ProfileMongoManager.update_profile_quote(guild_name=message.guild.name, guild_id=message.guild.id, user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, quote=quote)
             view = SelfDestructView(timeout=30)
             message_sent = await message.reply(embed=embed, view=view)
@@ -138,7 +138,7 @@ class ProfileEconomy(commands.Cog):
         if data == None:
             data = ProfileMongoManager.create_profile(guild_id=guild_id, user_id=user.id, guild_name=user.guild.name, user_name=user.name, user_display_name=user.display_name)
             if data == None:
-                embed = discord.Embed(title=f"", description=f"Không thể tạo profile! Vui lòng thử lại!", color=0xddede7)
+                embed = discord.Embed(title=f"", description=f"Không thể tạo profile! Vui lòng thử lại!", color=0xffffff)
                 return embed, None
         
         if data.guardian!= None and data.guardian.time_to_recover!= None:
@@ -150,7 +150,7 @@ class ProfileEconomy(commands.Cog):
                 data = ProfileMongoManager.find_profile_by_id(guild_id=guild_id, user_id=user.id)
         
         if data.is_authority and ProfileMongoManager.is_in_debt(data= data, copper_threshold=100000):
-            embed = discord.Embed(title=f"", description=f"Chính Quyền đã nợ nần quá nhiều và tự sụp đổ. Hãy dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", color=0xddede7)
+            embed = discord.Embed(title=f"", description=f"Chính Quyền đã nợ nần quá nhiều và tự sụp đổ. Hãy dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", color=0xffffff)
             data.copper = -10000
             data.silver = 0
             data.gold = 0
@@ -190,7 +190,11 @@ class ProfileEconomy(commands.Cog):
                     cq = "Bố Đường Tối Thượng"
         if data.is_authority:
             cq = "Chính Quyền Tối Cao"
-        embed = discord.Embed(title=cq, description=f"**Profile {user.mention}**", color=0xddede7)
+
+        embed_color = 0xffffff
+        if isinstance(data.profile_color, int) and 0x000000 <= data.profile_color <= 0xFFFFFF:
+            embed_color = data.profile_color
+        embed = discord.Embed(title=cq, description=f"**Profile {user.mention}**", color=embed_color)
         if user.avatar != None:
             embed.set_thumbnail(url=user.avatar.url)
         if data.protection_item != None:

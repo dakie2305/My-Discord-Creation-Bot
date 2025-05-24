@@ -36,8 +36,10 @@ class ProfileAdditionalView(discord.ui.View):
     # @discord.ui.button(label="Kho Đồ", style=discord.ButtonStyle.primary)
     async def inventory_button_function(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
-        
-        embed = discord.Embed(title=f"", description=f"**Kho đồ của <@{self.profile.user_id}>**", color=0xddede7)
+        embed_color = 0xffffff
+        if isinstance(self.profile.profile_color, int) and 0x000000 <= self.profile.profile_color <= 0xFFFFFF:
+            embed_color = self.profile.profile_color
+        embed = discord.Embed(title=f"", description=f"**Kho đồ của <@{self.profile.user_id}>**", color=embed_color)
         embed.add_field(name=f"Số lượng vật phẩm: {len(self.profile.list_items)}", value=f"", inline=True)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
         for item in self.profile.list_items:
@@ -55,7 +57,10 @@ class ProfileAdditionalView(discord.ui.View):
         time_window = timedelta(hours=self.profile.plant.hour_require)
         next_time = self.profile.plant.plant_date + time_window
         unix_time = int(next_time.timestamp())
-        embed = discord.Embed(title="", description=f"**Vườn nhà của <@{self.profile.user_id}>**", color=0xddede7)
+        embed_color = 0xffffff
+        if isinstance(self.profile.profile_color, int) and 0x000000 <= self.profile.profile_color <= 0xFFFFFF:
+            embed_color = self.profile.profile_color
+        embed = discord.Embed(title="", description=f"**Vườn nhà của <@{self.profile.user_id}>**", color=embed_color)
         embed.add_field(name=f"", value=f"Thông tin cây trồng", inline=True)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
         embed.add_field(name=f"", value=f"Hạt giống đang trồng: [{self.profile.plant.source_item.emoji} - **{self.profile.plant.source_item.item_name}**]", inline=False)
@@ -72,8 +77,10 @@ class ProfileAdditionalView(discord.ui.View):
 
     async def guardian_button_function(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
-        embed = discord.Embed(title="", description=f"**Thông tin Hộ Vệ Thần của <@{self.profile.user_id}>**", color=0xddede7)
-        
+        embed_color = 0xffffff
+        if isinstance(self.profile.profile_color, int) and 0x000000 <= self.profile.profile_color <= 0xFFFFFF:
+            embed_color = self.profile.profile_color
+        embed = discord.Embed(title="", description=f"**Thông tin Hộ Vệ Thần của <@{self.profile.user_id}>**", color=embed_color)
         text_name = f"{self.profile.guardian.ga_emoji} - **{self.profile.guardian.ga_name}**"
         if self.profile.guardian.time_to_recover != None and self.profile.guardian.time_to_recover > datetime.now() and self.profile.guardian.is_dead == False:
             next_time = self.profile.guardian.time_to_recover
@@ -81,7 +88,6 @@ class ProfileAdditionalView(discord.ui.View):
             text_name += f" (Trọng thương đến <t:{unix_time}:t>)"
         if self.profile.guardian.is_dead == True:
             text_name += f"\n(Đã **tử nạn**. Hồi sinh bằng Phục Sinh Thạch trong {SlashCommand.SHOP_GLOBAL.value} hoặc bán đi để mua Hộ Vệ Thần mới)"
-        
         embed.add_field(name=f"", value=text_name, inline=False)
         if self.profile.guardian.stats_point > 0:
             embed.add_field(name=f"", value=f"Có **{self.profile.guardian.stats_point}** điểm cộng ({SlashCommand.GA_RANKUP.value})", inline=False)
@@ -177,13 +183,14 @@ class BackToProfileView(discord.ui.View):
             await self.message.edit(embed=embed)
             await interaction.followup.send(f"Bạn đã chuyển sang chế độ Profile!", ephemeral=True)
             return
-        
         couple_info = CoupleMongoManager.find_couple_by_id(guild_id=interaction.guild_id, user_id=self.profile.user_id)
-        
         cq = ""
         if self.profile.is_authority:
             cq = "Chính Quyền Tối Cao"
-        embed = discord.Embed(title=cq, description=f"**Profile <@{self.profile.user_id}>**", color=0xddede7)
+        embed_color = 0xffffff
+        if isinstance(self.profile.profile_color, int) and 0x000000 <= self.profile.profile_color <= 0xFFFFFF:
+            embed_color = self.profile.profile_color
+        embed = discord.Embed(title=cq, description=f"**Profile <@{self.profile.user_id}>**", color=embed_color)
         if self.profile.protection_item != None:
             embed.add_field(name=f"", value=f"Bảo Hộ Vật: [{self.profile.protection_item.emoji} - **{self.profile.protection_item.item_name}**]", inline=False)
         if self.profile.attack_item != None:
