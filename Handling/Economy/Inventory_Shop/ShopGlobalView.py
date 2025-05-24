@@ -16,24 +16,7 @@ class ShopGlobalView(discord.ui.View):
         self.total_pages = len(self.keys)
         self.current_list_item: List[Item] = None
         self.rate = rate
-        self.update_buttons()
 
-    def update_buttons(self):
-        if(self.total_pages == 1):
-            self.next_button.disabled = True
-            self.prev_button.disabled = True
-        elif self.current_page + 1 == self.total_pages:
-            #Trang cuối, ẩn nút next
-            self.next_button.disabled = True
-            self.prev_button.disabled = False
-        elif self.current_page == 0:
-            #Trang đầu, ẩn nút prev
-            self.next_button.disabled = False
-            self.prev_button.disabled = True
-        else:
-            self.next_button.disabled = False
-            self.prev_button.disabled = False
-    
     def create_embed(self):
         shop_name = self.keys[self.current_page]
         items = self.list_all_shops[shop_name]
@@ -59,10 +42,8 @@ class ShopGlobalView(discord.ui.View):
     
     @discord.ui.button(label="Trước", style=discord.ButtonStyle.primary)
     async def prev_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if self.current_page > 0:
-            self.current_page -= 1
-            self.update_buttons()
-            await interaction.response.edit_message(embed=self.create_embed(), view=self)
+        self.current_page = (self.current_page - 1) % self.total_pages
+        await interaction.response.edit_message(embed=self.create_embed(), view=self)
     
     @discord.ui.button(label="Mua", style=discord.ButtonStyle.green)
     async def buy_button(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -71,10 +52,8 @@ class ShopGlobalView(discord.ui.View):
 
     @discord.ui.button(label="Sau", style=discord.ButtonStyle.primary)
     async def next_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if self.current_page < self.total_pages - 1:
-            self.current_page += 1
-            self.update_buttons()
-            await interaction.response.edit_message(embed=self.create_embed(), view=self)
+        self.current_page = (self.current_page + 1) % self.total_pages
+        await interaction.response.edit_message(embed=self.create_embed(), view=self)
         
     async def on_timeout(self):
         if self.message != None:
