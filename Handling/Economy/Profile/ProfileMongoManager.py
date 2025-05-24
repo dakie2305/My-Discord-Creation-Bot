@@ -228,6 +228,13 @@ def update_last_attack_item_now(guild_id:int, user_id: int):
                                                                                     }})
     return result
 
+#region profile color
+def update_profile_color(guild_id:int, user_id: int, color: int = 0xffffff):
+    collection = db_specific[f'profile_{guild_id}']
+    result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"profile_color": color,
+                                                                                    }})
+    return result
+
 #region quest finished
 def increase_quest_finished(guild_id:int, user_id: int):
     collection = db_specific[f'profile_{guild_id}']
