@@ -176,6 +176,7 @@ class GaDugeonView(discord.ui.View):
         selected_user, selected_user_profile, selected_guardian = random.choice(valid_users)
         
         if selected_user == None or selected_user_profile == None or selected_guardian == None: return
+        if selected_user_profile != None and selected_user_profile.guardian != None and selected_user_profile.guardian.last_battle != None and selected_user_profile.guardian.last_battle > datetime.now() - timedelta(minutes=4): return
         
         #Bắt đầu chiến
         self.is_attacked = True

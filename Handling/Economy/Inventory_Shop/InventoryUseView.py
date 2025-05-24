@@ -1,4 +1,5 @@
 import discord
+from Handling.Economy.GA.GaDugeonView import GaDugeonView
 from Handling.Economy.Profile.ProfileClass import Profile
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 from CustomEnum.EmojiEnum import EmojiCreation2
@@ -9,6 +10,8 @@ import asyncio
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 import Handling.Economy.Couple.CoupleMongoManager as CoupleMongoManager
 from datetime import datetime, timedelta
+import random
+import Handling.Economy.GA.ListGAAndSkills as ListGAAndSkills
 
 class InventoryUseView(discord.ui.View):
     def __init__(self, user_profile: Profile, user: discord.Member):
@@ -244,6 +247,15 @@ class InventoryUseView(discord.ui.View):
             color = color_map.get(self.selected_item.item_id, 0xffffff)  # Default
             ProfileMongoManager.update_profile_color(guild_id=interaction.guild_id, user_id=self.user.id, color=color)
             await channel.send(content=text)
+        elif self.selected_item.item_id == "ga_boss_summoning":
+            text = f"{interaction.user.mention} đã cầm [{self.selected_item.emoji} - **{self.selected_item.item_name}**] và thực hiện nghi thức triệu hồi Hộ Vệ Thần huyền thoại!"
+            await channel.send(content=text)
+            if self.message != None:
+                try:
+                    await self.message.delete()
+                except Exception as e:
+                    print(f"Failed to delete message in channel {interaction.channel.name} in guild {interaction.guild.name} after using GA summoning book.\n{e}")
+            await self.handline_summoning_ga_book(interaction=interaction)
         else:
             #Không xoá
             flag_delete_item = False
@@ -252,7 +264,67 @@ class InventoryUseView(discord.ui.View):
             #Xoá vật phẩm
             ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, amount= -1)
         return
+    
+    
+    async def handline_summoning_ga_book(self, interaction: discord.Interaction):
+        level = random.randint(10, 30)
+        guardian_chance = 100
+        mysterious_stats = True
+        bonus_percent = 15
+        double_enemy_chance = 25
+        double_enemy_dice = UtilitiesFunctions.get_chance(double_enemy_chance)
+        top_1_leaderboard_dice = UtilitiesFunctions.get_chance(10)
+        if top_1_leaderboard_dice:
+            #Lấy top 1 của leaderboard ra làm enemy
+            enemy = self.get_top_1_ga_leaderboard(guild_id=interaction.guild_id)
+            print(f"Top 1 GA leaderboard: {enemy.ga_name} - {enemy.level} at guild {interaction.guild.name}")
+            if enemy is None:
+                enemy = ListGAAndSkills.get_random_ga_enemy_generic(level=level, guardian_chance=guardian_chance)
+        else:
+            enemy = ListGAAndSkills.get_random_ga_enemy_generic(level=level, guardian_chance=guardian_chance)
+        enemy_2 = None
+        embed = discord.Embed(title=f"", description=f"{EmojiCreation2.STUN_SKILL.value} **Hộ Vệ Thần Huyền Thoại** {EmojiCreation2.STUN_SKILL.value}", color=0x0ce7f2)
+        embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
+        if double_enemy_dice:
+            enemy = ListGAAndSkills.get_random_ga_enemy_generic(level=int(level/2), guardian_chance=guardian_chance)
+            text = f"Kẻ thù {enemy.ga_emoji} - **{enemy.ga_name}** (Cấp {UtilitiesFunctions.replace_with_question_marks(enemy.level)})"
+            embed.add_field(name=f"", value=text, inline=False)
+            embed.add_field(name=f"", value=f"🦾: **{enemy.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.health, max_value=enemy.max_health, emoji=EmojiCreation2.HP.value, mysterious_stats=mysterious_stats)}\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.stamina, max_value=enemy.max_stamina, emoji=EmojiCreation2.STAMINA.value, mysterious_stats=mysterious_stats)}\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.mana, max_value=enemy.max_mana, emoji=EmojiCreation2.MP.value, mysterious_stats=mysterious_stats)}", inline=False)
             
+            enemy_2 = ListGAAndSkills.get_random_ga_enemy_generic(level=int(level/3), guardian_chance=guardian_chance)
+            text = f"Kẻ thù {enemy_2.ga_emoji} - **{enemy_2.ga_name}** (Cấp {UtilitiesFunctions.replace_with_question_marks(enemy_2.level)})"
+            embed.add_field(name=f"", value=text, inline=False)
+            embed.add_field(name=f"", value=f"🦾: **{enemy_2.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy_2.health, max_value=enemy_2.max_health, emoji=EmojiCreation2.HP.value, mysterious_stats=mysterious_stats)}\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy_2.stamina, max_value=enemy_2.max_stamina, emoji=EmojiCreation2.STAMINA.value, mysterious_stats=mysterious_stats)}\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy_2.mana, max_value=enemy_2.max_mana, emoji=EmojiCreation2.MP.value, mysterious_stats=mysterious_stats)}", inline=False)
+        else:
+            text = f"Kẻ thù {enemy.ga_emoji} - **{enemy.ga_name}** (Cấp {enemy.level})"
+            text = f"Kẻ thù {enemy.ga_emoji} - **{enemy.ga_name}** (Cấp {UtilitiesFunctions.replace_with_question_marks(enemy.level)})"
+            embed.add_field(name=f"", value=text, inline=False)
+            embed.add_field(name=f"", value=f"🦾: **{enemy.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.health, max_value=enemy.max_health, emoji=EmojiCreation2.HP.value, mysterious_stats=mysterious_stats)}\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.stamina, max_value=enemy.max_stamina, emoji=EmojiCreation2.STAMINA.value, mysterious_stats=mysterious_stats)}\n{UtilitiesFunctions.progress_bar_stat(input_value=enemy.mana, max_value=enemy.max_mana, emoji=EmojiCreation2.MP.value, mysterious_stats=mysterious_stats)}", inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
+        footer_text = f"Hộ Vệ Thần Huyền Thoại sẽ bắt ngẫu nhiên một người trong channel\nphải giao chiến với kẻ thù!"
+        embed.set_footer(text=footer_text)
+        print(f"Spawning GA boss by book, base level around {level} at channel {interaction.channel.name} in guild {interaction.guild.name}.")
+        view = GaDugeonView(guild_id=interaction.guild_id, enemy_ga=enemy, enemy_ga_2=enemy_2, title=f"{EmojiCreation2.STUN_SKILL.value} **Hộ Vệ Thần Huyền Thoại** {EmojiCreation2.STUN_SKILL.value}", bonus_percent=bonus_percent, difficulty=4, footer_text=footer_text)
+        m = await interaction.channel.send(embed=embed, view=view)
+        view.message = m
+        await view.catch_random_player_profile()
+        return
+    
+    def get_top_1_ga_leaderboard(self, guild_id: int):
+        #Lấy top 1 ga leaderboard ra
+        list_profile_guild = ProfileMongoManager.find_all_profiles(guild_id=guild_id)
+        if list_profile_guild == None or len(list_profile_guild) == 0:
+            return None
+        list_profile_guild = sorted(
+                [profile for profile in list_profile_guild if profile.guardian], 
+                key=lambda profile: profile.guardian.level, reverse=True
+            )
+        top_profile = list_profile_guild[0] if list_profile_guild else None
+        if top_profile and top_profile.guardian:
+            top_profile.guardian.ga_name += f" (<@{top_profile.user_id}>)"
+            return top_profile.guardian
+        else:
+            return None
         
 class ItemSelect(discord.ui.Select):
     def __init__(self, user: discord.Member, list_item: List[Item], view: "InventoryUseView"):

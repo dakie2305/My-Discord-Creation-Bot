@@ -248,6 +248,7 @@ class EmojiCreation2(Enum):
     POTION_STAMINA_1 = "<:potion_stamina_1:1322946339629301760>"
     MAGIC_DV = "<a:magic_dv:1323334240674517147>"
     LIXI = "<:li_xi:1333024689248800858>"
+    SUMMONING_BOOK = "<a:summoning_book:1375819935993040906>"
 
     COLOR_BLACK = "<:color_black:1375717775166935060>"
     COLOR_BLUE = "<:color_blue:1375717782834122844>"
