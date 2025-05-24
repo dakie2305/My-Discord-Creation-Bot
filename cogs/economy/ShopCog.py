@@ -8,7 +8,7 @@ import CustomFunctions
 from Handling.Misc.SelfDestructView import SelfDestructView
 import CustomEnum.UserEnum as UserEnum
 from typing import List, Optional, Dict
-from Handling.Economy.Inventory_Shop.ItemClass import Item, list_gift_items, list_protection_items, list_support_items, list_attack_items, list_fishing_rod, list_legend_weapon_1, list_legend_weapon_2, list_support_ga_items
+from Handling.Economy.Inventory_Shop.ItemClass import Item, list_gift_items, list_protection_items, list_support_items, list_attack_items, list_fishing_rod, list_legend_weapon_1, list_legend_weapon_2, list_support_ga_items, list_profile_color_1, list_profile_color_2
 import Handling.Economy.GA.ListGAAndSkills as ListGAAndSkills
 from Handling.Economy.GA.GuardianAngelClass import GuardianAngel, GuardianAngelSkill
 from Handling.Economy.GA.ShopGuardianView import ShopGuardianView
@@ -105,6 +105,11 @@ class ShopEconomy(commands.Cog):
         list_all_shops["Shop Bảo Hộ"] = list_temp
         list_temp = copy.deepcopy(list_attack_items)
         list_all_shops["Shop Vũ Khí"] = list_temp
+
+        list_temp = copy.deepcopy(list_profile_color_1)
+        list_all_shops["Shop Màu Sắc Rực Rỡ 1"] = list_temp
+        list_temp = copy.deepcopy(list_profile_color_2)
+        list_all_shops["Shop Màu Sắc Rực Rỡ 2"] = list_temp
 
         check_passed = False
         if datetime.now().hour == 0 and datetime.now().minute == 0:

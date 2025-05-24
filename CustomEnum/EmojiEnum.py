@@ -248,6 +248,18 @@ class EmojiCreation2(Enum):
     POTION_STAMINA_1 = "<:potion_stamina_1:1322946339629301760>"
     MAGIC_DV = "<a:magic_dv:1323334240674517147>"
     LIXI = "<:li_xi:1333024689248800858>"
+
+    COLOR_BLACK = "<:color_black:1375717775166935060>"
+    COLOR_BLUE = "<:color_blue:1375717782834122844>"
+    COLOR_GREEN = "<:color_green:1375717791109480459>"
+    COLOR_LIGHT_RED = "<:color_lightred:1375717800810643557>"
+    COLOR_MISTY_ROSE = "<:color_mistyrose:1375717817248256120>"
+    COLOR_ORANGE = "<:color_orange:1375717828774203453>"
+    COLOR_PURPLE = "<:color_purple:1375717843487686666>"
+    COLOR_RED = "<:color_red:1375717853235380224>"
+    COLOR_TEAL = "<:color_teal:1375717863951958067>"
+    COLOR_YELLOW = "<:color_yellow:1375717875008016496>"
+    COLOR_PINK = "<:color_pink:1375719008535449600>"
     
     
     
