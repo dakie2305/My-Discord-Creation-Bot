@@ -236,8 +236,8 @@ class InventoryUseView(discord.ui.View):
                 "profile_color_green": 0x33ff33,
                 "profile_color_black": 0x000001,
                 "profile_color_misty_rose": 0xffd1cc,
-                "profile_color_pink": 0xffc0cb,
-                "profile_color_purple": 0xff99aa,
+                "profile_color_pink": 0xff99aa,
+                "profile_color_purple": 0x9900cc,
                 "profile_color_orange": 0xff8000,
                 "profile_color_yellow": 0xffff00,
             }
