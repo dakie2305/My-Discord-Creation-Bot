@@ -11,11 +11,12 @@ from datetime import datetime, timedelta
 import random
 import Handling.Economy.Couple.CoupleMongoManager as CoupleMongoManager
 
-class ProfileToInventoryView(discord.ui.View):
-    def __init__(self, profile: Profile):
+class ProfileAdditionalView(discord.ui.View):
+    def __init__(self, profile: Profile, profile_embed: discord.Embed = None):
         super().__init__(timeout=30)
         self.message: discord.Message = None
         self.profile = profile
+        self.profile_embed = profile_embed
         
         if profile.list_items != None and len(profile.list_items)>0:
             self.profile_button = discord.ui.Button(label="Kho Đồ", style=discord.ButtonStyle.primary)
@@ -43,7 +44,7 @@ class ProfileToInventoryView(discord.ui.View):
             embed.add_field(name=f"", value=f"{item.emoji} - {item.item_name} (x{item.quantity})", inline=True)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
         embed.set_footer(text=f"Đừng quên, bạn chỉ được giữ tối đa 20 vật phẩm, mỗi loại vật phẩm chỉ tối đa 99 cái thôi nhé!", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")
-        view = InventoryBackToProfileView(profile=self.profile)
+        view = BackToProfileView(profile=self.profile, profile_embed=self.profile_embed)
         m = await self.message.edit(embed=embed, view = view)
         view.message = m
         await interaction.followup.send(f"Bạn đã chuyển sang chế độ Kho Đồ!", ephemeral=True)
@@ -64,7 +65,7 @@ class ProfileToInventoryView(discord.ui.View):
         embed.add_field(name=f"", value=f"Sẽ thu hoạch được:", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} [{self.profile.plant.des_item.emoji} - **{self.profile.plant.des_item.item_name}**]", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
-        view = InventoryBackToProfileView(profile=self.profile)
+        view = BackToProfileView(profile=self.profile, profile_embed=self.profile_embed)
         m = await self.message.edit(embed=embed, view = view)
         view.message = m
         await interaction.followup.send(f"Bạn đã chuyển sang Khu Vườn!", ephemeral=True)
@@ -103,7 +104,7 @@ class ProfileToInventoryView(discord.ui.View):
                     embed.add_field(name=f"", value=f"\nNgoài ra còn nhiều kỹ năng khác!", inline=False)
                     break
         embed.set_footer(text=f"Đừng quên, nếu có thắc mắc về Hộ Vệ Thần thì cứ nhắn câu\nga help", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")
-        view = InventoryBackToProfileView(profile=self.profile)
+        view = BackToProfileView(profile=self.profile, profile_embed=self.profile_embed)
         try:
             #Gắn link background dựa trên id của guardian nếu có
             urls = ListGAAndSkills.get_list_back_ground_on_ga_id(self.profile.guardian.ga_id)
@@ -136,11 +137,12 @@ class ProfileToInventoryView(discord.ui.View):
             except Exception:
                 return
         
-class InventoryBackToProfileView(discord.ui.View):
-    def __init__(self, profile: Profile):
+class BackToProfileView(discord.ui.View):
+    def __init__(self, profile: Profile, profile_embed: discord.Embed = None):
         super().__init__(timeout=30)
         self.message: discord.Message = None
         self.profile = profile
+        self.profile_embed = profile_embed
     
     async def on_timeout(self):
         #Delete
@@ -158,6 +160,10 @@ class InventoryBackToProfileView(discord.ui.View):
     
     @discord.ui.button(label="Profile", style=discord.ButtonStyle.primary)
     async def profile_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if self.profile_embed != None:
+            #Chuyển về embed cũ
+            await self.message.edit(embed=self.profile_embed, view = None)
+            return
         await interaction.response.defer(ephemeral=True)
         if self.profile.is_authority and ProfileMongoManager.is_in_debt(data = self.profile, copper_threshold=100000):
             embed = discord.Embed(title=f"", description=f"Chính Quyền đã nợ nần quá nhiều và tự sụp đổ. Hãy dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", color=0xddede7)

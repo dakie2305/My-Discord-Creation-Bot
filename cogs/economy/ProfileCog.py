@@ -11,7 +11,7 @@ from CustomEnum.EmojiEnum import EmojiCreation2
 import CustomFunctions
 import CustomEnum.UserEnum as UserEnum
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
-from Handling.Economy.Profile.InventoryBackToProfileView import ProfileToInventoryView, InventoryBackToProfileView
+from Handling.Economy.Profile.InventoryBackToProfileView import ProfileAdditionalView, BackToProfileView
 import Handling.Economy.Couple.CoupleMongoManager as CoupleMongoManager
 from datetime import datetime, timedelta
 from CustomEnum.TrueHeavenEnum import TrueHeavenEnum
@@ -51,7 +51,7 @@ class ProfileEconomy(commands.Cog):
         else:
             embed, data = await self.procress_profile_embed(user=user, guild_id=interaction.guild_id)
         if data != None:
-            view = ProfileToInventoryView(profile=data)
+            view = ProfileAdditionalView(profile=data, profile_embed=embed)
             m = await interaction.followup.send(embed=embed, view = view)
             view.message = m
         else:
@@ -109,7 +109,7 @@ class ProfileEconomy(commands.Cog):
             else:
                 embed, data = await self.procress_profile_embed(user=user, guild_id=message.guild.id)
             if data != None:
-                view = ProfileToInventoryView(profile=data)
+                view = ProfileAdditionalView(profile=data)
                 m = await message.reply(embed=embed, view= view)
                 view.message = m
             else:
