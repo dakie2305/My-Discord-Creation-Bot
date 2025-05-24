@@ -706,19 +706,19 @@ class InventoryEconomy(commands.Cog):
             money_type = EmojiCreation2.COPPER.value
             if target_profile.darkium >0:
                 money = int(target_profile.darkium*10/100)
-                if money > 1000: money = 1000
+                if money > 500000: money = 500000
                 money_type = EmojiCreation2.DARKIUM.value
             elif target_profile.gold >0:
                 money = int(target_profile.gold*10/100)
-                if money > 100000: money = 100000
+                if money > 1000000000: money = 1000000000
                 money_type = EmojiCreation2.GOLD.value
             elif target_profile.silver > 0:
                 money = int(target_profile.silver*10/100)
-                if money > 1000000: money = 1000000
+                if money > 10000000000: money = 10000000000
                 money_type = EmojiCreation2.SILVER.value
             elif target_profile.copper > 0:
                 money = int(target_profile.copper*10/100)
-                if money > 100000000: money = 100000000
+                if money > 100000000000: money = 100000000000
                 money_type = EmojiCreation2.COPPER.value
             if money <= 0: money = 1
             
