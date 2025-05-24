@@ -644,6 +644,22 @@ list_ga_passive_skills_private = [
         buff_attack_percent=1,
         min_level_required=1,
     ),
+    
+    GuardianAngelSkill(
+        skill_id = "shield_skill",
+        skill_name= "Khiên Chấn Thủ",
+        skill_desc="Ba lượt phòng thủ trước những kỹ năng tấn công khác! Kỹ năng này sẽ mất một lượng mana nhỏ mỗi khi dùng!",
+        skill_type= ["passive"],
+        emoji= EmojiCreation2.SHIELD_SKILL.value,
+        attack_power= 1,
+        item_worth_amount= 45000,
+        item_worth_type= "G",
+        percent_min_mana_req= 35,
+        mana_loss= 35,
+        buff_defense_percent=0,
+        buff_attack_percent=1,
+        min_level_required=1,
+    ),
 ]
 list_ga_passive_skills = copy.deepcopy(list_ga_passive_skills_private)
 

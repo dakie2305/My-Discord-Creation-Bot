@@ -141,14 +141,14 @@ class TextInputModal(discord.ui.Modal):
             if profile_user.darkium > 100 and to_emoji == EmojiCreation2.DARKIUM.value:
                 #Nếu sở hữu quá nhiều tiền thì cứ việc đánh thuế bình thường
                 if profile_user.darkium > 1000:
-                    #mặc định 5% số tiền quy đổi
-                    tax = int(new_money_value * 5 / 100)
+                    #mặc định 3% số tiền quy đổi
+                    tax = int(new_money_value * 3 / 100)
                     tax_emoji = EmojiCreation2.DARKIUM.value
                     if tax <= 0: tax = 1
                     if tax > 5000000: tax = 5000000
                 else:
-                    #Nếu sở hữu ít hơn 1000 darkium thì đánh thuế 3% số tiền quy đổi
-                    tax = int(new_money_value * 3 / 100)
+                    #Nếu sở hữu ít hơn 1000 darkium thì đánh thuế 1% số tiền quy đổi
+                    tax = int(new_money_value * 1 / 100)
                     tax_emoji = EmojiCreation2.DARKIUM.value
                     if tax <= 0: tax = 1
                     if tax > 5000000: tax = 5000000

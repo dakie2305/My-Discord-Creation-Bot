@@ -468,7 +468,6 @@ class GaBattleView(discord.ui.View):
             reward_text = f"x1 **Điểm Cộng Chỉ Số**"
             return reward_text
             
-        
         #legendary weapon chance
         roll_dice = UtilitiesFunctions.get_chance(5)
         if self.is_dungeon == True and self.difficulty < 4: roll_dice = False
