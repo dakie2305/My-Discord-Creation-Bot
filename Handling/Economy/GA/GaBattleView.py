@@ -851,8 +851,6 @@ class GaBattleView(discord.ui.View):
                 base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã tung chiêu {skill.emoji} - {skill.skill_name} nhưng [{opponent_alive_attack_info.player_ga.ga_emoji} - {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist} đã có khiên chắn! **[{self_player_info.player_ga.ga_name}]** đã mất **{own_loss_mana}** mana và [{opponent_alive_attack_info.player_ga.ga_name}] đã mất **{opponent_loss_mana}** mana!"
                 #Trừ khiên đối thủ
                 opponent_alive_attack_info.max_shield -= 1
-                print(f"Opponent shield remaining: {opponent_alive_attack_info.max_shield}")
-                
                 return base_text
             
             #Tuỳ skill mà tung kỹ năng, vì một số skill tấn công có cách tính khác
