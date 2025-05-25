@@ -654,10 +654,10 @@ list_ga_passive_skills_private = [
         attack_power= 1,
         item_worth_amount= 45000,
         item_worth_type= "G",
-        percent_min_mana_req= 35,
+        percent_min_mana_req= 10,
         mana_loss= 35,
         buff_defense_percent=0,
-        buff_attack_percent=1,
+        buff_attack_percent=0,
         min_level_required=1,
     ),
 ]
@@ -1176,6 +1176,10 @@ def get_random_ga_enemy_generic(level: int = 1, guardian_chance: int = 0, overri
         skill = get_random_skill(blacklist_ids=["summoning_skill"])
         if skill != None: data.list_skills.append(skill)
     if data.level > 100:
+        #Quái trên 100 thì đương nhiên hưởng thêm skill nữa
+        skill = get_random_skill(blacklist_ids=["summoning_skill"])
+        if skill != None: data.list_skills.append(skill)
+    if data.level > 150:
         #Quái trên 100 thì đương nhiên hưởng thêm skill nữa
         skill = get_random_skill(blacklist_ids=["summoning_skill"])
         if skill != None: data.list_skills.append(skill)

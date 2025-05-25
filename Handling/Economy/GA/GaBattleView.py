@@ -836,6 +836,25 @@ class GaBattleView(discord.ui.View):
             first_chance = UtilitiesFunctions.get_chance(use_magic_int)
             second_chance = UtilitiesFunctions.get_chance(use_magic_int)
             if first_chance == False or second_chance == False: return None #Nếu cả 2 lần không trúng thì không dùng skill
+            
+            #Xem đối thủ có khiên không, có khiên thì coi như self player tấn công thất bại
+            shield = self.get_random_skill(list_skills=opponent_alive_attack_info.player_ga.list_skills, skill_id="shield_skill")
+            if shield and opponent_alive_attack_info.max_shield > 0:
+                #Đối thủ có khiên
+                #Trừ stats của self player như bình thường
+                own_loss_mana = self.calculate_mana_loss_for_guardian(max_mana=self_player_info.player_ga.max_mana, skill_mana_loss=skill.mana_loss)
+                self_player_info.player_ga.mana -= own_loss_mana
+                
+                opponent_loss_mana = self.calculate_mana_loss_for_guardian(max_mana=opponent_alive_attack_info.player_ga.max_mana, skill_mana_loss=skill.mana_loss, reference_mana=opponent_alive_attack_info.player_ga.mana)
+                opponent_alive_attack_info.player_ga.mana -= opponent_loss_mana
+                
+                base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã tung chiêu {skill.emoji} - {skill.skill_name} nhưng [{opponent_alive_attack_info.player_ga.ga_emoji} - {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist} đã có khiên chắn! **[{self_player_info.player_ga.ga_name}]** đã mất **{own_loss_mana}** mana và [{opponent_alive_attack_info.player_ga.ga_name}] đã mất **{opponent_loss_mana}** mana!"
+                #Trừ khiên đối thủ
+                opponent_alive_attack_info.max_shield -= 1
+                print(f"Opponent shield remaining: {opponent_alive_attack_info.max_shield}")
+                
+                return base_text
+            
             #Tuỳ skill mà tung kỹ năng, vì một số skill tấn công có cách tính khác
             if skill.skill_id == "skill_black_fire":
                 #trừ máu của đối theo attack power của profile nhân với buff attack percent của skill
@@ -843,7 +862,7 @@ class GaBattleView(discord.ui.View):
                 opponent_alive_attack_info.player_ga.health -= loss_health
                 #dùng hàm mới để tính toán số mana sẽ mất
                 # own_loss_mana = int(self_player_info.player_ga.max_mana * 0.45) - skill.mana_loss
-                own_loss_mana = self.calculate_mana_loss_for_guardian(max_mana=self_player_info.player_ga.max_mana, skill_mana_loss=skill.mana_loss)
+                own_loss_mana = self.calculate_mana_loss_for_guardian(max_mana=self_player_info.player_ga.max_mana, skill_mana_loss=skill.mana_loss, reference_mana=self_player_info.player_ga.mana)
                 if own_loss_mana < 0:
                     own_loss_mana *= (-1)
                 self_player_info.player_ga.mana -= own_loss_mana
@@ -857,7 +876,7 @@ class GaBattleView(discord.ui.View):
                 opponent_alive_attack_info.stunned_round = 1
                 #trừ mana của người dùng theo tỉ lệ skill
                 # loss_own_mana = int(self_player_info.player_ga.max_mana * skill.mana_loss/100) - skill.mana_loss #Không hẳn là trừ quá nhiều, vì thường magic sẽ mạnh hơn, nên buff một tý cho chắc. Để balance sau
-                loss_own_mana = self.calculate_mana_loss_for_guardian(max_mana=self_player_info.player_ga.max_mana, skill_mana_loss=skill.mana_loss)
+                loss_own_mana = self.calculate_mana_loss_for_guardian(max_mana=self_player_info.player_ga.max_mana, skill_mana_loss=skill.mana_loss, reference_mana=self_player_info.player_ga.mana)
                 if loss_own_mana <= 10: loss_own_mana = 20
                 self_player_info.player_ga.mana -= loss_own_mana
                 base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã tung chiêu {skill.emoji} - {skill.skill_name} khiến [{opponent_alive_attack_info.player_ga.ga_emoji} - {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist} mất {loss_health} máu và mất một lượt!"
@@ -874,7 +893,7 @@ class GaBattleView(discord.ui.View):
                         loss_health = int(skill.attack_power + (self_player_info.player_ga.attack_power*skill.buff_attack_percent/100))
                         e.player_ga.health -= loss_health
 
-                loss_own_mana = self.calculate_mana_loss_for_guardian(max_mana=self_player_info.player_ga.max_mana, skill_mana_loss=skill.mana_loss)
+                loss_own_mana = self.calculate_mana_loss_for_guardian(max_mana=self_player_info.player_ga.max_mana, skill_mana_loss=skill.mana_loss, reference_mana=self_player_info.player_ga.mana)
                 if loss_own_mana <= 10: loss_own_mana = 20
                 self_player_info.player_ga.mana -= loss_own_mana
                 if self_player_info.player_ga.mana <= 0: self_player_info.player_ga.mana = 0
@@ -890,7 +909,7 @@ class GaBattleView(discord.ui.View):
                     for e in self.lower_attack_class:
                         e.stunned_round = 1
                 #trừ mana của người dùng theo tỉ lệ skill
-                loss_own_mana = self.calculate_mana_loss_for_guardian(max_mana=self_player_info.player_ga.max_mana, skill_mana_loss=skill.mana_loss)
+                loss_own_mana = self.calculate_mana_loss_for_guardian(max_mana=self_player_info.player_ga.max_mana, skill_mana_loss=skill.mana_loss, reference_mana=self_player_info.player_ga.mana)
                 if loss_own_mana <= 10: loss_own_mana = 20
                 self_player_info.player_ga.mana -= loss_own_mana
                 if self_player_info.player_ga.mana <= 0: self_player_info.player_ga.mana = 0
@@ -926,7 +945,7 @@ class GaBattleView(discord.ui.View):
                     loss_health = int(skill.attack_power + (skill.attack_power * skill.buff_attack_percent/100))
                     opponent_alive_attack_info.player_ga.health -= loss_health
                     #trừ mana của người dùng theo tỉ lệ skill
-                    loss_own_mana = self.calculate_mana_loss_for_guardian(max_mana=self_player_info.player_ga.max_mana, skill_mana_loss=skill.mana_loss)
+                    loss_own_mana = self.calculate_mana_loss_for_guardian(max_mana=self_player_info.player_ga.max_mana, skill_mana_loss=skill.mana_loss, reference_mana=self_player_info.player_ga.mana)
                     if loss_own_mana <= 10: loss_own_mana = 20
                     self_player_info.player_ga.mana -= loss_own_mana
                     ProfileMongoManager.update_list_items_profile(guild_id=self.guild_id, guild_name="", user_id= opponent_alive_attack_info.player_profile.user_id, user_display_name="", user_name="", item=rand_potion_filtered, amount=-amount_destroy)
@@ -969,7 +988,7 @@ class GaBattleView(discord.ui.View):
                 #trừ mana của người dùng theo tỉ lệ skill
                 # loss_own_mana = int(self_player_info.player_ga.max_mana * (skill.mana_loss/100)) - skill.attack_power #Không hẳn là trừ quá nhiều, vì thường magic sẽ mạnh hơn, nên buff một tý cho chắc. Để balance sau
                 
-                loss_own_mana = self.calculate_mana_loss_for_guardian(max_mana=self_player_info.player_ga.max_mana, skill_mana_loss=skill.mana_loss)
+                loss_own_mana = self.calculate_mana_loss_for_guardian(max_mana=self_player_info.player_ga.max_mana, skill_mana_loss=skill.mana_loss, reference_mana=self_player_info.player_ga.mana)
                 
                 if loss_own_mana <= 10: loss_own_mana = 20
                 self_player_info.player_ga.mana -= loss_own_mana
@@ -1118,7 +1137,7 @@ class GaBattleView(discord.ui.View):
             base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã dùng chiêu {skill.emoji} - {skill.skill_name} để hồi phục cho cả đội!"
             return base_text
         
-        skill = self.get_random_skill(list_skills=self_player_info.player_ga.list_skills, skill_id="max_mass_restored_mana_skill")
+        skill = self.get_random_skill(list_skills=self_player_info.player_ga.list_skills, skill_id="mass_restored_mana_skill")
         if skill != None and current_mana_percent <= 25 and self_player_info.max_mass_restored_mana_skill > 0:
             #Chỉ kích hoạt khi cả mana dưới 25%
             #Hồi phục 20% mana cho cả đội
