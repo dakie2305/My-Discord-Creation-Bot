@@ -739,7 +739,8 @@ def update_main_guardian_level_progressing(guild_id:int, user_id: int, bonus_exp
         existing_data.guardian.level_progressing += 30
     elif existing_data.guardian.level >= 99:
         #Cực khó sau level 99
-        existing_data.guardian.level_progressing += 150
+        new_gain = max(5, int(1000 / pow(existing_data.guardian.level, 0.8)))
+        existing_data.guardian.level_progressing += new_gain + int(bonus_exp / 3)
         bonus_exp = 0
     
     if bonus_exp < 0: bonus_exp = 0
