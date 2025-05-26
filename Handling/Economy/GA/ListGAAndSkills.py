@@ -763,8 +763,7 @@ list_ga_passive_skills_private_2 = [
 ]
 list_ga_passive_skills_2 = copy.deepcopy(list_ga_passive_skills_private_2)
 
-
-all_skill_lists = [list_ga_skills, list_ga_passive_skills, list_ga_passive_skills_2]
+all_skill_lists = [list_ga_skills, list_ga_attack_skills_2, list_ga_passive_skills, list_ga_passive_skills_2]
 
 def get_list_back_ground_on_ga_id(ga_id: str):
     background_urls = None
