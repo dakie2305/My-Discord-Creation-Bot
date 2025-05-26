@@ -451,7 +451,7 @@ class GaBattleView(discord.ui.View):
         return all(guardian.player_ga.health <= 0 for guardian in guardians)
     
     def get_result_addition_stats(self, info: GuardianAngelAttackClass):
-        if info.player_profile == None: return ""
+        if info.player_profile == None: return "", ""
         #Nhân theo lượng người tham gia
         bonus_exp = int(self.bonus_exp * len(self.upper_attack_class) + self.bonus_exp*len(self.lower_attack_class))
         if bonus_exp > 350: bonus_exp = 350
