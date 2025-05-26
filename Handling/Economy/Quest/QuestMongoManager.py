@@ -75,32 +75,32 @@ def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_n
     base_amount = 1
     quest_title = ""
     quest_des = ""
-    base_reward_amount = 4500
+    base_reward_amount = 10500
     bonus_exp = 50 * quest_difficult_rate
     if quest_type == "emoji_reaction_count":
-        base_amount = quest_difficult_rate * 45
+        base_amount = quest_difficult_rate * 20
         rand_reward_amount = random.randint(1, 5)
         base_reward_amount = 4500
         bonus_exp += rand_reward_amount * 50
         if reward_type == "C":
-            base_reward_amount = 4500 * rand_reward_amount
+            base_reward_amount = 10500 * rand_reward_amount
         elif reward_type == "S":
-            base_reward_amount = 25 * rand_reward_amount
+            base_reward_amount = 100 * rand_reward_amount
         elif reward_type == "G":
-            base_reward_amount = 2 * rand_reward_amount
+            base_reward_amount = 10 * rand_reward_amount
         quest_title = f"Thả **{base_amount}** reactions bất kỳ tại kênh <#{channel_id}>"
         quest_des = f"**{base_reward_amount}**{emoji}"
     elif quest_type == "message_count":
-        base_amount = quest_difficult_rate * 40
+        base_amount = quest_difficult_rate * 25
         rand_reward_amount = random.randint(1, 5)
         base_reward_amount = 4500
         bonus_exp += rand_reward_amount * 50
         if reward_type == "C":
-            base_reward_amount = 4500 * rand_reward_amount
+            base_reward_amount = 10500 * rand_reward_amount
         elif reward_type == "S":
-            base_reward_amount = 20 * rand_reward_amount
+            base_reward_amount = 100 * rand_reward_amount
         elif reward_type == "G":
-            base_reward_amount = 5 * rand_reward_amount
+            base_reward_amount = 15 * rand_reward_amount
         quest_title = f"Nhắn **{base_amount}** tin nhắn tại kênh <#{channel_id}>"
         quest_des = f"**{base_reward_amount}**{emoji}"
     elif quest_type == "attachments_count":
@@ -109,26 +109,26 @@ def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_n
         base_reward_amount = 3000
         bonus_exp += rand_reward_amount * 50
         if reward_type == "C":
-            base_reward_amount = 3000 * rand_reward_amount
+            base_reward_amount = 30000 * rand_reward_amount
         elif reward_type == "S":
-            base_reward_amount = 2 * rand_reward_amount
+            base_reward_amount = 25 * rand_reward_amount
         elif reward_type == "G":
-            base_reward_amount = 1 * rand_reward_amount
+            base_reward_amount = 10 * rand_reward_amount
         quest_title = f"Thả **{base_amount}** ảnh, video bất kỳ vào kênh <#{channel_id}>"
         quest_des = f"**{base_reward_amount}**{emoji}"
     elif quest_type == "truth_game_count" or quest_type == "dare_game_count":
         game_name = "Truth"
         if quest_type == "dare_game_count": game_name = "Dare"
-        base_amount = quest_difficult_rate * 15
+        base_amount = quest_difficult_rate * 8
         rand_reward_amount = random.randint(1, 5)
         base_reward_amount = 3000
         bonus_exp += rand_reward_amount * 50
         if reward_type == "C":
-            base_reward_amount = 3000 * rand_reward_amount
+            base_reward_amount = 30000 * rand_reward_amount
         elif reward_type == "S":
-            base_reward_amount = 2 * rand_reward_amount
+            base_reward_amount = 200 * rand_reward_amount
         elif reward_type == "G":
-            base_reward_amount = 1 * rand_reward_amount
+            base_reward_amount = 10 * rand_reward_amount
         quest_title = f"Chơi **{base_amount}** trò {game_name} trong game Truth Dare ({SlashCommand.TRUTH_DARE.value})"
         quest_des = f"**{base_reward_amount}**{emoji}"
     elif quest_type == "rps_game_count":
@@ -137,153 +137,153 @@ def create_new_random_quest(guild_id: int, guild_name: str, user_id: int, user_n
         base_reward_amount = 2500
         bonus_exp += rand_reward_amount * 50
         if reward_type == "C":
-            base_reward_amount = 2000 * rand_reward_amount
+            base_reward_amount = 20000 * rand_reward_amount
         elif reward_type == "S":
-            base_reward_amount = 1 * rand_reward_amount
+            base_reward_amount = 100 * rand_reward_amount
         elif reward_type == "G":
-            base_reward_amount = 1 * rand_reward_amount
+            base_reward_amount = 10 * rand_reward_amount
         quest_title = f"Chơi **{base_amount}** trận game Kéo Búa Bao ({SlashCommand.KEO_BUA_BAO.value})"
         quest_des = f"**{base_reward_amount}**{emoji}"
     elif quest_type == "coin_flip_game_count":
-        base_amount = quest_difficult_rate * 15
+        base_amount = quest_difficult_rate * 5
         rand_reward_amount = random.randint(1, 5)
         base_reward_amount = 2000
         bonus_exp += rand_reward_amount * 50
         if reward_type == "C":
-            base_reward_amount = 1000 * rand_reward_amount
+            base_reward_amount = 10000 * rand_reward_amount
         elif reward_type == "S":
-            base_reward_amount = 1 * rand_reward_amount
+            base_reward_amount = 100 * rand_reward_amount
         elif reward_type == "G":
-            base_reward_amount = 1 * rand_reward_amount
+            base_reward_amount = 10 * rand_reward_amount
         quest_title = f"Chơi **{base_amount}** trận game Tung Xu ({SlashCommand.COIN_FLIP.value})"
         quest_des = f"**{base_reward_amount}**{emoji}"
     elif quest_type == "sb_normal_count":
-        base_amount = quest_difficult_rate * 20
+        base_amount = quest_difficult_rate * 10
         rand_reward_amount = random.randint(1, 5)
         base_reward_amount = 1000
         if reward_type == "C":
-            base_reward_amount = 1000 * rand_reward_amount
+            base_reward_amount = 10000 * rand_reward_amount
         elif reward_type == "S":
-            base_reward_amount = 1 * rand_reward_amount
+            base_reward_amount = 100 * rand_reward_amount
         elif reward_type == "G":
-            base_reward_amount = 1 * rand_reward_amount
+            base_reward_amount = 10 * rand_reward_amount
         quest_title = f"Chơi **{base_amount}** trận game Tài Xỉu bình thường ({SlashCommand.SB_NORMAL.value})"
         quest_des = f"**{base_reward_amount}**{emoji}"
     elif quest_type == "sb_double_count":
-        base_amount = quest_difficult_rate * 15
+        base_amount = quest_difficult_rate * 8
         rand_reward_amount = random.randint(1, 5)
         base_reward_amount = 2000
         bonus_exp += rand_reward_amount * 50
         if reward_type == "C":
-            base_reward_amount = 2000 * rand_reward_amount
+            base_reward_amount = 20000 * rand_reward_amount
         elif reward_type == "S":
-            base_reward_amount = 1 * rand_reward_amount
+            base_reward_amount = 50 * rand_reward_amount
         elif reward_type == "G":
-            base_reward_amount = 1 * rand_reward_amount
+            base_reward_amount = 10 * rand_reward_amount
         quest_title = f"Chơi **{base_amount}** trận game Tài Xỉu Double ({SlashCommand.SB_DOUBLE.value})"
         quest_des = f"**{base_reward_amount}**{emoji}"
     elif quest_type == "sb_triple_count":
-        base_amount = quest_difficult_rate * 15
+        base_amount = quest_difficult_rate * 5
         rand_reward_amount = random.randint(1, 5)
         base_reward_amount = 2000
         bonus_exp += rand_reward_amount * 50
         if reward_type == "C":
-            base_reward_amount = 2000 * rand_reward_amount
+            base_reward_amount = 20000 * rand_reward_amount
         elif reward_type == "S":
-            base_reward_amount = 1 * rand_reward_amount
+            base_reward_amount = 100 * rand_reward_amount
         elif reward_type == "G":
-            base_reward_amount = 1 * rand_reward_amount
+            base_reward_amount = 10 * rand_reward_amount
         quest_title = f"Chơi **{base_amount}** trận game Tài Xỉu Triple ({SlashCommand.SB_TRIPLE.value})"
         quest_des = f"**{base_reward_amount}**{emoji}"
     elif quest_type == "sb_slot_machine_count":
-        base_amount = quest_difficult_rate * 10
+        base_amount = quest_difficult_rate * 5
         rand_reward_amount = random.randint(1, 5)
         base_reward_amount = 3500
         bonus_exp += rand_reward_amount * 75
         if reward_type == "C":
-            base_reward_amount = 3500 * rand_reward_amount
+            base_reward_amount = 35000 * rand_reward_amount
         elif reward_type == "S":
-            base_reward_amount = 1 * rand_reward_amount
+            base_reward_amount = 100 * rand_reward_amount
         elif reward_type == "G":
-            base_reward_amount = 1 * rand_reward_amount
+            base_reward_amount = 10 * rand_reward_amount
         quest_title = f"Chơi **{base_amount}** trận game Nổ Hủ May Mắn ({SlashCommand.SB_SLOT_MACHINE.value})"
         quest_des = f"**{base_reward_amount}**{emoji}"
     elif quest_type == "sb_bai_cao_count":
-        base_amount = quest_difficult_rate * 5
+        base_amount = quest_difficult_rate * 3
         rand_reward_amount = random.randint(1, 5)
-        base_reward_amount = 3000
+        base_reward_amount = 30000
         bonus_exp += rand_reward_amount * 75
         if reward_type == "C":
             base_reward_amount *= rand_reward_amount
         elif reward_type == "S":
-            base_reward_amount = 1 * rand_reward_amount
+            base_reward_amount = 50 * rand_reward_amount
         elif reward_type == "G":
-            base_reward_amount = 1 * rand_reward_amount
+            base_reward_amount = 10 * rand_reward_amount
         quest_title = f"Chơi **{base_amount}** trận game Bài Cào ({SlashCommand.SB_BAI_CAO.value})"
         quest_des = f"**{base_reward_amount}**{emoji}"
     elif quest_type == "work_fishing_count":
-        base_amount = quest_difficult_rate * 3
+        base_amount = quest_difficult_rate * 2
         rand_reward_amount = random.randint(1, 5)
-        base_reward_amount = 2000
+        base_reward_amount = 20000
         bonus_exp += rand_reward_amount * 50
         if reward_type == "C":
             base_reward_amount *= rand_reward_amount
         elif reward_type == "S":
-            base_reward_amount = 1 * rand_reward_amount
+            base_reward_amount = 100 * rand_reward_amount
         elif reward_type == "G":
-            base_reward_amount = 1
+            base_reward_amount = 5
         quest_title = f"Câu cá **{base_amount}** lần ({SlashCommand.WORK_FISHING.value})"
         quest_des = f"**{base_reward_amount}**{emoji}"
     elif quest_type == "work_planting_count":
         base_amount = quest_difficult_rate * 2
         rand_reward_amount = random.randint(1, 5)
-        base_reward_amount = 3500
+        base_reward_amount = 35000
         bonus_exp += rand_reward_amount * 50
         if reward_type == "C":
             base_reward_amount *= rand_reward_amount
         elif reward_type == "S":
-            base_reward_amount = 1 * rand_reward_amount
+            base_reward_amount = 50 * rand_reward_amount
         elif reward_type == "G":
-            base_reward_amount = 1 * rand_reward_amount
+            base_reward_amount = 5 * rand_reward_amount
         quest_title = f"Trồng cây **{base_amount}** lần ({SlashCommand.WORK_PLANTING.value})"
         quest_des = f"**{base_reward_amount}**{emoji}"
     elif quest_type == "work_normal_count":
-        base_amount = quest_difficult_rate * 3
+        base_amount = quest_difficult_rate * 2
         rand_reward_amount = random.randint(1, 5)
-        base_reward_amount = 3500
+        base_reward_amount = 35000
         bonus_exp += rand_reward_amount * 50
         if reward_type == "C":
             base_reward_amount *= rand_reward_amount
         elif reward_type == "S":
-            base_reward_amount = 1 * rand_reward_amount
+            base_reward_amount = 50 * rand_reward_amount
         elif reward_type == "G":
-            base_reward_amount = 1
+            base_reward_amount = 5
         quest_title = f"Làm việc **{base_amount}** lần ({SlashCommand.WORK.value})"
         quest_des = f"**{base_reward_amount}**{emoji}"
     elif quest_type == "gift_count":
         base_amount = quest_difficult_rate * 1
         rand_reward_amount = random.randint(1, 5)
-        base_reward_amount = 1500
+        base_reward_amount = 15000
         bonus_exp += rand_reward_amount * 50
         if reward_type == "C":
             base_reward_amount *= rand_reward_amount
         elif reward_type == "S":
-            base_reward_amount = 1 * rand_reward_amount
+            base_reward_amount = 50 * rand_reward_amount
         elif reward_type == "G":
-            base_reward_amount = 1
+            base_reward_amount = 5
         quest_title = f"Tặng quà **{base_amount}** lần cho người khác ({SlashCommand.GIFT.value})"
         quest_des = f"**{base_reward_amount}**{emoji}"
     elif quest_type == "crime_count":
         base_amount = quest_difficult_rate * 1
         rand_reward_amount = random.randint(1, 5)
-        base_reward_amount = 1500
+        base_reward_amount = 55500
         bonus_exp += rand_reward_amount * 50
         if reward_type == "C":
             base_reward_amount *= rand_reward_amount
         elif reward_type == "S":
-            base_reward_amount = 1 * rand_reward_amount
+            base_reward_amount = 50 * rand_reward_amount
         elif reward_type == "G":
-            base_reward_amount = 1
+            base_reward_amount = 5
         quest_title = f"Phạm tội **{base_amount}** lần ({SlashCommand.CRIME.value})"
         quest_des = f"**{base_reward_amount}**{emoji}"
 
