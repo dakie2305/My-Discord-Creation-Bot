@@ -855,8 +855,9 @@ class GaBattleView(discord.ui.View):
             
             #Tuỳ skill mà tung kỹ năng, vì một số skill tấn công có cách tính khác
             if skill.skill_id == "skill_black_fire":
-                #trừ máu của đối theo attack power của profile nhân với buff attack percent của skill
-                loss_health = int(self_player_info.player_ga.attack_power + self_player_info.player_ga.attack_power*0.2)
+                ap = self_player_info.player_ga.attack_power
+                scaling_ap = ap if ap <= 400 else 400 + (ap - 400) * 0.7  # Sau 400 thì giảm nhẹ
+                loss_health = int(scaling_ap + scaling_ap * 0.3)
                 opponent_alive_attack_info.player_ga.health -= loss_health
                 #dùng hàm mới để tính toán số mana sẽ mất
                 # own_loss_mana = int(self_player_info.player_ga.max_mana * 0.45) - skill.mana_loss
