@@ -418,8 +418,6 @@ class GaBattleView(discord.ui.View):
                     ProfileMongoManager.update_profile_money_by_type(guild_id=self.guild_id, user_id=winner.id, guild_name="", user_display_name=winner.display_name, user_name=winner.name, money=actual_money, money_type=self.loai_tien)
                     ProfileMongoManager.update_profile_money_by_type(guild_id=self.guild_id, user_id=loser.id, guild_name="", user_display_name=loser.display_name, user_name=loser.name, money=-self.so_tien, money_type=self.loai_tien)
                     ProfileMongoManager.update_money_authority_by_money_type(guild_id=self.guild_id, money_type=self.loai_tien, money=tax_money)
-
-        embed.set_footer(text=self.footer_text)
         try:
             await self.message.reply(embed=embed)
             await self.message.edit(view=None)
