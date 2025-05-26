@@ -422,11 +422,11 @@ class GaBattleView(discord.ui.View):
                 calculated_exp = int(calculated_exp * self.minus_all_reward_percent / 100)
             if self.is_players_versus_players and calculated_exp > 280: calculated_exp = 280
             
-            #Chỉ áp dụng cho người bắt hầm ngục
-            if self.difficulty < 3 and info.player_ga.level > self.enemy_ga.level and self.is_dungeon and self.user_profile.user_id == info.player_profile.user_id:
+            #Nếu level cao đánh hầm ngục thấp thì giảm tất cả phần thưởng
+            if self.difficulty < 3 and info.player_ga.level > self.enemy_ga.level and self.is_dungeon:
                 calculated_exp = 100
-                silver_reward = silver_reward * 0.4
-                gold_reward = gold_reward * 0.4
+                silver_reward = silver_reward * 0.5
+                gold_reward = gold_reward * 0.5
             
             text_target_profile_exist += f"**{calculated_exp}** EXP. "
             ProfileMongoManager.update_level_progressing(guild_id=self.guild_id, user_id=info.player_profile.user_id, bonus_exp=int(calculated_exp*0.3))
