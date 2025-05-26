@@ -1173,12 +1173,12 @@ class GaBattleView(discord.ui.View):
             summon = None
             if is_upper:
                 for info in self.upper_attack_class:
-                    if info.is_summoned:
+                    if info.is_summoned and info != self_player_info:
                         summon = info
                         break
             else:
                 for info in self.lower_attack_class:
-                    if info.is_summoned:
+                    if info.is_summoned and info != self_player_info:
                         summon = info
                         break
             if summon != None:
