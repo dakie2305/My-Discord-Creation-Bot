@@ -1754,7 +1754,7 @@ async def on_reaction_add(reaction: discord.Reaction, user):
             #Jail
             channel = message.channel
             print(f"{user_target.mention} just dropped one of the most blacklist emoji and is jailed for now at channel {channel.name} in guild {message.guild.name}")
-            jail_user(channel=channel, jailer=bot.user, user=user_target, reason="Đắc tội tày trời, thả emoji tối kỵ nguy hiểm tột độ. Trời tru đất diệt, thiên địa truy lùng",  duration= 2, time_format= "minute")
+            await jail_user(channel=channel, jailer=bot.user, user=user_target, reason="Đắc tội tày trời, thả emoji tối kỵ nguy hiểm tột độ. Trời tru đất diệt, thiên địa truy lùng",  duration= 2, time_format= "minute")
 
 @bot.event
 async def on_guild_remove(guild: discord.Guild):
