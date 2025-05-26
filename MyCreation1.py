@@ -1749,7 +1749,7 @@ async def on_reaction_add(reaction: discord.Reaction, user):
     if user_target is None or message is None: return
     #Chỉ check trong True Heavens
     if message.guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value: return
-    blacklist_emoji = ["th_you_are_gay", "th_gay_duoi", ":gay:", "th_are_you_gay"]
+    blacklist_emoji = ["th_you_are_gay", "th_gay_duoi", ":gay:", "th_are_you_gay", "gei"]
     #Check xem có jail không
     emoji_name = str(reaction.emoji)
     # Cooldown: block if jailed in the last 4 minutes
