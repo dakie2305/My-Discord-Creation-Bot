@@ -1218,7 +1218,12 @@ def get_random_ga_enemy_generic(level: int = 1, guardian_chance: int = 0, overri
         #Quái trên 100 thì đương nhiên hưởng thêm skill nữa
         skill = get_random_skill(blacklist_ids=["summoning_skill"])
         if skill != None: data.list_skills.append(skill)
-    
+        #roll tỉ lệ được chiên khiên
+        shield_dice = UtilitiesFunctions.get_chance(20)
+        if shield_dice:
+          skill = get_random_skill(skill_id="shield_skill")
+          if skill != None: data.list_skills.append(skill)
+
     if "Triệu Hồi" in data.ga_name:
         skill = get_random_skill("summoning_skill")
         data.list_skills.append(skill)
