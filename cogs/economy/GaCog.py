@@ -573,18 +573,6 @@ class GuardianAngelCog(commands.Cog):
             view.message = mess
             return
         
-        if user_profile.guardian.last_battle != None:
-            time_window = timedelta(minutes=30)
-            check = UtilitiesFunctions.check_if_within_time_delta(input=user_profile.guardian.last_battle, time_window=time_window)
-            if check:
-                next_time = user_profile.guardian.last_battle + time_window
-                unix_time = int(next_time.timestamp())
-                embed = discord.Embed(title=f"", description=f"🚫 Bạn đã cho Hộ Vệ Thần chiến đấu rồi. Vui lòng thực hiện lại lệnh vào lúc <t:{unix_time}:t>!", color=0xc379e0)
-                view = SelfDestructView(timeout=120)
-                mess = await interaction.followup.send(embed=embed, view=view, ephemeral=False)
-                view.message = mess
-                return
-        
         if user_profile.guardian.last_joined_battle != None:
             time_window = timedelta(minutes=1)
             check = UtilitiesFunctions.check_if_within_time_delta(input=user_profile.guardian.last_joined_battle, time_window=time_window)
