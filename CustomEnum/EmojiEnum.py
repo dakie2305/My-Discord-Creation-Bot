@@ -270,3 +270,4 @@ class EmojiCreation2(Enum):
     
 class EmojiCreation1(Enum):
     SHINY_POINT = "<a:shiny_point:1309193656887935036>"
+    TRUE_HEAVEN_LINK_MINI = "https://cdn.discordapp.com/emojis/1307360190353375336.webp?size=96"

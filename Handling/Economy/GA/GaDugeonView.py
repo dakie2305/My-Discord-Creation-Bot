@@ -13,8 +13,6 @@ import random
 import asyncio
 from datetime import datetime, timedelta
 from Handling.Misc.SelfDestructView import SelfDestructView
-import CustomFunctions
-from Handling.Economy.Inventory_Shop.ItemClass import Item, list_small_copper_fish,list_gold_fish, list_silver_fish, list_gift_items, list_trash, list_plant, list_legend_weapon_1, list_legend_weapon_2, list_support_ga_items, list_protection_items,list_attack_items,list_support_items
 from Handling.Economy.GA.GaBattleView import GaBattleView
 
 class GaDugeonView(discord.ui.View):

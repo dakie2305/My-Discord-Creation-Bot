@@ -19,7 +19,7 @@ import copy
 
 
 class GaBattleView(discord.ui.View):
-    def __init__(self, user_profile: Profile, user: discord.Member,enemy_ga: GuardianAngel, guild_id: int, is_players_versus_players: bool, target_profile: Profile = None, target: discord.Member = None, allowed_multiple_players: bool = False, max_players:int = 1, embed_title: str = "", gold_reward: int = 0, silver_reward: int= 0, dignity_point: int = 10, bonus_exp: int = 200, enemy_ga_2: GuardianAngel = None, bonus_all_reward_percent: int = None, footer_text: str = "", difficulty: int = 1, is_dungeon = False):
+    def __init__(self, user_profile: Profile, user: discord.Member,enemy_ga: GuardianAngel, guild_id: int, is_players_versus_players: bool, target_profile: Profile = None, target: discord.Member = None, allowed_multiple_players: bool = False, max_players:int = 1, embed_title: str = "", gold_reward: int = 0, silver_reward: int= 0, dignity_point: int = 10, bonus_exp: int = 200, enemy_ga_2: GuardianAngel = None, bonus_all_reward_percent: int = None, footer_text: str = "", difficulty: int = 1, is_dungeon = False, is_challenge = False):
         super().__init__(timeout=180)
         self.message : discord.Message = None
         self.user: discord.Member = user
@@ -33,13 +33,22 @@ class GaBattleView(discord.ui.View):
         self.max_players = max_players
         self.is_players_versus_players = is_players_versus_players
         self.is_dungeon = is_dungeon
-        
+        self.is_challenge = is_challenge
+        self.so_tien = None
+        self.loai_tien = None
+        self.battle_type = "A"
+        self.battle_type_mapping = {
+            "A": "Chiến đấu bình thường (Dùng mọi kỹ năng)",
+            "B": "Chiến đấu không dùng bất kỳ kỹ năng nào",
+            "C": "Chiến đấu không dùng kỹ năng Tẩy Não",
+            "D": "Chiến đấu không dùng kỹ năng Triệu Linh",
+            "E": "Chiến đấu không dùng kỹ năng Triệu Linh và Tẩy Não",
+        }
         self.upper_attack_class: List['GuardianAngelAttackClass'] = []
         self.lower_attack_class: List['GuardianAngelAttackClass'] = []
         
         self.round_number_text_report = {}
         self.round = 1
-        self.text = ""
         self.embed_title = embed_title
         self.footer_text = footer_text
         self.joined_player_id : List[int]= []
@@ -324,7 +333,7 @@ class GaBattleView(discord.ui.View):
             embed.add_field(name=f"", value=text_target_profile_exist, inline=False)
             embed.add_field(name=f"", value=f"🦾: **{self_player_info.player_ga.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=self_player_info.player_ga.health, max_value=self_player_info.player_ga.max_health, emoji=EmojiCreation2.HP.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=self_player_info.player_ga.stamina, max_value=self_player_info.player_ga.max_stamina, emoji=EmojiCreation2.STAMINA.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=self_player_info.player_ga.mana, max_value=self_player_info.player_ga.max_mana, emoji=EmojiCreation2.MP.value)}", inline=False)
         
-        embed.set_footer(text=self.footer_text)
+        embed.set_footer(text=self.footer_text, icon_url=EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value)
         formatted_string = "\n".join(f"Lượt thứ **{key}**.\n{value}\n" for key, value in self.round_number_text_report.items())
         try:
             await self.message.edit(embed=embed, content=formatted_string)
@@ -345,40 +354,88 @@ class GaBattleView(discord.ui.View):
     
     async def end_battle(self):
         print(f"Username {self.user_profile.user_name} has ended guardian battle in guild {self.user_profile.guild_name}!")
-        #Tính toán kết quả
+        # Tính toán kết quả
         self.battle_ended = True
-        result_text = "**Tổng Kết Chiến Đấu**\n"
+
+        embed = discord.Embed(title="Tổng Kết Chiến Đấu", color=0xFFD700)
         if self.upper_attack_won:
-            result_text += f"Phe trên thắng!\n▬▬▬ι════>\n"
-            for info in self.upper_attack_class:
-                additional_stats = self.get_result_addition_stats(info)
-                result_text += additional_stats
-            #Cho phép bên thua một tý EXP
-            for lose_info in self.lower_attack_class:
-                if lose_info.player_profile != None:
-                    ProfileMongoManager.update_main_guardian_level_progressing(guild_id=self.guild_id, user_id=lose_info.player_profile.user_id)
+            embed.description = "Phe trên thắng!"
+            # Nếu là challenge thì không có bất kỳ phần thưởng nào hết
+            if not self.is_challenge:
+                embed.add_field(name="", value="▬▬▬ι════>", inline=False)
+                for info in self.upper_attack_class:
+                    additional_stats, reward = self.get_result_addition_stats(info)
+                    if additional_stats.strip() and reward.strip():
+                        embed.add_field(name="", value=additional_stats, inline=False)
+                        embed.add_field(name="", value=reward, inline=False)
+                # Cho phép bên thua một tý EXP
+                for lose_info in self.lower_attack_class:
+                    if lose_info.player_profile != None:
+                        ProfileMongoManager.update_main_guardian_level_progressing(guild_id=self.guild_id, user_id=lose_info.player_profile.user_id)
+                
+            else:
+                #Là thách đấu nên sẽ ghi khác
+                winner = self.user
+                loser = self.target
+                embed.description = f"{EmojiCreation2.SHINY_POINT.value} Hộ Vệ Thần của {winner.mention} đã đánh thắng Hộ Vệ Thần của {loser.mention}!"
+                if self.so_tien != None and self.loai_tien != None:
+                    actual_money = int(self.so_tien * 0.95)
+                    tax_money = self.so_tien - actual_money
+
+                    embed.description = f"{EmojiCreation2.SHINY_POINT.value} {winner.mention} đã nhận được **{actual_money}** {UtilitiesFunctions.get_emoji_from_loai_tien(self.loai_tien)}!"
+                    embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Còn **{tax_money}** {UtilitiesFunctions.get_emoji_from_loai_tien(self.loai_tien)} đã được Chính Quyền thu làm thuế", inline=False)
+
+                    ProfileMongoManager.update_profile_money_by_type(guild_id=self.guild_id, user_id=winner.id, guild_name="", user_display_name=winner.display_name, user_name=winner.name, money=actual_money, money_type=self.loai_tien)
+                    ProfileMongoManager.update_profile_money_by_type(guild_id=self.guild_id, user_id=loser.id, guild_name="", user_display_name=loser.display_name, user_name=loser.name, money=-self.so_tien, money_type=self.loai_tien)
+                    ProfileMongoManager.update_money_authority_by_money_type(guild_id=self.guild_id, money_type=self.loai_tien, money=tax_money)
+
         else:
-            result_text += f"Phe dưới thắng!\n"
-            for info in self.lower_attack_class:
-                additional_stats = self.get_result_addition_stats(info)
-                result_text += additional_stats
-            #Cho phép bên thua một tý EXP
-            for lose_info in self.upper_attack_class:
-                if lose_info.player_profile != None:
-                    ProfileMongoManager.update_main_guardian_level_progressing(guild_id=self.guild_id, user_id=lose_info.player_profile.user_id)
+            embed.description = "Phe dưới thắng!"
+            # Nếu là challenge thì không có bất kỳ phần thưởng nào hết
+            if not self.is_challenge:
+                embed.add_field(name="", value="▬▬▬ι════>", inline=False)
+                for info in self.lower_attack_class:
+                    additional_stats, reward = self.get_result_addition_stats(info)
+                    if additional_stats.strip() and reward.strip():
+                        embed.add_field(name="", value=additional_stats, inline=False)
+                        embed.add_field(name="", value=reward, inline=False)
+                # Cho phép bên thua một tý EXP
+                for lose_info in self.upper_attack_class:
+                    if lose_info.player_profile != None:
+                        ProfileMongoManager.update_main_guardian_level_progressing(guild_id=self.guild_id, user_id=lose_info.player_profile.user_id)
+            else:
+                #Là thách đấu nên sẽ ghi khác
+                winner = self.target
+                loser = self.user
+                embed.description = f"{EmojiCreation2.SHINY_POINT.value} Hộ Vệ Thần của {winner.mention} đã đánh thắng Hộ Vệ Thần của {loser.mention}!"
+                if self.so_tien != None and self.loai_tien != None:
+                    actual_money = int(self.so_tien * 0.95)
+                    tax_money = self.so_tien - actual_money
+
+                    embed.description = f"{EmojiCreation2.SHINY_POINT.value} {winner.mention} đã nhận được **{actual_money}** {UtilitiesFunctions.get_emoji_from_loai_tien(self.loai_tien)}!"
+                    embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Còn **{tax_money}** {UtilitiesFunctions.get_emoji_from_loai_tien(self.loai_tien)} đã được Chính Quyền thu làm thuế", inline=False)
+
+                    ProfileMongoManager.update_profile_money_by_type(guild_id=self.guild_id, user_id=winner.id, guild_name="", user_display_name=winner.display_name, user_name=winner.name, money=actual_money, money_type=self.loai_tien)
+                    ProfileMongoManager.update_profile_money_by_type(guild_id=self.guild_id, user_id=loser.id, guild_name="", user_display_name=loser.display_name, user_name=loser.name, money=-self.so_tien, money_type=self.loai_tien)
+                    ProfileMongoManager.update_money_authority_by_money_type(guild_id=self.guild_id, money_type=self.loai_tien, money=tax_money)
+
+        embed.set_footer(text=self.footer_text)
         try:
-            await self.message.reply(content=result_text)
+            await self.message.reply(embed=embed)
             await self.message.edit(view=None)
         except Exception as e:
             print(e)
-        #Cập nhật stats cho guardian nếu có profile và đang là PVE
-        if self.is_players_versus_players == False:
-            for info in self.upper_attack_class:
-                if info.player_profile != None:
-                    self.update_stats_in_database(info)
-            for info in self.lower_attack_class:
-                if info.player_profile != None:
-                    self.update_stats_in_database(info)
+
+        # nếu là PVP và KHÔNG PHẢI thách đấu thì không cần cập nhật stats
+        if self.is_players_versus_players and not self.is_challenge:
+            return
+        # Cập nhật stats cho guardian nếu có profile cho PVE, hoặc challenge
+        for info in self.upper_attack_class:
+            if info.player_profile != None:
+                self.update_stats_in_database(info)
+        for info in self.lower_attack_class:
+            if info.player_profile != None:
+                self.update_stats_in_database(info)
         return
     
     
@@ -407,7 +464,6 @@ class GaBattleView(discord.ui.View):
             gold_reward += gold_reward * self.bonus_all_reward_percent / 100
         if gold_reward > 50000: gold_reward = 50000
         
-        
         silver_reward = int(self.silver_reward * len(self.upper_attack_class) + self.bonus_exp*len(self.lower_attack_class))
         if self.minus_all_reward_percent != None:
             silver_reward = silver_reward * self.minus_all_reward_percent / 100
@@ -415,7 +471,8 @@ class GaBattleView(discord.ui.View):
             silver_reward += silver_reward * self.bonus_all_reward_percent / 100
             
         contribution = self.calculate_contribution(info.starting_at_round)
-        text_target_profile_exist = f"<@{info.player_profile.user_id}> [{info.starting_at_round}] cống hiến **{contribution}%**, nhận: "
+        text_target_profile_exist = f"{EmojiCreation2.SHINY_POINT.value} <@{info.player_profile.user_id}> [{info.starting_at_round}] cống hiến **{contribution}%**, nhận: "
+        text_reward = ""
         calculated_exp = int(bonus_exp * (contribution / 100))
         if calculated_exp > 0:
             if self.minus_all_reward_percent != None:
@@ -428,32 +485,32 @@ class GaBattleView(discord.ui.View):
                 silver_reward = silver_reward * 0.5
                 gold_reward = gold_reward * 0.5
             
-            text_target_profile_exist += f"**{calculated_exp}** EXP. "
+            text_reward += f"**{calculated_exp}** EXP. "
             ProfileMongoManager.update_level_progressing(guild_id=self.guild_id, user_id=info.player_profile.user_id, bonus_exp=int(calculated_exp*0.3))
             ProfileMongoManager.update_main_guardian_level_progressing(guild_id=self.guild_id, user_id=info.player_profile.user_id, bonus_exp=calculated_exp)
         
         calculated_gold_reward = int(gold_reward * (contribution / 100))
         if calculated_gold_reward > 0:
-            text_target_profile_exist += f"**{calculated_gold_reward}** {EmojiCreation2.GOLD.value} "
+            text_reward += f"**{calculated_gold_reward}** {EmojiCreation2.GOLD.value} "
         
         calculated_silver_reward = int(silver_reward * (contribution / 100))
         if calculated_silver_reward > 0:
-            text_target_profile_exist += f"**{calculated_silver_reward}** {EmojiCreation2.SILVER.value} "
+            text_reward += f"**{calculated_silver_reward}** {EmojiCreation2.SILVER.value} "
         
         ProfileMongoManager.update_profile_money(guild_id=self.guild_id, user_id=info.player_profile.user_id, guild_name="",user_display_name="", user_name="", gold=calculated_gold_reward, silver=calculated_silver_reward)
         
         if self.dignity_point > 0:
-            text_target_profile_exist += f"**{self.dignity_point}** Nhân phẩm. "
+            text_reward += f"**{self.dignity_point}** Nhân phẩm. "
             ProfileMongoManager.update_dignity_point(guild_id=self.guild_id, user_id=info.player_profile.user_id, guild_name="",user_display_name="", user_name="", dignity_point=self.dignity_point)
         
         if info.player_profile.user_id == self.user.id and self.is_players_versus_players == False:
             #Chủ party
-            text_target_profile_exist += f"Thưởng thêm: {self.get_result_additional_reward(info=info)}"
+            text_reward += f"Thưởng thêm: {self.get_result_additional_reward(info=info)}"
         
         if info.player_ga.is_dead:
-            text_target_profile_exist+= " Hộ Vệ Thần tử nạn. "
-        text_target_profile_exist += "\n"
-        return text_target_profile_exist
+            text_reward+= " Hộ Vệ Thần tử nạn. "
+        text_reward += "\n"
+        return text_target_profile_exist, text_reward
     
     def get_result_additional_reward(self, info: GuardianAngelAttackClass):
         if info.player_profile == None: return ""
@@ -677,7 +734,7 @@ class GaBattleView(discord.ui.View):
 
         #Xử lý logic dùng skill nếu có skill trong list
         try:
-            if self_player_info.player_ga.list_skills != None and len(self_player_info.player_ga.list_skills) > 0:
+            if self_player_info.player_ga.list_skills != None and len(self_player_info.player_ga.list_skills) > 0 and self.battle_type != "B": #B là không dùng bất kỳ skill nào hết
                 #Ưu tiên skill passive trước
                 base_passive_text_result = self.execute_passive_skill(self_player_info = self_player_info, opponent_alive_attack_info = opponent_alive_attack_info, text_target_profile_exist=text_target_profile_exist, text_own_profile_exist=text_own_profile_exist)
                 if base_passive_text_result != None: return base_passive_text_result
@@ -856,7 +913,7 @@ class GaBattleView(discord.ui.View):
             #Tuỳ skill mà tung kỹ năng, vì một số skill tấn công có cách tính khác
             if skill.skill_id == "skill_black_fire":
                 ap = self_player_info.player_ga.attack_power
-                scaling_ap = ap if ap <= 400 else 400 + (ap - 400) * 0.7  # Sau 400 thì giảm nhẹ
+                scaling_ap = ap if ap <= 400 else 400 + (ap - 400) * 0.6  # Sau 400 thì giảm nhẹ
                 loss_health = int(scaling_ap + scaling_ap * 0.3)
                 opponent_alive_attack_info.player_ga.health -= loss_health
                 #dùng hàm mới để tính toán số mana sẽ mất
@@ -1013,7 +1070,16 @@ class GaBattleView(discord.ui.View):
     #region execute_passive_skill
     def execute_passive_skill(self, self_player_info: GuardianAngelAttackClass, opponent_alive_attack_info: GuardianAngelAttackClass, text_target_profile_exist: str, text_own_profile_exist: str):
         base_text = None
-        
+        allow_summoning_skill = True
+        allow_brain_wash_skill = True
+        if self.battle_type == "C":
+            allow_brain_wash_skill = False #Không dùng chiêu này trong battle C
+        elif self.battle_type == "D":
+            allow_summoning_skill = False
+        elif self.battle_type == "E":
+            allow_summoning_skill = False
+            allow_brain_wash_skill = False
+
         is_upper = False
         if self_player_info in self.upper_attack_class:
             is_upper = True
@@ -1021,7 +1087,7 @@ class GaBattleView(discord.ui.View):
         current_mana_percent = int(self_player_info.player_ga.mana/self_player_info.player_ga.max_mana*100)
         current_health_percent = int(self_player_info.player_ga.health/self_player_info.player_ga.max_health*100)
         skill = self.get_random_skill(list_skills=self_player_info.player_ga.list_skills, skill_id="summoning_skill")
-        if skill != None and current_mana_percent >= 65 and self_player_info.has_used_summoning == False:
+        if skill != None and current_mana_percent >= 65 and self_player_info.has_used_summoning == False and allow_summoning_skill:
             #Skill này sẽ triệu hồi một NPC vào phe của 
             #Dựa vào is_upper để xác định phe nào sẽ triệu hồi NPC
             #Nếu phe đó tổng GuardianAngelAttackClass dưới ba mới được triệu hồi
@@ -1074,7 +1140,7 @@ class GaBattleView(discord.ui.View):
                     return base_text
         
         skill = self.get_random_skill(list_skills=self_player_info.player_ga.list_skills, skill_id="brain_wash_skill")
-        if skill != None and current_mana_percent >= 45:
+        if skill != None and current_mana_percent >= 45 and allow_brain_wash_skill: #Loại C không dùng chiêu này
             #Skill này sẽ tẩy não opponent vào phe của self_player  
             #Dựa vào is_upper để xác định opponent sẽ vào phe nào
             

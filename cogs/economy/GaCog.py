@@ -2,6 +2,7 @@ from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.EmojiEnum import EmojiCreation2
 import discord
 from discord.ext import commands
+from Handling.Economy.GA.GaChallengeView import GaChallengeView
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 from datetime import datetime, timedelta
 import CustomFunctions
@@ -517,3 +518,198 @@ class GuardianAngelCog(commands.Cog):
             await interaction.response.send_message(f"⏳ Lệnh đang cooldown, vui lòng thực hiện lại trong vòng {error.retry_after:.2f}s tới.", ephemeral=True)
         else:
             await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
+
+    
+    #region ga challenge slash
+    @ga_group.command(name="challenge", description="Thách đấu Hộ Vệ Thần của người khác!")
+    @discord.app_commands.describe(target="Chọn user có sở hữu Hộ Vệ Thần.")
+    @discord.app_commands.describe(so_tien="Chọn số tiền muốn cược.")
+    @discord.app_commands.describe(loai="Chọn loại hình chiến đấu.")
+    @discord.app_commands.describe(loai_tien="Chọn loại tiền muốn cược.")
+    @discord.app_commands.choices(loai_tien=[
+        Choice(name="Gold", value="G"),
+        Choice(name="Silver", value="S"),
+        Choice(name="Copper", value="C"),
+    ])
+    @discord.app_commands.choices(loai=[
+        Choice(name="Chiến đấu bình thường (Dùng mọi kỹ năng)", value="A"),
+        Choice(name="Chiến đấu không dùng bất kỳ kỹ năng nào", value="B"),
+        Choice(name="Chiến đấu không dùng kỹ năng Tẩy Não", value="C"),
+        Choice(name="Chiến đấu không dùng kỹ năng Triệu Linh", value="D"),
+        Choice(name="Chiến đấu không dùng kỹ năng Triệu Linh và Tẩy Não", value="E"),
+    ])
+    @discord.app_commands.describe(max_players="Cho phép bấy nhiêu người gia nhập cuộc chiến.")
+    @discord.app_commands.choices(max_players=[
+        Choice(name="1", value="1"),
+        Choice(name="2", value="2"),
+        Choice(name="3", value="3"),
+    ])
+    @discord.app_commands.checks.cooldown(1, 30)
+    async def ga_challenge_slash_command(self, interaction: discord.Interaction, target: discord.Member, max_players: str = "3", loai:str = "A", so_tien:int = None, loai_tien:str = None):
+        await interaction.response.defer(ephemeral=False)
+        #Không cho dùng bot nếu không phải user
+        if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
+        
+        if target!= None and target.id == interaction.user.id:
+            view = SelfDestructView(timeout=30)
+            mess = await interaction.followup.send(content=f"Bạn không thể chiến đấu với bản thân mình!", ephemeral=True, view=view)
+            view.message = mess
+            return
+        
+        user_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
+        if user_profile == None:
+            view = SelfDestructView(timeout=30)
+            mess = await interaction.followup.send(content=f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True, view=view)
+            view.message = mess
+            return
+        elif user_profile.guardian == None or user_profile.guardian.is_dead:
+            view = SelfDestructView(timeout=30)
+            mess = await interaction.followup.send(content=f"Vui lòng mua Hộ Vệ Thần trước bằng lệnh {SlashCommand.SHOP_GUARDIAN.value} đã!", ephemeral=True, view=view)
+            view.message = mess
+            return
+        
+        if user_profile.guardian.last_battle != None:
+            time_window = timedelta(minutes=30)
+            check = UtilitiesFunctions.check_if_within_time_delta(input=user_profile.guardian.last_battle, time_window=time_window)
+            if check:
+                next_time = user_profile.guardian.last_battle + time_window
+                unix_time = int(next_time.timestamp())
+                embed = discord.Embed(title=f"", description=f"🚫 Bạn đã cho Hộ Vệ Thần chiến đấu rồi. Vui lòng thực hiện lại lệnh vào lúc <t:{unix_time}:t>!", color=0xc379e0)
+                view = SelfDestructView(timeout=120)
+                mess = await interaction.followup.send(embed=embed, view=view, ephemeral=False)
+                view.message = mess
+                return
+        
+        if user_profile.guardian.last_joined_battle != None:
+            time_window = timedelta(minutes=1)
+            check = UtilitiesFunctions.check_if_within_time_delta(input=user_profile.guardian.last_joined_battle, time_window=time_window)
+            if check:
+                next_time = user_profile.guardian.last_joined_battle + time_window
+                unix_time = int(next_time.timestamp())
+                embed = discord.Embed(title=f"", description=f"🚫 Bạn vừa tham chiến xong. Vui lòng đợi một phút rồi thực hiện lại lệnh!", color=0xc379e0)
+                view = SelfDestructView(timeout=120)
+                mess = await interaction.followup.send(embed=embed, view=view, ephemeral=False)
+                view.message = mess
+                return
+
+        if user_profile.guardian.time_to_recover != None:
+            if user_profile.guardian.time_to_recover > datetime.now():
+                view = SelfDestructView(timeout=30)
+                next_time = user_profile.guardian.time_to_recover
+                unix_time = int(next_time.timestamp())
+                mess = await interaction.followup.send(content=f"Hộ Vệ Thần của bạn đang bị thương! Vui lòng chờ hồi phục vào lúc <t:{unix_time}:t> hoặc mua bình hồi phục trong {SlashCommand.SHOP_GLOBAL.value}!", ephemeral=True, view=view)
+                view.message = mess
+                return
+            else:
+                #Hồi phục 50% máu, 50% thể lực
+                health = int(user_profile.guardian.max_health*50/100)
+                stamina = int(user_profile.guardian.max_stamina*50/100)
+                ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id,user_id=interaction.user.id, health=health, stamina=stamina)
+        
+        
+        target_profile = None
+        if target != None:
+            target_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=target.id)
+            if target_profile == None:
+                view = SelfDestructView(timeout=30)
+                mess = await interaction.followup.send(content=f"Đối thủ {target.mention} vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True, view=view)
+                view.message = mess
+                return
+            elif target_profile.guardian == None or target_profile.guardian.is_dead:
+                view = SelfDestructView(timeout=30)
+                mess = await interaction.followup.send(content=f"Đối thủ {target.mention} vui lòng mua Hộ Vệ Thần trước bằng lệnh {SlashCommand.SHOP_GUARDIAN.value} đã!", ephemeral=True, view=view)
+                view.message = mess
+                return
+            
+            if target_profile.guardian.time_to_recover != None:
+                if target_profile.guardian.time_to_recover > datetime.now():
+                    view = SelfDestructView(timeout=30)
+                    next_time = target_profile.guardian.time_to_recover
+                    unix_time = int(next_time.timestamp())
+                    mess = await interaction.followup.send(content=f"Hộ Vệ Thần của {target.mention} đang bị thương! Vui lòng chờ hồi phục vào lúc <t:{unix_time}:t> hoặc mua bình hồi phục trong {SlashCommand.SHOP_GLOBAL.value}!", ephemeral=True, view=view)
+                    view.message = mess
+                    return
+                else:
+                    #Hồi phục 50% máu, 50% thể lực
+                    health = int(target_profile.guardian.max_health*50/100)
+                    stamina = int(target_profile.guardian.max_stamina*50/100)
+                    ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id,user_id=target.id, health=health, stamina=stamina)
+        
+        if (so_tien is None) != (loai_tien is None):
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Vui lòng chọn *cả* loại tiền và giá tiền hoặc để *cả hai trống*!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
+
+        if so_tien is not None and so_tien <= 0:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Số tiền cược phải lớn hơn 0!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
+        
+        if so_tien is not None:
+            #Đảm bảo user đủ tiền cược
+            error_message = None
+            if loai_tien == "G" and (user_profile.gold < so_tien or target_profile.gold < so_tien):
+                error_message = f"Bạn hoặc đối thủ không đủ tiền vàng để cược {so_tien} {EmojiCreation2.GOLD.value}!"
+            if loai_tien == "S" and (user_profile.silver < so_tien or target_profile.silver < so_tien):
+                error_message = f"Bạn hoặc đối thủ không đủ tiền bạc để cược {so_tien} {EmojiCreation2.SILVER.value}!"
+            if loai_tien == "C" and (user_profile.copper < so_tien or target_profile.copper < so_tien):
+                error_message = f"Bạn hoặc đối thủ không đủ tiền đồng để cược {so_tien} {EmojiCreation2.COPPER.value}!"
+            if error_message != None:
+                view = SelfDestructView(timeout=30)
+                embed = discord.Embed(title=f"{error_message}",color=discord.Color.blue())
+                mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+                view.message = mess
+                return
+            
+        view = SelfDestructView(timeout=30)
+        embed = discord.Embed(title=f"", description=f"Bạn đã thách đấu {target.mention}",color=discord.Color.blue())
+        mess = await interaction.followup.send(embed=embed, view=view)
+        view.message = mess
+        
+        loai_name_mapping = {
+            "A": "Chiến đấu bình thường (Dùng mọi kỹ năng)",
+            "B": "Chiến đấu không dùng bất kỳ kỹ năng nào",
+            "C": "Chiến đấu không dùng kỹ năng Tẩy Não",
+            "D": "Chiến đấu không dùng kỹ năng Triệu Linh",
+            "E": "Chiến đấu không dùng kỹ năng Triệu Linh và Tẩy Não",
+        }
+
+        loai_label = loai_name_mapping.get(loai, "Không xác định")
+        if max_players == None: max_players = "3"
+        max_players_as_int = int(max_players)
+        title = f"💥{interaction.user.mention} THÁCH ĐẤU {target.mention}💥"
+        footer = f"Nếu ai vẫn còn chưa hiểu cách Thách Đấu Hộ Vệ Thần cứ nhắn câu\ngc help"
+        embed = discord.Embed(title=f"", description=title, color=discord.Color.red())
+        embed.add_field(name=f"", value=f"Hộ Vệ Thần {user_profile.guardian.ga_emoji} - **{user_profile.guardian.ga_name}** (Cấp {user_profile.guardian.level}) của {interaction.user.mention}", inline=False)
+        embed.add_field(name=f"", value=f"🦾: **{user_profile.guardian.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=user_profile.guardian.health, max_value=user_profile.guardian.max_health, emoji=EmojiCreation2.HP.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=user_profile.guardian.stamina, max_value=user_profile.guardian.max_stamina, emoji=EmojiCreation2.STAMINA.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=user_profile.guardian.mana, max_value=user_profile.guardian.max_mana, emoji=EmojiCreation2.MP.value)}", inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬▬▬ι═══════════>", inline=False)
+        embed.add_field(name=f"", value=f"Hộ Vệ Thần {target_profile.guardian.ga_emoji} - **{target_profile.guardian.ga_name}** (Cấp {target_profile.guardian.level}) của {target.mention}", inline=False)
+        embed.add_field(name=f"", value=f"🦾: **{target_profile.guardian.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=target_profile.guardian.health, max_value=target_profile.guardian.max_health, emoji=EmojiCreation2.HP.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=target_profile.guardian.stamina, max_value=target_profile.guardian.max_stamina, emoji=EmojiCreation2.STAMINA.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=target_profile.guardian.mana, max_value=target_profile.guardian.max_mana, emoji=EmojiCreation2.MP.value)}", inline=False)
+        embed.add_field(name=f"", value="----------------", inline=False)
+        embed.add_field(name=f"", value=f"Thể loại: **{loai_label}**", inline=False)
+        embed.add_field(name=f"", value=f"Tối đa người tham gia: **{max_players}**", inline=False)
+        if so_tien is not None:
+            embed.add_field(name=f"", value=f"Tiền cược: **{so_tien}** {UtilitiesFunctions.get_emoji_from_loai_tien(loai_tien=loai_tien)}", inline=False)
+        embed.set_footer(text=footer, icon_url=EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value)
+        #Tạo view thách đấu
+        view = GaChallengeView(guild_id=interaction.guild_id, user=interaction.user, target=target, user_profile=user_profile, target_profile=target_profile, max_players=max_players_as_int, battle_type=loai, so_tien=so_tien, loai_tien=loai_tien, title=title, footer = footer)
+        channel = interaction.channel
+        mess = await channel.send(content=f"{target.mention}", embed=embed, view=view)
+        view.message = mess
+    
+    @ga_challenge_slash_command.error
+    async def ga_challenge_slash_command_error(self, interaction: discord.Interaction, error):
+        if isinstance(error, discord.app_commands.CommandOnCooldown):
+            await interaction.response.send_message(f"⏳ Lệnh đang cooldown, vui lòng thực hiện lại trong vòng {error.retry_after:.2f}s tới.", ephemeral=True)
+        else:
+            await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
+    

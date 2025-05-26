@@ -45,6 +45,16 @@ def create_profile(guild_id: int, guild_name: str, user_id: int, user_name: str,
     result = collection.insert_one(data.to_dict())
     return data
 
+def update_profile_money_by_type(guild_id: int, guild_name: str, user_id: int, user_name: str, user_display_name: str, money: int = 0, money_type: str = "C"):
+    if money_type not in ["C", "S", "G", "D"]: return
+    if money_type == "C":
+        return update_profile_money(guild_id=guild_id, guild_name=guild_name, user_id=user_id, user_name=user_name, user_display_name=user_display_name, copper=money)
+    elif money_type == "S":
+        return update_profile_money(guild_id=guild_id, guild_name=guild_name, user_id=user_id, user_name=user_name, user_display_name=user_display_name, silver=money)
+    elif money_type == "G":
+        return update_profile_money(guild_id=guild_id, guild_name=guild_name, user_id=user_id, user_name=user_name, user_display_name=user_display_name, gold=money)
+    elif money_type == "D":
+        return update_profile_money(guild_id=guild_id, guild_name=guild_name, user_id=user_id, user_name=user_name, user_display_name=user_display_name, darkium=money)
 
 def update_profile_money(guild_id: int, guild_name: str, user_id: int, user_name: str, user_display_name: str, gold: int= 0, silver: int = 0, copper:int = 0, darkium: int = 0):
     collection = db_specific[f'profile_{guild_id}']
@@ -521,6 +531,16 @@ def remove_current_attack_item_profile(guild_id: int, user_id: int):
     return result
 
 #region Authority
+def update_money_authority_by_money_type(guild_id: int, money: int = 0, money_type: str = "C"):
+    if money_type not in ["C", "S", "G", "D"]: return
+    if money_type == "C":
+        return update_money_authority(guild_id=guild_id, copper=money)
+    elif money_type == "S":
+        return update_money_authority(guild_id=guild_id, silver=money)
+    elif money_type == "G":
+        return update_money_authority(guild_id=guild_id, gold=money)
+    elif money_type == "D":
+        return update_money_authority(guild_id=guild_id, darkium=money)
 
 def update_money_authority(guild_id: int, gold: int= 0, silver: int = 0, copper:int = 0, darkium: int = 0):
     collection = db_specific[f'profile_{guild_id}']

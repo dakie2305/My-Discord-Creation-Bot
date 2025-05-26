@@ -38,7 +38,6 @@ class AutoresponderHandling():
         dignity_help = ["tăng nhân phẩm", "điểm nhân phẩm", "nhân phẩm là gì", "nhân phẩm?"]
         dia_vi_help = ["tăng địa vị", "điểm địa vị", "địa vị là gì", "địa vị?"]
         
-        bbb_warning = ["bbb", "BBB", "bảo baby", "bảo babi"]
         
         donate = ["donate"]
         donate_disable = ["!disable donation", "!disable donation text"]
@@ -46,6 +45,7 @@ class AutoresponderHandling():
         legend_weapon = ["thất truyền huyền khí"]
         ga_help = ["ga help", "guardian help", "hộ vệ thần?", "guardian help"]
         gd_help = ["gd help", "dungeon help"]
+        gc_help = ["gc help", "challenge help", "ga challenge"]
 
         chosen_item: Item = None
         
@@ -128,6 +128,21 @@ class AutoresponderHandling():
             embed.add_field(name="", value=f"- Phần thưởng trong chiến đấu Hầm Ngục sẽ cao hơn {SlashCommand.GA_BATTLE.value}!", inline=False)
             embed.add_field(name="", value="-------------------------------------", inline=False)
             embed.set_footer(text=f"Đừng quên mỗi Hộ Vệ Thần có tỉ lệ chết vĩnh viễn nếu để trọng thương khi đánh với quái nhé! Tỉ lệ rất thấp, nhưng đừng khinh suất!", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")
+            view = SelfDestructView(timeout=180)
+            _mess = await message.channel.send(embed=embed, view=view)
+            view.message= _mess
+        
+        elif CustomFunctions.contains_substring(message.content.lower(), gc_help):
+            flag = True
+            embed = discord.Embed(title=f"", description=f"Hướng dẫn Thách Đấu Hộ Vệ Thần", color=0xc379e0)
+            embed.add_field(name="", value="-------------------------------------", inline=False)
+            embed.add_field(name="", value=f"- Dùng lệnh {SlashCommand.GA_CHALLENGE.value} để thách đấu Hộ Vệ Thần của đối phương (PVP).", inline=False)
+            embed.add_field(name="", value=f"- Ở Thách Đấu không có giới hạn thời gian chiến đấu, nhưng cũng sẽ không hưởng bất kỳ phần thưởng nào hết!", inline=False)
+            embed.add_field(name="", value=f"- Khi thách đấu, có thể đặt cược tiền, người thắng sẽ nhận được 95% số tiền cược của kẻ thua cuộc!", inline=False)
+            embed.add_field(name="", value=f"- Khi thách đấu, có thể chọn hình thức chiến đấu khác nhau nếu muốn!", inline=False)
+            embed.add_field(name="", value=f"- Mọi chỉ số Hộ Vệ Thần đều sẽ lưu lại sau mỗi trận chiến! Chỉ một bên ngã xuống thì mới dừng lại!", inline=False)
+            embed.add_field(name="", value="-------------------------------------", inline=False)
+            embed.set_footer(text=f"Đừng quên mỗi Hộ Vệ Thần có tỉ lệ chết vĩnh viễn nếu để trọng thương khi Thách Đấu nhé! Tỉ lệ rất thấp, nhưng đừng khinh suất!", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")
             view = SelfDestructView(timeout=180)
             _mess = await message.channel.send(embed=embed, view=view)
             view.message= _mess
