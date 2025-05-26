@@ -1739,22 +1739,29 @@ async def on_member_update(before: discord.Member, after: discord.Member):
             view = RemoveTimeoutView(user=after)
             m = await channel.send(view=view, embed=embed)
             view.message = m
-    
+
+reaction_cooldowns = {}
 @bot.event
 async def on_reaction_add(reaction: discord.Reaction, user):
     message: discord.Message = reaction.message
     user_target: discord.Member = user
-    if user_target != None and message != None:
-        #Chỉ check trong True Heavens
-        if message.guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value: return
-        blacklist_emoji = ["th_you_are_gay", "th_gay_duoi", ":gay:", "th_are_you_gay"]
-        #Check xem có jail không
-        emoji_name = str(reaction.emoji)
-        if any(bad in emoji_name for bad in blacklist_emoji):
-            #Jail
-            channel = message.channel
-            print(f"{user_target.mention} just dropped one of the most blacklist emoji and is jailed for now at channel {channel.name} in guild {message.guild.name}")
-            await jail_user(channel=channel, jailer=bot.user, user=user_target, reason="Đắc tội tày trời, thả emoji tối kỵ nguy hiểm tột độ. Trời tru đất diệt, thiên địa truy lùng",  duration= 2, time_format= "minute")
+    if user_target is None or message is None: return
+    #Chỉ check trong True Heavens
+    if message.guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value: return
+    blacklist_emoji = ["th_you_are_gay", "th_gay_duoi", ":gay:", "th_are_you_gay"]
+    #Check xem có jail không
+    emoji_name = str(reaction.emoji)
+    # Cooldown: block if jailed in the last 4 minutes
+    cooldown_time = timedelta(minutes=4)
+    now = datetime.now()
+    last_jailed = reaction_cooldowns.get(user_target.id)
+    if last_jailed and now - last_jailed < cooldown_time: return  # User is still on cooldown
+    if any(bad in emoji_name for bad in blacklist_emoji):
+        #Jail
+        channel = message.channel
+        print(f"{user_target.mention} just dropped one of the most blacklist emoji and is jailed for now at channel {channel.name} in guild {message.guild.name}")
+        reaction_cooldowns[user_target.id] = now
+        await jail_user(channel=channel, jailer=bot.user, user=user_target, reason="Đắc tội tày trời, thả emoji tối kỵ nguy hiểm tột độ. Trời tru đất diệt, thiên địa truy lùng",  duration= 2, time_format= "minute")
 
 @bot.event
 async def on_guild_remove(guild: discord.Guild):
