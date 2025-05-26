@@ -920,74 +920,6 @@ async def first_command(interaction: discord.Interaction, user : discord.Member,
     await jail_user(channel=channel, jailer=interaction.user, user=user, reason=reason, duration=duration, time_format=time_format, jail_db=jail_db)
     return
     
-    #Nếu là Bot thì lật ngược vị thế:
-    temp_author = interaction.user 
-    if user.bot:
-        interaction.user = user
-        user = temp_author
-    
-    # Calculate the end time
-    end_time = datetime.now() + CustomFunctions.get_timedelta(duration, time_format)
-    mordern_date_time_format = end_time.strftime(f"%d/%m/%Y %H:%M")
-    # Save user's roles
-    original_roles = [role for role in user.roles if not role.is_default() and not role.is_premium_subscriber()]
-    stored_original_roles = []
-    for role in original_roles:
-        old_role = {
-                        "role_id": role.id,
-                        "role_name": role.name
-                    }
-        stored_original_roles.append(old_role)
-    # Remove all roles and add jail role
-    jail_role = discord.utils.get(user.guild.roles, name="Đáy Xã Hội")
-    if not jail_role:
-        jail_role = await user.guild.create_role(name="Đáy Xã Hội")
-        user_info = UserInfo(
-        user_id=user.id,
-        user_name=user.name,
-        user_display_name=user.display_name,
-        reason= reason,
-        jail_until= end_time,
-        roles=stored_original_roles
-    )
-    
-    
-    #Tìm xem user này đã có chưa, chưa có thì insert
-    search_user = db.find_user_by_id(user_info.user_id, jail_db)
-    if search_user == None:
-        #Insert
-        db.create_user(user_info= user_info, chosen_collection= jail_db)
-    else:
-        #Update lại jail_until và reason
-        updated_data = {"jail_until": end_time.isoformat(), "reason" :user_info.reason }
-        db.update_guild_extra_info(guild_id=user_info.user_id, update_data= updated_data)
-    
-    try:
-        for ori_role in original_roles:
-            try:
-                await user.remove_roles(ori_role)
-            except Exception:
-                continue
-        await user.add_roles(jail_role)
-    except Exception as e:
-        print(e)
-    # Create embed object
-
-    await channel.send(f"Kẻ tội độ {user.mention} đã bị {interaction.user.mention} bắt giữ và sẽ bị tống vào đại lao. Kẻ tội đồ này chỉ được thả ra xã hội sau {duration} {time_format}. Lý do tống giam: {reason}")
-    
-    embed = discord.Embed(title="Đại Lao Thẳng Tiến", description=f"Kẻ tội đồ {user.mention} đã bị {interaction.user.mention} bắt giữ và tống vào đại lao!", color=0x00FF00)  # Green color
-    embed.add_field(name="Lý do bị tù đày:", value=reason, inline=False)  # Single-line field
-    embed.add_field(name="Sẽ được ân xoá sau khoảng thời gian:", value=f"{duration} {time_format}", inline=False)
-    embed.add_field(name="Thời gian ra đại lao:", value=f"{mordern_date_time_format}", inline=True)
-    embed.add_field(name="Ghi chú", value="Nếu quá thời hạn phạt tù mà chưa được ra tù thì hãy la làng lên nhé!", inline=False) 
-    embed.set_footer(text=f"Đã bị tống giam bởi: {interaction.user.name}")  # Footer text
-
-    channel = bot.get_channel(1257012036718563380)
-    if channel:
-        await channel.send(content=f"{user.mention}",embed=embed)
-    print(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} jailed {user.display_name} for {duration} {time_format}. Reason: {reason}")
-    commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} jailed {user.display_name} for {duration} {time_format}. Reason: {reason}")
-
 async def jail_user(channel: discord.TextChannel, jailer:discord.Member, user: discord.Member, reason: str, duration: int, time_format: str, jail_db = 'jailed_user'):
     #Nếu là Bot thì lật ngược vị thế:
     temp_author = jailer 
@@ -1739,49 +1671,6 @@ async def on_member_update(before: discord.Member, after: discord.Member):
             view = RemoveTimeoutView(user=after)
             m = await channel.send(view=view, embed=embed)
             view.message = m
-
-reaction_cooldowns = {}
-recently_handled_users = set()
-@bot.event
-async def on_reaction_add(reaction: discord.Reaction, user):
-    message: discord.Message = reaction.message
-    user_target: discord.Member = user
-    if user_target is None or message is None: return
-    #Chỉ check trong True Heavens
-    if message.guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value: return
-    blacklist_emoji = ["th_you_are_gay", "th_gay_duoi", ":gay:", "th_are_you_gay", "gei"]
-    #Check xem có jail không
-    emoji_name = str(reaction.emoji)
-    # Cooldown: block if jailed in the last 4 minutes
-    cooldown_time = timedelta(minutes=4)
-    now = datetime.now()
-    last_jailed = reaction_cooldowns.get(user_target.id)
-    if last_jailed and now - last_jailed < cooldown_time: return  # User is still on cooldown
-    if any(bad in emoji_name for bad in blacklist_emoji):
-        # Add to recently handled set to avoid duplicates
-        recently_handled_users.add(user_target.id)
-        # Delay and handle punishment safely
-        async def handle_jail():
-            try:
-                await asyncio.sleep(5)  # slight delay to avoid flood
-                channel = message.channel
-                print(f"{user_target.mention} used blacklisted emoji in {channel.name}")
-                await jail_user(
-                    channel=channel,
-                    jailer=bot.user,
-                    user=user_target,
-                    reason="Đắc tội tày trời, thả emoji tối kỵ nguy hiểm tột độ. Trời tru đất diệt, thiên địa truy lùng",
-                    duration=2,
-                    time_format="minute"
-                )
-                reaction_cooldowns[user_target.id] = now
-            except Exception as e:
-                print(f"Failed to jail user: {e}")
-            finally:
-                # Remove from set after cooldown expires
-                await asyncio.sleep(10)  # short delay before allowing next
-                recently_handled_users.discard(user_target.id)
-        asyncio.create_task(handle_jail())
 
 @bot.event
 async def on_guild_remove(guild: discord.Guild):
