@@ -331,6 +331,9 @@ class ShopEconomy(commands.Cog):
         list_skill = copy.deepcopy(ListGAAndSkills.list_ga_skills)
         list_all_shops_guardian_skill["Cửa Hàng Kỹ Năng Tấn Công"] = list_skill
         
+        list_temp = copy.deepcopy(ListGAAndSkills.list_ga_attack_skills_2)
+        list_all_shops_guardian_skill["Cửa Hàng Kỹ Năng Tấn Công 2"] = list_temp
+
         list_temp = copy.deepcopy(ListGAAndSkills.list_ga_passive_skills)
         list_all_shops_guardian_skill["Cửa Hàng Kỹ Năng Nội Tại"] = list_temp
         

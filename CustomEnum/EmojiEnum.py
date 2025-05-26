@@ -237,7 +237,9 @@ class EmojiCreation2(Enum):
     TRADE_STATS_SKILL = "<:trade_stats_skill:1328910123128586342>"
     FIRE_COLL = "<:flame_coll:1332178177589514322>"
     HEALTH_SACRIFICE = "<:health_sacrifice:1373947029486702696>"
+    SUMMON_SACRIFICE = "<:summon_sacrifice_skill:1376374742172565655>"
     SHIELD_SKILL = "<a:shield_skill:1375882285156401263>"
+    VITALITY_DRAIN = "<a:vitality_drain:1376374755237822547>"
     
     
     HP = "<:HP:1320777603358920724>"

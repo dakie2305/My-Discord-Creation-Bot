@@ -504,7 +504,11 @@ list_ga_skills_private = [
         buff_defense_percent=0,
         buff_attack_percent=5,
         min_level_required=1,
-    ),
+    )
+]
+list_ga_skills = copy.deepcopy(list_ga_skills_private)
+
+list_ga_attack_skills_2_private = [
     GuardianAngelSkill(
         skill_id = "skill_potion_destroyer",
         skill_name= "Phá Dược Tiễn",
@@ -541,7 +545,7 @@ list_ga_skills_private = [
         skill_desc="Triệu hồi cột lửa thiêu đốt cả tổ đội của đối thủ, kỹ năng này sẽ mất nhiều mana mỗi khi dùng!",
         skill_type= ["attack"],
         emoji= EmojiCreation2.FIRE_COLL.value,
-        attack_power= 1,
+        attack_power= 35,
         item_worth_amount= 60000,
         item_worth_type= "G",
         percent_min_mana_req= 30,
@@ -550,8 +554,24 @@ list_ga_skills_private = [
         buff_attack_percent=5,
         min_level_required=1,
     ),
+    GuardianAngelSkill(
+        skill_id = "skill_drain_vitality",
+        skill_name= "Rút Sinh Lực",
+        skill_desc="Kỹ năng này sẽ khiến đối phương mất máu, và lượng máu đã mất sẽ cộng vào người thi triển! Kỹ năng này sẽ mất nhiều mana mỗi khi dùng!",
+        skill_type= ["attack"],
+        emoji= EmojiCreation2.VITALITY_DRAIN.value,
+        attack_power= 45,
+        item_worth_amount= 80000,
+        item_worth_type= "G",
+        percent_min_mana_req= 30,
+        mana_loss= 30,
+        buff_defense_percent=0,
+        buff_attack_percent=5,
+        min_level_required=1,
+    ),
 ]
-list_ga_skills = copy.deepcopy(list_ga_skills_private)
+list_ga_attack_skills_2 = copy.deepcopy(list_ga_attack_skills_2_private)
+
 
 list_ga_passive_skills_private = [
   GuardianAngelSkill(
@@ -716,6 +736,21 @@ list_ga_passive_skills_private_2 = [
         skill_desc="Khi mana dưới 50% sẽ huỷ 5% máu của bản thân, và trừ máu của cả hai phe để nạp lại một lượng mana tương ứng tất cả số máu đã mất!",
         skill_type= ["passive"],
         emoji= EmojiCreation2.HEALTH_SACRIFICE.value,
+        attack_power= 1,
+        item_worth_amount= 60000,
+        item_worth_type= "G",
+        percent_min_mana_req= 20,
+        mana_loss= 20,
+        buff_defense_percent=0,
+        buff_attack_percent=1,
+        min_level_required=1,
+    ),
+  GuardianAngelSkill(
+        skill_id = "skill_summon_sacrifice",
+        skill_name= "Hiến Linh",
+        skill_desc="Nếu trong đội bạn có triệu hồi thì sẽ hiến tế triệu hồi và nhận về 50% chỉ số của triệu hồi đó! Chỉ kích hoạt một lần trong trận chiến!",
+        skill_type= ["passive"],
+        emoji= EmojiCreation2.SUMMON_SACRIFICE.value,
         attack_power= 1,
         item_worth_amount= 60000,
         item_worth_type= "G",
