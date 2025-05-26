@@ -3,6 +3,7 @@ import discord
 from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
+from CustomEnum.TrueHeavenEnum import TrueHeavenEnum
 import CustomFunctions
 import google.generativeai as genai
 import time
@@ -114,7 +115,7 @@ async def start_wm_vn(ctx):
 async def reset_wm(ctx):
     message: discord.Message = ctx.message
     if message:
-        if message.guild.id == 1256987900277690470:
+        if message.guild.id == TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value:
             #Chỉ check trong True Heaven
             req_roles = ['Supervisor', 'Server Master', 'Moderator', 'Ultimate Admins']
             has_required_role = any(role.name in req_roles for role in message.author.roles)
@@ -148,7 +149,7 @@ async def process_reset_word_matching(message: discord.Message, word_matching_ch
                 count+=1
             if count >= 25: break
     text = "Chúc mừng các player top đầu!"
-    if message.guild.id == 1256987900277690470:
+    if message.guild.id == TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value:
         text+= " <@315835396305059840> sẽ trao role đặc biệt cho những Player thuộc top 3 nhé!"
     await message.channel.send(content=text, embed=embed)
     #Xoá đi tạo lại
@@ -163,7 +164,7 @@ async def process_reset_word_matching(message: discord.Message, word_matching_ch
 @app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
 async def wm_give_skill(ctx, item_id: str = None, user: Optional[discord.Member] = None):
     message: discord.Message = ctx.message
-    if message.guild.id == 1256987900277690470:
+    if message.guild.id == TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value:
         req_roles = ['Cai Ngục', 'Server Master', 'Moderator']
         has_required_role = any(role.name in req_roles for role in message.author.roles)
         if not has_required_role and message.author.id != 315835396305059840:
@@ -212,7 +213,7 @@ async def wm_give_skill(ctx, item_id: str = None, user: Optional[discord.Member]
 @app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
 async def wm_give_ban(ctx, user: discord.Member, ban_amount: int):
     message: discord.Message = ctx.message
-    if message.guild.id == 1256987900277690470:
+    if message.guild.id == TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value:
         req_roles = ['Cai Ngục', 'Server Master', 'Moderator']
         has_required_role = any(role.name in req_roles for role in message.author.roles)
         if not has_required_role and message.author.id != 315835396305059840:
@@ -247,7 +248,7 @@ async def wm_give_ban(ctx, user: discord.Member, ban_amount: int):
 async def wm_remove_skill(ctx, item_id: str = None, user: Optional[discord.Member] = None):
     message: discord.Message = ctx.message
     called_channel = message.channel
-    if message.guild.id == 1256987900277690470:
+    if message.guild.id == TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value:
         #Chỉ check trong guild True Heaven
         req_roles = ['Cai Ngục', 'Moderator','Server Master']
         has_required_role = any(role.name in req_roles for role in message.author.roles)
@@ -892,7 +893,7 @@ async def say(interaction: discord.Interaction, thing_to_say : str, image: Optio
 #endregion
 
 #region jail command
-@bot.tree.command(name="jail", description="Tống ai đó vào đại lao trong khoảng thời gian nhất định.", guild=discord.Object(id=1256987900277690470))
+@bot.tree.command(name="jail", description="Tống ai đó vào đại lao trong khoảng thời gian nhất định.", guild=discord.Object(id=TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value))
 @discord.app_commands.choices(time_format=[
         Choice(name="Giây", value="second"),
         Choice(name="Phút", value="minute"),
@@ -903,7 +904,7 @@ async def say(interaction: discord.Interaction, thing_to_say : str, image: Optio
     ])
 @app_commands.describe(user= "Người cần tống giam", duration= "Thời gian tống giam (nhập số)", time_format = "Thời gian tống giam (second, minute, hour, day, week, month)", reason="Lý do tống giam")
 async def first_command(interaction: discord.Interaction, user : discord.Member, duration: int, time_format : str, reason : str):
-    await interaction.response.defer()  # Defer the interaction early
+    await interaction.response.defer(ephemeral=True)  # Defer the interaction early
     req_roles = ['Cai Ngục', 'Supervisor', 'Server Master', 'Moderator']
     jail_db = "jailed_user"
     has_required_role = any(role.name in req_roles for role in interaction.user.roles)
@@ -913,6 +914,11 @@ async def first_command(interaction: discord.Interaction, user : discord.Member,
     if time_format not in ['second', 'minute', 'hour', 'day', 'month']:
         await interaction.followup.send("Sai định dạng thời gian. Chỉ dùng những từ sau: second, minute, hour, day, month.", ephemeral=True)
         return
+    
+    await interaction.followup.send(f"Bạn đã tống giam {user.mention} vào đại lao thành công!", ephemeral=True)
+    channel = interaction.channel
+    await jail_user(channel=channel, jailer=interaction.user, user=user, reason=reason, duration=duration, time_format=time_format, jail_db=jail_db)
+    return
     
     #Nếu là Bot thì lật ngược vị thế:
     temp_author = interaction.user 
@@ -932,19 +938,17 @@ async def first_command(interaction: discord.Interaction, user : discord.Member,
                         "role_name": role.name
                     }
         stored_original_roles.append(old_role)
-    
     # Remove all roles and add jail role
     jail_role = discord.utils.get(user.guild.roles, name="Đáy Xã Hội")
     if not jail_role:
         jail_role = await user.guild.create_role(name="Đáy Xã Hội")
-
-    user_info = UserInfo(
-    user_id=user.id,
-    user_name=user.name,
-    user_display_name=user.display_name,
-    reason= reason,
-    jail_until= end_time,
-    roles=stored_original_roles
+        user_info = UserInfo(
+        user_id=user.id,
+        user_name=user.name,
+        user_display_name=user.display_name,
+        reason= reason,
+        jail_until= end_time,
+        roles=stored_original_roles
     )
     
     
@@ -968,6 +972,9 @@ async def first_command(interaction: discord.Interaction, user : discord.Member,
     except Exception as e:
         print(e)
     # Create embed object
+
+    await channel.send(f"Kẻ tội độ {user.mention} đã bị {interaction.user.mention} bắt giữ và sẽ bị tống vào đại lao. Kẻ tội đồ này chỉ được thả ra xã hội sau {duration} {time_format}. Lý do tống giam: {reason}")
+    
     embed = discord.Embed(title="Đại Lao Thẳng Tiến", description=f"Kẻ tội đồ {user.mention} đã bị {interaction.user.mention} bắt giữ và tống vào đại lao!", color=0x00FF00)  # Green color
     embed.add_field(name="Lý do bị tù đày:", value=reason, inline=False)  # Single-line field
     embed.add_field(name="Sẽ được ân xoá sau khoảng thời gian:", value=f"{duration} {time_format}", inline=False)
@@ -975,16 +982,85 @@ async def first_command(interaction: discord.Interaction, user : discord.Member,
     embed.add_field(name="Ghi chú", value="Nếu quá thời hạn phạt tù mà chưa được ra tù thì hãy la làng lên nhé!", inline=False) 
     embed.set_footer(text=f"Đã bị tống giam bởi: {interaction.user.name}")  # Footer text
 
-    await interaction.followup.send(f"Kẻ tội độ {user.mention} đã bị {interaction.user.mention} bắt giữ và sẽ bị tống vào đại lao. Kẻ tội đồ này chỉ được thả ra xã hội sau {duration} {time_format}. Lý do tống giam: {reason}")
     channel = bot.get_channel(1257012036718563380)
     if channel:
         await channel.send(content=f"{user.mention}",embed=embed)
     print(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} jailed {user.display_name} for {duration} {time_format}. Reason: {reason}")
     commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} jailed {user.display_name} for {duration} {time_format}. Reason: {reason}")
+
+async def jail_user(channel: discord.TextChannel, jailer:discord.Member, user: discord.Member, reason: str, duration: int, time_format: str, jail_db = 'jailed_user'):
+    #Nếu là Bot thì lật ngược vị thế:
+    temp_author = jailer 
+    if user.bot:
+        user = user
+        user = temp_author
+    
+    # Calculate the end time
+    end_time = datetime.now() + CustomFunctions.get_timedelta(duration, time_format)
+    mordern_date_time_format = end_time.strftime(f"%d/%m/%Y %H:%M")
+    # Save user's roles
+    original_roles = [role for role in user.roles if not role.is_default() and not role.is_premium_subscriber()]
+    stored_original_roles = []
+    for role in original_roles:
+        old_role = {
+                        "role_id": role.id,
+                        "role_name": role.name
+                    }
+        stored_original_roles.append(old_role)
+    # Remove all roles and add jail role
+    jail_role = discord.utils.get(user.guild.roles, name="Đáy Xã Hội")
+    if not jail_role:
+        jail_role = await user.guild.create_role(name="Đáy Xã Hội")
+    
+    user_info = UserInfo(
+        user_id=user.id,
+        user_name=user.name,
+        user_display_name=user.display_name,
+        reason= reason,
+        jail_until= end_time,
+        roles=stored_original_roles
+    )
+    
+    #Tìm xem user này đã có chưa, chưa có thì insert
+    search_user = db.find_user_by_id(user_info.user_id, jail_db)
+    if search_user == None:
+        #Insert
+        db.create_user(user_info= user_info, chosen_collection= jail_db)
+    else:
+        #Update lại jail_until và reason
+        updated_data = {"jail_until": end_time.isoformat(), "reason" :user_info.reason }
+        db.update_guild_extra_info(guild_id=user_info.user_id, update_data= updated_data)
+    
+    try:
+        for ori_role in original_roles:
+            try:
+                await user.remove_roles(ori_role)
+            except Exception:
+                continue
+        await user.add_roles(jail_role)
+    except Exception as e:
+        print(e)
+    # Create embed object
+
+    await channel.send(f"Kẻ tội độ {user.mention} đã bị {jailer.mention} bắt giữ và sẽ bị tống vào đại lao. Kẻ tội đồ này chỉ được thả ra xã hội sau {duration} {time_format}. Lý do tống giam: {reason}")
+    
+    embed = discord.Embed(title="Đại Lao Thẳng Tiến", description=f"Kẻ tội đồ {user.mention} đã bị {jailer.mention} bắt giữ và tống vào đại lao!", color=0x00FF00)  # Green color
+    embed.add_field(name="Lý do bị tù đày:", value=reason, inline=False)  # Single-line field
+    embed.add_field(name="Sẽ được ân xoá sau khoảng thời gian:", value=f"{duration} {time_format}", inline=False)
+    embed.add_field(name="Thời gian ra đại lao:", value=f"{mordern_date_time_format}", inline=True)
+    embed.add_field(name="Ghi chú", value="Nếu quá thời hạn phạt tù mà chưa được ra tù thì hãy la làng lên nhé!", inline=False) 
+    embed.set_footer(text=f"Đã bị tống giam bởi: {jailer.name}")  # Footer text
+
+    channel = bot.get_channel(1257012036718563380)
+    if channel:
+        await channel.send(content=f"{user.mention}",embed=embed)
+    print(f"Username {jailer.name}, Display user name {jailer.display_name} jailed {user.display_name} for {duration} {time_format}. Reason: {reason}")
+    commands_logger.info(f"Username {jailer.name}, Display user name {jailer.display_name} jailed {user.display_name} for {duration} {time_format}. Reason: {reason}")
+
 #endregion
 
 #region unjail command
-@bot.tree.command(name="unjail", description="Ân xá tội đồ ra khỏi đại lao ngay lập tức.", guild=discord.Object(id=1256987900277690470))
+@bot.tree.command(name="unjail", description="Ân xá tội đồ ra khỏi đại lao ngay lập tức.", guild=discord.Object(id=TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value))
 @app_commands.describe(user= "Người cần ân xá", reason = "Lý do tại sao ân xá")
 async def unjail(interaction: discord.Interaction, user : discord.Member, reason : str):
     await interaction.response.defer()
@@ -1032,7 +1108,7 @@ async def unjail(interaction: discord.Interaction, user : discord.Member, reason
 #endregion
 
 #region delete_message command
-@bot.tree.command(name="delete_message", description="Xoá một hoặc nhiều tin nhắn bất kỳ.", guild=discord.Object(id=1256987900277690470))
+@bot.tree.command(name="delete_message", description="Xoá một hoặc nhiều tin nhắn bất kỳ.", guild=discord.Object(id=TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value))
 @app_commands.describe(reason= "Lý do tại sao xoá tin nhắn này", message_id= "Chuột phải vào message muốn xoá, vào bấm Copy Id rồi dán vào đây", chosen_channel = "Channel chứa message cần xoá. Tất cả message id phải chung một channel")
 async def delete_message(interaction: discord.Interaction, reason : str, message_id: str, chosen_channel: Optional[discord.TextChannel]= None):
     await interaction.response.defer(ephemeral=True)
@@ -1141,7 +1217,7 @@ async def delete_message_context(interaction: discord.Interaction, message: disc
 #endregion
 
 #region report command
-@bot.tree.command(name="report", description="Báo cáo user vi phạm luật về cho admin và moderator xem xét.", guild=discord.Object(id=1256987900277690470))
+@bot.tree.command(name="report", description="Báo cáo user vi phạm luật về cho admin và moderator xem xét.", guild=discord.Object(id=TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value))
 @app_commands.describe(user="Chọn user đã phạm luật để báo cáo", reason="Lý do tại sao báo cáo", message_id= "Chuột phải vào message muốn xoá, vào bấm Copy Id rồi dán vào đây", image = "Chọn hình làm bằng chứng (sẽ xử lý nhanh hơn).")
 async def report(interaction: discord.Interaction, user : discord.Member, reason: str, message_id: Optional[str] = None, image: Optional[discord.Attachment] = None):
     await interaction.response.defer(ephemeral=True)
@@ -1279,7 +1355,7 @@ async def check_jail_expiry():
     jail_db = "jailed_user"
     #Lấy tất cả dữ liệu db jail user ra
     list_all_jailed_users = db.find_all_users(chosen_collection=jail_db)
-    guild = bot.get_guild(1256987900277690470)
+    guild = bot.get_guild(TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value)
     if list_all_jailed_users:
         for jail_user in list_all_jailed_users:
                 #Lấy thời hạn tù đày
@@ -1398,7 +1474,7 @@ async def sub_function_ai_response(message: discord.Message, speakFlag = True):
     bots_creation1_name = ["creation 1", "creation số 1", "creation no 1", "creation no. 1"]
     if message.reference is not None and message.reference.resolved is not None:
         if message.reference.resolved.author == bot.user or CustomFunctions.contains_substring(message.content.lower(), bots_creation1_name):
-            if message.guild.id != 1256987900277690470 and message.guild.id != 1194106864582004849: #Chỉ True Heaven, học viện 2ten mới không bị dính
+            if message.guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value and message.guild.id != 1194106864582004849: #Chỉ True Heaven, học viện 2ten mới không bị dính
                 if CustomFunctions.is_inside_working_time() == False:
                     await message.channel.send(f"Tính năng AI của Bot chỉ hoạt động đến 12h đêm, vui lòng đợi đến 8h sáng hôm sau.")
                     return
@@ -1442,7 +1518,7 @@ async def sub_function_ai_response(message: discord.Message, speakFlag = True):
             
     elif CustomFunctions.contains_substring(message.content.lower(), bots_creation1_name):
         async with message.channel.typing():
-            if message.guild.id != 1256987900277690470 and message.guild.id != 1194106864582004849: #Chỉ True Heaven, học viện 2ten mới không bị dính
+            if message.guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value and message.guild.id != 1194106864582004849: #Chỉ True Heaven, học viện 2ten mới không bị dính
                 if CustomFunctions.is_inside_working_time() == False:
                     await message.channel.send(f"Tính năng AI của Bot chỉ hoạt động đến 12h đêm, vui lòng đợi đến 8h sáng hôm sau.")
                     return
@@ -1643,7 +1719,7 @@ async def on_ready():
 @bot.event
 async def on_member_update(before: discord.Member, after: discord.Member):
     #Tạm thời không cần chạy trong server khác
-    if before.guild.id != 1256987900277690470: return
+    if before.guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value: return
     
     model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
     channel = bot.get_channel(1259392446987632661)
@@ -1664,6 +1740,21 @@ async def on_member_update(before: discord.Member, after: discord.Member):
             m = await channel.send(view=view, embed=embed)
             view.message = m
     
+@bot.event
+async def on_reaction_add(reaction: discord.Reaction, user):
+    message: discord.Message = reaction.message
+    user_target: discord.Member = user
+    if user_target != None and message != None:
+        #Chỉ check trong True Heavens
+        if message.guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value: return
+        blacklist_emoji = ["th_you_are_gay", "th_gay_duoi", ":gay:", "th_are_you_gay"]
+        #Check xem có jail không
+        emoji_name = str(reaction.emoji)
+        if any(bad in emoji_name for bad in blacklist_emoji):
+            #Jail
+            channel = message.channel
+            print(f"{user_target.mention} just dropped one of the most blacklist emoji and is jailed for now at channel {channel.name} in guild {message.guild.name}")
+            jail_user(channel=channel, jailer=bot.user, user=user_target, reason="Đắc tội tày trời, thả emoji tối kỵ nguy hiểm tột độ. Trời tru đất diệt, thiên địa truy lùng",  duration= 2, time_format= "minute")
 
 @bot.event
 async def on_guild_remove(guild: discord.Guild):
@@ -1676,7 +1767,7 @@ async def on_guild_remove(guild: discord.Guild):
 @bot.event
 async def on_member_ban(guild: discord.Guild, user: discord.Member):
     #Tạm thời không cần chạy trong server khác
-    if guild.id != 1256987900277690470: return
+    if guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value: return
     channel = guild.get_channel(1257004337989943370) #Channel great hall
     if not channel:
         return
