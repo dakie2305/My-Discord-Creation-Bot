@@ -1741,6 +1741,7 @@ async def on_member_update(before: discord.Member, after: discord.Member):
             view.message = m
 
 reaction_cooldowns = {}
+recently_handled_users = set()
 @bot.event
 async def on_reaction_add(reaction: discord.Reaction, user):
     message: discord.Message = reaction.message
@@ -1757,11 +1758,30 @@ async def on_reaction_add(reaction: discord.Reaction, user):
     last_jailed = reaction_cooldowns.get(user_target.id)
     if last_jailed and now - last_jailed < cooldown_time: return  # User is still on cooldown
     if any(bad in emoji_name for bad in blacklist_emoji):
-        #Jail
-        channel = message.channel
-        print(f"{user_target.mention} just dropped one of the most blacklist emoji and is jailed for now at channel {channel.name} in guild {message.guild.name}")
-        reaction_cooldowns[user_target.id] = now
-        await jail_user(channel=channel, jailer=bot.user, user=user_target, reason="Đắc tội tày trời, thả emoji tối kỵ nguy hiểm tột độ. Trời tru đất diệt, thiên địa truy lùng",  duration= 2, time_format= "minute")
+        # Add to recently handled set to avoid duplicates
+        recently_handled_users.add(user_target.id)
+        # Delay and handle punishment safely
+        async def handle_jail():
+            try:
+                await asyncio.sleep(5)  # slight delay to avoid flood
+                channel = message.channel
+                print(f"{user_target.mention} used blacklisted emoji in {channel.name}")
+                await jail_user(
+                    channel=channel,
+                    jailer=bot.user,
+                    user=user_target,
+                    reason="Đắc tội tày trời, thả emoji tối kỵ nguy hiểm tột độ. Trời tru đất diệt, thiên địa truy lùng",
+                    duration=2,
+                    time_format="minute"
+                )
+                reaction_cooldowns[user_target.id] = now
+            except Exception as e:
+                print(f"Failed to jail user: {e}")
+            finally:
+                # Remove from set after cooldown expires
+                await asyncio.sleep(10)  # short delay before allowing next
+                recently_handled_users.discard(user_target.id)
+        asyncio.create_task(handle_jail())
 
 @bot.event
 async def on_guild_remove(guild: discord.Guild):
