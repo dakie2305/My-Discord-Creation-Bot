@@ -1,4 +1,5 @@
 import discord
+from CustomEnum.TrueHeavenEnum import TrueHeavenEnum
 from Handling.Economy.Profile.ProfileClass import Profile
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 from CustomEnum.EmojiEnum import EmojiCreation2
@@ -64,7 +65,7 @@ class InventoryAttackAuthorityInterceptView(discord.ui.View):
     
     async def jail_real(self, interaction: discord.Interaction, actual_user: discord.Member, message: discord.Message):
         #Server True Heavens sẽ jail thật luôn
-        if interaction.guild_id !=  1256987900277690470: return
+        if interaction.guild_id !=  TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value: return
         # Calculate the end time
         end_time = datetime.now() + timedelta(minutes=10)
         mordern_date_time_format = end_time.strftime(f"%d/%m/%Y %H:%M")

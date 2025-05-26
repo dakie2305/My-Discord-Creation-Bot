@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import asyncio
 from datetime import datetime
+from CustomEnum.TrueHeavenEnum import TrueHeavenEnum
 import db.DbMongoManager as db
 from CustomEnum.EmojiEnum import EmojiCreation2, EmojiCreation1
 
@@ -89,7 +90,7 @@ class TrueHeavenCustomCommands(commands.Cog):
     async def sd_th(self, ctx, user: discord.Member, *, text: str):
         message: discord.Message = ctx.message
         if message:
-            if message.author.id != 315835396305059840 or message.guild.id != 1256987900277690470:
+            if message.author.id != 315835396305059840 or message.guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value:
                 return
             channel = message.channel
             await message.delete()
@@ -111,7 +112,7 @@ class TrueHeavenCustomCommands(commands.Cog):
     async def sticky_partner_rule(self, ctx):
         message: discord.Message = ctx.message
         if message:
-            if message.author.id != 315835396305059840 or message.guild.id != 1256987900277690470:
+            if message.author.id != 315835396305059840 or message.guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value:
                 return
             channel = message.channel
             

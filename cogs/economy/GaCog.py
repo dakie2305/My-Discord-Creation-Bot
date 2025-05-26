@@ -138,7 +138,7 @@ class GuardianAngelCog(commands.Cog):
                 ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id,user_id=interaction.user.id, health=health, stamina=stamina)
         
         special_case = False
-        if interaction.guild_id == 1256987900277690470:
+        if interaction.guild_id == TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value:
             for role in interaction.user.roles:
                 if role.id == TrueHeavenEnum.TOP_1_GUARDIAN.value: 
                     special_case = True
@@ -249,7 +249,7 @@ class GuardianAngelCog(commands.Cog):
         
 
         special_case = False
-        if interaction.guild_id == 1256987900277690470:
+        if interaction.guild_id == TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value:
             for role in interaction.user.roles:
                 if role.id == TrueHeavenEnum.TOP_1_GUARDIAN.value: 
                     special_case = True

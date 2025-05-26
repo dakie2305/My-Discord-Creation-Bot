@@ -119,7 +119,7 @@ class DailyEconomy(commands.Cog):
             embed.add_field(name=f"", value=f"- Đã điểm danh liên tiếp **{user_profile.daily_streak_count}** ngày liền: **{bonus_streak}** {EmojiCreation2.COPPER.value}", inline=False)
         
         #Đặc quyền server tổng
-        if user.guild.id == 1256987900277690470:
+        if user.guild.id == TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value:
             for role in user.roles:
                 if role.id == TrueHeavenEnum.MODERATOR.value:
                     actual_money += 2000

@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import PIL
+from CustomEnum.TrueHeavenEnum import TrueHeavenEnum
 import db.DbMongoManager as db
 import CustomFunctions
 import os
@@ -12,7 +13,7 @@ class StickyMessageHandling():
         self.bot = bot
 
     async def handling_sticky_message(self, message: discord.Message):
-        if message.guild.id != 1256987900277690470: return
+        if message.guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value: return
         if message.author.bot: return
         #Hiện tại chỉ cho True Heaven thôi
         #Xoá cũ và send lại cái mới

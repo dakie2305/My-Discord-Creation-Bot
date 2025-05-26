@@ -1,6 +1,7 @@
 import random
 import os
 from dotenv import load_dotenv
+from CustomEnum.TrueHeavenEnum import TrueHeavenEnum
 import db.DbMongoManager as db
 import db.Class.UserList as DefaultUserList
 from datetime import datetime, timedelta, time as dt_time
@@ -140,7 +141,7 @@ async def get_proper_prompt(message: discord.Message, bot_name: str, extra_messa
     background = ""
     final_prompt = ""
     lowered_botname = bot_name.lower()
-    if message.guild.id == 1256987900277690470:
+    if message.guild.id == TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value:
         #True Heaven
         channel_and_guild_name = f"**Hiện tại thì các ngươi đang ở chính nhà của mình, server True Heaven, và bản thân ngươi đang ở trong một phòng có tên là {message.channel.name}**\n"
     else:

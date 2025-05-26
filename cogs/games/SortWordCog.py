@@ -3,6 +3,7 @@ from discord.ext import commands
 from discord.app_commands import Choice
 from typing import Optional
 from datetime import datetime, timedelta
+from CustomEnum.TrueHeavenEnum import TrueHeavenEnum
 from Handling.MiniGame.SortWord import SwClass, SwHandling, SwMongoManager, SwView
 
 async def setup(bot: commands.Bot):
@@ -79,7 +80,7 @@ class SortWords(commands.Cog):
     async def reset_sw(self, ctx):
         message: discord.Message = ctx.message
         if message:
-            if message.guild.id == 1256987900277690470:
+            if message.guild.id == TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value:
                 #Chỉ check trong guild True Heaven
                 req_roles = ['Cai Ngục', 'Moderator','Server Master']
                 has_required_role = any(role.name in req_roles for role in message.author.roles)
@@ -181,7 +182,7 @@ class SortWords(commands.Cog):
     @discord.app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
     async def sws_give_skill(self, ctx, item_id: str = None, user: Optional[discord.Member] = None):
         message: discord.Message = ctx.message
-        if message.guild.id == 1256987900277690470:
+        if message.guild.id == TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value:
             req_roles = ['Cai Ngục', 'Server Master']
             has_required_role = any(role.name in req_roles for role in message.author.roles)
             if not has_required_role and message.author.id != 315835396305059840:

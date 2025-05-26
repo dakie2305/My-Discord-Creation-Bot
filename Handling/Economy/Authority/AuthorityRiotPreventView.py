@@ -1,5 +1,6 @@
 import discord
 from discord.ui import Button, View
+from CustomEnum.TrueHeavenEnum import TrueHeavenEnum
 from Handling.Economy.Profile import ProfileMongoManager
 from Handling.Economy.Profile.ProfileClass import Profile
 from CustomEnum.EmojiEnum import EmojiCreation2
@@ -68,7 +69,7 @@ class AuthorityRiotPreventView(discord.ui.View):
             await interaction.followup.send(embed=embed, ephemeral=False)
         
         #Nếu là Server True Heaven thì thực hiện jail như Creation 1
-        if interaction.guild_id == 1256987900277690470:
+        if interaction.guild_id == TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value:
             # Calculate the end time
             end_time = datetime.now() + timedelta(minutes=15)
             mordern_date_time_format = end_time.strftime(f"%d/%m/%Y %H:%M")

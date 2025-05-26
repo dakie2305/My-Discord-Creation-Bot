@@ -1,6 +1,7 @@
 import discord
 from typing import List, Optional
 import random
+from CustomEnum.TrueHeavenEnum import TrueHeavenEnum
 import Handling.MiniGame.SortWord.SwMongoManager as SwMongoManager
 import Handling.MiniGame.SortWord.SwClass
 from Handling.MiniGame.SortWord.SwClass import SortWordInfo
@@ -62,7 +63,7 @@ class SwHandlingFunction():
                     count+=1
                 if count >= 25: break
         text = "Chúc mừng các player top đầu!"
-        if message.guild.id == 1256987900277690470:
+        if message.guild.id == TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value:
             text+= " <@315835396305059840> sẽ trao role đặc biệt cho những Player thuộc top 3 nhé!"
         await message.channel.send(content=text, embed=embed)
         #Xoá đi tạo lại

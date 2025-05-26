@@ -121,7 +121,7 @@ class ShopEconomy(commands.Cog):
         elif interaction.user.id == interaction.guild.owner_id:
             #Cho phép chủ server dùng
             check_passed = True
-        if interaction.guild_id == 1256987900277690470:
+        if interaction.guild_id == TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value:
             for role in interaction.user.roles:
                 if role.id == TrueHeavenEnum.TOP_1_WEALTH.value: 
                     check_passed = True

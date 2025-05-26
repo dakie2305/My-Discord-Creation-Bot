@@ -235,13 +235,13 @@ class ProfileEconomy(commands.Cog):
         embed.add_field(name=f"", value=f"**Quote**: \"{data.quote}\"", inline=False)
         embed.set_footer(text=f"Profile của {user.name}.", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")
         
-        if user.guild.id == 1256987900277690470:
+        if user.guild.id == TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value:
             #Của true heaven
             await self.update_rank_role(user= user, profile= data)
         return embed, data
     
     async def update_rank_role(self, user: discord.Member, profile: Profile):
-        if user.guild.id != 1256987900277690470: return
+        if user.guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value: return
         role_mappings = {
         "Rank 10": range(10, 20),
         "Rank 20": range(20, 30),

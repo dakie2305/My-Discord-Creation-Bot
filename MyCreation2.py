@@ -479,10 +479,10 @@ async def on_message_delete(message):
     if message.guild == None: return
     
     channel_where_message_deleted = message.channel
-    if message.guild.id == 1256987900277690470 and message.attachments != None and len(message.attachments)>0:
+    if message.guild.id == TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value and message.attachments != None and len(message.attachments)>0:
         #Áp dụng log images cho server true Heavens
         temp_files = []
-        true_heaven_server = bot.get_guild(1256987900277690470) 
+        true_heaven_server = bot.get_guild(TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value) 
         log_image_channel = true_heaven_server.get_channel(1257004596426182757)
         embed = discord.Embed(title=f"Một tin nhắn đã bị xoá trong server {message.guild.name}", description=f"Tin nhắn của {message.author.mention} đã bị xoá tại {channel_where_message_deleted.mention}!", color=0xFC0345)
         embed.add_field(name="Nội dung tin nhắn bị xoá:", value=message.content, inline=False)
@@ -565,7 +565,7 @@ async def on_guild_remove(guild: discord.Guild):
 @bot.event
 async def on_member_update(before: discord.Member, after: discord.Member):
     #Tạm thời không cần chạy trong server khác
-    if before.guild.id != 1256987900277690470: return
+    if before.guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value: return
     
     model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
     channel = bot.get_channel(1259392446987632661)

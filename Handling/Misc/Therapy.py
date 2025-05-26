@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import PIL
+from CustomEnum.TrueHeavenEnum import TrueHeavenEnum
 import db.DbMongoManager as db
 import CustomFunctions
 import os
@@ -18,7 +19,7 @@ class TherapyHandling():
             return
 
         
-        if message.guild.id != 1256987900277690470 and message.guild.id != 1194106864582004849: #Chỉ True Heaven, học viện 2ten mới không bị dính
+        if message.guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value and message.guild.id != 1194106864582004849: #Chỉ True Heaven, học viện 2ten mới không bị dính
             if CustomFunctions.is_inside_working_time() == False:
                 await message.channel.send(f"Tính năng AI của Bot chỉ hoạt động đến 12h đêm, vui lòng đợi đến 8h sáng hôm sau.")
                 return
