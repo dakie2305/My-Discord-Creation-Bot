@@ -136,6 +136,10 @@ class Help(commands.Cog):
         count+=1
         embed.add_field(name=f"", value=f"- **Trang {count}**: Tổng hợp thông tin chiến đấu Hộ Vệ Thần (Guardian Angel Battle)", inline=False)
         count+=1
+
+        embed.add_field(name=f"", value=f"- **Trang {count}**: Tổng hợp thông tin Thách Đấu Hộ Vệ Thần (Guardian Angel Challenge)", inline=False)
+        count+=1
+
         embed.add_field(name=f"", value=f"- **Trang {count}**: Tổng hợp thông tin về hệ thống Cặp Đôi.", inline=False)
         count+=1
         embed.add_field(name=f"", value=f"- **Trang {count}**: Những thông tin hữu ích về bot Creation 2", inline=False)
@@ -252,6 +256,17 @@ class Help(commands.Cog):
         embed.add_field(name="", value=f"- Khi chọn thêm `target` tức là Hộ Vệ Thần của bạn sẽ đánh giao hữu với Hộ Vệ Thần của mục tiêu. Cả hai sẽ **không mất chỉ số, sẽ không chết vĩnh viễn** nếu thua. Coi như đánh vui thôi", inline=False)
         embed.add_field(name="", value=f"- Khi không chọn `target` tức là đánh với quái. Phần thưởng cao hơn, có khả năng lụm phần thưởng tốt, nhưng mọi chỉ số đã mất sẽ lưu lại, và tồn tại khả năng rất thấp là sẽ chết vĩnh viễn. Liều thì ăn nhiều", inline=False)
         embed.add_field(name="", value=f"- Chọn `max_players` để set mặc định bao nhiêu người đánh với nhau được, tối đa là 3 vs 3.", inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
+        list_embed.append(embed)
+
+        embed = discord.Embed(title=f"Cách thách đấu Hộ Vệ Thần", description=f"Hướng dẫn dùng lệnh {SlashCommand.GA_CHALLENGE.value}", color=0xddede7)
+        embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
+        embed.add_field(name="", value=f"- Chọn `max_players` để set mặc định bao nhiêu người đánh với nhau được, tối đa là 3 vs 3.", inline=False)
+        embed.add_field(name="", value=f"- Ở Thách Đấu không có giới hạn thời gian chiến đấu, nhưng cũng sẽ không hưởng bất kỳ phần thưởng nào hết!", inline=False)
+        embed.add_field(name="", value=f"- Khi thách đấu, có thể đặt cược tiền, người thắng sẽ nhận được 95% số tiền cược của kẻ thua cuộc!", inline=False)
+        embed.add_field(name="", value=f"- Chọn `loai` để xác định hình thức chiến đấu khác nhau nếu muốn!", inline=False)
+        embed.add_field(name="", value=f"- Mọi chỉ số Hộ Vệ Thần đều sẽ lưu lại sau mỗi trận chiến! Chỉ một bên ngã xuống thì mới dừng lại!", inline=False)
+        embed.add_field(name="", value=f"- Đừng quên mỗi Hộ Vệ Thần có tỉ lệ chết vĩnh viễn nếu để trọng thương khi Thách Đấu nhé! Tỉ lệ rất thấp, nhưng đừng khinh suất!", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
         list_embed.append(embed)
         
