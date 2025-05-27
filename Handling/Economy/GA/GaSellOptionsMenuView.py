@@ -27,6 +27,7 @@ class GaSellOptionsMenuView(discord.ui.View):
     
     @discord.ui.button(label="Bán Hộ Vệ Thần", style=discord.ButtonStyle.blurple)
     async def sell_guardian(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.user.id: return
         #Tính toán số tiền bán hộ vệ thần
         money = UtilitiesFunctions.calculate_guardian_sell_money(self.user_profile.guardian.worth_amount, self.user_profile.guardian.level, self.user_profile.guardian.is_dead, self.user_profile.guardian.attack_power, self.user_profile.guardian.max_health, self.user_profile.guardian.max_mana, self.user_profile.guardian.max_stamina)
         embed = discord.Embed(title=f"", description=f"Bán Hộ Vệ Thần", color=0x0ce7f2)
@@ -42,6 +43,7 @@ class GaSellOptionsMenuView(discord.ui.View):
     
     @discord.ui.button(label="Bán Kỹ Năng", style=discord.ButtonStyle.green)
     async def sell_skills(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.user.id: return
         shop_rate = 1.0
         conversion_rate = ConversionRateMongoManager.find_conversion_rate_by_id(guild_id=interaction.guild_id)
         if conversion_rate == None:
