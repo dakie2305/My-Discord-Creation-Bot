@@ -1,4 +1,5 @@
 import discord
+from Handling.Economy.GA.GuardianMemoryTag import GuardianMemoryTag
 from Handling.Economy.Profile.ProfileClass import Profile
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 from CustomEnum.SlashEnum import SlashCommand
@@ -97,7 +98,9 @@ class ShopGuardianView(discord.ui.View):
             #Giá của Hộ Vệ Thần bây giờ sẽ bằng giá khi mua để khi bán ra sẽ có thể lời
             self.current_ga.worth_amount = cost_money
             ProfileMongoManager.set_main_guardian_profile(guild_id=interaction.guild_id, user_id=interaction.user.id, guardian=self.current_ga)
-                
+            #Tạo mới memory cho hộ vệ thần
+            ProfileMongoManager.add_memory_guardian(guild_id=interaction.guild_id, user_id=interaction.user.id, memory_description=f"{interaction.user.display_name} đã đưa {self.current_ga.ga_name} về với giá **{cost_money}** {UtilitiesFunctions.get_emoji_from_loai_tien(self.current_ga.worth_type)}", channel_name=interaction.channel.name)
+            
             authority_text = f"Chính Quyền đã nhận được một nửa số tiền trên để làm thuế!"
             if profile_user.is_authority == True:
                 authority_text = ""

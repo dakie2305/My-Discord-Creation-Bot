@@ -961,7 +961,7 @@ def increase_count_guardian(guild_id: int, user_id: int, count_type: str, count_
 
 #region guardian memory
 
-def add_memory_guardian(guild_id: int, user_id: int, memory_description: str, channel_name: str, tag: GuardianMemoryTag):
+def add_memory_guardian(guild_id: int, user_id: int, memory_description: str, channel_name: str = "Không rõ", tag: str = "general"):
     collection = db_specific[f'profile_{guild_id}']
 
     existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)

@@ -39,7 +39,7 @@ class GuardianAngel:
         self.count_battle_pve_lose = count_battle_pve_lose
         self.count_battle_pvp_lose = count_battle_pvp_lose
         self.count_dungeon_fight_lose = count_dungeon_fight_lose
-        
+
         
         self.last_feed = last_feed if last_feed else None
         self.last_meditation = last_meditation if last_meditation else None
@@ -230,7 +230,7 @@ class GuardianAngelSkill:
 
 
 class GuardianAngelMemory:
-    def __init__(self, memory_id: str, date: datetime, description: str, channel_name: str, tag: GuardianMemoryTag):
+    def __init__(self, memory_id: str, date: datetime, description: str, channel_name: str, tag: str):
         self.memory_id = memory_id
         self.date = date
         self.description = description
@@ -246,18 +246,15 @@ class GuardianAngelMemory:
             "date": self.date,
             "description": self.description,
             "channel_name": self.channel_name,
-            "tag": self.tag.value,
+            "tag": self.tag,
         }
 
     @staticmethod
     def from_dict(data: dict):
-        tag_str = data.get("tag", "custom")
-        tag_enum = GuardianMemoryTag(tag_str) if tag_str in GuardianMemoryTag._value2member_map_ else GuardianMemoryTag.CUSTOM
-        
         return GuardianAngelMemory(
             memory_id=data.get("memory_id"),
             date=data.get("date", None),
             description=data.get("description"),
             channel_name=data.get("channel_name"),
-            tag=tag_enum,
+            tag=data.get("tag"),
         )

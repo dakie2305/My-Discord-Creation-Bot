@@ -1,4 +1,5 @@
 import discord
+from Handling.Economy.Profile.GuardianMemoryView import GuardianMemoryView
 from Handling.Economy.Profile.ProfileClass import Profile
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 from CustomEnum.SlashEnum import SlashCommand
@@ -110,7 +111,7 @@ class ProfileAdditionalView(discord.ui.View):
                     embed.add_field(name=f"", value=f"\nNgoài ra còn nhiều kỹ năng khác!", inline=False)
                     break
         embed.set_footer(text=f"Đừng quên, nếu có thắc mắc về Hộ Vệ Thần thì cứ nhắn câu\nga help", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")
-        view = BackToProfileView(profile=self.profile, profile_embed=self.profile_embed)
+        view = SpecialGuardianView(profile=self.profile, profile_embed=self.profile_embed)
         try:
             #Gắn link background dựa trên id của guardian nếu có
             urls = ListGAAndSkills.get_list_back_ground_on_ga_id(self.profile.guardian.ga_id)
@@ -237,3 +238,77 @@ class BackToProfileView(discord.ui.View):
         bar = '█' * filled_length + '░' * (bar_length - filled_length)
         # Format the output with percentage
         return f'{bar} **{int(percentage)}%**'
+
+
+class SpecialGuardianView(discord.ui.View):
+    def __init__(self, profile: Profile, profile_embed: discord.Embed = None):
+        super().__init__(timeout=30)
+        self.message: discord.Message = None
+        self.profile = profile
+        self.profile_embed = profile_embed
+    
+    async def on_timeout(self):
+        #Delete
+        if self.message != None: 
+            #Disable
+            for item in self.children:
+                if isinstance(item, discord.ui.Button):
+                    item.disabled = True
+                if isinstance(item, discord.ui.Select):
+                    item.disabled = True
+            try:
+                await self.message.edit(view=None)
+            except Exception:
+                return
+    
+    @discord.ui.button(label="Profile", style=discord.ButtonStyle.primary)
+    async def profile_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if self.profile_embed != None:
+            #Chuyển về embed cũ
+            await self.message.edit(embed=self.profile_embed, view = None)
+            return
+
+    @discord.ui.button(label="Ký Ức Hộ Vệ Thần", style=discord.ButtonStyle.blurple)
+    async def memories_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.defer(ephemeral=True)
+        page_size = 6
+        list_data = self.profile.guardian.memories if self.profile.guardian.memories else []
+        self.pages = [list_data[i:i+page_size] for i in range(0, len(list_data), page_size)]
+        current_page = 0
+        total_pages = len(self.pages) if len(self.pages) > 0 else 1
+        embed_color = 0xffffff
+        if isinstance(self.profile.profile_color, int) and 0x000000 <= self.profile.profile_color <= 0xFFFFFF:
+            embed_color = self.profile.profile_color
+        embed = discord.Embed(title="", description=f"**Ký ức Hộ Vệ Thần của <@{self.profile.user_id}>**", color=embed_color)
+        text_name = f"{self.profile.guardian.ga_emoji} - **{self.profile.guardian.ga_name}**"
+        embed.add_field(name=f"", value= text_name, inline=False)
+        #Stats count
+        text_stats = f"Trọng thương: **{self.profile.guardian.count_injury}** - Tử nạn: **{self.profile.guardian.count_death}**"
+        embed.add_field(name=f"", value= text_stats, inline=False)
+        text_stats = f"PVE thắng: **{self.profile.guardian.count_battle_pve_won}** - PVE thua: **{self.profile.guardian.count_battle_pve_lose}**"
+        embed.add_field(name=f"", value= text_stats, inline=False)
+        text_stats = f"PVP thắng: **{self.profile.guardian.count_battle_pvp_won}** - PVP thua: **{self.profile.guardian.count_battle_pvp_lose}**"
+        embed.add_field(name=f"", value= text_stats, inline=False)
+        text_stats = f"Ăn: **{self.profile.guardian.count_feed}** - Thiền định: **{self.profile.guardian.count_meditation}**"
+        embed.add_field(name=f"", value= text_stats, inline=False)
+        text_stats = f"Hầm ngục thắng: **{self.profile.guardian.count_dungeon_fight_won}** - Hầm ngục thua: **{self.profile.guardian.count_dungeon_fight_lose}**"
+        embed.add_field(name=f"", value= text_stats, inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+        page_data = self.pages[current_page] if self.pages else []
+        if not page_data:
+            embed.add_field(name=f"", value="Không có dữ liệu ký ức", inline=False)
+        else:
+            for idx, data in enumerate(page_data, start=1 + current_page * page_size):
+                # Convert data.date to Discord unix time format if possible
+                unix_time = int(data.date.timestamp())
+                date_display = f"<t:{unix_time}:f>"
+                text = f"{EmojiCreation2.SHINY_POINT.value} {data.description}"
+                embed.add_field(name=f"#{idx}. Tại kênh *{data.channel_name}* - Ngày: {date_display}", value=text, inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+        embed.set_footer(text=f"Trang 1/{total_pages}")
+        view = GuardianMemoryView(profile=self.profile, list_data=list_data)
+        m = await self.message.edit(embed=embed, view=view)
+        view.message = m
+        await interaction.followup.send(f"Bạn đã chuyển sang Ký Ức Hộ Vệ Thần!", ephemeral=True)
+        return
+            
