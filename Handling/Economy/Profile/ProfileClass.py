@@ -1,7 +1,7 @@
 from typing import List, Optional
 from datetime import datetime
 from Handling.Economy.Inventory_Shop.ItemClass import Item, PlantItem
-from Handling.Economy.GA.GuardianAngelClass import GuardianAngel, GuardianAngelSkill
+from Handling.Economy.GA.GuardianAngelClass import GuardianAngel
 
 class Profile:
     def __init__(self, user_id: int, user_name: str, user_display_name: str, guild_name: str, copper: int = 500, silver: int = 0, gold: int = 0, darkium: int = 0, is_authority: bool = False, last_attendance: datetime= None, last_work: datetime = None, level: int = 1, dignity_point: int = 50, quest_finished: int = 0, quote: str = None, level_progressing: int = 0, jail_time: datetime = None, last_crime: datetime = None, last_riot: datetime = None, last_gift: datetime = None, last_attack_item_used: datetime = None, gift_given: int = 0, list_items : Optional[List['Item']] = None, protection_item: Item = None, daily_streak_count: int = 0, last_breakup: datetime = None, attack_item: Item = None, last_fishing: datetime = None, plant: PlantItem = None, guardian: GuardianAngel = None, profile_color: int = None):

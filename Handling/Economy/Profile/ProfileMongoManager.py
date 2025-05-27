@@ -1,8 +1,9 @@
 from typing import List
 from pymongo import MongoClient
 from datetime import datetime, timedelta
+from Handling.Economy.GA.GuardianMemoryTag import GuardianMemoryTag
 from Handling.Economy.Profile.ProfileClass import Profile
-from Handling.Economy.GA.GuardianAngelClass import GuardianAngel, GuardianAngelSkill
+from Handling.Economy.GA.GuardianAngelClass import GuardianAngel, GuardianAngelSkill, GuardianAngelMemory
 import Handling.Economy.ConversionRate.ConversionRateMongoManager as ConversionRateMongoManager
 from Handling.Economy.Inventory_Shop.ItemClass import Item, list_gift_items, PlantItem
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
@@ -926,3 +927,63 @@ def update_list_skills_guardian(guild_id: int, user_id: int, skill: GuardianAnge
         list_skills.pop(0)
     result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"guardian.list_skills": [data.to_dict() for data in list_skills],}})
     return result
+
+
+def increase_count_guardian(guild_id: int, user_id: int, count_type: str, count_value: int = 1):
+    collection = db_specific[f'profile_{guild_id}']
+
+    existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
+    if existing_data == None: return
+    if existing_data.guardian == None: return
+
+    valid_count_fields = {
+        'count_death', 'count_resurrection', 'count_injury',
+        'count_battle_pve', 'count_battle_pvp', 'count_dungeon_fight',
+        'count_meditation', 'count_feed',
+        'count_battle_pve_won', 'count_battle_pvp_won', 'count_dungeon_fight_won',
+        'count_battle_pve_lose', 'count_battle_pvp_lose', 'count_dungeon_fight_lose'
+    }
+
+    if count_type not in valid_count_fields:
+        print(f"[WARNING] Invalid count_type: {count_type}")
+        return
+    
+    update_result = collection.update_one(
+        {
+            "id": "profile",
+            "user_id": user_id,
+        },
+        {
+            "$inc": { f"guardian.{count_type}": count_value }
+        }
+    )
+    return update_result
+
+#region guardian memory
+
+def add_memory_guardian(guild_id: int, user_id: int, memory_description: str, channel_name: str, tag: GuardianMemoryTag):
+    collection = db_specific[f'profile_{guild_id}']
+
+    existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
+    if existing_data == None: return
+    if existing_data.guardian == None: return
+    
+    # memories = existing_data.guardian.memories
+    # if memories == None: memories = []
+    date = datetime.now()
+    memory_id = date.strftime('%Y%m%d%H%M%S')
+    new_memory = GuardianAngelMemory(
+            memory_id=memory_id,
+            date=date,
+            description=memory_description,
+            channel_name=channel_name,
+            tag=tag
+        )
+    result = collection.update_one(
+        {"id": "profile", "user_id": user_id},
+        {"$push": {"guardian.memories": new_memory.to_dict()}}
+    )
+    # result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"guardian.memories": [data.to_dict() for data in memories],}})
+    return result
+
+    
