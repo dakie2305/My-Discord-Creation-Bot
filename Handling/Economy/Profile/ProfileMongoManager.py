@@ -976,7 +976,7 @@ def add_memory_guardian(guild_id: int, user_id: int, memory_description: str, ch
             channel_name=channel_name,
             tag=tag
         )
-    result = collection.update_one(
+    collection.update_one(
         {"id": "profile", 
          "user_id": user_id,
          "guardian": { "$exists": True }
@@ -991,7 +991,3 @@ def add_memory_guardian(guild_id: int, user_id: int, memory_description: str, ch
             }
         }
     )
-    # result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"guardian.memories": [data.to_dict() for data in memories],}})
-    return result
-
-    
