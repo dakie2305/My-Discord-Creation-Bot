@@ -301,6 +301,9 @@ class InventoryUseView(discord.ui.View):
             print(f"Top 1 GA leaderboard: {enemy.ga_name} - {enemy.level} at guild {interaction.guild.name}")
             if enemy is None:
                 enemy = ListGAAndSkills.get_random_ga_enemy_generic(level=level, guardian_chance=guardian_chance)
+            enemy.health = enemy.max_health
+            enemy.mana = enemy.max_mana
+            enemy.stamina = enemy.max_stamina
         else:
             enemy = ListGAAndSkills.get_random_ga_enemy_generic(level=level, guardian_chance=guardian_chance)
         enemy_2 = None
