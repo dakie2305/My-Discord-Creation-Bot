@@ -1217,7 +1217,8 @@ class GaBattleView(discord.ui.View):
                     #Tạo NPC
                     calculated_level= int(self_player_info.player_ga.level/2)
                     roll_chance_legendary = UtilitiesFunctions.get_chance(5)
-                    if roll_chance_legendary: calculated_level = self_player_info.player_ga.level*2
+                    up = random.randint(2, 3)
+                    if roll_chance_legendary: calculated_level = self_player_info.player_ga.level*up
                     if calculated_level < 1: calculated_level = 1
                     enemy: GuardianAngel = ListGAAndSkills.get_random_ga_enemy_generic(level=calculated_level)
                     new_enemy = GuardianAngelAttackClass(player_profile=None, player_ga=enemy, starting_at_round=self.round, is_summoned=True)
@@ -1249,8 +1250,9 @@ class GaBattleView(discord.ui.View):
                 if len(self.lower_attack_class) < 3:
                     #Tạo NPC
                     calculated_level= int(self_player_info.player_ga.level/2)
-                    roll_chance_legendary = UtilitiesFunctions.get_chance(10)
-                    if roll_chance_legendary: calculated_level = self_player_info.player_ga.level*3
+                    roll_chance_legendary = UtilitiesFunctions.get_chance(5)
+                    up = random.randint(2, 3)
+                    if roll_chance_legendary: calculated_level = self_player_info.player_ga.level*up
                     if calculated_level < 1: calculated_level = 1
                     enemy: GuardianAngel = ListGAAndSkills.get_random_ga_enemy_generic(level=calculated_level)
                     new_enemy = GuardianAngelAttackClass(player_profile=None, player_ga=enemy, starting_at_round=self.round, is_summoned=True)
