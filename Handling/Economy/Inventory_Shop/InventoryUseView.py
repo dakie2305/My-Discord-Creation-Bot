@@ -1,4 +1,5 @@
 import discord
+from CustomEnum.GuardianMemoryTag import GuardianMemoryTag
 from Handling.Economy.GA.GaDugeonView import GaDugeonView
 from Handling.Economy.Profile.ProfileClass import Profile
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
@@ -188,6 +189,10 @@ class InventoryUseView(discord.ui.View):
                 if total > self.user_profile.guardian.max_health:
                     total = self.user_profile.guardian.max_health
                 ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id, user_id=self.user.id, health=health_to_heal)
+                #roll chance
+                roll_chance = UtilitiesFunctions.get_chance(15)
+                if roll_chance:
+                    ProfileMongoManager.add_memory_guardian(guild_id=interaction.guild_id, user_id=self.user.id, memory_description=f"Đã được {interaction.user.display_name} cho dùng bình [{self.selected_item.emoji} - **{self.selected_item.item_name}**] để hồi phục.", tag = GuardianMemoryTag.RESTORATION.value)
                 addition_text = f"\nMáu hiện tại: {total}/{self.user_profile.guardian.max_health}"
                 text = f"{interaction.user.mention} đã dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] và hồi phục **{health_to_heal}** Máu {EmojiCreation2.HP.value} cho Hộ Vệ Thần của mình!{addition_text}"
             await channel.send(content=text)
@@ -201,6 +206,10 @@ class InventoryUseView(discord.ui.View):
                 if total > self.user_profile.guardian.max_stamina:
                     total = self.user_profile.guardian.max_stamina
                 ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id, user_id=self.user.id, stamina=stats_restored)
+                #roll chance
+                roll_chance = UtilitiesFunctions.get_chance(15)
+                if roll_chance:
+                    ProfileMongoManager.add_memory_guardian(guild_id=interaction.guild_id, user_id=self.user.id, memory_description=f"Đã được {interaction.user.display_name} cho dùng bình [{self.selected_item.emoji} - **{self.selected_item.item_name}**] để hồi phục.", tag = GuardianMemoryTag.RESTORATION.value)
                 addition_text = f"\nThể lực hiện tại: {total}/{self.user_profile.guardian.max_stamina}"
                 text = f"{interaction.user.mention} đã dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] và hồi phục **{stats_restored}** Thể Lực {EmojiCreation2.STAMINA.value} cho Hộ Vệ Thần của mình!{addition_text}"
             await channel.send(content=text)
@@ -213,6 +222,10 @@ class InventoryUseView(discord.ui.View):
                 if total > self.user_profile.guardian.max_mana:
                     total = self.user_profile.guardian.max_mana
                 ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id, user_id=self.user.id, mana=stats_restored)
+                #roll chance
+                roll_chance = UtilitiesFunctions.get_chance(15)
+                if roll_chance:
+                    ProfileMongoManager.add_memory_guardian(guild_id=interaction.guild_id, user_id=self.user.id, memory_description=f"Đã được {interaction.user.display_name} cho dùng bình [{self.selected_item.emoji} - **{self.selected_item.item_name}**] để hồi phục.", tag = GuardianMemoryTag.RESTORATION.value)
                 addition_text = f"\nMana hiện tại: {total}/{self.user_profile.guardian.max_mana}"
                 text = f"{interaction.user.mention} đã dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] và hồi phục **{stats_restored}** Mana {EmojiCreation2.MP.value} cho Hộ Vệ Thần của mình!{addition_text}"
             await channel.send(content=text)
@@ -221,6 +234,12 @@ class InventoryUseView(discord.ui.View):
             text = f"{interaction.user.mention} đã dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] nhưng quên mất mình làm gì có Hộ Vệ Thần!"
             if self.user_profile.guardian!= None and self.user_profile.guardian.is_dead == False:
                 ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id, user_id=self.user.id, health=self.user_profile.guardian.max_health, stamina=self.user_profile.guardian.max_stamina, mana=self.user_profile.guardian.max_mana)
+
+                #roll chance
+                roll_chance = UtilitiesFunctions.get_chance(30)
+                if roll_chance:
+                    ProfileMongoManager.add_memory_guardian(guild_id=interaction.guild_id, user_id=self.user.id, memory_description=f"Đã được {interaction.user.display_name} cho dùng bình [{self.selected_item.emoji} - **{self.selected_item.item_name}**] để hồi phục.", tag = GuardianMemoryTag.RESTORATION.value)
+
                 text = f"{interaction.user.mention} đã dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] và hồi phục Hộ Vệ Thần về trạng thái hoàng kim!"
             await channel.send(content=text)
         elif self.selected_item.item_id == "ga_resurrection":
@@ -228,6 +247,7 @@ class InventoryUseView(discord.ui.View):
             if self.user_profile.guardian!= None:
                 ProfileMongoManager.set_guardian_dead_status(guild_id=interaction.guild_id, user_id=self.user.id, is_dead=False)
                 ProfileMongoManager.increase_count_guardian(guild_id=interaction.guild_id, user_id=self.user.id, count_type="count_resurrection")
+                ProfileMongoManager.add_memory_guardian(guild_id=interaction.guild_id, user_id=self.user.id, memory_description="Đã được chủ nhân đưa về từ cõi chết bằng Phục Sinh Thạch.", tag = GuardianMemoryTag.RESURRECTION.value)
                 text = f"{interaction.user.mention} đã lập tức dùng đến [{self.selected_item.emoji} - **{self.selected_item.item_name}**] để Hộ Vệ Thần của mình từ cõi chết trở về!"
             await channel.send(content=text)
         elif "profile_color_" in self.selected_item.item_id:
@@ -305,7 +325,7 @@ class InventoryUseView(discord.ui.View):
         footer_text = f"Hộ Vệ Thần Huyền Thoại sẽ bắt ngẫu nhiên một người trong channel\nphải giao chiến với kẻ thù!"
         embed.set_footer(text=footer_text)
         print(f"Spawning GA boss by book, base level around {level} at channel {interaction.channel.name} in guild {interaction.guild.name}.")
-        view = GaDugeonView(guild_id=interaction.guild_id, enemy_ga=enemy, enemy_ga_2=enemy_2, title=f"{EmojiCreation2.STUN_SKILL.value} **Hộ Vệ Thần Huyền Thoại** {EmojiCreation2.STUN_SKILL.value}", bonus_percent=bonus_percent, difficulty=4, footer_text=footer_text)
+        view = GaDugeonView(guild_id=interaction.guild_id, enemy_ga=enemy, enemy_ga_2=enemy_2, title=f"{EmojiCreation2.STUN_SKILL.value} **Hộ Vệ Thần Huyền Thoại** {EmojiCreation2.STUN_SKILL.value}", bonus_percent=bonus_percent, difficulty=4, footer_text=footer_text, channel_name=interaction.channel.name)
         m = await interaction.channel.send(embed=embed, view=view)
         view.message = m
         await view.catch_random_player_profile()

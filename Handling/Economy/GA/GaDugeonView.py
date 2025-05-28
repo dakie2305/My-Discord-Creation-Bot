@@ -16,7 +16,7 @@ from Handling.Misc.SelfDestructView import SelfDestructView
 from Handling.Economy.GA.GaBattleView import GaBattleView
 
 class GaDugeonView(discord.ui.View):
-    def __init__(self, guild_id: int, enemy_ga: GuardianAngel, enemy_ga_2: GuardianAngel = None, title: str = "", bonus_percent: int = None, difficulty: int = 1, footer_text: str = "", timeout = 200):
+    def __init__(self, guild_id: int, enemy_ga: GuardianAngel, enemy_ga_2: GuardianAngel = None, title: str = "", bonus_percent: int = None, difficulty: int = 1, footer_text: str = "", channel_name = "Không rõ",  timeout = 200):
         super().__init__(timeout=timeout)
         self.message : discord.Message = None
         self.is_attacked = False
@@ -27,6 +27,7 @@ class GaDugeonView(discord.ui.View):
         self.bonus_percent = bonus_percent
         self.difficulty = difficulty
         self.footer_text = footer_text
+        self.channel_name = channel_name
         self.battle_button = discord.ui.Button(label="⚔️ Chiến Đấu", style=discord.ButtonStyle.primary)
         self.battle_button.callback = self.battle_button_event
         self.add_item(self.battle_button)
@@ -127,7 +128,7 @@ class GaDugeonView(discord.ui.View):
             embed.add_field(name=f"", value="", inline=False)
             embed.add_field(name=f"", value=f"🦾: **{self.enemy_ga_2.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=self.enemy_ga_2.health, max_value=self.enemy_ga_2.max_health, emoji=EmojiCreation2.HP.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=self.enemy_ga_2.stamina, max_value=self.enemy_ga_2.max_stamina, emoji=EmojiCreation2.STAMINA.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=self.enemy_ga_2.mana, max_value=self.enemy_ga_2.max_mana, emoji=EmojiCreation2.MP.value)}", inline=False)
         embed.set_footer(text=self.footer_text)
-        view = GaBattleView(user=interaction.user, user_profile=new_player_profile, is_players_versus_players=False, max_players=3, enemy_ga=self.enemy_ga, enemy_ga_2=self.enemy_ga_2, guild_id=interaction.guild_id, gold_reward=gold_reward, silver_reward=silver_reward, bonus_exp=exp_reward, dignity_point=dignity_point_reward, embed_title=self.title, bonus_all_reward_percent=self.bonus_percent, footer_text=self.footer_text, is_dungeon= True, difficulty=self.difficulty)
+        view = GaBattleView(user=interaction.user, user_profile=new_player_profile, is_players_versus_players=False, max_players=3, enemy_ga=self.enemy_ga, enemy_ga_2=self.enemy_ga_2, guild_id=interaction.guild_id, gold_reward=gold_reward, silver_reward=silver_reward, bonus_exp=exp_reward, dignity_point=dignity_point_reward, embed_title=self.title, bonus_all_reward_percent=self.bonus_percent, footer_text=self.footer_text, is_dungeon= True, difficulty=self.difficulty, channel_name=self.channel_name)
         mess = await self.message.edit(embed=embed, view=view)
         ProfileMongoManager.update_main_guardian_profile_time(guild_id=interaction.guild_id,user_id=interaction.user.id, data_type="last_joined_battle", date_value=datetime.now())
         ProfileMongoManager.increase_count_guardian(guild_id=interaction.guild_id, user_id=interaction.user.id, count_type="count_dungeon_fight")
@@ -224,7 +225,7 @@ class GaDugeonView(discord.ui.View):
             embed.add_field(name=f"", value="", inline=False)
             embed.add_field(name=f"", value=f"🦾: **{self.enemy_ga_2.attack_power}**\n{UtilitiesFunctions.progress_bar_stat(input_value=self.enemy_ga_2.health, max_value=self.enemy_ga_2.max_health, emoji=EmojiCreation2.HP.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=self.enemy_ga_2.stamina, max_value=self.enemy_ga_2.max_stamina, emoji=EmojiCreation2.STAMINA.value)}\n{UtilitiesFunctions.progress_bar_stat(input_value=self.enemy_ga_2.mana, max_value=self.enemy_ga_2.max_mana, emoji=EmojiCreation2.MP.value)}", inline=False)
         embed.set_footer(text=self.footer_text)
-        view = GaBattleView(user=selected_user, user_profile=selected_user_profile, is_players_versus_players=False, max_players=3, enemy_ga=self.enemy_ga, enemy_ga_2=self.enemy_ga_2, guild_id=self.guild_id, gold_reward=gold_reward, silver_reward=silver_reward, bonus_exp=exp_reward, dignity_point=dignity_point_reward, embed_title=self.title, bonus_all_reward_percent=self.bonus_percent, footer_text=self.footer_text, is_dungeon= True, difficulty=self.difficulty)
+        view = GaBattleView(user=selected_user, user_profile=selected_user_profile, is_players_versus_players=False, max_players=3, enemy_ga=self.enemy_ga, enemy_ga_2=self.enemy_ga_2, guild_id=self.guild_id, gold_reward=gold_reward, silver_reward=silver_reward, bonus_exp=exp_reward, dignity_point=dignity_point_reward, embed_title=self.title, bonus_all_reward_percent=self.bonus_percent, footer_text=self.footer_text, is_dungeon= True, difficulty=self.difficulty, channel_name=self.channel_name)
         mess = await self.message.edit(embed=embed, view=view)
         ProfileMongoManager.update_main_guardian_profile_time(guild_id=self.guild_id,user_id=selected_user.id, data_type="last_joined_battle", date_value=datetime.now())
         ProfileMongoManager.increase_count_guardian(guild_id=self.guild_id, user_id=selected_user.id, count_type="count_dungeon_fight")

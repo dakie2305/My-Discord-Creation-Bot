@@ -31,9 +31,9 @@ class GuardianMemoryView(discord.ui.View):
         embed.add_field(name=f"", value= text_stats, inline=False)
         text_stats = f"PVP thắng: **{self.profile.guardian.count_battle_pvp_won}** - PVP thua: **{self.profile.guardian.count_battle_pvp_lose}**"
         embed.add_field(name=f"", value= text_stats, inline=False)
-        text_stats = f"Ăn: **{self.profile.guardian.count_feed}** - Thiền định: **{self.profile.guardian.count_meditation}**"
-        embed.add_field(name=f"", value= text_stats, inline=False)
         text_stats = f"Hầm ngục thắng: **{self.profile.guardian.count_dungeon_fight_won}** - Hầm ngục thua: **{self.profile.guardian.count_dungeon_fight_lose}**"
+        embed.add_field(name=f"", value= text_stats, inline=False)
+        text_stats = f"Ăn: **{self.profile.guardian.count_feed}** - Thiền định: **{self.profile.guardian.count_meditation}**"
         embed.add_field(name=f"", value= text_stats, inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
         page_data = self.pages[self.current_page] if self.pages else []

@@ -1,8 +1,6 @@
 from typing import List, Optional
 from datetime import datetime
 
-from Handling.Economy.GA.GuardianMemoryTag import GuardianMemoryTag
-
 class GuardianAngel:
     def __init__(self, ga_id: str, ga_name: str, ga_emoji: str, stamina: int, max_stamina: int, health: int, max_health: int, mana: int, max_mana:int, attack_power: int = 10, buff_attack_percent: int = 0, level: int = 1, level_progressing: int = 0, stats_point: int = 0, list_skills : Optional[List['GuardianAngelSkill']] = None, max_skills: int = 1, is_injured: bool = False, time_to_recover: datetime = None, worth_amount: int = 50, worth_type: str = "D", last_feed: datetime = None, last_meditation: datetime = None, bonus_dignity_point: int = 0, bonus_exp: int = 0, last_battle: datetime = None, last_joined_battle: datetime = None, last_dungeon: datetime = None, is_dead = False, memories: Optional[List['GuardianAngelMemory']] = None, count_death: int = 0, count_resurrection: int = 0, count_injury: int = 0, count_battle_pve: int = 0, count_battle_pvp: int = 0, count_dungeon_fight: int = 0, count_meditation: int = 0, count_feed: int = 0, count_battle_pve_won: int = 0, count_battle_pvp_won: int = 0, count_dungeon_fight_won: int = 0, count_battle_pve_lose: int = 0, count_battle_pvp_lose: int = 0, count_dungeon_fight_lose: int = 0):
         self.ga_id = ga_id

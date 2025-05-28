@@ -15,7 +15,7 @@ from Handling.Misc.SelfDestructView import SelfDestructView
 from Handling.Economy.GA.GaBattleView import GaBattleView
 
 class GaChallengeView(discord.ui.View):
-    def __init__(self, guild_id: int, user: discord.Member, target: discord.Member, user_profile: Profile, target_profile: Profile, so_tien:int = None, battle_type:str = "A", loai_tien:str = None, title = "", footer = "", max_players:int = 3, timeout = 200):
+    def __init__(self, guild_id: int, user: discord.Member, target: discord.Member, user_profile: Profile, target_profile: Profile, so_tien:int = None, battle_type:str = "A", loai_tien:str = None, title = "", footer = "", max_players:int = 3, channel_name = "Không rõ", timeout = 200):
         super().__init__(timeout=timeout)
         self.message : discord.Message = None
         self.battle_button = discord.ui.Button(label="⚔️ Chấp Nhận Thách Đấu", style=discord.ButtonStyle.primary)
@@ -33,6 +33,7 @@ class GaChallengeView(discord.ui.View):
         self.title = title
         self.footer = footer
         self.battle_type = battle_type
+        self.channel_name = channel_name
 
     async def on_timeout(self):
         #Delete
@@ -47,7 +48,7 @@ class GaChallengeView(discord.ui.View):
             return
         self.is_accepted = True
         await interaction.followup.send(f"Bạn đã chấp nhận thách đấu với {self.user.mention}!", ephemeral=True)
-        view = GaBattleView(user_profile=self.user_profile, user=self.user, is_players_versus_players=True, enemy_ga=self.target_profile.guardian, guild_id=self.guild_id, target=self.target, target_profile=self.target_profile, max_players=self.max_players, embed_title=self.title, gold_reward=0, silver_reward=0, dignity_point=0, bonus_all_reward_percent=0, footer_text=self.footer)
+        view = GaBattleView(user_profile=self.user_profile, user=self.user, is_players_versus_players=True, enemy_ga=self.target_profile.guardian, guild_id=self.guild_id, target=self.target, target_profile=self.target_profile, max_players=self.max_players, embed_title=self.title, gold_reward=0, silver_reward=0, dignity_point=0, bonus_all_reward_percent=0, footer_text=self.footer, channel_name=self.channel_name)
         view.is_challenge = True
         view.so_tien = self.so_tien
         view.loai_tien = self.loai_tien

@@ -1,5 +1,5 @@
 import discord
-from Handling.Economy.GA.GuardianMemoryTag import GuardianMemoryTag
+from CustomEnum.GuardianMemoryTag import GuardianMemoryTag
 from Handling.Economy.Profile.ProfileClass import Profile
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 from CustomEnum.SlashEnum import SlashCommand

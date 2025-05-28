@@ -10,4 +10,5 @@ class GuardianMemoryTag(Enum):
     INJURY = "injury"
     DEATH = "death"
     RESURRECTION = "resurrection"
+    RESTORATION = "restoration"
     CUSTOM = "general"

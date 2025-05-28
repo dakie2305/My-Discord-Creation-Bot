@@ -1,7 +1,6 @@
 from typing import List
 from pymongo import MongoClient
 from datetime import datetime, timedelta
-from Handling.Economy.GA.GuardianMemoryTag import GuardianMemoryTag
 from Handling.Economy.Profile.ProfileClass import Profile
 from Handling.Economy.GA.GuardianAngelClass import GuardianAngel, GuardianAngelSkill, GuardianAngelMemory
 import Handling.Economy.ConversionRate.ConversionRateMongoManager as ConversionRateMongoManager
@@ -986,7 +985,14 @@ def add_memory_guardian(guild_id: int, user_id: int, memory_description: str, ch
         )
     result = collection.update_one(
         {"id": "profile", "user_id": user_id},
-        {"$push": {"guardian.memories": new_memory.to_dict()}}
+        {
+            "$push": {
+                "guardian.memories": {
+                    "$each": [new_memory.to_dict()],
+                    "$position": 0
+                }
+            }
+        }
     )
     # result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"guardian.memories": [data.to_dict() for data in memories],}})
     return result

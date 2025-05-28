@@ -415,7 +415,7 @@ async def spawning_enemy_embed_in_dungeon(guild: discord.Guild, random_quest_cha
         footer_text = f"Ai chưa hiểu cách thức hoạt động của Hầm Ngục Hộ Vệ Thần thì cứ nhắn\ngd help"
         embed.set_footer(text=footer_text)
         print(f"Spawning enemy with base level around {level} at channel {quest_channel.name} in guild {guild.name}. Difficult dungeon: {random_quest_channel_id.difficulty_level}")
-        view = GaDugeonView(guild_id=guild.id, enemy_ga=enemy, enemy_ga_2=enemy_2, title=f"{EmojiCreation2.STUN_SKILL.value} **Hầm Ngục {UtilitiesFunctions.get_cap_do_quest(random_quest_channel_id.difficulty_level)}** {EmojiCreation2.STUN_SKILL.value}", bonus_percent=bonus_percent, difficulty=random_quest_channel_id.difficulty_level, footer_text=footer_text)
+        view = GaDugeonView(guild_id=guild.id, enemy_ga=enemy, enemy_ga_2=enemy_2, title=f"{EmojiCreation2.STUN_SKILL.value} **Hầm Ngục {UtilitiesFunctions.get_cap_do_quest(random_quest_channel_id.difficulty_level)}** {EmojiCreation2.STUN_SKILL.value}", bonus_percent=bonus_percent, difficulty=random_quest_channel_id.difficulty_level, footer_text=footer_text, channel_name=quest_channel.name)
         m = await quest_channel.send(embed=embed, view=view)
         view.message = m
         await view.catch_random_player_profile()

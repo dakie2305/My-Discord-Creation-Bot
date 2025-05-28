@@ -1,3 +1,4 @@
+from CustomEnum.GuardianMemoryTag import GuardianMemoryTag
 from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.EmojiEnum import EmojiCreation2
 import discord
@@ -168,6 +169,30 @@ class GuardianAngelCog(commands.Cog):
         ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id,user_id=interaction.user.id, mana=mana)
         ProfileMongoManager.update_main_guardian_profile_time(guild_id=interaction.guild_id,user_id=interaction.user.id, data_type="last_meditation", date_value=datetime.now())
         ProfileMongoManager.increase_count_guardian(guild_id=interaction.guild_id, user_id=interaction.user.id, count_type="count_meditation")
+
+        # Tạo memory chỉ khi memory mới nhất không phải là tag MEDITATION
+        memories = user_profile.guardian.memories or []
+        latest_memory = memories[0] if memories else None
+        should_add_memory = (
+            latest_memory is None or latest_memory.tag != GuardianMemoryTag.MEDITATION.value
+        )
+        if should_add_memory:
+            meditation_templates = [
+                "Đã tĩnh tâm thiền định, cảm nhận luồng mana tuôn chảy trở lại.",
+                "Bước vào trạng thái thiền định, Hộ Vệ Thần đã khôi phục một phần năng lượng tinh thần.",
+                "Giữa yên lặng, Hộ Vệ Thần tập trung nội lực, mana dần hồi phục.",
+                "Một buổi thiền định sâu sắc giúp Hộ Vệ Thần tái thiết năng lượng phép thuật.",
+                "Đã nhập định bên trong tâm trí, lấy lại sự tỉnh táo và mana.",
+            ]
+            memory_description = random.choice(meditation_templates)
+            ProfileMongoManager.add_memory_guardian(
+                guild_id=interaction.guild_id,
+                user_id=interaction.user.id,
+                memory_description=memory_description,
+                channel_name=interaction.channel.name,
+                tag=GuardianMemoryTag.MEDITATION.value
+            )
+
     
     @ga_meditate_slash_command.error
     async def ga_meditate_slash_command_error(self, interaction: discord.Interaction, error):
@@ -285,7 +310,32 @@ class GuardianAngelCog(commands.Cog):
         ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id,user_id=interaction.user.id, health=health, stamina=stamina)
         ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id,user_id=interaction.user.id, user_display_name="", user_name="", guild_name="", item=chosen_item, amount=-1)
         ProfileMongoManager.increase_count_guardian(guild_id=interaction.guild_id, user_id=interaction.user.id, count_type="count_feed")
-        
+        # Tạo memory chỉ khi memory mới nhất không phải là tag FEED
+        memories = user_profile.guardian.memories or []
+        latest_memory = memories[0] if memories else None
+        should_add_memory = (
+            latest_memory is None or latest_memory.tag != GuardianMemoryTag.FEEDING.value
+        )
+        if should_add_memory:
+            templates = [
+                    f"Đã thưởng thức {chosen_item.emoji} - **{chosen_item.item_name}** đầy đủ dưỡng chất, hồi phục thể lực và tinh thần.",
+                    f"Đã được cho ăn {chosen_item.emoji} - **{chosen_item.item_name}**, lấy lại sức lực hơn.",
+                    f"Một món {chosen_item.emoji} - **{chosen_item.item_name}** đơn giản nhưng tràn đầy sinh lực.",
+                    f"Sau khi dùng  {chosen_item.emoji} - **{chosen_item.item_name}**, Hộ Vệ Thần cảm thấy mạnh mẽ và sẵn sàng cho thử thách tiếp theo.",
+                    f"Bụng no, tâm an - Hộ Vệ Thần vừa nạp lại năng lượng cần thiết.",
+                    f"Tiêu hóa {chosen_item.emoji} - **{chosen_item.item_name}** và biến nó thành nguồn sức mạnh dồi dào.",
+                    f"{chosen_item.emoji} - **{chosen_item.item_name}** giúp Hộ Vệ Thần lấy lại nhiệt huyết chiến đấu.",
+                ]
+
+            memory_description = random.choice(templates)
+            ProfileMongoManager.add_memory_guardian(
+                guild_id=interaction.guild_id,
+                user_id=interaction.user.id,
+                memory_description=memory_description,
+                channel_name=interaction.channel.name,
+                tag=GuardianMemoryTag.FEEDING.value
+            )
+    
     @ga_feed_slash_command.error
     async def ga_feed_slash_command_error(self, interaction: discord.Interaction, error):
         if isinstance(error, discord.app_commands.CommandOnCooldown):
@@ -509,7 +559,7 @@ class GuardianAngelCog(commands.Cog):
         if CustomFunctions.check_if_dev_mode() == False:
             ProfileMongoManager.update_main_guardian_profile_time(guild_id=interaction.guild_id,user_id=interaction.user.id, data_type="last_battle", date_value=datetime.now())
             ProfileMongoManager.update_main_guardian_profile_time(guild_id=interaction.guild_id,user_id=interaction.user.id, data_type="last_joined_battle", date_value=datetime.now())
-        view = GaBattleView(user=interaction.user, user_profile=user_profile, target=target, target_profile=target_profile, is_players_versus_players=is_players_versus_player, max_players=max_players_as_int, enemy_ga=enemy, embed_title=title, guild_id=interaction.guild_id, gold_reward=gold_reward, silver_reward=silver_reward, bonus_exp=exp_reward, dignity_point=dignity_point_reward)
+        view = GaBattleView(user=interaction.user, user_profile=user_profile, target=target, target_profile=target_profile, is_players_versus_players=is_players_versus_player, max_players=max_players_as_int, enemy_ga=enemy, embed_title=title, guild_id=interaction.guild_id, gold_reward=gold_reward, silver_reward=silver_reward, bonus_exp=exp_reward, dignity_point=dignity_point_reward, channel_name=interaction.channel.name)
         mess = await interaction.followup.send(embed=embed, view=view)
         view.message = mess
         print(f"Username {interaction.user.name} has started guardian battle in guild {interaction.guild.name} at channel {interaction.channel.name}!")
@@ -693,7 +743,7 @@ class GuardianAngelCog(commands.Cog):
             embed.add_field(name=f"", value=f"Tiền cược: **{so_tien}** {UtilitiesFunctions.get_emoji_from_loai_tien(loai_tien=loai_tien)}", inline=False)
         embed.set_footer(text=footer, icon_url=EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value)
         #Tạo view thách đấu
-        view = GaChallengeView(guild_id=interaction.guild_id, user=interaction.user, target=target, user_profile=user_profile, target_profile=target_profile, max_players=max_players_as_int, battle_type=loai, so_tien=so_tien, loai_tien=loai_tien, title=title, footer = footer)
+        view = GaChallengeView(guild_id=interaction.guild_id, user=interaction.user, target=target, user_profile=user_profile, target_profile=target_profile, max_players=max_players_as_int, battle_type=loai, so_tien=so_tien, loai_tien=loai_tien, title=title, footer = footer, channel_name=interaction.channel.name)
         channel = interaction.channel
         mess = await channel.send(content=f"{target.mention}", embed=embed, view=view)
         view.message = mess

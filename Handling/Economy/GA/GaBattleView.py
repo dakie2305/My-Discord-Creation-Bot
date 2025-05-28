@@ -1,5 +1,6 @@
 
 import discord
+from CustomEnum.GuardianMemoryTag import GuardianMemoryTag
 from Handling.Economy.Profile.ProfileClass import Profile
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 from CustomEnum.SlashEnum import SlashCommand
@@ -19,7 +20,7 @@ import copy
 
 
 class GaBattleView(discord.ui.View):
-    def __init__(self, user_profile: Profile, user: discord.Member,enemy_ga: GuardianAngel, guild_id: int, is_players_versus_players: bool, target_profile: Profile = None, target: discord.Member = None, allowed_multiple_players: bool = False, max_players:int = 1, embed_title: str = "", gold_reward: int = 0, silver_reward: int= 0, dignity_point: int = 10, bonus_exp: int = 200, enemy_ga_2: GuardianAngel = None, bonus_all_reward_percent: int = None, footer_text: str = "", difficulty: int = 1, is_dungeon = False, is_challenge = False):
+    def __init__(self, user_profile: Profile, user: discord.Member,enemy_ga: GuardianAngel, guild_id: int, is_players_versus_players: bool, target_profile: Profile = None, target: discord.Member = None, allowed_multiple_players: bool = False, max_players:int = 1, embed_title: str = "", gold_reward: int = 0, silver_reward: int= 0, dignity_point: int = 10, bonus_exp: int = 200, enemy_ga_2: GuardianAngel = None, bonus_all_reward_percent: int = None, footer_text: str = "", difficulty: int = 1, is_dungeon = False, is_challenge = False, channel_name: str = "Không rõ"):
         super().__init__(timeout=180)
         self.message : discord.Message = None
         self.user: discord.Member = user
@@ -36,6 +37,7 @@ class GaBattleView(discord.ui.View):
         self.is_challenge = is_challenge
         self.so_tien = None
         self.loai_tien = None
+        self.channel_name = channel_name
         self.battle_type = "A"
         self.battle_type_mapping = {
             "A": "Chiến đấu bình thường (Dùng mọi kỹ năng)",
@@ -102,7 +104,7 @@ class GaBattleView(discord.ui.View):
             await self.message.edit(view= None)
             return
 
-        #region button event
+    #region button event
     async def joined_allied_button_event(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
         if len(self.upper_attack_class) >= self.max_players:
@@ -431,15 +433,18 @@ class GaBattleView(discord.ui.View):
             await self.message.edit(view=None)
         except Exception as e:
             print(e)
-        
-        #Tăng count cho từng loại
+        #Tăng count, tạo memories cho từng người có info
         for info in self.upper_attack_class:
+            if not info.player_profile: continue
             result = "won" if self.upper_attack_won else "lose"
             self.increase_count_win_lose_profile(info=info, result=result)
+            self.add_memory_win_lose(info=info, result=result)
                 
         for info in self.lower_attack_class:
+            if not info.player_profile: continue
             result = "lose" if self.upper_attack_won else "won"
             self.increase_count_win_lose_profile(info=info, result=result)
+            self.add_memory_win_lose(info=info, result=result)
 
         # nếu là PVP và KHÔNG PHẢI thách đấu thì không cần cập nhật stats
         if self.is_players_versus_players and not self.is_challenge: return
@@ -469,6 +474,57 @@ class GaBattleView(discord.ui.View):
         else:
             ProfileMongoManager.increase_count_guardian(guild_id=self.guild_id, user_id=info.player_profile.user_id, count_type=f"count_battle_pve_{result}")
 
+
+    def add_memory_win_lose(self, info: GuardianAngelAttackClass, result="won"):
+        if info.player_profile is None:
+            return
+        battle_type = "Chiến Đấu Quái"
+        if self.is_dungeon:
+            battle_type = "Hầm Ngục Hộ Vệ Thần"
+        elif self.is_players_versus_players:
+            battle_type = "Thách Đấu Hộ Vệ Thần" if self.is_challenge else "Chiến Đấu Hộ Vệ Thần"
+        memories = info.player_ga.memories or []
+        memory_description = None
+        # Templates
+        win_templates = [
+            f"{info.player_ga.ga_name} đã xuất sắc đánh bại {self.enemy_ga.ga_name} trong trận {battle_type}.",
+            f"{info.player_ga.ga_name} dễ dàng hạ gục {self.enemy_ga.ga_name} trong {battle_type}.",
+            f"Trong {battle_type}, {info.player_ga.ga_name} đã bón hành cho {self.enemy_ga.ga_name}.",
+            f"{info.player_ga.ga_name} đã thắng áp đảo {self.enemy_ga.ga_name} trong {battle_type}.",
+        ]
+
+        lose_templates = [
+            f"{info.player_ga.ga_name} đã thất bại trước {self.enemy_ga.ga_name} trong trận {battle_type}.",
+            f"Dù đã cố gắng, {info.player_ga.ga_name} không thể vượt qua {self.enemy_ga.ga_name} trong {battle_type}.",
+            f"Trong {battle_type}, {info.player_ga.ga_name} đã chịu khuất phục trước sức mạnh của {self.enemy_ga.ga_name}.",
+            f"Trận {battle_type} kết thúc với thất bại đầy cay đắng của {info.player_ga.ga_name} trước {self.enemy_ga.ga_name}.",
+        ]
+
+        templates = win_templates if result == "won" else lose_templates
+        selected_description = random.choice(templates)
+
+        # Chỉ có % khả năng nhớ kết quả, và hai memory mới nhất không phải thuộc tag battle
+        chance = 40
+        if not memories:
+            memory_description = selected_description
+        else:
+            try:
+                if UtilitiesFunctions.get_chance(chance):
+                    first = memories[0]
+                    second = memories[1] if len(memories) > 1 else None
+                    if first.tag != GuardianMemoryTag.BATTLE and (second is None or second.tag != GuardianMemoryTag.BATTLE):
+                        memory_description = selected_description
+            except Exception:
+                memory_description = selected_description
+
+        if memory_description:
+            ProfileMongoManager.add_memory_guardian(
+                guild_id=self.guild_id,
+                user_id=info.player_profile.user_id,
+                channel_name=self.channel_name,
+                memory_description=memory_description,
+                tag=GuardianMemoryTag.BATTLE.value
+            )
     
     def is_empty_or_whitespace(self, s: str):
         return not s.strip()
@@ -641,6 +697,24 @@ class GaBattleView(discord.ui.View):
         if info.player_profile != None:
             if CustomFunctions.check_if_dev_mode(): return
             ProfileMongoManager.set_guardian_current_stats(guild_id=self.guild_id, user_id=info.player_profile.user_id,stamina=info.player_ga.stamina, health=info.player_ga.health, mana=info.player_ga.mana, is_dead=info.player_ga.is_dead)
+            if info.player_ga.is_dead:
+                #Tạo memory death
+                ProfileMongoManager.add_memory_guardian(
+                    guild_id=self.guild_id,
+                    user_id=info.player_profile.user_id,
+                    channel_name=self.channel_name,
+                    memory_description= f"Đã tử nạn trong lúc giao chiến với {self.enemy_ga.ga_emoji} - {self.enemy_ga.ga_name}",
+                    tag=GuardianMemoryTag.DEATH.value
+                )
+            if info.player_ga.health <= 0:
+                #Tạo memory injure
+                ProfileMongoManager.add_memory_guardian(
+                    guild_id=self.guild_id,
+                    user_id=info.player_profile.user_id,
+                    channel_name=self.channel_name,
+                    memory_description= f"Đã trọng thương trong lúc giao chiến với {self.enemy_ga.ga_emoji} - {self.enemy_ga.ga_name}",
+                    tag=GuardianMemoryTag.INJURY.value
+                )
     
     def get_ga_stil_alive(self, side: str):
         if side == "upper":
@@ -709,6 +783,9 @@ class GaBattleView(discord.ui.View):
                 self_player_info.recovery_time += 1
                 #Xóa item khỏi inventory
                 ProfileMongoManager.update_list_items_profile(guild_id=self.guild_id, user_id=self_player_info.player_profile.user_id, user_name="", guild_name="",user_display_name="", item = health_potion, amount=-1)
+                roll_chance = UtilitiesFunctions.get_chance(20)
+                if roll_chance:
+                    ProfileMongoManager.add_memory_guardian(guild_id=self.guild_id, user_id=self_player_info.player_profile.user_id, channel_name=self.channel_name, memory_description=f"Đã sử dụng **{mana_potion.item_name}** để hồi phục sức mạnh", tag=GuardianMemoryTag.BATTLE.value)
                 try:
                     self_player_info.player_profile.list_items.remove(health_potion)
                 except Exception as e: print()
@@ -730,6 +807,9 @@ class GaBattleView(discord.ui.View):
                 
                 #Xóa item khỏi inventory
                 ProfileMongoManager.update_list_items_profile(guild_id=self.guild_id, user_id=self_player_info.player_profile.user_id, user_name="", guild_name="",user_display_name="", item = stamina_potion, amount=-1)
+                roll_chance = UtilitiesFunctions.get_chance(20)
+                if roll_chance:
+                    ProfileMongoManager.add_memory_guardian(guild_id=self.guild_id, user_id=self_player_info.player_profile.user_id, channel_name=self.channel_name, memory_description=f"Đã sử dụng **{mana_potion.item_name}** để hồi phục sức mạnh", tag=GuardianMemoryTag.BATTLE.value)
                 try:
                     self_player_info.player_profile.list_items.remove(stamina_potion)
                 except Exception as e: print()
@@ -751,6 +831,9 @@ class GaBattleView(discord.ui.View):
 
                 #Xóa item khỏi inventory
                 ProfileMongoManager.update_list_items_profile(guild_id=self.guild_id, user_id=self_player_info.player_profile.user_id, user_name="", guild_name="",user_display_name="", item = mana_potion, amount=-1)
+                roll_chance = UtilitiesFunctions.get_chance(20)
+                if roll_chance:
+                    ProfileMongoManager.add_memory_guardian(guild_id=self.guild_id, user_id=self_player_info.player_profile.user_id, channel_name=self.channel_name, memory_description=f"Đã sử dụng **{mana_potion.item_name}** để hồi phục sức mạnh", tag=GuardianMemoryTag.BATTLE.value)
                 try:
                     self_player_info.player_profile.list_items.remove(mana_potion)
                 except Exception as e: print()
@@ -816,6 +899,7 @@ class GaBattleView(discord.ui.View):
                     additional_loss_stats_text = f" Hộ Vệ Thần của mục tiêu đã chết vĩnh viễn!"
                     opponent_alive_attack_info.is_dead_ga = True
                     opponent_alive_attack_info.player_ga.is_dead = True
+
             #Kiểm tra xem phải summoned không, có thì remove hẳn khỏi đội hình
             if opponent_alive_attack_info.is_summoned:
                 #Remove khỏi đội hình
@@ -939,6 +1023,9 @@ class GaBattleView(discord.ui.View):
                 ap = self_player_info.player_ga.attack_power
                 scaling_ap = ap if ap <= 400 else 400 + (ap - 400) * 0.6  # Sau 400 thì giảm nhẹ
                 loss_health = int(scaling_ap + scaling_ap * 0.3)
+                min_damage = int(ap * 0.4)
+                if loss_health < min_damage:
+                    loss_health = min_damage
                 opponent_alive_attack_info.player_ga.health -= loss_health
                 #dùng hàm mới để tính toán số mana sẽ mất
                 # own_loss_mana = int(self_player_info.player_ga.max_mana * 0.45) - skill.mana_loss
