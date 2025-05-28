@@ -822,7 +822,6 @@ class GaBattleView(discord.ui.View):
             if use_chance:
                 #Tuỳ loại bình mà hồi theo phần trăm, mặc định 40%
                 percent_restored= 0.4
-
                 heal_amount = int(self_player_info.player_ga.max_mana * percent_restored)
                 self_player_info.player_ga.mana += heal_amount
                 if self_player_info.player_ga.mana > self_player_info.player_ga.max_mana: self_player_info.player_ga.mana = self_player_info.player_ga.max_mana
@@ -993,7 +992,7 @@ class GaBattleView(discord.ui.View):
 
     def execute_attack_skill(self, self_player_info: GuardianAngelAttackClass, opponent_alive_attack_info: GuardianAngelAttackClass, skill: GuardianAngelSkill, text_target_profile_exist: str, text_own_profile_exist: str):
         base_text = None
-        mem_chance = 20
+        mem_chance = UtilitiesFunctions.get_chance(20)
         #Mana của bản thân phải lớn hơn hoặc bằng mana yêu cầu của skill
         current_mana_percent = int(self_player_info.player_ga.mana/self_player_info.player_ga.max_mana*100)
         if current_mana_percent >= skill.percent_min_mana_req:
@@ -1025,7 +1024,6 @@ class GaBattleView(discord.ui.View):
                         memory_description=f"{opponent_alive_attack_info.player_ga.ga_name} đã kịp thời dựng Khiên Chấn Thủ để chống lại {self_player_info.player_ga.ga_name}!",
                         tag=GuardianMemoryTag.BATTLE.value
                     )
-
                 return base_text
             
             #Tuỳ skill mà tung kỹ năng, vì một số skill tấn công có cách tính khác
@@ -1045,14 +1043,6 @@ class GaBattleView(discord.ui.View):
                     own_loss_mana *= (-1)
                 self_player_info.player_ga.mana -= own_loss_mana
                 base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã khai chiêu {skill.emoji} - {skill.skill_name} và thiêu đốt mất {loss_health} máu của [{opponent_alive_attack_info.player_ga.ga_emoji} - {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist}!"
-                if self_player_info.player_profile != None and mem_chance:
-                    ProfileMongoManager.add_memory_guardian(
-                        guild_id=self.guild_id,
-                        user_id=self_player_info.player_profile.user_id,
-                        channel_name=self.channel_name,
-                        memory_description=f"{self_player_info.player_ga.ga_name} khai chiêu {skill.emoji} - {skill.skill_name} vào kẻ địch!",
-                        tag=GuardianMemoryTag.BATTLE.value
-                    )
                 return base_text
             
             elif skill.skill_id == "skill_stun":
@@ -1328,11 +1318,10 @@ class GaBattleView(discord.ui.View):
                                 guild_id=self.guild_id,
                                 user_id=opponent_alive_attack_info.player_profile.user_id,
                                 channel_name=self.channel_name,
-                                memory_description=f"{opponent_alive_attack_info.player_ga.ga_name} đã có khiên và chống bị kẻ địch {opponent_alive_attack_info.player_ga.ga_name} tẩy não",
+                                memory_description=f"{opponent_alive_attack_info.player_ga.ga_name} đã có khiên và chống bị kẻ địch {self_player_info.player_ga.ga_name} tẩy não",
                                 tag=GuardianMemoryTag.BATTLE.value
                             )
                         return base_text
-
                     if opponent_alive_attack_info in self.lower_attack_class:
                         self.lower_attack_class.remove(opponent_alive_attack_info)
                         self.upper_attack_class.append(opponent_alive_attack_info)
