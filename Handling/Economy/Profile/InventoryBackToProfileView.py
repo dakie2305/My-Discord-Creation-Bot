@@ -302,8 +302,8 @@ class SpecialGuardianView(discord.ui.View):
                 # Convert data.date to Discord unix time format if possible
                 unix_time = int(data.date.timestamp())
                 date_display = f"<t:{unix_time}:f>"
-                text = f"{EmojiCreation2.SHINY_POINT.value} {data.description}"
-                embed.add_field(name=f"#{idx}. Tại kênh *{data.channel_name}* - Ngày: {date_display}", value=text, inline=False)
+                text = f"{EmojiCreation2.SHINY_POINT.value} {data.description}\n\n"
+                embed.add_field(name=f"#*{data.channel_name}* - {date_display}", value=text, inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
         embed.set_footer(text=f"Trang 1/{total_pages}")
         view = GuardianMemoryView(profile=self.profile, list_data=list_data)
