@@ -785,7 +785,7 @@ class GaBattleView(discord.ui.View):
                 ProfileMongoManager.update_list_items_profile(guild_id=self.guild_id, user_id=self_player_info.player_profile.user_id, user_name="", guild_name="",user_display_name="", item = health_potion, amount=-1)
                 roll_chance = UtilitiesFunctions.get_chance(20)
                 if roll_chance:
-                    ProfileMongoManager.add_memory_guardian(guild_id=self.guild_id, user_id=self_player_info.player_profile.user_id, channel_name=self.channel_name, memory_description=f"Đã sử dụng **{mana_potion.item_name}** để hồi phục sức mạnh", tag=GuardianMemoryTag.BATTLE.value)
+                    ProfileMongoManager.add_memory_guardian(guild_id=self.guild_id, user_id=self_player_info.player_profile.user_id, channel_name=self.channel_name, memory_description=f"Đã sử dụng **{health_potion.item_name}** để hồi phục sức mạnh", tag=GuardianMemoryTag.BATTLE.value)
                 try:
                     self_player_info.player_profile.list_items.remove(health_potion)
                 except Exception as e: print()
@@ -809,7 +809,7 @@ class GaBattleView(discord.ui.View):
                 ProfileMongoManager.update_list_items_profile(guild_id=self.guild_id, user_id=self_player_info.player_profile.user_id, user_name="", guild_name="",user_display_name="", item = stamina_potion, amount=-1)
                 roll_chance = UtilitiesFunctions.get_chance(20)
                 if roll_chance:
-                    ProfileMongoManager.add_memory_guardian(guild_id=self.guild_id, user_id=self_player_info.player_profile.user_id, channel_name=self.channel_name, memory_description=f"Đã sử dụng **{mana_potion.item_name}** để hồi phục sức mạnh", tag=GuardianMemoryTag.BATTLE.value)
+                    ProfileMongoManager.add_memory_guardian(guild_id=self.guild_id, user_id=self_player_info.player_profile.user_id, channel_name=self.channel_name, memory_description=f"Đã sử dụng **{stamina_potion.item_name}** để hồi phục sức mạnh", tag=GuardianMemoryTag.BATTLE.value)
                 try:
                     self_player_info.player_profile.list_items.remove(stamina_potion)
                 except Exception as e: print()
@@ -1244,7 +1244,6 @@ class GaBattleView(discord.ui.View):
                             memory_description=f"{self_player_info.player_ga.ga_name} đã thực sự triệu hồi được {enemy.ga_name} huyền thoại gia nhập phe",
                             tag=GuardianMemoryTag.BATTLE.value
                         )
-
                     return base_text
             else:
                 if len(self.lower_attack_class) < 3:
