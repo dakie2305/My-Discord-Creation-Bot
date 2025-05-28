@@ -154,6 +154,10 @@ class GaBattleView(discord.ui.View):
         self.upper_attack_class.append(data)
         self.joined_player_id.append(interaction.user.id)
         ProfileMongoManager.update_main_guardian_profile_time(guild_id=interaction.guild_id,user_id=interaction.user.id, data_type="last_joined_battle", date_value=datetime.now())
+        if self.is_players_versus_players:
+            ProfileMongoManager.increase_count_guardian(guild_id=interaction.guild_id, user_id=interaction.user.id, count_type="count_battle_pve")
+        else:
+            ProfileMongoManager.increase_count_guardian(guild_id=interaction.guild_id, user_id=interaction.user.id, count_type="count_battle_pvp")
         await interaction.followup.send(content=f"Bạn đã gia nhập phe trên vào lượt thứ {self.round}!", ephemeral=True)
         return
     
@@ -208,6 +212,10 @@ class GaBattleView(discord.ui.View):
         self.lower_attack_class.append(data)
         self.joined_player_id.append(interaction.user.id)
         ProfileMongoManager.update_main_guardian_profile_time(guild_id=interaction.guild_id,user_id=interaction.user.id, data_type="last_joined_battle", date_value=datetime.now())
+        if self.is_players_versus_players:
+            ProfileMongoManager.increase_count_guardian(guild_id=interaction.guild_id, user_id=interaction.user.id, count_type="count_battle_pve")
+        else:
+            ProfileMongoManager.increase_count_guardian(guild_id=interaction.guild_id, user_id=interaction.user.id, count_type="count_battle_pvp")
         await interaction.followup.send(content=f"Bạn đã gia nhập phe dưới, vào lượt thứ {self.round}!", ephemeral=True)
         return
 
@@ -259,18 +267,19 @@ class GaBattleView(discord.ui.View):
         self.joined_player_id.append(interaction.user.id)
         await interaction.followup.send(content=f"Bạn đã gia nhập chiến đấu vào lượt thứ {self.round}!", ephemeral=True)
         ProfileMongoManager.update_main_guardian_profile_time(guild_id=interaction.guild_id,user_id=interaction.user.id, data_type="last_joined_battle", date_value=datetime.now())
+        if self.is_dungeon:
+            ProfileMongoManager.increase_count_guardian(guild_id=interaction.guild_id, user_id=interaction.user.id, count_type="count_dungeon_fight")
+        else:
+            ProfileMongoManager.increase_count_guardian(guild_id=interaction.guild_id, user_id=interaction.user.id, count_type="count_battle_pve")
         return
 
     #region battle event
     async def commence_battle(self):
         if len(self.upper_attack_class) == 0 or len(self.lower_attack_class) == 0: return
         await asyncio.sleep(3)
-        
         #upper attack sẽ đánh trước
         flag_end_battle = False
         full_text = ""
-        
-
         for self_player_info in self.upper_attack_class:
             #Skip qua guardian đã chết
             if self_player_info.player_ga.health <= 0: continue
@@ -356,7 +365,6 @@ class GaBattleView(discord.ui.View):
         print(f"Username {self.user_profile.user_name} has ended guardian battle in guild {self.user_profile.guild_name}!")
         # Tính toán kết quả
         self.battle_ended = True
-
         embed = discord.Embed(title="Tổng Kết Chiến Đấu", color=0xFFD700)
         if self.upper_attack_won:
             embed.description = "Phe trên thắng!"
@@ -423,10 +431,18 @@ class GaBattleView(discord.ui.View):
             await self.message.edit(view=None)
         except Exception as e:
             print(e)
+        
+        #Tăng count cho từng loại
+        for info in self.upper_attack_class:
+            result = "won" if self.upper_attack_won else "lose"
+            self.increase_count_win_lose_profile(info=info, result=result)
+                
+        for info in self.lower_attack_class:
+            result = "lose" if self.upper_attack_won else "won"
+            self.increase_count_win_lose_profile(info=info, result=result)
 
         # nếu là PVP và KHÔNG PHẢI thách đấu thì không cần cập nhật stats
-        if self.is_players_versus_players and not self.is_challenge:
-            return
+        if self.is_players_versus_players and not self.is_challenge: return
         # Cập nhật stats cho guardian nếu có profile cho PVE, hoặc challenge
         for info in self.upper_attack_class:
             if info.player_profile != None:
@@ -443,6 +459,16 @@ class GaBattleView(discord.ui.View):
         turns_participated = self.round - entry_turn + 1
         contribution_percentage = int(turns_participated / self.round * 100) 
         return contribution_percentage
+    
+    def increase_count_win_lose_profile(self, info: GuardianAngelAttackClass, result = "won"):
+        if info.player_profile == None: return
+        if self.is_dungeon:
+            ProfileMongoManager.increase_count_guardian(guild_id=self.guild_id, user_id=info.player_profile.user_id, count_type=f"count_dungeon_fight_{result}")
+        elif self.is_players_versus_players or self.is_challenge:
+            ProfileMongoManager.increase_count_guardian(guild_id=self.guild_id, user_id=info.player_profile.user_id, count_type=f"count_battle_pvp_{result}")
+        else:
+            ProfileMongoManager.increase_count_guardian(guild_id=self.guild_id, user_id=info.player_profile.user_id, count_type=f"count_battle_pve_{result}")
+
     
     def is_empty_or_whitespace(self, s: str):
         return not s.strip()

@@ -53,9 +53,11 @@ class GaChallengeView(discord.ui.View):
         view.loai_tien = self.loai_tien
         view.battle_type = self.battle_type
         mess = await self.message.edit(view=view)
-        ProfileMongoManager.update_main_guardian_profile_time(guild_id=interaction.guild_id,user_id=self.user.id, data_type="last_joined_battle", date_value=datetime.now())
-        ProfileMongoManager.update_main_guardian_profile_time(guild_id=interaction.guild_id,user_id=self.target.id, data_type="last_joined_battle", date_value=datetime.now())
         view.message = mess
         print(f"Username {interaction.user.name} has started guardian challenge in guild {interaction.guild.name} at channel {interaction.channel.name}!")
+        ProfileMongoManager.update_main_guardian_profile_time(guild_id=interaction.guild_id,user_id=self.user.id, data_type="last_joined_battle", date_value=datetime.now())
+        ProfileMongoManager.update_main_guardian_profile_time(guild_id=interaction.guild_id,user_id=self.target.id, data_type="last_joined_battle", date_value=datetime.now())
+        ProfileMongoManager.increase_count_guardian(guild_id=interaction.guild_id, user_id=self.user.id, count_type="count_battle_pvp")
+        ProfileMongoManager.increase_count_guardian(guild_id=interaction.guild_id, user_id=self.target.id, count_type="count_battle_pvp")
         await view.commence_battle()
         return

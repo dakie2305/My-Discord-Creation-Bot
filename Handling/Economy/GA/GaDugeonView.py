@@ -77,11 +77,9 @@ class GaDugeonView(discord.ui.View):
                 stamina = int(new_player_profile.guardian.max_stamina*50/100)
                 ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id,user_id=interaction.user.id, health=health, stamina=stamina)
                 new_player_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
-        
+            
         await interaction.followup.send(content=f"Bạn đã tham chiến!", ephemeral=True)
         self.is_attacked = True
-        
-        
         if self.difficulty >= 3:
             #Nếu self.difficulty trên 3 thì roll lại kẻ địch theo stats của player ga nếu player ga trên cấp 80 hoặc enemy thấp cấp hơn
             #Thì scale theo level của player
@@ -132,6 +130,7 @@ class GaDugeonView(discord.ui.View):
         view = GaBattleView(user=interaction.user, user_profile=new_player_profile, is_players_versus_players=False, max_players=3, enemy_ga=self.enemy_ga, enemy_ga_2=self.enemy_ga_2, guild_id=interaction.guild_id, gold_reward=gold_reward, silver_reward=silver_reward, bonus_exp=exp_reward, dignity_point=dignity_point_reward, embed_title=self.title, bonus_all_reward_percent=self.bonus_percent, footer_text=self.footer_text, is_dungeon= True, difficulty=self.difficulty)
         mess = await self.message.edit(embed=embed, view=view)
         ProfileMongoManager.update_main_guardian_profile_time(guild_id=interaction.guild_id,user_id=interaction.user.id, data_type="last_joined_battle", date_value=datetime.now())
+        ProfileMongoManager.increase_count_guardian(guild_id=interaction.guild_id, user_id=interaction.user.id, count_type="count_dungeon_fight")
         view.message = mess
         print(f"Username {interaction.user.name} has started guardian battle in guild {interaction.guild.name} at channel {interaction.channel.name}!")
         await view.commence_battle()
@@ -228,6 +227,7 @@ class GaDugeonView(discord.ui.View):
         view = GaBattleView(user=selected_user, user_profile=selected_user_profile, is_players_versus_players=False, max_players=3, enemy_ga=self.enemy_ga, enemy_ga_2=self.enemy_ga_2, guild_id=self.guild_id, gold_reward=gold_reward, silver_reward=silver_reward, bonus_exp=exp_reward, dignity_point=dignity_point_reward, embed_title=self.title, bonus_all_reward_percent=self.bonus_percent, footer_text=self.footer_text, is_dungeon= True, difficulty=self.difficulty)
         mess = await self.message.edit(embed=embed, view=view)
         ProfileMongoManager.update_main_guardian_profile_time(guild_id=self.guild_id,user_id=selected_user.id, data_type="last_joined_battle", date_value=datetime.now())
+        ProfileMongoManager.increase_count_guardian(guild_id=self.guild_id, user_id=selected_user.id, count_type="count_dungeon_fight")
         view.message = mess
         print(f"Username {selected_user.name} has been caught for guardian battle in guild {self.guild_id} at channel {self.message.channel.name}!")
         try:

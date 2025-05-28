@@ -809,6 +809,7 @@ def update_guardian_stats(guild_id:int, user_id: int, health: int = 0, max_healt
         #Coi như bị thương
         is_injured = True
         time_to_recover = datetime.now() + timedelta(hours=3)
+        increase_count_guardian(guild_id=guild_id, user_id=user_id, count_type="count_injury")
         
     existing_data.guardian.max_health += max_health
     if existing_data.guardian.max_health <= 0: 
@@ -857,7 +858,11 @@ def set_guardian_current_stats(guild_id:int, user_id: int, health: int, mana: in
         #Coi như bị thương
         is_injured = True
         time_to_recover = datetime.now() + timedelta(hours=3)
+        increase_count_guardian(guild_id=guild_id, user_id=user_id, count_type="count_injury")
     
+    if is_dead:
+        increase_count_guardian(guild_id=guild_id, user_id=user_id, count_type="count_death")
+
     if existing_data.guardian.health >= existing_data.guardian.max_health: existing_data.guardian.health = existing_data.guardian.max_health
 
     existing_data.guardian.mana = mana

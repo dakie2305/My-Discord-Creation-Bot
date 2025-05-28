@@ -227,6 +227,7 @@ class InventoryUseView(discord.ui.View):
             text = f"{interaction.user.mention} đã sử dụng đến [{self.selected_item.emoji} - **{self.selected_item.item_name}**] nhưng quên mất mình làm gì có Hộ Vệ Thần!"
             if self.user_profile.guardian!= None:
                 ProfileMongoManager.set_guardian_dead_status(guild_id=interaction.guild_id, user_id=self.user.id, is_dead=False)
+                ProfileMongoManager.increase_count_guardian(guild_id=interaction.guild_id, user_id=self.user.id, count_type="count_resurrection")
                 text = f"{interaction.user.mention} đã lập tức dùng đến [{self.selected_item.emoji} - **{self.selected_item.item_name}**] để Hộ Vệ Thần của mình từ cõi chết trở về!"
             await channel.send(content=text)
         elif "profile_color_" in self.selected_item.item_id:

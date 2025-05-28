@@ -161,15 +161,13 @@ class GuardianAngelCog(commands.Cog):
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Cộng **{random_bonus_exp}** điểm EXP cho Hộ Vệ Thần!", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Cộng **{dignity_point}** nhân phẩm!", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
-        
+        await interaction.followup.send(embed=embed)
         ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id,user_id=interaction.user.id)
         ProfileMongoManager.update_main_guardian_level_progressing(guild_id=interaction.guild_id,user_id=interaction.user.id, bonus_exp=random_bonus_exp)
         ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id,user_id=interaction.user.id, guild_name="", user_display_name="", user_name="", dignity_point=dignity_point)
         ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id,user_id=interaction.user.id, mana=mana)
         ProfileMongoManager.update_main_guardian_profile_time(guild_id=interaction.guild_id,user_id=interaction.user.id, data_type="last_meditation", date_value=datetime.now())
-        
-        
-        await interaction.followup.send(embed=embed)
+        ProfileMongoManager.increase_count_guardian(guild_id=interaction.guild_id, user_id=interaction.user.id, count_type="count_meditation")
     
     @ga_meditate_slash_command.error
     async def ga_meditate_slash_command_error(self, interaction: discord.Interaction, error):
@@ -279,14 +277,14 @@ class GuardianAngelCog(commands.Cog):
         if dignity_point != 0:
             embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Cộng **{dignity_point}** nhân phẩm!", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
-        
+        await interaction.followup.send(embed=embed)
         ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id,user_id=interaction.user.id)
         ProfileMongoManager.update_main_guardian_level_progressing(guild_id=interaction.guild_id,user_id=interaction.user.id, bonus_exp=random_bonus_exp)
         ProfileMongoManager.update_dignity_point(guild_id=interaction.guild_id,user_id=interaction.user.id, guild_name="", user_display_name="", user_name="", dignity_point=dignity_point)
         ProfileMongoManager.update_main_guardian_profile_time(guild_id=interaction.guild_id,user_id=interaction.user.id, data_type="last_feed", date_value=datetime.now())
         ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id,user_id=interaction.user.id, health=health, stamina=stamina)
         ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id,user_id=interaction.user.id, user_display_name="", user_name="", guild_name="", item=chosen_item, amount=-1)
-        await interaction.followup.send(embed=embed)
+        ProfileMongoManager.increase_count_guardian(guild_id=interaction.guild_id, user_id=interaction.user.id, count_type="count_feed")
         
     @ga_feed_slash_command.error
     async def ga_feed_slash_command_error(self, interaction: discord.Interaction, error):
@@ -497,6 +495,12 @@ class GuardianAngelCog(commands.Cog):
             
         if max_players == None: max_players = "3"
         max_players_as_int = int(max_players)
+
+        if is_players_versus_player:
+            ProfileMongoManager.increase_count_guardian(guild_id=interaction.guild_id, user_id=interaction.user.id, count_type="count_battle_pvp")
+            ProfileMongoManager.increase_count_guardian(guild_id=interaction.guild_id, user_id=target.id, count_type="count_battle_pvp")
+        else:
+            ProfileMongoManager.increase_count_guardian(guild_id=interaction.guild_id, user_id=interaction.user.id, count_type="count_battle_pve")
         
         #Tính lại theo enemy_ga
         gold_reward = int(gold_reward + gold_reward*enemy.level*0.2)
