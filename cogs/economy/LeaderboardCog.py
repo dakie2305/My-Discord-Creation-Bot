@@ -43,6 +43,7 @@ class LeaderboardEconomy(commands.Cog):
         Choice(name="Xếp hạng theo rank", value="rank"),
         Choice(name="Xếp hạng Quest hoàn thành", value="quest"),
         Choice(name="Xếp hạng cấp bậc Hộ Vệ Thần", value="guardian"),
+        Choice(name="Xếp hạng lực chiến Hộ Vệ Thần", value="guardian_power"),
     ])
     @discord.app_commands.checks.cooldown(1, 10)
     @discord.app_commands.command(name="leaderboard", description="Bảng xếp hạng tài chính trong server!")
@@ -331,7 +332,57 @@ class LeaderboardEconomy(commands.Cog):
                         break
             embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
             return embed
+        
+        #region leaderboard guardian_power
+        elif type == "guardian_power":
+            #Lọc theo rank
+            title = "Bảng Xếp Hạng Lực Chiến Vệ Thần"
+            list_profile_guild = sorted(
+                [profile for profile in list_profile_guild if profile.guardian],
+                key=lambda p: (p.guardian.max_stamina + p.guardian.max_health + p.guardian.max_mana + p.guardian.attack_power + p.guardian.stats_point * 5 + p.guardian.max_skills
+                ),
+                reverse=True
+            )
 
+            embed = discord.Embed(title=f"", description=f"{title}", color=0x0ce7f2)
+            embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+            if user == None:
+                count = 1
+                for index, profile in enumerate(list_profile_guild):
+                    if profile == None or profile.user_id == None: continue
+                    if profile.guardian == None: continue
+                    total_stats = profile.guardian.max_stamina + profile.guardian.max_health + profile.guardian.max_mana + profile.guardian.attack_power + profile.guardian.stats_point * 5 + profile.guardian.max_skills
+                    text = f"{profile.guardian.ga_emoji} - {profile.guardian.ga_name} (<@{profile.user_id}>) với lực chiến **{total_stats}**"
+                    if (index+1) == 1:
+                        embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.FIRST_CUP.value}**: {text}", inline=False)
+                    elif (index+1) == 2:
+                        embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.SECOND_CUP.value}**: {text}", inline=False)
+                    elif (index+1) == 3:
+                        embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.THIRD_CUP.value}**: {text}", inline=False)
+                    else:
+                        embed.add_field(name=f"", value=f"**Hạng {index+1}**: {text}", inline=False)
+                    count+=1
+                    if count >= 20: break
+            else:
+                embed.add_field(name=f"", value=f"Xếp hạng của {user.mention}", inline=True)
+                embed.add_field(name=f"", value=f"_____________", inline=False)
+                for index, profile in enumerate(list_profile_guild):
+                    if profile == None or profile.user_id == None: continue
+                    if profile.guardian == None: continue
+                    if profile.user_id == user.id:
+                        total_stats = profile.guardian.max_stamina + profile.guardian.max_health + profile.guardian.max_mana + profile.guardian.attack_power + profile.guardian.stats_point * 5 + profile.guardian.max_skills
+                        text = f"{profile.guardian.ga_emoji} - {profile.guardian.ga_name} (<@{profile.user_id}>) với lực chiến **{total_stats}**"
+                        if (index+1) == 1:
+                            embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.FIRST_CUP.value}**: {text}", inline=False)
+                        elif (index+1) == 2:
+                            embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.SECOND_CUP.value}**: {text}", inline=False)
+                        elif (index+1) == 3:
+                            embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.THIRD_CUP.value}**: {text}", inline=False)
+                        else:
+                            embed.add_field(name=f"", value=f"**Hạng {index+1}**: {text}", inline=False)
+                        break
+            embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+            return embed
         else:
             embed = discord.Embed(title=f"", description=f"Loại bảng xếp hạng này vẫn chưa được code xong!", color=0x03F8FC)
             return embed
