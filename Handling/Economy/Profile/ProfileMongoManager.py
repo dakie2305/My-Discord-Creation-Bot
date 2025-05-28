@@ -967,13 +967,6 @@ def increase_count_guardian(guild_id: int, user_id: int, count_type: str, count_
 
 def add_memory_guardian(guild_id: int, user_id: int, memory_description: str, channel_name: str = "Không rõ", tag: str = "general"):
     collection = db_specific[f'profile_{guild_id}']
-
-    existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
-    if existing_data == None: return
-    if existing_data.guardian == None: return
-    
-    # memories = existing_data.guardian.memories
-    # if memories == None: memories = []
     date = datetime.now()
     memory_id = date.strftime('%Y%m%d%H%M%S')
     new_memory = GuardianAngelMemory(
@@ -984,7 +977,10 @@ def add_memory_guardian(guild_id: int, user_id: int, memory_description: str, ch
             tag=tag
         )
     result = collection.update_one(
-        {"id": "profile", "user_id": user_id},
+        {"id": "profile", 
+         "user_id": user_id,
+         "guardian": { "$exists": True }
+        },
         {
             "$push": {
                 "guardian.memories": {
