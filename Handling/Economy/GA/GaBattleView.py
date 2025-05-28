@@ -1023,7 +1023,8 @@ class GaBattleView(discord.ui.View):
                 ap = self_player_info.player_ga.attack_power
                 scaling_ap = ap if ap <= 400 else 400 + (ap - 400) * 0.6  # Sau 400 thì giảm nhẹ
                 loss_health = int(scaling_ap + scaling_ap * 0.3)
-                min_damage = int(ap * 0.4)
+                choice = random.choice([20, 40, 50, 55, 60, 65, 70, 75, 80, 85, 90, 100, 110, 120])
+                min_damage = ap + choice
                 if loss_health < min_damage:
                     loss_health = min_damage
                 opponent_alive_attack_info.player_ga.health -= loss_health
