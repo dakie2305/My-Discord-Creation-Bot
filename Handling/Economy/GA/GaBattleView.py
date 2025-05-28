@@ -509,11 +509,11 @@ class GaBattleView(discord.ui.View):
             memory_description = selected_description
         else:
             try:
-                if UtilitiesFunctions.get_chance(chance):
-                    first = memories[0]
-                    second = memories[1] if len(memories) > 1 else None
-                    if first.tag != GuardianMemoryTag.BATTLE and (second is None or second.tag != GuardianMemoryTag.BATTLE):
-                        memory_description = selected_description
+                first = memories[0]
+                if first.tag != GuardianMemoryTag.BATTLE:
+                    memory_description = selected_description
+                elif chance:
+                    memory_description = selected_description
             except Exception:
                 memory_description = selected_description
 

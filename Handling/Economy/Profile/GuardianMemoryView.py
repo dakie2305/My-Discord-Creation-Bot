@@ -10,7 +10,7 @@ class GuardianMemoryView(discord.ui.View):
     def __init__(self, profile: Profile, list_data: list[GuardianAngelMemory] = None):
         super().__init__(timeout=120)
         self.message: discord.Message = None
-        self.page_size = 6
+        self.page_size = 4
         self.profile = profile
         self.list_data = list_data
         self.pages = [list_data[i:i+self.page_size] for i in range(0, len(list_data), self.page_size)]

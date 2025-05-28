@@ -271,7 +271,7 @@ class SpecialGuardianView(discord.ui.View):
     @discord.ui.button(label="Ký Ức Hộ Vệ Thần", style=discord.ButtonStyle.blurple)
     async def memories_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.defer(ephemeral=True)
-        page_size = 6
+        page_size = 4
         list_data = self.profile.guardian.memories if self.profile.guardian.memories else []
         self.pages = [list_data[i:i+page_size] for i in range(0, len(list_data), page_size)]
         current_page = 0
