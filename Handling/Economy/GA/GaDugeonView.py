@@ -80,9 +80,9 @@ class GaDugeonView(discord.ui.View):
                 stamina = int(new_player_profile.guardian.max_stamina*50/100)
                 ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id,user_id=interaction.user.id, health=health, stamina=stamina)
                 new_player_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
-            
-        await interaction.followup.send(content=f"Bạn đã tham chiến!", ephemeral=True)
+        
         self.is_attacked = True
+        await interaction.followup.send(content=f"Bạn đã tham chiến!", ephemeral=True)
 
         embed, view = self.create_embed(selected_user=interaction.user, selected_user_profile=new_player_profile)
         mess = await self.message.edit(embed=embed, view=view)
@@ -124,6 +124,7 @@ class GaDugeonView(discord.ui.View):
         
         # Không có user hợp lệ thì khỏi
         if not valid_users: return
+        if self.is_attacked: return
         
         selected_user: discord.Member = None 
         selected_user_profile: Profile = None 
@@ -133,6 +134,7 @@ class GaDugeonView(discord.ui.View):
         
         if selected_user == None or selected_user_profile == None or selected_guardian == None: return
         if selected_user_profile != None and selected_user_profile.guardian != None and selected_user_profile.guardian.last_battle != None and selected_user_profile.guardian.last_battle > datetime.now() - timedelta(minutes=4): return
+        #Coi như chiến
         embed, view = self.create_embed(selected_user=selected_user, selected_user_profile=selected_user_profile)
         mess = await self.message.edit(embed=embed, view=view)
         view.message = mess
@@ -145,6 +147,7 @@ class GaDugeonView(discord.ui.View):
         return
 
     def create_embed(self, selected_user_profile: Profile, selected_user: discord.Member):
+        self.is_attacked = True
         #Bắt đầu chiến
         if self.difficulty >= 3 and not self.is_top_1_server:
             #Nếu self.difficulty trên 3 thì roll lại kẻ địch theo stats của player ga nếu player ga trên cấp 80 hoặc enemy thấp cấp hơn
