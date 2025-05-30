@@ -294,15 +294,16 @@ class InventoryUseView(discord.ui.View):
         bonus_percent = 15
         double_enemy_chance = 25
         double_enemy_dice = UtilitiesFunctions.get_chance(double_enemy_chance)
-        top_1_leaderboard_dice = UtilitiesFunctions.get_chance(10)
+        top_1_leaderboard_dice = UtilitiesFunctions.get_chance(8)
         is_top_1_server = False
         if top_1_leaderboard_dice:
             #Lấy top 1 của leaderboard ra làm enemy
-            enemy = self.get_top_1_ga_leaderboard(guild_id=interaction.guild_id)
+            enemy = await self.get_top_1_ga_leaderboard(guild_id=interaction.guild_id, interaction=interaction)
             print(f"Top 1 GA leaderboard: {enemy.ga_name} - {enemy.level} at guild {interaction.guild.name}")
             if enemy is None:
                 enemy = ListGAAndSkills.get_random_ga_enemy_generic(level=level, guardian_chance=guardian_chance)
-            else: is_top_1_server = True
+            else: 
+                is_top_1_server = True
             enemy.health = enemy.max_health
             enemy.mana = enemy.max_mana
             enemy.stamina = enemy.max_stamina
@@ -336,7 +337,7 @@ class InventoryUseView(discord.ui.View):
         await view.catch_random_player_profile()
         return
     
-    def get_top_1_ga_leaderboard(self, guild_id: int):
+    async def get_top_1_ga_leaderboard(self, guild_id: int, interaction: discord.Interaction):
         #Lấy top 1 ga leaderboard ra
         list_profile_guild = ProfileMongoManager.find_all_profiles(guild_id=guild_id)
         if list_profile_guild == None or len(list_profile_guild) == 0:
@@ -347,7 +348,12 @@ class InventoryUseView(discord.ui.View):
             )
         top_profile = list_profile_guild[0] if list_profile_guild else None
         if top_profile and top_profile.guardian:
-            top_profile.guardian.ga_name += f" (<@{top_profile.user_id}>)"
+            member = await interaction.guild.fetch_member(top_profile.user_id)
+            if member:
+                display_name = f"@{member.name}"
+            else:
+                display_name = f"<@{top_profile.user_id}>"
+            top_profile.guardian.ga_name += f" ({display_name})"
             return top_profile.guardian
         else:
             return None
