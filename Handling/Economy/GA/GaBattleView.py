@@ -858,49 +858,55 @@ class GaBattleView(discord.ui.View):
                 except Exception as e: print()
                 return base_text
 
+        #Đánh flag xem đã dùng action chưa
+        flag_action = False
         #Xử lý logic dùng skill nếu có skill trong list
         try:
             if self_player_info.player_ga.list_skills != None and len(self_player_info.player_ga.list_skills) > 0 and self.battle_type != "B": #B là không dùng bất kỳ skill nào hết
                 #Ưu tiên skill passive trước
-                base_passive_text_result = self.execute_passive_skill(self_player_info = self_player_info, opponent_alive_attack_info = opponent_alive_attack_info, text_target_profile_exist=text_target_profile_exist, text_own_profile_exist=text_own_profile_exist)
-                if base_passive_text_result != None: return base_passive_text_result
+                base_text = self.execute_passive_skill(self_player_info = self_player_info, opponent_alive_attack_info = opponent_alive_attack_info, text_target_profile_exist=text_target_profile_exist, text_own_profile_exist=text_own_profile_exist)
+                if base_text != None:
+                    flag_action = True
                 
-                #Đến skill tấn công
-                attack_skill = self.get_random_skill(list_skills=self_player_info.player_ga.list_skills, skill_types=["attack"])
-                if attack_skill != None:
-                    #Thi triển kỹ năng
-                    base_text = self.execute_attack_skill(self_player_info = self_player_info, opponent_alive_attack_info = opponent_alive_attack_info, skill=attack_skill, text_target_profile_exist=text_target_profile_exist, text_own_profile_exist=text_own_profile_exist)
-                    if base_text != None: return base_text
+                if not flag_action:
+                    #Đến skill tấn công
+                    attack_skill = self.get_random_skill(list_skills=self_player_info.player_ga.list_skills, skill_types=["attack"])
+                    if attack_skill != None:
+                        #Thi triển kỹ năng
+                        base_text = self.execute_attack_skill(self_player_info = self_player_info, opponent_alive_attack_info = opponent_alive_attack_info, skill=attack_skill, text_target_profile_exist=text_target_profile_exist, text_own_profile_exist=text_own_profile_exist)
+                        if base_text != None: 
+                            flag_action = True
         except Exception as e:
             print(f"Exception when executing attack skill, {e}")
         
-        #Tính tỉ lệ evasion
-        loss_amount = int(self_player_info.player_ga.attack_power * 0.5)
-        opponent_evasion_chance = self.calculate_chance_by_stats(current_stat=opponent_alive_attack_info.player_ga.stamina, max_stat=opponent_alive_attack_info.player_ga.max_stamina, level=opponent_alive_attack_info.player_ga.level)
-        if opponent_evasion_chance > 85: opponent_evasion_chance = 85
-        evasion_dice = UtilitiesFunctions.get_chance(opponent_evasion_chance)
-        if evasion_dice and opponent_alive_attack_info.player_ga.stamina >= loss_amount: #Phải có đủ thể lực cần thiết mới né được
-            #Chỉ trừ stamina của lower, tỉ lệ thấp hơn, tầm 50% của info.player_ga.attack_power
-            loss_amount = int(self_player_info.player_ga.attack_power * 0.3)
-            opponent_alive_attack_info.player_ga.stamina -= loss_amount
-            if opponent_alive_attack_info.player_ga.stamina <= 0: opponent_alive_attack_info.player_ga.stamina = 0
-            base_text = f"- **[{self_player_info.player_ga.ga_emoji} - {self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã lao đến đánh {opponent_alive_attack_info.player_ga.ga_name} {text_target_profile_exist} nhưng mục tiêu đã kịp né tránh, và chỉ mất **{loss_amount}** thể lực!"
-        else:
-            #trừ máu của lower
-            loss_health = int(self_player_info.player_ga.attack_power + self_player_info.player_ga.attack_power*(self_player_info.player_ga.buff_attack_percent/100))
-            opponent_alive_attack_info.player_ga.health -= loss_health
-            #trừ stamina của lower, tỉ lệ thấp hơn, tầm 25% của info.player_ga.attack_power
-            loss_amount = int(self_player_info.player_ga.attack_power * 0.25)
-            opponent_alive_attack_info.player_ga.stamina -= loss_amount
-            if opponent_alive_attack_info.player_ga.stamina <= 0: opponent_alive_attack_info.player_ga.stamina = 0
-            base_text = f"- **[{self_player_info.player_ga.ga_emoji} - {self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã đánh trúng [{opponent_alive_attack_info.player_ga.ga_emoji} - {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist}! Mục tiêu mất **{loss_health}** Máu và **{loss_amount}** Thể Lực!"
-            try:
-                #Sau khi attack thì kiểm tra
-                new_base_text = self.execute_after_attack_skill(self_player_info=self_player_info, opponent_alive_attack_info=opponent_alive_attack_info, text_target_profile_exist=text_target_profile_exist, text_own_profile_exist=text_own_profile_exist)
-                if new_base_text != None:
-                    base_text = new_base_text
-            except Exception as e:
-                print(f"Exception when executing after attack skill, {e}")
+        if not flag_action: 
+            #Tính tỉ lệ evasion
+            loss_amount = int(self_player_info.player_ga.attack_power * 0.5)
+            opponent_evasion_chance = self.calculate_chance_by_stats(current_stat=opponent_alive_attack_info.player_ga.stamina, max_stat=opponent_alive_attack_info.player_ga.max_stamina, level=opponent_alive_attack_info.player_ga.level)
+            if opponent_evasion_chance > 85: opponent_evasion_chance = 85
+            evasion_dice = UtilitiesFunctions.get_chance(opponent_evasion_chance)
+            if evasion_dice and opponent_alive_attack_info.player_ga.stamina >= loss_amount: #Phải có đủ thể lực cần thiết mới né được
+                #Chỉ trừ stamina của lower, tỉ lệ thấp hơn, tầm 50% của info.player_ga.attack_power
+                loss_amount = int(self_player_info.player_ga.attack_power * 0.3)
+                opponent_alive_attack_info.player_ga.stamina -= loss_amount
+                if opponent_alive_attack_info.player_ga.stamina <= 0: opponent_alive_attack_info.player_ga.stamina = 0
+                base_text = f"- **[{self_player_info.player_ga.ga_emoji} - {self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã lao đến đánh {opponent_alive_attack_info.player_ga.ga_name} {text_target_profile_exist} nhưng mục tiêu đã kịp né tránh, và chỉ mất **{loss_amount}** thể lực!"
+            else:
+                #trừ máu của lower
+                loss_health = int(self_player_info.player_ga.attack_power + self_player_info.player_ga.attack_power*(self_player_info.player_ga.buff_attack_percent/100))
+                opponent_alive_attack_info.player_ga.health -= loss_health
+                #trừ stamina của lower, tỉ lệ thấp hơn, tầm 25% của info.player_ga.attack_power
+                loss_amount = int(self_player_info.player_ga.attack_power * 0.25)
+                opponent_alive_attack_info.player_ga.stamina -= loss_amount
+                if opponent_alive_attack_info.player_ga.stamina <= 0: opponent_alive_attack_info.player_ga.stamina = 0
+                base_text = f"- **[{self_player_info.player_ga.ga_emoji} - {self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã đánh trúng [{opponent_alive_attack_info.player_ga.ga_emoji} - {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist}! Mục tiêu mất **{loss_health}** Máu và **{loss_amount}** Thể Lực!"
+                try:
+                    #Sau khi attack thì kiểm tra
+                    new_base_text = self.execute_after_attack_skill(self_player_info=self_player_info, opponent_alive_attack_info=opponent_alive_attack_info, text_target_profile_exist=text_target_profile_exist, text_own_profile_exist=text_own_profile_exist)
+                    if new_base_text != None:
+                        base_text = new_base_text
+                except Exception as e:
+                    print(f"Exception when executing after attack skill, {e}")
         
         additional_loss_stats_text = ""
         #Để đảm bảo stats không bị âm        
@@ -938,7 +944,6 @@ class GaBattleView(discord.ui.View):
                     if a.player_profile != None and a.player_profile.user_id == opponent_alive_attack_info.summoner_owner_id:
                         a.has_used_summoning = False
                         break
-                
         
         #Trừ -1 tẩy não khi hết lượt
         if self_player_info.brain_washed_round != None: 
@@ -987,7 +992,6 @@ class GaBattleView(discord.ui.View):
         if opponent_alive_attack_info.player_ga.health > opponent_alive_attack_info.player_ga.max_health: opponent_alive_attack_info.player_ga.health = opponent_alive_attack_info.player_ga.max_health
         if opponent_alive_attack_info.player_ga.mana > opponent_alive_attack_info.player_ga.max_mana: opponent_alive_attack_info.player_ga.mana = opponent_alive_attack_info.player_ga.max_mana
         if opponent_alive_attack_info.player_ga.stamina > opponent_alive_attack_info.player_ga.max_stamina: opponent_alive_attack_info.player_ga.stamina = opponent_alive_attack_info.player_ga.max_stamina
-        
         return base_text
         
     def calculate_chance_by_stats(self, current_stat, max_stat, level, max_percent=90, level_bonus=0.8):
