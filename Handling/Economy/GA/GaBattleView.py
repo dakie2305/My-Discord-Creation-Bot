@@ -365,74 +365,84 @@ class GaBattleView(discord.ui.View):
     
     async def end_battle(self):
         print(f"Username {self.user_profile.user_name} has ended guardian battle in guild {self.user_profile.guild_name}!")
-        # Tính toán kết quả
         self.battle_ended = True
         embed = discord.Embed(title="Tổng Kết Chiến Đấu", color=0xFFD700)
+        # winner, loser
+        winning_class = self.upper_attack_class if self.upper_attack_won else self.lower_attack_class
+        losing_class = self.lower_attack_class if self.upper_attack_won else self.upper_attack_class
+        winner = self.user if self.upper_attack_won else self.target
+        loser = self.target if self.upper_attack_won else self.user
+        is_solo_battle = all(
+            info.player_profile is None or info.player_profile.user_id == self.user.id
+            for info in winning_class + losing_class
+        )
+
+        print(f"is_solo: {is_solo_battle}")
+
         if self.upper_attack_won:
             embed.description = "Phe trên thắng!"
-            # Nếu là challenge thì không có bất kỳ phần thưởng nào hết
-            if not self.is_challenge:
-                embed.add_field(name="", value="▬▬▬ι════>", inline=False)
-                for info in self.upper_attack_class:
-                    additional_stats, reward = self.get_result_addition_stats(info)
-                    if additional_stats.strip() and reward.strip():
-                        embed.add_field(name="", value=additional_stats, inline=False)
-                        embed.add_field(name="", value=reward, inline=False)
-                # Cho phép bên thua một tý EXP
-                for lose_info in self.lower_attack_class:
-                    if lose_info.player_profile != None:
-                        ProfileMongoManager.update_main_guardian_level_progressing(guild_id=self.guild_id, user_id=lose_info.player_profile.user_id)
-                
-            else:
-                #Là thách đấu nên sẽ ghi khác
-                winner = self.user
-                loser = self.target
-                embed.description = f"{EmojiCreation2.SHINY_POINT.value} Hộ Vệ Thần của {winner.mention} đã đánh thắng Hộ Vệ Thần của {loser.mention}!"
-                if self.so_tien != None and self.loai_tien != None:
-                    actual_money = int(self.so_tien * 0.95)
-                    tax_money = self.so_tien - actual_money
-
-                    embed.description = f"{EmojiCreation2.SHINY_POINT.value} {winner.mention} đã nhận được **{actual_money}** {UtilitiesFunctions.get_emoji_from_loai_tien(self.loai_tien)}!"
-                    embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Còn **{tax_money}** {UtilitiesFunctions.get_emoji_from_loai_tien(self.loai_tien)} đã được Chính Quyền thu làm thuế", inline=False)
-
-                    ProfileMongoManager.update_profile_money_by_type(guild_id=self.guild_id, user_id=winner.id, guild_name="", user_display_name=winner.display_name, user_name=winner.name, money=actual_money, money_type=self.loai_tien)
-                    ProfileMongoManager.update_profile_money_by_type(guild_id=self.guild_id, user_id=loser.id, guild_name="", user_display_name=loser.display_name, user_name=loser.name, money=-self.so_tien, money_type=self.loai_tien)
-                    ProfileMongoManager.update_money_authority_by_money_type(guild_id=self.guild_id, money_type=self.loai_tien, money=tax_money)
-
         else:
             embed.description = "Phe dưới thắng!"
-            # Nếu là challenge thì không có bất kỳ phần thưởng nào hết
-            if not self.is_challenge:
-                embed.add_field(name="", value="▬▬▬ι════>", inline=False)
-                for info in self.lower_attack_class:
-                    additional_stats, reward = self.get_result_addition_stats(info)
-                    if additional_stats.strip() and reward.strip():
-                        embed.add_field(name="", value=additional_stats, inline=False)
-                        embed.add_field(name="", value=reward, inline=False)
-                # Cho phép bên thua một tý EXP
-                for lose_info in self.upper_attack_class:
-                    if lose_info.player_profile != None:
-                        ProfileMongoManager.update_main_guardian_level_progressing(guild_id=self.guild_id, user_id=lose_info.player_profile.user_id)
-            else:
-                #Là thách đấu nên sẽ ghi khác
-                winner = self.target
-                loser = self.user
-                embed.description = f"{EmojiCreation2.SHINY_POINT.value} Hộ Vệ Thần của {winner.mention} đã đánh thắng Hộ Vệ Thần của {loser.mention}!"
-                if self.so_tien != None and self.loai_tien != None:
-                    actual_money = int(self.so_tien * 0.95)
-                    tax_money = self.so_tien - actual_money
 
-                    embed.description = f"{EmojiCreation2.SHINY_POINT.value} {winner.mention} đã nhận được **{actual_money}** {UtilitiesFunctions.get_emoji_from_loai_tien(self.loai_tien)}!"
-                    embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Còn **{tax_money}** {UtilitiesFunctions.get_emoji_from_loai_tien(self.loai_tien)} đã được Chính Quyền thu làm thuế", inline=False)
+        # Nếu là challenge thì không có bất kỳ phần thưởng nào hết
+        if not self.is_challenge:
+            embed.add_field(name="", value="▬▬▬ι════>", inline=False)
+            for info in winning_class:
+                additional_stats, reward = self.get_result_addition_stats(info, is_solo_battle)
+                if additional_stats.strip() and reward.strip():
+                    embed.add_field(name="", value=additional_stats, inline=False)
+                    embed.add_field(name="", value=reward, inline=False)
 
-                    ProfileMongoManager.update_profile_money_by_type(guild_id=self.guild_id, user_id=winner.id, guild_name="", user_display_name=winner.display_name, user_name=winner.name, money=actual_money, money_type=self.loai_tien)
-                    ProfileMongoManager.update_profile_money_by_type(guild_id=self.guild_id, user_id=loser.id, guild_name="", user_display_name=loser.display_name, user_name=loser.name, money=-self.so_tien, money_type=self.loai_tien)
-                    ProfileMongoManager.update_money_authority_by_money_type(guild_id=self.guild_id, money_type=self.loai_tien, money=tax_money)
+            # Cho phép bên thua một tý EXP
+            for lose_info in losing_class:
+                if lose_info.player_profile is not None:
+                    ProfileMongoManager.update_main_guardian_level_progressing(
+                        guild_id=self.guild_id, user_id=lose_info.player_profile.user_id
+                    )
+        else:
+            # Là thách đấu nên sẽ ghi khác
+            embed.description = f"{EmojiCreation2.SHINY_POINT.value} Hộ Vệ Thần của {winner.mention} đã đánh thắng Hộ Vệ Thần của {loser.mention}!"
+
+            if self.so_tien is not None and self.loai_tien is not None:
+                actual_money = int(self.so_tien * 0.95)
+                tax_money = self.so_tien - actual_money
+
+                embed.description = f"{EmojiCreation2.SHINY_POINT.value} {winner.mention} đã nhận được **{actual_money}** {UtilitiesFunctions.get_emoji_from_loai_tien(self.loai_tien)}!"
+                embed.add_field(
+                    name="",
+                    value=f"{EmojiCreation2.SHINY_POINT.value} Còn **{tax_money}** {UtilitiesFunctions.get_emoji_from_loai_tien(self.loai_tien)} đã được Chính Quyền thu làm thuế",
+                    inline=False
+                )
+
+                ProfileMongoManager.update_profile_money_by_type(
+                    guild_id=self.guild_id,
+                    user_id=winner.id,
+                    guild_name="",
+                    user_display_name=winner.display_name,
+                    user_name=winner.name,
+                    money=actual_money,
+                    money_type=self.loai_tien
+                )
+                ProfileMongoManager.update_profile_money_by_type(
+                    guild_id=self.guild_id,
+                    user_id=loser.id,
+                    guild_name="",
+                    user_display_name=loser.display_name,
+                    user_name=loser.name,
+                    money=-self.so_tien,
+                    money_type=self.loai_tien
+                )
+                ProfileMongoManager.update_money_authority_by_money_type(
+                    guild_id=self.guild_id,
+                    money_type=self.loai_tien,
+                    money=tax_money
+                )
         try:
             await self.message.reply(embed=embed)
             await self.message.edit(view=None)
         except Exception as e:
             print(e)
+
         #Tăng count, tạo memories cho từng người có info
         for info in self.upper_attack_class:
             if not info.player_profile: continue
@@ -532,11 +542,13 @@ class GaBattleView(discord.ui.View):
     def all_guardians_dead(self, guardians: List['GuardianAngelAttackClass']) -> bool:
         return all(guardian.player_ga.health <= 0 for guardian in guardians)
     
-    def get_result_addition_stats(self, info: GuardianAngelAttackClass):
+    def get_result_addition_stats(self, info: GuardianAngelAttackClass, is_solo = False):
         if info.player_profile == None: return "", ""
         #Nhân theo lượng người tham gia
         bonus_exp = int(self.bonus_exp * len(self.upper_attack_class) + self.bonus_exp*len(self.lower_attack_class))
-        if bonus_exp > 350: bonus_exp = 350
+        if bonus_exp > 350: 
+            bonus_exp = 350
+            if is_solo: bonus_exp = 450
         gold_reward = int(self.gold_reward * len(self.upper_attack_class) + self.bonus_exp*len(self.lower_attack_class))
         if self.minus_all_reward_percent != None:
             gold_reward = gold_reward * self.minus_all_reward_percent / 100
@@ -585,26 +597,25 @@ class GaBattleView(discord.ui.View):
         
         if info.player_profile.user_id == self.user.id and self.is_players_versus_players == False:
             #Chủ party
-            text_reward += f"Thưởng thêm: {self.get_result_additional_reward(info=info)}"
+            text_reward += f"Thưởng thêm: {self.get_result_additional_reward(info=info, is_solo=is_solo)}"
         
         if info.player_ga.is_dead:
             text_reward+= " Hộ Vệ Thần tử nạn. "
         text_reward += "\n"
         return text_target_profile_exist, text_reward
     
-    def get_result_additional_reward(self, info: GuardianAngelAttackClass):
+    def get_result_additional_reward(self, info: GuardianAngelAttackClass, is_solo = False):
         if info.player_profile == None: return ""
         reward_text = ""
         amount = 1
-        
         #point
         roll_dice = UtilitiesFunctions.get_chance(15)
         if roll_dice:
             amount = 1
+            if is_solo: amount = 2
             ProfileMongoManager.set_guardian_stats_points(guild_id=self.guild_id, user_id=info.player_profile.user_id, stats_point=1)
-            reward_text = f"x1 **Điểm Cộng Chỉ Số**"
+            reward_text = f"x{amount} **Điểm Cộng Chỉ Số**"
             return reward_text
-            
         #legendary weapon chance
         roll_dice = UtilitiesFunctions.get_chance(5)
         if self.is_dungeon == True and self.difficulty < 4: roll_dice = False
@@ -616,7 +627,7 @@ class GaBattleView(discord.ui.View):
                 reward_text = f"x1 **[{item.emoji} - {item.item_name}]**"
                 ProfileMongoManager.update_list_items_profile(guild_id=self.guild_id, guild_name="", user_id=info.player_profile.user_id, user_display_name="", user_name="", item=item, amount=1)
                 return reward_text
-            else: 
+            else:
                 item = copy.deepcopy(random.choice(list_legend_weapon_2))
                 item.item_worth_amount = 10
                 reward_text = f"x1 **[{item.emoji} - {item.item_name}]**"
@@ -628,6 +639,7 @@ class GaBattleView(discord.ui.View):
         if self.is_dungeon == True and self.difficulty < 4: roll_dice = False
         if roll_dice:
             amount = random.randint(1, 3)
+            if is_solo: amount * 3
             reward_text = f"**{amount}** {EmojiCreation2.DARKIUM.value}"
             ProfileMongoManager.update_profile_money(guild_id=self.guild_id, guild_name="", user_id=info.player_profile.user_id, user_display_name="", user_name="", darkium=amount)
             return reward_text
@@ -637,6 +649,7 @@ class GaBattleView(discord.ui.View):
         if roll_dice:
             amount = random.randint(1, 5)
             item = random.choice(list_gift_items)
+            if is_solo: amount * 3
             reward_text = f"x{amount} **[{item.emoji} - {item.item_name}]**"
             ProfileMongoManager.update_list_items_profile(guild_id=self.guild_id, guild_name="", user_id=info.player_profile.user_id, user_display_name="", user_name="", item=item, amount=amount)
             return reward_text
@@ -645,6 +658,7 @@ class GaBattleView(discord.ui.View):
         if roll_dice:
             amount = random.randint(1, 3)
             #Roll xem trúng bình nào
+            if is_solo: amount * 3
             item = copy.deepcopy(random.choice(list_support_ga_items))
             roll_dice = UtilitiesFunctions.get_chance(70)
             if self.is_dungeon == True and self.difficulty < 3: roll_dice = True
@@ -658,6 +672,7 @@ class GaBattleView(discord.ui.View):
                 item.item_worth_amount = 1000
             else:
                 amount = 1
+                if is_solo: amount * 2
                 item_id = "ga_all_restored"
                 additional_dice = UtilitiesFunctions.get_chance(35)
                 if additional_dice: item_id = "ga_resurrection"
@@ -674,6 +689,7 @@ class GaBattleView(discord.ui.View):
         roll_dice =UtilitiesFunctions.get_chance(35)
         if roll_dice:
             amount = random.randint(1, 3)
+            if is_solo: amount * 3
             item = random.choice(list_attack_items)
             reward_text = f"x{amount} **[{item.emoji} - {item.item_name}]**"
             ProfileMongoManager.update_list_items_profile(guild_id=self.guild_id, guild_name="", user_id=info.player_profile.user_id, user_display_name="", user_name="", item=item, amount=amount)
@@ -682,12 +698,14 @@ class GaBattleView(discord.ui.View):
         roll_dice =UtilitiesFunctions.get_chance(25)
         if roll_dice:
             amount = random.randint(1, 2)
+            if is_solo: amount * 3
             item = random.choice(list_protection_items)
             reward_text = f"x{amount} **[{item.emoji} - {item.item_name}]**"
             ProfileMongoManager.update_list_items_profile(guild_id=self.guild_id, guild_name="", user_id=info.player_profile.user_id, user_display_name="", user_name="", item=item, amount=amount)
             return reward_text
         #gold
         amount = random.randint(1000, 30000)
+        if is_solo: amount * 3
         reward_text = f"**{amount}** {EmojiCreation2.GOLD.value}"
         ProfileMongoManager.update_profile_money(guild_id=self.guild_id, guild_name="", user_id=info.player_profile.user_id, user_display_name="", user_name="", gold=amount)
         return reward_text
@@ -1004,13 +1022,13 @@ class GaBattleView(discord.ui.View):
             
             #Xem đối thủ có khiên không, có khiên thì coi như self player tấn công thất bại
             shield = self.get_random_skill(list_skills=opponent_alive_attack_info.player_ga.list_skills, skill_id="shield_skill")
-            if shield and opponent_alive_attack_info.max_shield > 0:
+            if shield != None and opponent_alive_attack_info.max_shield > 0 and int(opponent_alive_attack_info.player_ga.mana/opponent_alive_attack_info.player_ga.max_mana*100) > shield.percent_min_mana_req:
                 #Đối thủ có khiên
                 #Trừ stats của self player như bình thường
                 own_loss_mana = self.calculate_mana_loss_for_guardian(max_mana=self_player_info.player_ga.max_mana, skill_mana_loss=skill.mana_loss)
                 self_player_info.player_ga.mana -= own_loss_mana
                 
-                opponent_loss_mana = self.calculate_mana_loss_for_guardian(max_mana=opponent_alive_attack_info.player_ga.max_mana, skill_mana_loss=skill.mana_loss, reference_mana=opponent_alive_attack_info.player_ga.mana)
+                opponent_loss_mana = self.calculate_mana_loss_for_guardian(max_mana=opponent_alive_attack_info.player_ga.max_mana, skill_mana_loss=shield.mana_loss, reference_mana=opponent_alive_attack_info.player_ga.mana)
                 opponent_alive_attack_info.player_ga.mana -= opponent_loss_mana
                 
                 base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã tung chiêu {skill.emoji} - {skill.skill_name} nhưng [{opponent_alive_attack_info.player_ga.ga_emoji} - {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist} đã có khiên chắn! **[{self_player_info.player_ga.ga_name}]** đã mất **{own_loss_mana}** mana và [{opponent_alive_attack_info.player_ga.ga_name}] đã mất **{opponent_loss_mana}** mana!"
@@ -1293,13 +1311,13 @@ class GaBattleView(discord.ui.View):
                 try:
                     #Xem đối thủ có khiên không, có khiên thì coi như tẩy não thất bại
                     shield = self.get_random_skill(list_skills=opponent_alive_attack_info.player_ga.list_skills, skill_id="shield_skill")
-                    if shield and opponent_alive_attack_info.max_shield > 0:
+                    if shield != None and opponent_alive_attack_info.max_shield > 0 and int(opponent_alive_attack_info.player_ga.mana/opponent_alive_attack_info.player_ga.max_mana*100) > shield.percent_min_mana_req:
                         #Đối thủ có khiên
                         #Trừ stats của self player như bình thường
                         own_loss_mana = self.calculate_mana_loss_for_guardian(max_mana=self_player_info.player_ga.max_mana, skill_mana_loss=skill.mana_loss)
                         self_player_info.player_ga.mana -= own_loss_mana
                         
-                        opponent_loss_mana = self.calculate_mana_loss_for_guardian(max_mana=opponent_alive_attack_info.player_ga.max_mana, skill_mana_loss=skill.mana_loss, reference_mana=opponent_alive_attack_info.player_ga.mana)
+                        opponent_loss_mana = self.calculate_mana_loss_for_guardian(max_mana=opponent_alive_attack_info.player_ga.max_mana, skill_mana_loss=shield.mana_loss, reference_mana=opponent_alive_attack_info.player_ga.mana)
                         opponent_alive_attack_info.player_ga.mana -= opponent_loss_mana
                         
                         base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã tung chiêu {skill.emoji} - {skill.skill_name} nhưng [{opponent_alive_attack_info.player_ga.ga_emoji} - {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist} đã có khiên chắn! **[{self_player_info.player_ga.ga_name}]** mất **{own_loss_mana}** mana và [{opponent_alive_attack_info.player_ga.ga_name}] đã mất **{opponent_loss_mana}** mana!"
