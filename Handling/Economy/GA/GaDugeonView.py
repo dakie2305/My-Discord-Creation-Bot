@@ -14,6 +14,7 @@ import asyncio
 from datetime import datetime, timedelta
 from Handling.Misc.SelfDestructView import SelfDestructView
 from Handling.Economy.GA.GaBattleView import GaBattleView
+import re
 
 class GaDugeonView(discord.ui.View):
     def __init__(self, guild_id: int, enemy_ga: GuardianAngel, enemy_ga_2: GuardianAngel = None, title: str = "", bonus_percent: int = None, difficulty: int = 1, footer_text: str = "", channel_name = "Không rõ", is_top_1_server = False, timeout = 200):
@@ -140,7 +141,8 @@ class GaDugeonView(discord.ui.View):
         view.message = mess
         print(f"Username {selected_user.name} has been caught for guardian battle in guild {self.guild_id} at channel {self.message.channel.name}!")
         try:
-            await self.message.channel.send(content=f"{selected_user.mention} quá sơ hở, đã bị kẻ thù {self.enemy_ga.ga_emoji} - **{self.enemy_ga.ga_name}** bắt được!")
+            clean_name = re.sub(r'\s*\(<@!?[0-9]+>\)', '', self.enemy_ga.ga_name)
+            await self.message.channel.send(content=f"{selected_user.mention} quá sơ hở, đã bị kẻ thù {self.enemy_ga.ga_emoji} - **{clean_name}** bắt được!")
             await view.commence_battle()
         except Exception as e:
             print(f"Exception at auto catching user {e}")
