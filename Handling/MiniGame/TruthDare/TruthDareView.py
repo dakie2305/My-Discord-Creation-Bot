@@ -13,10 +13,14 @@ class TruthDareView(discord.ui.View):
         
     async def on_timeout(self):
         #Ẩn nút
-        for item in self.children:
-            if isinstance(item, discord.ui.Button):
-                item.disabled = True
-        await self.message.edit(view=self)
+        try:
+            for item in self.children:
+                if isinstance(item, discord.ui.Button):
+                    item.disabled = True
+            await self.message.edit(view=self)
+        except Exception as e:
+            print(f"Caught exception at Truth Dare View: {e}")
+
         
     @discord.ui.button(label="Sự thật", style=discord.ButtonStyle.primary, custom_id="truth_button")
     async def buttonTruth_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
