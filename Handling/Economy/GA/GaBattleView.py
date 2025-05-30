@@ -376,9 +376,6 @@ class GaBattleView(discord.ui.View):
             info.player_profile is None or info.player_profile.user_id == self.user.id
             for info in winning_class + losing_class
         )
-
-        print(f"is_solo: {is_solo_battle}")
-
         if self.upper_attack_won:
             embed.description = "Phe trên thắng!"
         else:
@@ -565,6 +562,7 @@ class GaBattleView(discord.ui.View):
         contribution = self.calculate_contribution(info.starting_at_round)
         text_target_profile_exist = f"{EmojiCreation2.SHINY_POINT.value} <@{info.player_profile.user_id}> [{info.starting_at_round}] cống hiến **{contribution}%**, nhận: "
         text_reward = ""
+        flag_no_additional_reward = False
         calculated_exp = int(bonus_exp * (contribution / 100))
         if calculated_exp > 0:
             if self.minus_all_reward_percent != None:
@@ -576,6 +574,8 @@ class GaBattleView(discord.ui.View):
                 calculated_exp = 100
                 silver_reward = silver_reward * 0.5
                 gold_reward = gold_reward * 0.5
+                #Không cho phép nhận phần thưởng cộng thêm
+                flag_no_additional_reward = True
             
             text_reward += f"**{calculated_exp}** EXP. "
             ProfileMongoManager.update_level_progressing(guild_id=self.guild_id, user_id=info.player_profile.user_id, bonus_exp=int(calculated_exp*0.3))
@@ -595,7 +595,7 @@ class GaBattleView(discord.ui.View):
             text_reward += f"**{self.dignity_point}** Nhân phẩm. "
             ProfileMongoManager.update_dignity_point(guild_id=self.guild_id, user_id=info.player_profile.user_id, guild_name="",user_display_name="", user_name="", dignity_point=self.dignity_point)
         
-        if info.player_profile.user_id == self.user.id and self.is_players_versus_players == False:
+        if info.player_profile.user_id == self.user.id and self.is_players_versus_players == False and flag_no_additional_reward == False:
             #Chủ party
             text_reward += f"Thưởng thêm: {self.get_result_additional_reward(info=info, is_solo=is_solo)}"
         
