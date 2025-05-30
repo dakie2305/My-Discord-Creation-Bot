@@ -612,7 +612,9 @@ class GaBattleView(discord.ui.View):
         roll_dice = UtilitiesFunctions.get_chance(15)
         if roll_dice:
             amount = 1
-            if is_solo: amount = 2
+            if is_solo: 
+                #roll random 1 2
+                amount = random.randint(1, 2)
             ProfileMongoManager.set_guardian_stats_points(guild_id=self.guild_id, user_id=info.player_profile.user_id, stats_point=1)
             reward_text = f"x{amount} **Điểm Cộng Chỉ Số**"
             return reward_text
