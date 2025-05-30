@@ -295,12 +295,14 @@ class InventoryUseView(discord.ui.View):
         double_enemy_chance = 25
         double_enemy_dice = UtilitiesFunctions.get_chance(double_enemy_chance)
         top_1_leaderboard_dice = UtilitiesFunctions.get_chance(10)
+        is_top_1_server = False
         if top_1_leaderboard_dice:
             #Lấy top 1 của leaderboard ra làm enemy
             enemy = self.get_top_1_ga_leaderboard(guild_id=interaction.guild_id)
             print(f"Top 1 GA leaderboard: {enemy.ga_name} - {enemy.level} at guild {interaction.guild.name}")
             if enemy is None:
                 enemy = ListGAAndSkills.get_random_ga_enemy_generic(level=level, guardian_chance=guardian_chance)
+            else: is_top_1_server = True
             enemy.health = enemy.max_health
             enemy.mana = enemy.max_mana
             enemy.stamina = enemy.max_stamina
@@ -328,7 +330,7 @@ class InventoryUseView(discord.ui.View):
         footer_text = f"Hộ Vệ Thần Huyền Thoại sẽ bắt ngẫu nhiên một người trong channel\nphải giao chiến với kẻ thù!"
         embed.set_footer(text=footer_text)
         print(f"Spawning GA boss by book, base level around {level} at channel {interaction.channel.name} in guild {interaction.guild.name}.")
-        view = GaDugeonView(guild_id=interaction.guild_id, enemy_ga=enemy, enemy_ga_2=enemy_2, title=f"{EmojiCreation2.STUN_SKILL.value} **Hộ Vệ Thần Huyền Thoại** {EmojiCreation2.STUN_SKILL.value}", bonus_percent=bonus_percent, difficulty=4, footer_text=footer_text, channel_name=interaction.channel.name)
+        view = GaDugeonView(guild_id=interaction.guild_id, enemy_ga=enemy, enemy_ga_2=enemy_2, title=f"{EmojiCreation2.STUN_SKILL.value} **Hộ Vệ Thần Huyền Thoại** {EmojiCreation2.STUN_SKILL.value}", bonus_percent=bonus_percent, difficulty=4, footer_text=footer_text, channel_name=interaction.channel.name, is_top_1_server=is_top_1_server)
         m = await interaction.channel.send(embed=embed, view=view)
         view.message = m
         await view.catch_random_player_profile()

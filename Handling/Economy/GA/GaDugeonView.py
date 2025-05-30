@@ -16,7 +16,7 @@ from Handling.Misc.SelfDestructView import SelfDestructView
 from Handling.Economy.GA.GaBattleView import GaBattleView
 
 class GaDugeonView(discord.ui.View):
-    def __init__(self, guild_id: int, enemy_ga: GuardianAngel, enemy_ga_2: GuardianAngel = None, title: str = "", bonus_percent: int = None, difficulty: int = 1, footer_text: str = "", channel_name = "Không rõ",  timeout = 200):
+    def __init__(self, guild_id: int, enemy_ga: GuardianAngel, enemy_ga_2: GuardianAngel = None, title: str = "", bonus_percent: int = None, difficulty: int = 1, footer_text: str = "", channel_name = "Không rõ", is_top_1_server = False, timeout = 200):
         super().__init__(timeout=timeout)
         self.message : discord.Message = None
         self.is_attacked = False
@@ -28,6 +28,7 @@ class GaDugeonView(discord.ui.View):
         self.difficulty = difficulty
         self.footer_text = footer_text
         self.channel_name = channel_name
+        self.is_top_1_server = is_top_1_server
         self.battle_button = discord.ui.Button(label="⚔️ Chiến Đấu", style=discord.ButtonStyle.primary)
         self.battle_button.callback = self.battle_button_event
         self.add_item(self.battle_button)
@@ -81,7 +82,8 @@ class GaDugeonView(discord.ui.View):
             
         await interaction.followup.send(content=f"Bạn đã tham chiến!", ephemeral=True)
         self.is_attacked = True
-        if self.difficulty >= 3:
+        #Top 1 server không cần phải re-roll lại stats
+        if self.difficulty >= 3 and not self.is_top_1_server:
             #Nếu self.difficulty trên 3 thì roll lại kẻ địch theo stats của player ga nếu player ga trên cấp 80 hoặc enemy thấp cấp hơn
             #Thì scale theo level của player
             scale_level = new_player_profile.guardian.level + 10
