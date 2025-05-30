@@ -1082,14 +1082,14 @@ def get_random_ga_enemy_generic(level: int = 1, guardian_chance: int = 0, overri
         ga_id = "enemy_generic",
         ga_name= "",
         ga_emoji= "",
-        stamina = 80,
-        max_stamina= 80,
+        stamina = 100,
+        max_stamina= 100,
         health= 120,
         max_health= 120,
-        mana= 90,
-        max_mana= 90,
+        mana= 100,
+        max_mana= 100,
         buff_attack_percent = 0,
-        attack_power= 15,
+        attack_power= 25,
         worth_amount = 50, 
         worth_type = "D",
     )
@@ -1148,12 +1148,16 @@ def get_random_ga_enemy_generic(level: int = 1, guardian_chance: int = 0, overri
         random_level_bonus = random.randint(4, 6)
     elif level >= 75 and level < 85:
         random_level_bonus = random.randint(3, 7)
+    elif level >= 85 and level < 100:
+        random_level_bonus = random.randint(4, 8)
+    elif level >= 100 and level < 150:
+        random_level_bonus = random.randint(5, 7)
     else:
-        random_level_bonus = random.randint(3, 12)
+        random_level_bonus = random.randint(4, 20)
     
     data.level = level + random_level_bonus
     if data.level <= 0: data.level = 1
-    percent_boost = 5
+    percent_boost = 6
     base = 20
     bonus_base = 30
     data.attack_power = base + bonus_base*int(percent_boost * data.level / 100) #tăng 5% mỗi level
