@@ -65,6 +65,7 @@ class WordMiniGameCog(commands.Cog):
             #Đã tồn tại thì xoá đi
             embed = discord.Embed(title=f"{EmojiCreation1.EXCLAIM_MARK.value} Xoá Nối Từ {lan_label} {EmojiCreation1.EXCLAIM_MARK.value}", description=f"",color=discord.Color.red())
             embed.add_field(name=f"", value="▬▬▬▬▬▬ι═══════════>", inline=False)
+            embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} {interaction.user.mention} đây đang là kênh để chơi Nối Từ.", inline=False)
             embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} {interaction.user.mention} Bạn sắp sửa xoá trò chơi Nối Từ {lan_label} của channel <#{interaction.channel.id}>.", inline=False)
             embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Bạn có chắc không? Nếu thực sự chắc chắn thì ấn vào nút bên dưới.", inline=False)
             view = MwConfirmDeleteView(user=interaction.user, channel_id=interaction.channel_id, lan=lan)
@@ -97,8 +98,8 @@ class WordMiniGameCog(commands.Cog):
             embed = discord.Embed(title=f"{EmojiCreation1.CHECK.value} Nối Từ {lan_label}", description=f"",color=discord.Color.blue())
             embed.add_field(name=f"", value="▬▬▬▬▬▬ι═══════════>", inline=False)
             embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Nối Từ Tiếng Việt có hai loại đặc biệt: **Nối Theo Từ Cuối** hoặc **Nối Theo Âm Cuối**.", inline=False)
-            embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Ví dụ khi chọn Nối Theo Từ Cuối: \"anh trai\" => \"trai làng\" =>  \"làng quê\"", inline=False)
-            embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Ví dụ khi chọn Nối Theo Âm Cuối: \"anh trai\" => \"im lặng\" =>  \"gay cấn\"", inline=False)
+            embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Ví dụ khi chọn **Nối Theo Từ Cuối**:\n `anh trai`  ->  `trai làng`  ->   `làng quê`", inline=False)
+            embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Ví dụ khi chọn **Nối Theo Âm Cuối**:\n `anh trai`  ->  `im lặng`  ->   `gay cấn`", inline=False)
             embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Vui lòng chọn thể loại hình thức bạn muốn.", inline=False)
             embed.add_field(name=f"", value="▬▬▬▬▬▬ι═══════════>", inline=False)
             view = MwChooseVietnamType(user=interaction.user)
@@ -135,6 +136,7 @@ class WordMiniGameCog(commands.Cog):
             #Đã tồn tại thì xoá đi
             embed = discord.Embed(title=f"{EmojiCreation1.EXCLAIM_MARK.value} Xoá Đoán Từ {lan_label} {EmojiCreation1.EXCLAIM_MARK.value}", description=f"",color=discord.Color.red())
             embed.add_field(name=f"", value="▬▬▬▬▬▬ι═══════════>", inline=False)
+            embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} {interaction.user.mention} đây đang là kênh để chơi Đoán Từ {lan_label}.", inline=False)
             embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} {interaction.user.mention} Bạn sắp sửa xoá trò chơi Đoán Từ {lan_label} của channel <#{interaction.channel.id}>.", inline=False)
             embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Bạn có chắc không? Nếu thực sự chắc chắn thì ấn vào nút bên dưới.", inline=False)
             view = SwConfirmDeleteView(user=interaction.user, channel_id=interaction.channel_id, lan=lan)
@@ -158,13 +160,15 @@ class WordMiniGameCog(commands.Cog):
         embed = discord.Embed(title=f"{EmojiCreation1.CHECK.value} Đoán Từ {lan_label}", description=f"",color=discord.Color.blue())
         embed.add_field(name=f"", value="▬▬▬▬▬▬ι═══════════>", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} {interaction.user.mention} đã chọn kênh này làm kênh đoán từ.", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Hướng dẫn chơi Tiếng Anh:\n `ih` -> `hi`, `ytr` -> `try`", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Hướng dẫn chơi Tiếng Việt:\n `han rtai` -> `anh trai`, `me rait` -> `em trai`", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Đoán từ hiện tại:", inline=False)
         embed.add_field(name=f"{data.unsorted_word}", value=f"", inline=False)
         mess = await interaction.followup.send(embed=embed)
         return
 
         
-    @start_match_word_slash_command.error
+    @start_sort_word_slash_command.error
     async def start_sort_word_slash_command(self, interaction: discord.Interaction, error):
         if isinstance(error, discord.app_commands.CommandOnCooldown):
             await interaction.response.send_message(f"⏳ Lệnh đang cooldown, vui lòng thực hiện lại trong vòng {error.retry_after:.2f}s tới.", ephemeral=True)

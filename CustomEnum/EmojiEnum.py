@@ -273,5 +273,5 @@ class EmojiCreation1(Enum):
     QUESTION_MARK = "<a:question_mark:1378264679335333968>"
     EXCLAIM_MARK = "<a:exclaim:1378264904817184798>"
     CHECK = "<a:check:1378265379419193354>"
-    CROSS = "<a:cross:1378265390110474362>"
+    CROSS = "<a:x_cross_red:1378265390110474362>"
     TRUE_HEAVEN_LINK_MINI = "https://cdn.discordapp.com/emojis/1307360190353375336.webp?size=96"
