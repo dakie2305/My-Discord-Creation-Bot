@@ -1384,12 +1384,12 @@ async def clear_up_data_task():
                 if snipe_channel.snipe_messages != None and len(snipe_channel.snipe_messages) > 0:
                     #Xóa bớt message
                     snipe_messages = snipe_channel.snipe_messages
-                    for deleted_mess in snipe_messages:
-                        date_deleted = deleted_mess.deleted_date
-                        overdue_date = date_deleted + timedelta(weeks=2)
-                        if datetime.now() > overdue_date:
-                            snipe_messages.remove(deleted_mess)
-                            count+=1
+                    filtered_messages = [
+                        msg for msg in snipe_messages 
+                        if datetime.now() <= msg.deleted_date + timedelta(weeks=2)
+                    ]
+                    count += len(snipe_messages) - len(filtered_messages)
+                    snipe_messages = filtered_messages
                     db.replace_snipe_message_info(guild_id=guild.id, channel_id=snipe_channel.channel_id, snipe_messages=snipe_messages)
                 else:
                     #Xóa channel
