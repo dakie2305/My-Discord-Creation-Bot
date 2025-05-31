@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List, Optional
 #region SortWordInfo
 class SortWordInfo:
-    def __init__(self, channel_id: int, channel_name: str, current_player_id: int = None, current_player_name: str = None, unsorted_word: str = None, current_word: str = None, special_point: int = None, special_item: Optional['SwSpecialItem'] = None, used_words: List[str] = None, special_case: bool = False, player_profiles: Optional[List['SwPlayerProfile']] = None, player_effects : Optional[List['SwPlayerEffect']] = None, current_round: int = 0, guild_name: str = None):
+    def __init__(self, channel_id: int, channel_name: str, current_player_id: int = None, current_player_name: str = None, unsorted_word: str = None, current_word: str = None, special_point: int = None, special_item: Optional['SwSpecialItem'] = None, used_words: List[str] = None, special_case: bool = False, player_profiles: Optional[List['SwPlayerProfile']] = None, player_effects : Optional[List['SwPlayerEffect']] = None, current_round: int = 0, guild_name: str = None, last_played: datetime = datetime.now()):
         self.channel_id = channel_id
         self.channel_name = channel_name
         self.guild_name = guild_name
@@ -14,7 +14,7 @@ class SortWordInfo:
         self.special_item = special_item if special_item else None
         self.special_case = special_case
         self.current_round = current_round
-        self.last_played = datetime.now()
+        self.last_played = last_played
         self.used_words: List[str] = used_words if used_words else []
         self.player_profiles: List[SwPlayerProfile] = player_profiles if player_profiles else []
         self.player_effects: List[SwPlayerEffect] = player_effects if player_effects else []
@@ -51,7 +51,7 @@ class SortWordInfo:
             special_point=data.get("special_point", None),
             special_case=data.get("special_case", False),
             current_round=data.get("current_round", 0),
-            last_played=data.get("last_played", datetime.now()),
+            last_played=data.get("last_played", None),
             special_item = SwSpecialItem.from_dict(data.get("special_item", None)) if data.get("special_item") else None,
             player_profiles = [SwPlayerProfile.from_dict(item) for item in data.get("player_profiles", [])],
             player_effects = [SwPlayerEffect.from_dict(item) for item in data.get("player_effects", [])],
