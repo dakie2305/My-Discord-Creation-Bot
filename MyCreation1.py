@@ -906,10 +906,15 @@ async def say(interaction: discord.Interaction, thing_to_say : str, image: Optio
 async def first_command(interaction: discord.Interaction, user : discord.Member, duration: int, time_format : str, reason : str):
     await interaction.response.defer(ephemeral=True)  # Defer the interaction early
     req_roles = ['Cai Ngục', 'Supervisor', 'Server Master', 'Moderator']
+    jailed_roles = ['Đáy Xã Hội']
     jail_db = "jailed_user"
     has_required_role = any(role.name in req_roles for role in interaction.user.roles)
     if not has_required_role:
         await interaction.followup.send("Không đủ thẩm quyền để tống giam.")
+        return
+    has_jailed_role = any(role.name in jailed_roles for role in interaction.user.roles)
+    if has_jailed_role:
+        await interaction.followup.send("Người này đã bị tống giam rồi.")
         return
     if time_format not in ['second', 'minute', 'hour', 'day', 'month']:
         await interaction.followup.send("Sai định dạng thời gian. Chỉ dùng những từ sau: second, minute, hour, day, month.", ephemeral=True)
