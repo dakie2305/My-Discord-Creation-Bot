@@ -2,7 +2,7 @@ from datetime import date, datetime
 from typing import List, Optional
 #region MatchWordInfo
 class MatchWordInfo:
-    def __init__(self, channel_id: int, channel_name: str, guild_name: str, current_player_id: int = None, current_player_name: str = None, current_word: str = None, special_point: int = None, used_words: List[str] = None, current_round: int = 0, special_case = False, type: str = "A", player_profiles: Optional[List['PlayerProfile']] = None, player_effects : Optional[List['PlayerEffect']] = None, player_penalty : Optional[List['PlayerPenalty']] = None,):
+    def __init__(self, channel_id: int, channel_name: str, guild_name: str, current_player_id: int = None, current_player_name: str = None, current_word: str = None, special_point: int = None, used_words: List[str] = None, current_round: int = 0, special_case = False, type: str = "A", player_profiles: Optional[List['PlayerProfile']] = None, player_effects : Optional[List['PlayerEffect']] = None, player_penalty : Optional[List['PlayerPenalty']] = None, last_played = datetime.now()):
         self.channel_id = channel_id
         self.channel_name = channel_name
         self.guild_name = guild_name
@@ -13,7 +13,7 @@ class MatchWordInfo:
         self.current_round = current_round
         self.special_case = special_case
         self.type = type
-        self.last_played = datetime.now()
+        self.last_played = last_played
         self.used_words: List[str] = used_words if used_words else []
         self.player_profiles: List[PlayerProfile] = player_profiles if player_profiles else []
         self.player_effects: List[PlayerEffect] = player_effects if player_effects else []

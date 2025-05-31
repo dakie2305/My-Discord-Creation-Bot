@@ -56,7 +56,7 @@ class MwConfirmRestartView(discord.ui.View):
             data = MwClass.MatchWordInfo(channel_id=interaction.channel_id, channel_name=interaction.channel.name, guild_name=interaction.guild.name, current_word="anh", special_case=is_special, type=self.info.type)
             embed = discord.Embed(title=f"{EmojiCreation1.CHECK.value} Nối Từ {lan_label}", description=f"Thể Loại: **{type_label}**",color=discord.Color.blue())
             embed.add_field(name=f"", value="▬▬▬▬▬▬ι═══════════>", inline=False)
-            embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} {interaction.user.mention} đã resrat kênh nối từ.", inline=False)
+            embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} {interaction.user.mention} đã restart kênh nối từ.", inline=False)
             embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Từ hiện tại:", inline=False)
             embed.add_field(name=f"{data.current_word}", value=f"", inline=False)
             channel = interaction.channel
