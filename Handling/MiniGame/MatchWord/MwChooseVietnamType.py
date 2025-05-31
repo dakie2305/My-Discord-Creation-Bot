@@ -40,4 +40,8 @@ class MwChooseVietnamType(discord.ui.View):
         embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Từ hiện tại:", inline=False)
         embed.add_field(name=f"{data.current_word}", value=f"", inline=False)
         await interaction.followup.send(embed=embed)
+        try:
+            await self.message.delete()
+        except Exception:
+            pass
         return

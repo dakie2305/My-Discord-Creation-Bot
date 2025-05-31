@@ -42,7 +42,7 @@ class MwHandlingFunction():
             text+= " <@315835396305059840> sẽ trao role đặc biệt cho những Player thuộc top 3 nhé!"
         await message.channel.send(content=text, embed=embed)
         #Xoá đi tạo lại
-        
+        MwMongoManager.delete_data_info(channel_id=message.channel.id, guild_id=message.guild.id, lang=language)
         lan_label = "Tiếng Anh" if language == "en" else "Tiếng Việt"
         #Nếu là tiếng anh thì cứ tạo bình thường
         if language == "en":

@@ -51,7 +51,7 @@ def update_data_info(channel_id: int, guild_id: int, current_player_id: int, cur
     
     #Nếu là special case thì correct_start_word luôn là bằng current word
     if special_case:
-        correct_start_word = current_word
+        correct_start_word = current_word.strip().split()[-1].lower()
     else:
         #Không thì sẽ lấy từ cuối
         correct_start_word = current_word[-1]
