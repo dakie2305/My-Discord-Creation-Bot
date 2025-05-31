@@ -10,9 +10,11 @@ from CustomEnum.TrueHeavenEnum import TrueHeavenEnum
 import CustomFunctions
 from Handling.MiniGame.MatchWord.MwChooseVietnamType import MwChooseVietnamType
 from Handling.MiniGame.MatchWord.MwConfirmDeleteView import MwConfirmDeleteView
+from Handling.MiniGame.MatchWord.MwConfirmRestartView import MwConfirmRestartView
 from Handling.MiniGame.SortWord import SwClass, SwHandling, SwMongoManager, SwView
 from Handling.MiniGame.MatchWord import MwClass, MwMongoManager
 from Handling.MiniGame.SortWord.SwConfirmDeleteView import SwConfirmDeleteView
+from Handling.MiniGame.SortWord.SwConfirmRestartView import SwConfirmRestartView
 from Handling.Misc.SelfDestructView import SelfDestructView
 
 async def setup(bot: commands.Bot):
@@ -22,7 +24,6 @@ async def setup(bot: commands.Bot):
 class WordMiniGameCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-
 
     def check_if_message_inside_sw_game(self, guild_id: int = None, channel_id: int = None):
         langs = ['en', 'vn']
@@ -82,7 +83,6 @@ class WordMiniGameCog(commands.Cog):
             return
         #Tạo mới nối từ
         lan_label = "Tiếng Anh" if language == "en" else "Tiếng Việt"
-
         #Nếu là tiếng anh thì cứ tạo bình thường
         if language == "en":
             data = MwClass.MatchWordInfo(channel_id=interaction.channel_id, channel_name=interaction.channel.name, guild_name=interaction.guild.name, current_word="hello", special_case=False)
@@ -104,6 +104,7 @@ class WordMiniGameCog(commands.Cog):
             embed.add_field(name=f"", value="▬▬▬▬▬▬ι═══════════>", inline=False)
             view = MwChooseVietnamType(user=interaction.user)
             mess = await interaction.followup.send(embed=embed, view=view)
+            view.message = mess
             return
     @start_match_word_slash_command.error
     async def start_match_word_slash_command_error(self, interaction: discord.Interaction, error):
@@ -175,3 +176,84 @@ class WordMiniGameCog(commands.Cog):
         else:
             await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
     
+
+    restart = discord.app_commands.Group(name="restart", description="Các lệnh liên quan đến Mini Game Từ Vựng!")
+    #region start match_word slash
+    @restart.command(name="match_word", description="Restart trò chơi Nối Từ trong channel hiện tại!")
+    @discord.app_commands.checks.cooldown(1, 30)
+    async def restart_match_word_slash_command(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=False)
+        #Không cho dùng bot nếu không phải user
+        if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
+        #Kiểm tra xem tồn tại mini game nối từ hay đoán từ chưa
+        info, lan = self.check_if_message_inside_mw_game(guild_id=interaction.guild_id, channel_id=interaction.channel_id)
+        if info is None:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title="",description=f"{EmojiCreation1.CROSS.value} Đây là lệnh dùng để restart Nối Từ, chỉ dùng trong kênh Nối Từ!",color=discord.Color.red())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
+        lan_label = "Tiếng Anh" if lan == "en" else "Tiếng Việt"
+        #Đã tồn tại thì xoá đi
+        embed = discord.Embed(title=f"{EmojiCreation1.EXCLAIM_MARK.value} Restart Nối Từ {lan_label} {EmojiCreation1.EXCLAIM_MARK.value}", description=f"",color=discord.Color.red())
+        embed.add_field(name=f"", value="▬▬▬▬▬▬ι═══════════>", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} {interaction.user.mention} đây đang là kênh để chơi Nối Từ.", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} {interaction.user.mention} Bạn sắp sửa restart lại Nối Từ {lan_label} của channel <#{interaction.channel.id}>.", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Bạn có chắc không? Nếu thực sự chắc chắn thì ấn vào nút bên dưới.", inline=False)
+        view = MwConfirmRestartView(user=interaction.user, channel_id=interaction.channel_id, lan=lan, info = info)
+        mess = await interaction.followup.send(embed=embed, view=view)
+        view.message = mess
+        return
+
+        
+    @restart_match_word_slash_command.error
+    async def restart_match_word_slash_command_error(self, interaction: discord.Interaction, error):
+        if isinstance(error, discord.app_commands.CommandOnCooldown):
+            await interaction.response.send_message(f"⏳ Lệnh đang cooldown, vui lòng thực hiện lại trong vòng {error.retry_after:.2f}s tới.", ephemeral=True)
+        else:
+            await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
+    
+    #region start match_word slash
+    @restart.command(name="sort_word", description="Restart trò chơi Đoán Từ trong channel hiện tại!")
+    @discord.app_commands.checks.cooldown(1, 30)
+    async def restart_sort_word_slash_command(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=False)
+        #Không cho dùng bot nếu không phải user
+        if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
+        
+        #Kiểm tra xem tồn tại mini game nối từ hay đoán từ chưa
+        info, lan = self.check_if_message_inside_sw_game(guild_id=interaction.guild_id, channel_id=interaction.channel_id)
+        if info is None:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title="",description=f"{EmojiCreation1.CROSS.value} Đây là lệnh dùng để restart Đoán Từ, chỉ dùng trong kênh Đoán Từ!",color=discord.Color.red())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
+        lan_label = "Tiếng Anh" if lan == "en" else "Tiếng Việt"
+        #Đã tồn tại thì xoá đi
+        embed = discord.Embed(title=f"{EmojiCreation1.EXCLAIM_MARK.value} Restart Đoán Từ {lan_label} {EmojiCreation1.EXCLAIM_MARK.value}", description=f"",color=discord.Color.red())
+        embed.add_field(name=f"", value="▬▬▬▬▬▬ι═══════════>", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} {interaction.user.mention} đây đang là kênh để chơi Đoán Từ.", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} {interaction.user.mention} Bạn sắp sửa restart lại Đoán Từ {lan_label} của channel <#{interaction.channel.id}>.", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Bạn có chắc không? Nếu thực sự chắc chắn thì ấn vào nút bên dưới.", inline=False)
+        view = SwConfirmRestartView(user=interaction.user, channel_id=interaction.channel_id, lan=lan, info = info)
+        mess = await interaction.followup.send(embed=embed, view=view)
+        view.message = mess
+        return
+
+    @restart_sort_word_slash_command.error
+    async def restart_sort_word_slash_command_error(self, interaction: discord.Interaction, error):
+        if isinstance(error, discord.app_commands.CommandOnCooldown):
+            await interaction.response.send_message(f"⏳ Lệnh đang cooldown, vui lòng thực hiện lại trong vòng {error.retry_after:.2f}s tới.", ephemeral=True)
+        else:
+            await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
