@@ -2,7 +2,7 @@ import os
 from typing import List
 from pymongo import MongoClient
 from datetime import datetime, timedelta
-from Handling.MiniGame.SortWord.SwClass import SortWordInfo, SwPlayerProfile, SwSpecialItem, SwPlayerBan, SwPlayerEffect
+from Handling.MiniGame.SortWord.SwClass import SortWordInfo, SwPlayerProfile, SwSpecialItem, PlayerPenalty, SwPlayerEffect
 import random
 import string
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
@@ -260,43 +260,33 @@ def update_player_effects(channel_id: int, guild_id: int, language: str,user_id:
                                                                          }})
     return result
 
-def create_and_update_player_bans(channel_id: int, guild_id: int, language: str,user_id: int,user_name: str, ban_remaining: int):
+def create_and_update_player_penalty(channel_id: int, guild_id: int, language: str,user_id: int, user_name: str, penalty_point = 1):
     """
     Cập nhật lại danh sách Player Bans của world matching info cụ thể.
     """
     collection = db_specific[f'{language}_sw_guild_{guild_id}']
     existing_data = collection.find_one({"channel_id": channel_id})
     existing_info = SortWordInfo.from_dict(existing_data)
-    list_player_ban = existing_info.player_bans
+    list_penalty = existing_info.player_penalty
     #Tìm xem có user_id trong list player_ban chưa
-    selected_player: SwPlayerBan = None
-    for player in list_player_ban:
+    selected_player: PlayerPenalty = None
+    for player in list_penalty:
         if player.user_id == user_id:
             selected_player = player
-            player.ban_remaining = ban_remaining
+            player.penalty_point += penalty_point
             break
     if selected_player == None:
         #Tạo mới player ban và thêm vào world matching
-        new_player = SwPlayerBan(user_id=user_id, user_name=user_name, ban_remaining=ban_remaining)
-        list_player_ban.append(new_player)
-    elif selected_player.ban_remaining <= 0:
-        list_player_ban.remove(selected_player)
-    result = collection.update_one({"channel_id": channel_id}, {"$set": {"player_bans": [player.to_dict() for player in list_player_ban],
+        new_player = PlayerPenalty(user_id=user_id, user_name=user_name, timestamp=datetime.now(), penalty_point=penalty_point)
+        list_penalty.append(new_player)
+    elif selected_player.penalty_point <= 0:
+        list_penalty.remove(selected_player)
+    result = collection.update_one({"channel_id": channel_id}, {"$set": {"player_penalty": [player.to_dict() for player in list_penalty],
                                                                          }})
     return result
     
-def reduce_player_bans_after_round(channel_id: int, guild_id: int, language: str):
-    """
-    Trừ 1 điểm ban_remaining của tất cả dữ liệu trong danh sách Player Ban cụ thể sau mỗi lượt chơi thành công.
-    """
+def remove_player_penalty_after_round(channel_id: int, guild_id: int, language: str):
     collection = db_specific[f'{language}_sw_guild_{guild_id}']
-    existing_data = collection.find_one({"channel_id": channel_id})
-    existing_info = SortWordInfo.from_dict(existing_data)
-    list_player_ban = existing_info.player_bans
-    if list_player_ban != None and len(list_player_ban) > 0:
-        for player in list_player_ban:
-            player.ban_remaining += -1
-        new_list_remove_0 = [item for item in list_player_ban if item.ban_remaining > 0]    
-        result = collection.update_one({"channel_id": channel_id}, {"$set": {"player_bans": [player.to_dict() for player in new_list_remove_0],
+    result = collection.update_one({"channel_id": channel_id}, {"$set": {"player_penalty": [],
                                                                             }})
-        return result
+    return result

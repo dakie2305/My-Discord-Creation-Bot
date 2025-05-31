@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List, Optional
 #region SortWordInfo
 class SortWordInfo:
-    def __init__(self, channel_id: int, channel_name: str, current_player_id: int = None, current_player_name: str = None, unsorted_word: str = None, current_word: str = None, special_point: int = None, special_item: Optional['SwSpecialItem'] = None, used_words: List[str] = None, special_case: bool = False, player_profiles: Optional[List['SwPlayerProfile']] = None, player_effects : Optional[List['SwPlayerEffect']] = None, current_round: int = 0, guild_name: str = None, last_played: datetime = datetime.now()):
+    def __init__(self, channel_id: int, channel_name: str, current_player_id: int = None, current_player_name: str = None, unsorted_word: str = None, current_word: str = None, special_point: int = None, special_item: Optional['SwSpecialItem'] = None, used_words: List[str] = None, special_case: bool = False, player_profiles: Optional[List['SwPlayerProfile']] = None, player_effects : Optional[List['SwPlayerEffect']] = None, player_penalty : Optional[List['PlayerPenalty']] = None, current_round: int = 0, guild_name: str = None, last_played: datetime = datetime.now()):
         self.channel_id = channel_id
         self.channel_name = channel_name
         self.guild_name = guild_name
@@ -18,7 +18,8 @@ class SortWordInfo:
         self.used_words: List[str] = used_words if used_words else []
         self.player_profiles: List[SwPlayerProfile] = player_profiles if player_profiles else []
         self.player_effects: List[SwPlayerEffect] = player_effects if player_effects else []
-    
+        self.player_penalty: List[PlayerPenalty] = player_penalty if player_penalty else []
+        
     def to_dict(self):
         return {
             "channel_id": self.channel_id,
@@ -36,6 +37,7 @@ class SortWordInfo:
             "used_words": [data for data in self.used_words],
             "player_profiles": [data.to_dict() for data in self.player_profiles],
             "player_effects": [data.to_dict() for data in self.player_effects],
+            "player_penalty": [data.to_dict() for data in self.player_penalty],
         }
 
     @staticmethod
@@ -55,6 +57,7 @@ class SortWordInfo:
             special_item = SwSpecialItem.from_dict(data.get("special_item", None)) if data.get("special_item") else None,
             player_profiles = [SwPlayerProfile.from_dict(item) for item in data.get("player_profiles", [])],
             player_effects = [SwPlayerEffect.from_dict(item) for item in data.get("player_effects", [])],
+            player_penalty = [PlayerPenalty.from_dict(item) for item in data.get("player_penalty", [])],
             used_words = [item for item in data.get("used_words", [])],
         )
 
@@ -151,26 +154,29 @@ class SwPlayerEffect:
 
 
 #region Player Ban
-class SwPlayerBan:
-    def __init__(self, user_id: int, user_name: str, ban_remaining: int):
+class PlayerPenalty:
+    def __init__(self, user_id: int, username: str, timestamp: datetime = datetime.now(), penalty_point: int = 0):
         self.user_id = user_id 
-        self.user_name = user_name
-        self.ban_remaining = ban_remaining
+        self.username = username
+        self.timestamp = timestamp
+        self.penalty_point = penalty_point
     def to_dict(self):
         return {
             "user_id": self.user_id,
-            "user_name": self.user_name,
-            "ban_remaining": self.ban_remaining,
+            "username": self.username,
+            "timestamp": self.timestamp,
+            "penalty_point": self.penalty_point,
         }
         
     @staticmethod
     def from_dict(data:dict):
-        return SwPlayerBan(
+        return PlayerPenalty(
             user_id=data.get("user_id", None),
-            user_name=data.get("user_name", None),
-            ban_remaining = data.get("ban_remaining", 0),
+            username=data.get("username", None),
+            timestamp = data.get("timestamp", None),
+            penalty_point = data.get("timestamp", 0),
         )
-        
+
 list_special_items_cap_thap = [
     SwSpecialItem(
         item_id="t-",

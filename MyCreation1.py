@@ -1706,7 +1706,7 @@ async def on_message(message: discord.Message):
     if message.author == bot.user:
         return
     speakFlag= True
-    sort_word_game = SwHandling.SwHandlingFunction(message= message, message_tracker=message_tracker)
+    sort_word_game = SwHandling.SwHandlingFunction(message= message)
     sw_info, lan = await sort_word_game.check_if_message_inside_game(source=message)
     if sw_info != None:
         #Xử lý nối từ

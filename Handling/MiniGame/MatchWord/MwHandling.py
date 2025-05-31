@@ -1,17 +1,17 @@
 import discord
+from typing import List, Optional
 import random
-from CustomEnum.EmojiEnum import EmojiCreation1
 from CustomEnum.TrueHeavenEnum import TrueHeavenEnum
-import Handling.MiniGame.SortWord.SwMongoManager as SwMongoManager
-import Handling.MiniGame.SortWord.SwClass
+from Handling.MiniGame.MatchWord import MwMongoManager, MwClass
 from Handling.MiniGame.SortWord.SwClass import SortWordInfo
 import CustomFunctions
 import string
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 
-class SwHandlingFunction():
-    def __init__ (self, message: discord.Message):
+class MwHandlingFunction():
+    def __init__ (self, message: discord.Message, message_tracker):
         self.message = message
+        self.message_tracker = message_tracker
         self.english_words_dictionary = CustomFunctions.english_dict
         self.vietnamese_dict = CustomFunctions.vietnamese_dict
         
@@ -19,7 +19,7 @@ class SwHandlingFunction():
         if source == None: return None, None
         langs = ['en', 'vn']
         for lan in langs:
-            check = SwMongoManager.find_sort_word_info_by_id(lang=lan, guild_id=source.guild.id, channel_id= source.channel.id)
+            check = MwMongoManager.find_match_word_info_by_id(lang=lan, guild_id=source.guild.id, channel_id= source.channel.id)
             if check!=None:
                 return check, lan
         return None, None
@@ -48,63 +48,33 @@ class SwHandlingFunction():
         return start_count
     
     async def process_reset(self, message: discord.Message, sw_info: SortWordInfo, language: str):
-        embed = discord.Embed(title=f"Xếp hạng các player theo điểm.", description=f"Game Đoán Từ", color=0x03F8FC)
-        embed.add_field(name=f"", value=f"Lượt chơi thứ: {sw_info.current_round}/1200", inline=False)
+        embed = discord.Embed(title=f"Xếp hạng các player theo điểm.", description=f"Game Nối Từ", color=0x03F8FC)
         embed.add_field(name=f"", value="___________________", inline=False)
+        embed.add_field(name=f"", value=f"Round hiện tại: {sw_info.current_round}", inline=False)
         count = 0
         if sw_info.player_profiles:
             sw_info.player_profiles.sort(key=lambda x: x.point, reverse=True)
             for index, profile in enumerate(sw_info.player_profiles):
-                if (profile.point!= 0 or len(profile.special_items)> 0):
-                    embed.add_field(name=f"", value=f"**Hạng {index+1}.** <@{profile.user_id}>. Tổng điểm: **{profile.point}**. Số lượng kỹ năng đặc biệt: **{len(profile.special_items)}**.", inline=False)
+                user = message.guild.get_member(profile.user_id)
+                if user != None and (profile.point!= 0 or len(profile.special_items)> 0):
+                    embed.add_field(name=f"", value=f"**Hạng {index+1}.** {user.mention}. Tổng điểm: **{profile.point}**. Số lượng kỹ năng đặc biệt: **{len(profile.special_items)}**.", inline=False)
                     count+=1
-                if count >= 20: break
+                if count >= 25: break
         text = "Chúc mừng các player top đầu!"
         if message.guild.id == TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value:
             text+= " <@315835396305059840> sẽ trao role đặc biệt cho những Player thuộc top 3 nhé!"
         await message.channel.send(content=text, embed=embed)
         #Xoá đi tạo lại
-        SwMongoManager.delete_data_info(channel_id=message.channel.id, guild_id=message.guild.id, lang=language)
-        #Tạo mới
-        lan_label = "Tiếng Anh" if language == "en" else "Tiếng Việt"
-        current_word = "hello" if language == "en" else "trai"
-        unsorted = "olehl" if language == "en" else "rtia"
-        data = SortWordInfo(channel_id=self.message.channel, channel_name=message.channel.name, guild_name=message.guild.name, current_word=current_word, unsorted_word=unsorted, special_case=False)
-        SwMongoManager.create_info(data=data, guild_id=message.guild.id, lang=language)
-        embed = discord.Embed(title=f"{EmojiCreation1.CHECK.value} Đoán Từ {lan_label}", description=f"",color=discord.Color.blue())
-        embed.add_field(name=f"", value="▬▬▬▬▬▬ι═══════════>", inline=False)
-        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Hướng dẫn chơi Tiếng Anh:\n `ih` -> `hi`, `ytr` -> `try`", inline=False)
-        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Hướng dẫn chơi Tiếng Việt:\n `han rtai` -> `anh trai`, `me rait` -> `em trai`", inline=False)
-        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Đoán từ hiện tại:", inline=False)
-        embed.add_field(name=f"{data.unsorted_word}", value=f"", inline=False)
-        await message.channel.send(embed=embed)
 
             
     async def fail_attempt(self, message: discord.Message, sw_info: SortWordInfo, lan: str, point: int, err: str = None):
     #Reset special point nếu trả lời sai, và nếu trước đó đã có
         if sw_info.special_point:
-            SwMongoManager.update_special_point_data_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_point= 0)
+            MwMongoManager.update_special_point_data_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_point= 0)
         if sw_info.special_item:
-            SwMongoManager.update_special_item_data_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_item= None)
+            MwMongoManager.update_special_item_data_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_item= None)
             return
-        
-        list_player_penalty = sw_info.player_penalty
-        selected_player = None
-        for player in list_player_penalty:
-            if player.user_id == message.author.id and player.penalty_point > 5:
-                selected_player = player
-                break
-        if selected_player is not None:
-            #Trừ điểm vì sai quá nhiều
-            point = 2
-            await message.reply(f"{message.author.mention} đã bị trừ **{point}** vì trả lời sai quá nhiều lần!")
-            SwMongoManager.update_player_point_data_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, user_id=message.author.id, user_name=message.author.name, point=-point)
-            return
-        SwMongoManager.create_and_update_player_penalty(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, user_id=message.author.id, user_name=message.author.name)
-        if CustomFunctions.check_if_dev_mode():
-            await message.add_reaction('❌')
-        else:
-            await message.add_reaction('<a:x_cross_red:1378265390110474362>')
+        await message.add_reaction('❌')
         if err != None:
             message_tu_hien_tai = f"\nTừ hiện tại: `'{sw_info.unsorted_word}'`. Chữ này có **{len(sw_info.current_word)}** chữ cái"
             await message.reply(f"{err} {message_tu_hien_tai}")
@@ -129,23 +99,20 @@ class SwHandlingFunction():
             await self.fail_attempt(message=message, sw_info= sw_info,lan=lan,point=point, err= "Đoán sai rồi!")
         else:
             #Coi như pass hết
-            if CustomFunctions.check_if_dev_mode():
-                await message.add_reaction('👍')
-            else:
-                await message.add_reaction('<a:check:1378265379419193354>')
+            await message.add_reaction('👍')
             #Cập nhật lại thông tin
             current_word = self.get_random_current_word(lang=lan)
-            current_player_id=message.author.id
-            if CustomFunctions.check_if_dev_mode(): current_player_id = 1
-            SwMongoManager.update_data_info(lang=lan,channel_id=message.channel.id, guild_id= message.guild.id, current_player_id=current_player_id, current_player_name=message.author.name,current_word=current_word)
+            SwMongoManager.update_data_info(lang=lan,channel_id=message.channel.id, guild_id= message.guild.id, current_player_id=message.author.id, current_player_name=message.author.name,current_word=current_word)
             #Cập nhật lại điểm
             SwMongoManager.update_player_point_data_info(user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= point, guild_id=message.guild.id, channel_id=message.channel.id,language=lan)
+            
             ProfileMongoManager.update_level_progressing(guild_id=message.guild.id, user_id=message.author.id)
-            end_round = 500
+            
+            #Mỗi game 1000 round là kết thúc
             sw_info, lan = await self.check_if_message_inside_game(source=message)
-            if sw_info.current_round>=end_round:
+            if sw_info.current_round>=1200:
                 #Reset
-                await message.channel.send(f"Đã chơi được **{end_round}** lượt rồi. Cảm ơn mọi người đã chơi nhé. Đến lúc reset lại rồi, nên mọi người bắt đầu lại nhé!")
+                await message.channel.send(f"Đã chơi được 1200 round rồi. Cảm ơn mọi người đã chơi nhé. Đến lúc reset lại rồi, nên mọi người bắt đầu lại nhé!")
                 await self.process_reset(message=message, sw_info=sw_info, language=lan)
                 return
             else:
@@ -157,12 +124,10 @@ class SwHandlingFunction():
                     SwMongoManager.update_player_special_item(user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= point, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= sw_info.special_item)
                     chuc_mung_item = f" và nhận được kỹ năng **{sw_info.special_item.item_name}**. Nhớ đừng quên sử dụng nó nhé"
                 #Trả lời đúng thì reset special_points và special_item lại từ đầu, cập nhật lại list player ban
-                await message.channel.send(f"{message.author.mention}, bạn đã được cộng {point} điểm{chuc_mung_item}. Để kiểm tra điểm số của mình thì hãy dùng lệnh /bxh_sw nhé. {message_tu_hien_tai}")
+                await message.channel.send(f"Hay lắm {message.author.mention}, bạn đã được cộng {point} điểm{chuc_mung_item}. Để kiểm tra điểm số của mình thì hãy dùng lệnh /bxh_sw nhé. {message_tu_hien_tai}")
                 #Reset special point, special item, giảm ban remain của tất cả player
                 SwMongoManager.update_special_point_data_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_point= 0)
                 SwMongoManager.update_special_item_data_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_item= None)
-                SwMongoManager.remove_player_penalty_after_round(channel_id= message.channel.id, guild_id= message.guild.id, language=lan)
-                
         #Xổ số nếu chưa có special point
         so_xo = random.randint(4, 10)
         #Nếu sổ xố rơi trúng số 5 thì coi như cộng point lên x2, x3, x4 ngẫu nhiên
@@ -170,11 +135,8 @@ class SwHandlingFunction():
             x_value = random.randint(2, 5)
             special_point_english = 1*x_value
             SwMongoManager.update_special_point_data_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_point= special_point_english)
-            embed = discord.Embed(title=f"{EmojiCreation1.EXCLAIM_MARK.value} Điểm Thưởng Duy Nhất {EmojiCreation1.EXCLAIM_MARK.value}", description=f"",color=discord.Color.blue())
-            embed.add_field(name=f"", value="▬▬▬▬▬▬ι═══════════>", inline=False)
-            embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Cơ hội chỉ đến một lần duy nhất, nếu ai đoán đúng sẽ nhận được **{special_point_english}** điểm! !", inline=False)
-            embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} **Lưu ý**: Đoán sai sẽ mất điểm ngay, nên hãy suy nghĩ cho kỹ trước khi trả lời!", inline=False)
-            await message.channel.send(embed=embed)
+            text_cong_point = f"\nCơ hội chỉ đến một lần duy nhất, nếu ai đoán đúng sẽ nhận được **{special_point_english}** điểm nhaaa! Sai là mất!\n"
+            await message.channel.send(f"{text_cong_point}")
         else:
             #Sổ xố xem trúng kỹ năng đặc biệt không
             so_xo = random.randint(3, 10)
@@ -194,11 +156,15 @@ class SwHandlingFunction():
                 else:
                     #tối thượng
                     item = random.choice(Handling.MiniGame.SortWord.SwClass.list_special_items_toi_thuong)
+                
+                instruction = f"!sws {item.item_id}"
+                if item.required_target:
+                    instruction = f"!sws {item.item_id} <@315835396305059840>"
                 result = SwMongoManager.update_special_item_data_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_item=item)
                 embed = discord.Embed(title=f"Kỹ năng đặc biệt. Rank: {item.level}", description=f"", color=0x03F8FC)
                 embed.add_field(name=f"", value=f"Tên kỹ năng: {item.item_name}", inline=False)
                 embed.add_field(name=f"", value=f"Mô tả kỹ năng: {item.item_description}", inline=False)
-                embed.add_field(name=f"", value=f"Cách dùng:\n**/skills**", inline=False)
+                embed.add_field(name=f"", value=f"Cách dùng:\n**{instruction}**", inline=False)
                 await message.channel.send(content=text_cong_skill, embed=embed)
                 return
                 

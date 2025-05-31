@@ -33,7 +33,7 @@ def create_info(lang: str, guild_id: int, data: MatchWordInfo):
     result = collection.insert_one(data.to_dict())
     return result
 
-def update_data_info(channel_id: int, guild_id: int, current_player_id: int, current_player_name: str, current_word: str, lang: str, existed_words: List[str] = None, special_case: bool = False):
+def update_data_info(channel_id: int, guild_id: int, current_player_id: int, current_player_name: str, current_word: str, lang: str, existed_words: List[str] = None, special_case: bool = False, type: str = "A"):
     collection = db_specific[f'{lang}_mw_guild_{guild_id}']
     existing_data = collection.find_one({"channel_id": channel_id})
     existing_info = MatchWordInfo.from_dict(existing_data)
@@ -46,6 +46,19 @@ def update_data_info(channel_id: int, guild_id: int, current_player_id: int, cur
     current_round = existing_info.current_round+ 1
     #Chuyển last play thành hiện tại
     last_played = datetime.now()
+    if type == "A": #Nối Theo Từ Cuối
+        special_case = True
+    
+    #Nếu là special case thì correct_start_word luôn là bằng current word
+    if special_case:
+        correct_start_word = current_word
+    else:
+        #Không thì sẽ lấy từ cuối
+        correct_start_word = current_word[-1]
+    
+    remaining_word = get_remaining_words_english(data=correct_start_word, used_words=used_words) if lang == "en" else get_remaining_words_vietnamese(data=correct_start_word, used_words=used_words, special_case=special_case)
+    
+    
 
     result = collection.update_one({"channel_id": channel_id}, {"$set": {"current_player_id": current_player_id,
                                                                          "current_player_name": current_player_name,
@@ -53,9 +66,38 @@ def update_data_info(channel_id: int, guild_id: int, current_player_id: int, cur
                                                                          "current_round": current_round,
                                                                          "special_case": special_case,
                                                                          "last_played": last_played,
+                                                                         "remaining_word": remaining_word,
+                                                                         "correct_start_word": correct_start_word,
                                                                          "used_words": [word for word in used_words], #chỉ dùng used_words
                                                                          }})
     return result
+
+def get_remaining_words_english(data: str, used_words: List[str]):
+    """
+    Kiểm tra với danh sách những từ đã tồn tại, đối chiếu với dictionary để xem còn bao nhiêu từ khả dụng.
+    """
+    if data == None: return 0
+    count = 0
+    for word in english_words_dictionary.keys():
+        if word == data: continue
+        if word.startswith(data) and word not in used_words:
+            count+= 1
+    return count
+
+def get_remaining_words_vietnamese(data: str, used_words: List[str], special_case: bool = False):
+    """
+    Kiểm tra với danh sách những từ đã tồn tại, đối chiếu với dictionary để xem còn bao nhiêu từ khả dụng.
+    """
+    if data == None: return 0
+    count = 0
+    for phrase in vietnamese_words_dictionary.keys():
+        if phrase == data: continue
+        if special_case == True and phrase.split()[0] == data and phrase not in used_words:
+            count += 1
+        elif special_case == False and phrase.startswith(data) and phrase not in used_words:
+            count += 1
+    return count
+
 
 def delete_data_info(channel_id: int, guild_id: int, lang: str):
     collection = db_specific[f'{lang}_mw_guild_{guild_id}']

@@ -2,13 +2,15 @@ from datetime import date, datetime
 from typing import List, Optional
 #region MatchWordInfo
 class MatchWordInfo:
-    def __init__(self, channel_id: int, channel_name: str, guild_name: str, current_player_id: int = None, current_player_name: str = None, current_word: str = None, special_point: int = None, used_words: List[str] = None, current_round: int = 0, special_case = False, type: str = "A", player_profiles: Optional[List['PlayerProfile']] = None, player_effects : Optional[List['PlayerEffect']] = None, player_penalty : Optional[List['PlayerPenalty']] = None, last_played = datetime.now()):
+    def __init__(self, channel_id: int, channel_name: str, guild_name: str, current_player_id: int = None, current_player_name: str = None, current_word: str = None, correct_start_word: str = None, remaining_word: int = 0, special_point: int = None, used_words: List[str] = None, current_round: int = 0, special_case = False, type: str = "A", player_profiles: Optional[List['PlayerProfile']] = None, player_effects : Optional[List['PlayerEffect']] = None, player_penalty : Optional[List['PlayerPenalty']] = None, last_played = datetime.now()):
         self.channel_id = channel_id
         self.channel_name = channel_name
         self.guild_name = guild_name
         self.current_player_id = current_player_id
         self.current_player_name = current_player_name
         self.current_word = current_word
+        self.correct_start_word = correct_start_word
+        self.remaining_word = remaining_word
         self.special_point = special_point
         self.current_round = current_round
         self.special_case = special_case
@@ -27,6 +29,8 @@ class MatchWordInfo:
             "current_player_id": self.current_player_id,
             "current_player_name": self.current_player_name,
             "current_word": self.current_word,
+            "correct_start_word": self.correct_start_word,
+            "remaining_word": self.remaining_word,
             "special_point": self.special_point,
             "current_round": self.current_round,
             "last_played": self.last_played,
@@ -48,6 +52,8 @@ class MatchWordInfo:
             current_player_id=data.get("current_player_id", None),
             current_player_name=data.get("current_player_name", None),
             current_word=data.get("current_word", None),
+            correct_start_word=data.get("correct_start_word", None),
+            remaining_word=data.get("remaining_word", None),
             special_point=data.get("special_point", None),
             current_round=data.get("current_round", 0),
             last_played=data.get("last_played", datetime.now()),
@@ -155,15 +161,17 @@ class PlayerEffect:
 
 #region Player Ban
 class PlayerPenalty:
-    def __init__(self, user_id: int, username: str, timestamp: date):
+    def __init__(self, user_id: int, username: str, timestamp: datetime = datetime.now(), penalty_point: int = 0):
         self.user_id = user_id 
         self.username = username
         self.timestamp = timestamp
+        self.penalty_point = penalty_point
     def to_dict(self):
         return {
             "user_id": self.user_id,
             "username": self.username,
             "timestamp": self.timestamp,
+            "penalty_point": self.penalty_point,
         }
         
     @staticmethod
@@ -172,8 +180,5 @@ class PlayerPenalty:
             user_id=data.get("user_id", None),
             username=data.get("username", None),
             timestamp = data.get("timestamp", None),
+            penalty_point = data.get("timestamp", 0),
         )
-
-
-
-
