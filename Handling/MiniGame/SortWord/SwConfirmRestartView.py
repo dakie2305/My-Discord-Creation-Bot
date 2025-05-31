@@ -32,7 +32,7 @@ class SwConfirmRestartView(discord.ui.View):
                     embed.add_field(name=f"", value=f"**Hạng {index+1}.** <@{profile.user_id}>. Tổng điểm: **{profile.point}**. Số lượng kỹ năng đặc biệt: **{len(profile.special_items)}**.", inline=False)
                     count+=1
                 if count >= 25: break
-        await interaction.followup.send(content=f"{interaction.user.mention} đã restart trò chơi Nối Từ trong kênh này!")
+        await interaction.followup.send(content=f"{interaction.user.mention} đã restart trò chơi Nối Từ trong kênh này!", embed=embed)
 
         #Xoá đi tạo lại
         SwMongoManager.delete_data_info(channel_id=self.channel_id, guild_id=interaction.guild_id, lang=self.lan)
@@ -51,4 +51,8 @@ class SwConfirmRestartView(discord.ui.View):
         embed.add_field(name=f"{data.unsorted_word}", value=f"", inline=False)
         channel = interaction.channel
         await channel.send(embed=embed)
+        try:
+            await self.message.delete()
+        except Exception:
+            pass
         return

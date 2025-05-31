@@ -178,7 +178,7 @@ class WordMiniGameCog(commands.Cog):
     
 
     restart = discord.app_commands.Group(name="restart", description="Các lệnh liên quan đến Mini Game Từ Vựng!")
-    #region start match_word slash
+    #region restart match_word slash
     @restart.command(name="match_word", description="Restart trò chơi Nối Từ trong channel hiện tại!")
     @discord.app_commands.checks.cooldown(1, 30)
     async def restart_match_word_slash_command(self, interaction: discord.Interaction):
@@ -218,7 +218,7 @@ class WordMiniGameCog(commands.Cog):
         else:
             await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
     
-    #region start match_word slash
+    #region restart restart_word slash
     @restart.command(name="sort_word", description="Restart trò chơi Đoán Từ trong channel hiện tại!")
     @discord.app_commands.checks.cooldown(1, 30)
     async def restart_sort_word_slash_command(self, interaction: discord.Interaction):

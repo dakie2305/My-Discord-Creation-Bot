@@ -102,15 +102,7 @@ class SwHandlingFunction():
         if message.content[0] in string.punctuation or message.content[0] == ":": return
         if lan == 'en' and len(message.content.split()) > 1: return
         #Kiểm tra xem có nằm trong danh sách ban không
-        selected_ban = None
-        for player_ban in sw_info.player_bans:
-                if player_ban.user_id == message.author.id and player_ban.ban_remaining>0:
-                    selected_ban = player_ban
-                    break
         message_tu_hien_tai = f"\nTừ hiện tại: `'{sw_info.unsorted_word}'`. Chữ này có **{len(sw_info.current_word)}** chữ cái."
-        if selected_ban:
-            await message.reply(f"Bạn đã bị khoá mõm trong vòng **{selected_ban.ban_remaining}** lượt chơi tới. Vui lòng chờ đi.")
-            return
         point = 1
         if sw_info.special_point != None and sw_info.special_point > 0:
             point = sw_info.special_point
@@ -150,7 +142,6 @@ class SwHandlingFunction():
                 #Reset special point, special item, giảm ban remain của tất cả player
                 SwMongoManager.update_special_point_data_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_point= 0)
                 SwMongoManager.update_special_item_data_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_item= None)
-                SwMongoManager.reduce_player_bans_after_round(channel_id= message.channel.id, guild_id= message.guild.id, language=lan)
         #Xổ số nếu chưa có special point
         so_xo = random.randint(4, 10)
         #Nếu sổ xố rơi trúng số 5 thì coi như cộng point lên x2, x3, x4 ngẫu nhiên
