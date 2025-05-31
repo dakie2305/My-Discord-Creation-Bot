@@ -31,7 +31,8 @@ class MwChooseVietnamType(discord.ui.View):
     async def handling_create_match_word_vietnamese(self, interaction: discord.Interaction, type: str):
         type_label = "Nối Theo Từ Cuối" if type == "A" else "Nối Theo Âm Cuối"
         is_special = True if type == "A" else False
-        data = MwClass.MatchWordInfo(channel_id=interaction.channel_id, channel_name=interaction.channel.name, guild_name=interaction.guild.name, current_word="anh", special_case=is_special, type=type)
+        correct_word = "anh" if type == "A" else "h"
+        data = MwClass.MatchWordInfo(channel_id=interaction.channel_id, channel_name=interaction.channel.name, guild_name=interaction.guild.name, current_word="anh", special_case=is_special, type=type, correct_start_word=correct_word, remaining_word=300)
         MwMongoManager.create_info(data=data, guild_id=interaction.guild_id, lang="vn")
         embed = discord.Embed(title=f"{EmojiCreation1.CHECK.value} Nối Từ Tiếng Việt", description=f"Thể Loại: **{type_label}**",color=discord.Color.blue())
         embed.add_field(name=f"", value="▬▬▬▬▬▬ι═══════════>", inline=False)

@@ -10,6 +10,7 @@ import time
 import DailyLogger
 from discord.ext import commands, tasks
 from discord import app_commands
+from Handling.MiniGame.MatchWord import MwHandling, MwMongoManager
 import db.DbMongoManager as db
 from db.DbMongoManager import UserInfo
 import db.Class.WordMatchingClass as WordMatchingClass
@@ -1682,6 +1683,7 @@ async def on_guild_remove(guild: discord.Guild):
     #drop collection sw guild and world matching database
     db.drop_word_matching_info_collection(guild_id=guild.id)
     SwMongoManager.drop_sort_word_info_collection(guild_id=guild.id)
+    MwMongoManager.drop_word_matching_info_collection(guild_id=guild.id)
     print(f"Bot {bot.user.display_name} removed from guild {guild.name}. Deleted all related collection")
     
 #Khi có người bị banned
@@ -1717,6 +1719,13 @@ async def on_message(message: discord.Message):
         #Xử lý nối từ
         asyncio.create_task(sort_word_game.handling_game(message=message))
         speakFlag = False
+        
+    match_word_game = MwHandling.MwHandlingFunction(message= message)
+    mw_info, lan = await match_word_game.check_if_message_inside_game(source=message)
+    if mw_info != None:
+        #Xử lý nối từ
+        asyncio.create_task(match_word_game.handling_game(message=message))
+        speakFlag = False
     
     guild_extra_info = db.find_guild_extra_info_by_id(guild_id=message.guild.id)
     if guild_extra_info != None and message.channel.id == guild_extra_info.therapy_channel and message.author.bot == False:
@@ -1728,16 +1737,9 @@ async def on_message(message: discord.Message):
         speakFlag = False
         #sticky message
         await StickyMessageHandling(bot=bot).handling_sticky_message(message=message)
-    asyncio.create_task(word_matching(message=message))
-    
-    word_matching_channel_en = db.find_word_matching_info_by_id(channel_id= message.channel.id, guild_id= message.guild.id, language= 'en')
-    word_matching_channel_vn = db.find_word_matching_info_by_id(channel_id= message.channel.id, guild_id= message.guild.id, language= 'vn')
-    if word_matching_channel_en != None or word_matching_channel_vn!= None:
-        speakFlag = False
     
     ai_handling_response = AIResponseHandling(bot=bot)
     await ai_handling_response.sub_function_ai_response(message=message, speakFlag=speakFlag)
-    
     await bot.process_commands(message)
 
 bot_token = os.getenv("BOT_TOKENN")

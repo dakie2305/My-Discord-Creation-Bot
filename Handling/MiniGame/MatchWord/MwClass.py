@@ -2,7 +2,7 @@ from datetime import date, datetime
 from typing import List, Optional
 #region MatchWordInfo
 class MatchWordInfo:
-    def __init__(self, channel_id: int, channel_name: str, guild_name: str, current_player_id: int = None, current_player_name: str = None, current_word: str = None, correct_start_word: str = None, remaining_word: int = 0, special_point: int = None, used_words: List[str] = None, current_round: int = 0, special_case = False, type: str = "A", player_profiles: Optional[List['PlayerProfile']] = None, player_effects : Optional[List['PlayerEffect']] = None, player_penalty : Optional[List['PlayerPenalty']] = None, player_ban : Optional[List['PlayerBan']] = None, last_played = datetime.now()):
+    def __init__(self, channel_id: int, channel_name: str, guild_name: str, current_player_id: int = None, current_player_name: str = None, current_word: str = None, correct_start_word: str = None, remaining_word: int = 0, special_point: int = None, used_words: List[str] = None, current_round: int = 0, special_case = False, type: str = "A", player_profiles: Optional[List['PlayerProfile']] = None, player_effects : Optional[List['PlayerEffect']] = None, player_penalty : Optional[List['PlayerPenalty']] = None, player_ban : Optional[List['PlayerBan']] = None, special_item: Optional['SpecialItem'] = None, last_played = datetime.now()):
         self.channel_id = channel_id
         self.channel_name = channel_name
         self.guild_name = guild_name
@@ -16,6 +16,7 @@ class MatchWordInfo:
         self.special_case = special_case
         self.type = type
         self.last_played = last_played
+        self.special_item = special_item if special_item else None
         self.used_words: List[str] = used_words if used_words else []
         self.player_profiles: List[PlayerProfile] = player_profiles if player_profiles else []
         self.player_effects: List[PlayerEffect] = player_effects if player_effects else []
@@ -37,6 +38,7 @@ class MatchWordInfo:
             "last_played": self.last_played,
             "special_case": self.special_case,
             "type": self.type,
+            "special_item": self.special_item.to_dict() if self.special_item else None,
             "used_words": [data for data in self.used_words],
             "player_profiles": [data.to_dict() for data in self.player_profiles],
             "player_effects": [data.to_dict() for data in self.player_effects],
@@ -58,8 +60,10 @@ class MatchWordInfo:
             remaining_word=data.get("remaining_word", None),
             special_point=data.get("special_point", None),
             current_round=data.get("current_round", 0),
+            type=data.get("type", None),
             last_played=data.get("last_played", datetime.now()),
             used_words = [item for item in data.get("used_words", [])],
+            special_item = SpecialItem.from_dict(data.get("special_item", None)) if data.get("special_item") else None,
             player_profiles = [PlayerProfile.from_dict(item) for item in data.get("player_profiles", [])],
             player_effects = [PlayerEffect.from_dict(item) for item in data.get("player_effects", [])],
             player_penalty = [PlayerPenalty.from_dict(item) for item in data.get("player_penalty", [])],
@@ -183,7 +187,7 @@ class PlayerPenalty:
             user_id=data.get("user_id", None),
             user_name=data.get("user_name", None),
             timestamp = data.get("timestamp", None),
-            penalty_point = data.get("timestamp", 0),
+            penalty_point = data.get("penalty_point", 0),
         )
         
 #region Player Ban

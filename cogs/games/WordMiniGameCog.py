@@ -85,7 +85,7 @@ class WordMiniGameCog(commands.Cog):
         lan_label = "Tiếng Anh" if language == "en" else "Tiếng Việt"
         #Nếu là tiếng anh thì cứ tạo bình thường
         if language == "en":
-            data = MwClass.MatchWordInfo(channel_id=interaction.channel_id, channel_name=interaction.channel.name, guild_name=interaction.guild.name, current_word="hello", special_case=False)
+            data = MwClass.MatchWordInfo(channel_id=interaction.channel_id, channel_name=interaction.channel.name, guild_name=interaction.guild.name, current_word="hello", correct_start_word="o", remaining_word=10000, special_case=False, type="B")
             MwMongoManager.create_info(data=data, guild_id=interaction.guild_id, lang=language)
             embed = discord.Embed(title=f"{EmojiCreation1.CHECK.value} Nối Từ {lan_label}", description=f"",color=discord.Color.blue())
             embed.add_field(name=f"", value="▬▬▬▬▬▬ι═══════════>", inline=False)

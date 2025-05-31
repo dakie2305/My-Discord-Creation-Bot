@@ -86,7 +86,6 @@ class SwHandlingFunction():
             SwMongoManager.update_special_point_data_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_point= 0)
         if sw_info.special_item:
             SwMongoManager.update_special_item_data_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_item= None)
-            return
         
         list_player_penalty = sw_info.player_penalty
         selected_player = None
@@ -142,7 +141,6 @@ class SwHandlingFunction():
             SwMongoManager.update_player_point_data_info(user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= point, guild_id=message.guild.id, channel_id=message.channel.id,language=lan)
             ProfileMongoManager.update_level_progressing(guild_id=message.guild.id, user_id=message.author.id)
             end_round = 500
-            sw_info, lan = await self.check_if_message_inside_game(source=message)
             if sw_info.current_round>=end_round:
                 #Reset
                 await message.channel.send(f"Đã chơi được **{end_round}** lượt rồi. Cảm ơn mọi người đã chơi nhé. Đến lúc reset lại rồi, nên mọi người bắt đầu lại nhé!")
@@ -150,6 +148,7 @@ class SwHandlingFunction():
                 return
             else:
                 #Thông báo
+                sw_info, lan = await self.check_if_message_inside_game(source=message)
                 message_tu_hien_tai = f"\nTừ hiện tại: `'{sw_info.unsorted_word}'`. Chữ này có **{len(sw_info.current_word)}** chữ cái"
                 #Kiểm tra xem có special_item không, nếu có thì cộng cho player
                 chuc_mung_item = ""
