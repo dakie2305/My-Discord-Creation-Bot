@@ -1,6 +1,9 @@
 
 from datetime import datetime
+import json
+import os
 from pymongo import MongoClient
+import CustomFunctions
 from Handling.MiniGame.MatchWord.MwClass import MatchWordInfo, SpecialItem, PlayerProfile
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 from typing import List
@@ -112,3 +115,108 @@ def update_player_point_data_info(channel_id: int, guild_id: int, language: str,
                                                                                                                 }})
         return result
 
+def update_player_special_item(channel_id: int, guild_id: int, language: str,user_id: int,user_name: str, user_display_name: str, point:int, special_item: SpecialItem, remove_special_item = False):
+    collection = db_specific[f'{language}_mw_guild_{guild_id}']
+    existing_data = collection.find_one({"channel_id": channel_id})
+    existing_info = MatchWordInfo.from_dict(existing_data)
+    list_player_profiles = existing_info.player_profiles
+    #Tìm xem có user_id trong list player_profiles chưa
+    selected_player = None
+    for player in list_player_profiles:
+        if player.user_id == user_id:
+            selected_player = player
+            break
+    if selected_player == None:
+        #Tạo mới player và thêm vào
+        temp = []
+        temp.append(special_item)
+        new_player = PlayerProfile(user_id=user_id, user_name=user_name, user_display_name=user_display_name, point=point, special_items=temp)
+        list_player_profiles.append(new_player)
+        result = collection.update_one({"channel_id": channel_id}, {"$set": {"player_profiles": [player.to_dict() for player in list_player_profiles],
+                                                                         }})
+        return result
+    else:
+        #Thêm item đó vào list special_items của player
+        existing_items = selected_player.special_items
+        if remove_special_item == False:
+            existing_items.append(special_item)
+        else:
+            #Tìm xem có item đó không, và remove luôn
+            for item_in_list in existing_items:
+                if item_in_list.item_id == special_item.item_id: 
+                    existing_items.remove(item_in_list)
+                    break
+        #Chỉ cho phép tối đa 4 item
+        if len(existing_items) > 4:
+            existing_items.pop(0)
+        result = collection.update_one({"channel_id": channel_id, "player_profiles.user_id": user_id}, {"$set": {"player_profiles.$.special_items": [data.to_dict() for data in existing_items],
+                                                                                                                }})
+        return result
+
+def update_current_player_id(channel_id: int, guild_id: int, language: str,user_id: int):
+    collection = db_specific[f'{language}_mw_guild_{guild_id}']
+    existing_data = collection.find_one({"channel_id": channel_id})
+    if existing_data:
+        result = collection.update_one({"channel_id": channel_id}, {"$set": {"current_player_id": user_id}})
+        return result
+
+def update_all_players_point(channel_id: int, guild_id: int, language: str, immune_user_id: int,point: int):
+    collection = db_specific[f'{language}_mw_guild_{guild_id}']
+    existing_data = collection.find_one({"channel_id": channel_id})
+    existing_info = MatchWordInfo.from_dict(existing_data)
+    if existing_info:
+        list_player_profiles = existing_info.player_profiles
+        for player_profile in list_player_profiles:
+            if player_profile.user_id == immune_user_id: 
+                continue
+            player_profile.point += point
+            if player_profile.point < 0: player_profile.point = 0
+        
+        result = collection.update_one({"channel_id": channel_id}, {"$set": {"player_profiles": [player.to_dict() for player in list_player_profiles],
+                                                                         }})
+        return result
+
+
+#region remaining words
+def get_remaining_words_english(data: str, used_words: List[str]):
+    """
+    Kiểm tra với danh sách những từ đã tồn tại, đối chiếu vói dictionary để xem còn bao nhiêu từ khả dụng.
+    """
+    if data == None: return 0
+    count = 0
+    for word in english_words_dictionary.keys():
+        if word == data: continue
+        if word.startswith(data) and word not in used_words:
+            count+= 1
+    return count
+
+def get_remaining_words_vietnamese(data: str, used_words: List[str], special_case: bool = False):
+    """
+    Kiểm tra với danh sách những từ đã tồn tại, đối chiếu vói dictionary để xem còn bao nhiêu từ khả dụng.
+    """
+    if data == None: return 0
+    count = 0
+    for phrase in vietnamese_words_dictionary.keys():
+        if phrase == data: continue
+        if special_case == True and phrase.split()[0] == data and phrase not in used_words:
+            count += 1
+        elif special_case == False and phrase.startswith(data) and phrase not in used_words:
+            count += 1
+    return count
+
+def get_english_dict()->dict:
+    filepath = os.path.join(os.path.dirname(__file__), "json", "english_dictionary.json")
+    with open(filepath, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+        return data
+    return None
+
+def get_vietnamese_dict()->dict:
+    filepath = os.path.join(os.path.dirname(__file__),"json", "vietnamese_dictionary.json")
+    with open(filepath, 'r', encoding= 'utf-8') as f:
+        data = json.load(f)
+        return data
+    return None
+
+english_words_dictionary = CustomFunctions.get_english_dict()
+vietnamese_words_dictionary = CustomFunctions.get_vietnamese_dict()
