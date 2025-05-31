@@ -1743,7 +1743,7 @@ vietnamese_dict = CustomFunctions.vietnamese_dict
 message_tracker = CustomFunctions.MessageTracker()
 #Cog command
 init_extension = [
-                  "cogs.games.SortWordCog",
+                  "cogs.games.WordMiniGameCog",
                   "cogs.games.TruthDareCog",
                   "cogs.misc.TherapyAICog",
                   "cogs.misc.TrueHeavenCustomCommandsCog",

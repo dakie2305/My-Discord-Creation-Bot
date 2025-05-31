@@ -2,9 +2,10 @@ from datetime import datetime
 from typing import List, Optional
 #region SortWordInfo
 class SortWordInfo:
-    def __init__(self, channel_id: int, channel_name: str, current_player_id: int = None, current_player_name: str = None, unsorted_word: str = None, current_word: str = None, special_point: int = None, special_item: Optional['SwSpecialItem'] = None, used_words: List[str] = None, special_case: bool = False, player_profiles: Optional[List['SwPlayerProfile']] = None, player_effects : Optional[List['SwPlayerEffect']] = None, player_bans : Optional[List['SwPlayerBan']] = None, current_round: int = 0):
+    def __init__(self, channel_id: int, channel_name: str, current_player_id: int = None, current_player_name: str = None, unsorted_word: str = None, current_word: str = None, special_point: int = None, special_item: Optional['SwSpecialItem'] = None, used_words: List[str] = None, special_case: bool = False, player_profiles: Optional[List['SwPlayerProfile']] = None, player_effects : Optional[List['SwPlayerEffect']] = None, current_round: int = 0, guild_name: str = None):
         self.channel_id = channel_id
         self.channel_name = channel_name
+        self.guild_name = guild_name
         self.current_player_id = current_player_id
         self.current_player_name = current_player_name
         self.unsorted_word = unsorted_word
@@ -17,12 +18,12 @@ class SortWordInfo:
         self.used_words: List[str] = used_words if used_words else []
         self.player_profiles: List[SwPlayerProfile] = player_profiles if player_profiles else []
         self.player_effects: List[SwPlayerEffect] = player_effects if player_effects else []
-        self.player_bans: List[SwPlayerBan] = player_bans if player_bans else []
     
     def to_dict(self):
         return {
             "channel_id": self.channel_id,
             "channel_name": self.channel_name,
+            "guild_name": self.guild_name,
             "current_player_id": self.current_player_id,
             "current_player_name": self.current_player_name,
             "unsorted_word": self.unsorted_word,
@@ -35,7 +36,6 @@ class SortWordInfo:
             "used_words": [data for data in self.used_words],
             "player_profiles": [data.to_dict() for data in self.player_profiles],
             "player_effects": [data.to_dict() for data in self.player_effects],
-            "player_bans": [data.to_dict() for data in self.player_bans],
         }
 
     @staticmethod
@@ -43,6 +43,7 @@ class SortWordInfo:
         return SortWordInfo(
             channel_id=data.get("channel_id", None),
             channel_name=data.get("channel_name", None),
+            guild_name=data.get("guild_name", None),
             current_player_id=data.get("current_player_id", None),
             current_player_name=data.get("current_player_name", None),
             unsorted_word=data.get("unsorted_word", None),
@@ -54,7 +55,6 @@ class SortWordInfo:
             special_item = SwSpecialItem.from_dict(data.get("special_item", None)) if data.get("special_item") else None,
             player_profiles = [SwPlayerProfile.from_dict(item) for item in data.get("player_profiles", [])],
             player_effects = [SwPlayerEffect.from_dict(item) for item in data.get("player_effects", [])],
-            player_bans = [SwPlayerBan.from_dict(item) for item in data.get("player_bans", [])],
             used_words = [item for item in data.get("used_words", [])],
         )
 
