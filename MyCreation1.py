@@ -856,12 +856,7 @@ def find_player_profile_by_user_id(word_matching_channel: db.WordMatchingInfo, u
         return None
     else:
         return None
-#endregion   
-#endregion
 
-
-
-#region Bot Slash Commands
 
 #region say command
 @bot.tree.command(name = "say", description="Nói gì đó ẩn danh thông qua bot, có thể gắn hình ảnh và nhắn vào Channel khác")
@@ -1148,10 +1143,6 @@ async def delete_message_context(interaction: discord.Interaction, message: disc
             await interaction.followup.send(f"<@315835396305059840> Bot gặp exception trong lúc xoá message ID {message.id}. Exception: {str(e)}. Vui lòng liên hệ Darkie!")
             print(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} tried to delete message id{message.id} but got exception {str(e)}.")
     
-    
-    
-
-
 #endregion
 
 #region report command
@@ -1196,9 +1187,6 @@ async def snipe(interaction: discord.Interaction):
     
     snipe_channel_info = db.find_snipe_channel_info_by_id(called_channel.id, interaction.guild.id)
     if snipe_channel_info:
-        # list_snipe_message = []
-        # for mess in snipe_channel_info.snipe_messages:
-        #     list_snipe_message.append(mess.to_dict)
         list_snipe_message = snipe_channel_info.snipe_messages
         if list_snipe_message == None:
             await interaction.followup.send(f"Chưa thấy bất kỳ message nào bị xoá trong channel {interaction.channel.mention}. Vui lòng thử lại sau.")
@@ -1278,12 +1266,6 @@ def get_bxh_noi_tu(interaction: discord.Interaction,lan: str, word_matching_chan
         embed.add_field(name=f"", value=f"*Chưa có dữ liệu về người chơi*", inline=False)       
     embed.add_field(name=f"", value="___________________", inline=False)
     return embed     
-#endregion
-
-
-#endregion
-
-#endregion
 
 
 # Task: Check jail expiry
@@ -1403,233 +1385,6 @@ async def clear_up_data_task():
         print(f"clear_up_data_task started. Deleted {count} snipe message in {guild.name}")
         #drop collection nếu trống
         db.drop_snipe_channel_info_collection_if_empty(guild_id=guild.id)
-
-
-#region Response AI
-async def sub_function_ai_response(message: discord.Message, speakFlag = True):
-    if speakFlag == False: return
-    if message.channel.id == 1269029322950180977 or message.channel.id == 1259237810653626440 or message.channel.id == 1259242009290477618 or message.channel.id == 1287118424874684530: return #Không cho bot nói chuyện ở những channel sau
-    bots_creation1_name = ["creation 1", "creation số 1", "creation no 1", "creation no. 1"]
-    if message.reference is not None and message.reference.resolved is not None:
-        if message.reference.resolved.author == bot.user or CustomFunctions.contains_substring(message.content.lower(), bots_creation1_name):
-            if message.guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value and message.guild.id != 1194106864582004849: #Chỉ True Heaven, học viện 2ten mới không bị dính
-                if CustomFunctions.is_inside_working_time() == False:
-                    await message.channel.send(f"Tính năng AI của Bot chỉ hoạt động đến 12h đêm, vui lòng đợi đến 8h sáng hôm sau.")
-                    return
-            flag, mess = await CustomFunctions.check_message_nsfw(message, bot)
-            if flag != 0:
-                await message.reply(mess)
-                interaction_logger.info(f"Username {message.author.name}, Display user name {message.author.display_name} violated chat when talking to {bot.user}")
-                interaction_logger.info(f"Username {message.author.name} violated chat {message.content} when talking to {bot.user}")
-                return
-            referenced_message = await message.channel.fetch_message(message.reference.message_id)
-            if referenced_message.embeds: return
-            async with message.channel.typing():
-                model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
-                prompt = await CustomFunctions.get_proper_prompt(message,"Creation 1", referenced_message)
-                print(f"Prompt generated from {bot.user}: {prompt}")
-                file_image_path = None
-                if len(message.attachments)>0:
-                    #Lấy ảnh đầu tiên thôi
-                    for att in message.attachments:
-                        if 'image' in att.content_type:
-                            file_image_path = await CustomFunctions.download_image_file_from_url(url=att.url, content_type=att.content_type,filename= att.filename)
-                            break
-                if file_image_path!= None:
-                    response = model.generate_content([f"{prompt}", PIL.Image.open(file_image_path)])
-                    #Xoá file
-                    os.remove(file_image_path)
-                else:
-                    response = model.generate_content(f"{prompt}")
-                bot_response = CustomFunctions.remove_creation_name_prefix(f"{response.text}")
-                #Kiểm tra xem bot reponse có nhiều emoji không, nếu nhiều quá thì remove emoji
-                if CustomFunctions.count_emojis_in_text(bot_response) > 4:
-                    bot_response = CustomFunctions.remove_emojis_from_text(bot_response)
-                #Nếu là bot thì đương nhiên không reply, chỉ nhắn bình thường thôi
-                if(message.author.id == CustomFunctions.user_cr_1["user_id"] or message.author.id == CustomFunctions.user_cr_2["user_id"] or message.author.id == CustomFunctions.user_cr_3["user_id"]):
-                    await message.channel.send(f"{message.author.mention} {bot_response}")
-                else:
-                    await message.reply(f"{bot_response}")
-                CustomFunctions.save_user_convo_data(message=message, bot_reponse= bot_response, bot_name= "Creation 1")
-                print(f"Username {message.author.name}, Display user name {message.author.display_name} replied {bot.user}")
-                interaction_logger.info(f"Username {message.author.name}, Display user name {message.author.display_name} replied {bot.user}")
-            
-    elif CustomFunctions.contains_substring(message.content.lower(), bots_creation1_name):
-        async with message.channel.typing():
-            if message.guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value and message.guild.id != 1194106864582004849: #Chỉ True Heaven, học viện 2ten mới không bị dính
-                if CustomFunctions.is_inside_working_time() == False:
-                    await message.channel.send(f"Tính năng AI của Bot chỉ hoạt động đến 12h đêm, vui lòng đợi đến 8h sáng hôm sau.")
-                    return
-            flag, mess = await CustomFunctions.check_message_nsfw(message, bot)
-            if flag != 0:
-                await message.channel.send(mess)
-                interaction_logger.info(f"Username {message.author.name}, Display user name {message.author.display_name} violated chat when talking to {bot.user}")
-                interaction_logger.info(f"Username {message.author.name} violated chat {message.content} when talking to {bot.user}")
-            else:
-                model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
-                prompt = await CustomFunctions.get_proper_prompt(message,"Creation 1")
-                print(f"Prompt generated from {bot.user}: {prompt}")
-                file_image_path = None
-                if len(message.attachments)>0:
-                    #Lấy ảnh đầu tiên thôi
-                    for att in message.attachments:
-                        if 'image' in att.content_type:
-                            file_image_path = await CustomFunctions.download_image_file_from_url(url=att.url, content_type=att.content_type,filename= att.filename)
-                            break
-                if file_image_path!= None:
-                    response = model.generate_content([f"{prompt}", PIL.Image.open(file_image_path)])
-                    #Xoá file
-                    os.remove(file_image_path)
-                else:
-                    response = model.generate_content(f"{prompt}")
-                bot_response = CustomFunctions.remove_creation_name_prefix(f"{response.text}")
-                #Kiểm tra xem bot reponse có nhiều emoji không, nếu nhiều quá thì remove emoji
-                if CustomFunctions.count_emojis_in_text(bot_response) > 4:
-                    bot_response = CustomFunctions.remove_emojis_from_text(bot_response)     
-                await message.channel.send(f"{message.author.mention} {bot_response}")
-                CustomFunctions.save_user_convo_data(message=message, bot_reponse= bot_response, bot_name= "Creation 1")
-                print(f"Username {message.author.name}, Display user name {message.author.display_name} directly call {bot.user}")
-                interaction_logger.info(f"Username {message.author.name}, Display user name {message.author.display_name} directly call {bot.user}")
-    return
-
-#region Word Matching
-async def word_matching(message: discord.Message):
-    if str.isspace(message.content): return
-    if message.author.bot: return
-    word_matching_channel = db.find_word_matching_info_by_id(channel_id= message.channel.id, guild_id= message.guild.id, language= 'en')
-    lan = 'en'
-    if word_matching_channel == None:
-        word_matching_channel = db.find_word_matching_info_by_id(channel_id= message.channel.id, guild_id= message.guild.id, language= 'vn')
-        if word_matching_channel == None:
-            return
-        lan = 'vn'
-    if lan == 'en' and len(message.content.split()) > 1: return
-    if message.content[0] not in string.punctuation and message.content[0] != ":":
-        #Kiểm xem nằm đúng channel không
-        point = 1
-        if word_matching_channel.special_point != None and word_matching_channel.special_point > 0:
-            point = word_matching_channel.special_point
-        selected_ban = None
-        for player_ban in word_matching_channel.player_bans:
-                if player_ban.user_id == message.author.id and player_ban.ban_remaining>0:
-                    selected_ban = player_ban
-                    break
-        #Bắt đầu chơi
-        message_tu_hien_tai = f"\nTừ hiện tại là: `'{word_matching_channel.current_word}'`, và có **{word_matching_channel.remaining_word if word_matching_channel.remaining_word else 0}** bắt đầu bằng chữ cái `{word_matching_channel.last_character if word_matching_channel.last_character else 0}`"
-        if selected_ban:
-            await message.reply(f"Bạn đã bị khoá mõm trong vòng **{selected_ban.ban_remaining}** lượt chơi tới. Vui lòng chờ đi.\nOwner server có thể dùng lệnh `!wm_give_ban {message.author.mention} 0` để mở khoá giam")
-            return
-        if word_matching_channel.current_player_id == message.author.id:
-            await message.reply(f"Bạn đã nối từ rồi, vui lòng né qua để cho người khác chơi đi. {message_tu_hien_tai}")
-            if message_tracker.add_message(user_id= message.author.id, channel_id= message.channel.id, content= "spam nối từ"): #Đánh dấu những đối tượng thích spam
-                #Ban 5 vòng
-                db.create_and_update_player_bans_word_matching_info(channel_id= message.channel.id, guild_id= message.guild.id, language= lan, user_id= message.author.id, user_name=message.author.name, ban_remaining=5)
-                await message.reply(f"{message.author.mention} đã spam quá nhiều và bị khoá mõm trong vòng **5** lượt chơi tiếp theo!")
-                print(f"Player {message.author.name} is banned 5 round from world matching game for spamming")
-                message_tracker.clear_user_messages(user_id=message.author.id, channel_id=message.channel.id)
-            return
-        #Kiểm tra xem content có chứa first character là last character của current word không
-        elif word_matching_channel.special_case == False and message.content.lower()[0] != word_matching_channel.last_character:
-            await matching_words_fail(err= f"Từ mới phải bắt đầu bằng chữ cái `'{word_matching_channel.last_character}'` mới được nha.", message=message, word_matching_channel=word_matching_channel,lan=lan,point=point)
-        #Kiểm tra xem content có chứa nguyên từ đầu là last character của current word không
-        elif word_matching_channel.special_case == True and message.content.lower().split()[0] != word_matching_channel.last_character:
-            await matching_words_fail(err= f"Từ mới phải bắt đầu bằng chữ cái `'{word_matching_channel.last_character}'` mới được nha.", message=message, word_matching_channel=word_matching_channel,lan=lan,point=point)
-        #Kiểm xem content có nằm trong list từ đã nối rồi chưa
-        elif message.content.lower() in word_matching_channel.used_words:
-            await matching_words_fail(err= f"Từ `{message.content}` đã có người nối rồi bạn ơi.", message=message, word_matching_channel=word_matching_channel,lan=lan,point=point)
-        #Kiểm tra xem từ này có tồn tại không
-        elif lan == 'en' and message.content.lower() not in english_words_dictionary.keys():
-            await matching_words_fail(err= f"Từ `{message.content}` không nằm trong từ điển.", message=message, word_matching_channel=word_matching_channel,lan=lan,point=point)
-        elif lan == 'vn' and message.content.lower() not in vietnamese_dict.keys():
-            await matching_words_fail(err= f"Từ `{message.content}` không nằm trong từ điển.", message=message, word_matching_channel=word_matching_channel,lan=lan,point=point)
-        else:
-            if word_matching_channel.current_round>=1200:
-                #Reset
-                await message.channel.send(f"Đã chơi được 1200 round rồi. Cảm ơn mọi người đã chơi nhé. Đến lúc reset lại rồi, nên mọi người bắt đầu lại nhé!")
-                await process_reset_word_matching(message=message, word_matching_channel=word_matching_channel, language=lan)
-                return
-            #Coi như pass hết
-            await message.add_reaction('👍')
-            #Nếu trong game việt nam, gặp những từ có đuôi như sau thì đánh special case để xử lý tiếp
-            special_words = ["à", "ả","ã", "ạ", "ẳ", "ẵ","ặ", "ẫ", "ẩ", "ậ", "õ", "ẽ", "ó", "ọ", "ờ","ớ", "ỡ", "ỗ", "ĩ", "ỉ","í", "ị", "ì", "ũ", "ỹ", "ỳ", "ỵ", "ử", "ự", "ộ","ẻ","è", "ể", "ề", "ễ", "ệ", "ẹ", "ợ", "ữ"]
-            special_case = False
-            if lan == 'vn' and message.content[-1].lower() in special_words:
-                special_case = True
-            #Cập nhật lại thông tin
-            db.update_data_word_matching_info(language=lan,channel_id=message.channel.id, guild_id= message.guild.id, current_player_id=message.author.id, current_player_name=message.author.name,current_word=message.content.lower(), special_case_vn=special_case)
-            db.update_player_point_word_matching_info(user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= point, guild_id=message.guild.id, channel_id=message.channel.id,language=lan)
-            word_matching_channel = db.find_word_matching_info_by_id(channel_id= message.channel.id, guild_id= message.guild.id, language=lan)
-            ProfileMongoManager.update_level_progressing(guild_id=message.guild.id, user_id=message.author.id)
-            if word_matching_channel.remaining_word>0:
-                message_tu_hien_tai = f"\nTừ hiện tại là: `'{word_matching_channel.current_word}'`, và có **{word_matching_channel.remaining_word if word_matching_channel.remaining_word else 0}** từ bắt đầu bằng chữ cái `{word_matching_channel.last_character if word_matching_channel.last_character else 0}`"
-                #Kiểm tra xem có special_item không, nếu có thì cộng cho player
-                chuc_mung_item = ""
-                if word_matching_channel.special_item:
-                    db.update_player_special_item_word_matching_info(user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= point, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= word_matching_channel.special_item)
-                    chuc_mung_item = f" và nhận được kỹ năng **{word_matching_channel.special_item.item_name}**. Nhớ đừng quên sử dụng nó nhé"
-                #Trả lời đúng thì reset special_points và special_item lại từ đầu, cập nhật lại list player ban
-                await message.channel.send(f"Hay lắm {message.author.mention}, bạn đã được cộng {point} điểm{chuc_mung_item}. Để kiểm tra điểm số của mình thì hãy dùng lệnh /bxh_noi_tu nhé. {message_tu_hien_tai}")
-                db.update_special_point_word_matching_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_point= 0)
-                db.update_special_item_word_matching_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_item= None)
-                db.reduce_player_bans_word_matching_info_after_round(channel_id= message.channel.id, guild_id= message.guild.id, language=lan)
-            elif word_matching_channel.remaining_word==0:
-                #reset lại
-                await message.channel.send(f"Kinh nhờ, chơi hết từ khả dụng rồi. Cảm ơn mọi người đã chơi nhé. Đến lúc reset thông tin từ rồi. Mọi người bắt đầu lại nhé!")
-                await process_reset_word_matching(message=message, word_matching_channel=word_matching_channel, language=lan)
-            message_tracker.clear_user_messages(user_id=message.author.id, channel_id=message.channel.id)
-        #Xổ số nếu chưa có special point
-        so_xo = random.randint(4, 10)
-        #Nếu sổ xố rơi trúng số 5 thì coi như cộng point lên x2, x3, x4 ngẫu nhiên
-        if so_xo == 10:
-            x_value = random.randint(2, 5)
-            special_point_english = 1*x_value
-            db.update_special_point_word_matching_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_point= special_point_english)
-            text_cong_point = f"\n**Cơ hội chỉ đến một lần duy nhất, nếu ai thắng nhận được {special_point_english} điểm nhaaa! Cơ hội duy nhất, duy nhất, suy nghĩ kỹ trước khi trả lời!**\n"
-            await message.channel.send(f"{text_cong_point}")
-        else:
-            #Sổ xố xem trúng kỹ năng đặc biệt không
-            so_xo = random.randint(3, 10)
-            if so_xo == 10:
-                text_cong_skill = f"\n**Cơ hội chỉ đến một lần duy nhất, nếu ai thắng nhận được kỹ năng đặc biệt bên dưới! Cơ hội duy nhất thôi!**\n"
-                percent = random.randint(0, 100)
-                item = None
-                if percent >= 0 and percent < 55:
-                    #Cấp thấp
-                    item = random.choice(WordMatchingClass.list_special_items_cap_thap)
-                elif percent >= 55 and percent < 80:
-                    #Cấp cao
-                    item = random.choice(WordMatchingClass.list_special_items_cap_cao)
-                elif percent >= 80 and percent < 95:
-                    #Đẳng cấp
-                    item = random.choice(WordMatchingClass.list_special_items_dang_cap)
-                else:
-                    #tối thượng
-                    item = random.choice(WordMatchingClass.list_special_items_toi_thuong)
-                result = db.update_special_item_word_matching_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_item=item)
-                embed = discord.Embed(title=f"Kỹ năng đặc biệt. Rank: {item.level}", description=f"", color=0x03F8FC)
-                embed.add_field(name=f"", value=f"Mã kỹ năng: {item.item_id}", inline=False)
-                embed.add_field(name=f"", value=f"Tên kỹ năng: {item.item_name}", inline=False)
-                embed.add_field(name=f"", value=f"Mô tả kỹ năng: {item.item_description}", inline=False)
-                await message.channel.send(content=text_cong_skill, embed=embed)
-                return
-
-
-async def matching_words_fail(message: discord.Message, err: str, word_matching_channel: db.WordMatchingInfo, lan: str, point: int):
-    #Reset special point nếu trả lời sai, và nếu trước đó đã có
-    message_tu_hien_tai = f"\nTừ hiện tại là: `'{word_matching_channel.current_word}'`, và có **{word_matching_channel.remaining_word if word_matching_channel.remaining_word else 0}** từ bắt đầu bằng chữ cái `{word_matching_channel.last_character if word_matching_channel.last_character else 0}`"
-    if word_matching_channel.special_point:
-        db.update_special_point_word_matching_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_point= 0)
-    if word_matching_channel.special_item:
-        db.update_special_item_word_matching_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_item= None)
-    if message_tracker.add_message(user_id= message.author.id, channel_id= message.channel.id, content= "spam nối từ"): #Đánh dấu những đối tượng thích spam
-        #Ban 5 vòng
-        db.create_and_update_player_bans_word_matching_info(channel_id= message.channel.id, guild_id= message.guild.id, language= lan, user_id= message.author.id, user_name=message.author.name, ban_remaining=5)
-        await message.reply(f"{message.author.mention} đã spam quá nhiều và bị khoá mõm trong vòng **5** lượt chơi tiếp theo!")
-        print(f"Player {message.author.name} is banned 5 round from world matching game for spamming")
-        message_tracker.clear_user_messages(user_id=message.author.id, channel_id=message.channel.id)
-        return
-    await message.add_reaction('❌')
-    await message.reply(f"{err} {message_tu_hien_tai}")
 
 
 client = discord.Client(intents=intents)
