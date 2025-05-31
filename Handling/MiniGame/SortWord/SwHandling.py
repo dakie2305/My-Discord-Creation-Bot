@@ -98,7 +98,7 @@ class SwHandlingFunction():
             #Trừ điểm vì sai quá nhiều
             point = 2
             await message.reply(f"{message.author.mention} đã bị trừ **{point}** vì trả lời sai quá nhiều lần!")
-            SwMongoManager.update_player_point_data_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, user_id=message.author.id, user_name=message.author.name, point=-point)
+            SwMongoManager.update_player_point_data_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point=-point)
             return
         SwMongoManager.create_and_update_player_penalty(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, user_id=message.author.id, user_name=message.author.name)
         if CustomFunctions.check_if_dev_mode():

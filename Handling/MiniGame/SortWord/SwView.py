@@ -1,5 +1,5 @@
 import discord
-from Handling.MiniGame.SortWord.SwClass import SortWordInfo, SwPlayerBan, SwPlayerEffect, SwPlayerProfile, SwSpecialItem
+from Handling.MiniGame.SortWord.SwClass import SortWordInfo
 from Handling.MiniGame.SortWord import SwMongoManager as SwMongoManager
 
 class SwView(discord.ui.View):

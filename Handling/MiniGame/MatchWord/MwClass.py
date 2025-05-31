@@ -2,7 +2,7 @@ from datetime import date, datetime
 from typing import List, Optional
 #region MatchWordInfo
 class MatchWordInfo:
-    def __init__(self, channel_id: int, channel_name: str, guild_name: str, current_player_id: int = None, current_player_name: str = None, current_word: str = None, correct_start_word: str = None, remaining_word: int = 0, special_point: int = None, used_words: List[str] = None, current_round: int = 0, special_case = False, type: str = "A", player_profiles: Optional[List['PlayerProfile']] = None, player_effects : Optional[List['PlayerEffect']] = None, player_penalty : Optional[List['PlayerPenalty']] = None, last_played = datetime.now()):
+    def __init__(self, channel_id: int, channel_name: str, guild_name: str, current_player_id: int = None, current_player_name: str = None, current_word: str = None, correct_start_word: str = None, remaining_word: int = 0, special_point: int = None, used_words: List[str] = None, current_round: int = 0, special_case = False, type: str = "A", player_profiles: Optional[List['PlayerProfile']] = None, player_effects : Optional[List['PlayerEffect']] = None, player_penalty : Optional[List['PlayerPenalty']] = None, player_ban : Optional[List['PlayerBan']] = None, last_played = datetime.now()):
         self.channel_id = channel_id
         self.channel_name = channel_name
         self.guild_name = guild_name
@@ -20,6 +20,7 @@ class MatchWordInfo:
         self.player_profiles: List[PlayerProfile] = player_profiles if player_profiles else []
         self.player_effects: List[PlayerEffect] = player_effects if player_effects else []
         self.player_penalty: List[PlayerPenalty] = player_penalty if player_penalty else []
+        self.player_ban: List[PlayerBan] = player_ban if player_ban else []
     
     def to_dict(self):
         return {
@@ -40,6 +41,7 @@ class MatchWordInfo:
             "player_profiles": [data.to_dict() for data in self.player_profiles],
             "player_effects": [data.to_dict() for data in self.player_effects],
             "player_penalty": [data.to_dict() for data in self.player_penalty],
+            "player_ban": [data.to_dict() for data in self.player_ban],
 
         }
 
@@ -61,6 +63,7 @@ class MatchWordInfo:
             player_profiles = [PlayerProfile.from_dict(item) for item in data.get("player_profiles", [])],
             player_effects = [PlayerEffect.from_dict(item) for item in data.get("player_effects", [])],
             player_penalty = [PlayerPenalty.from_dict(item) for item in data.get("player_penalty", [])],
+            player_ban = [PlayerBan.from_dict(item) for item in data.get("player_ban", [])],
         )
 
 #region SwPlayerProfile   
@@ -137,15 +140,15 @@ class SpecialItem:
 
 #region Player Effect
 class PlayerEffect:
-    def __init__(self, user_id: int, username: str, effect_id: str, effect_name: str):
+    def __init__(self, user_id: int, user_name: str, effect_id: str, effect_name: str):
         self.user_id = user_id 
-        self.username = username
+        self.user_name = user_name
         self.effect_id = effect_id
         self.effect_name = effect_name
     def to_dict(self):
         return {
             "user_id": self.user_id,
-            "username": self.username,
+            "user_name": self.user_name,
             "effect_id": self.effect_id,
             "effect_name": self.effect_name,
         }
@@ -154,22 +157,22 @@ class PlayerEffect:
     def from_dict(data:dict):
         return PlayerEffect(
             user_id=data.get("user_id", None),
-            username=data.get("username", None),
+            user_name=data.get("user_name", None),
             effect_id = data.get("effect_id", None),
             effect_name = data.get("effect_name", None),
         )
 
-#region Player Ban
+#region PlayerPenalty
 class PlayerPenalty:
-    def __init__(self, user_id: int, username: str, timestamp: datetime = datetime.now(), penalty_point: int = 0):
+    def __init__(self, user_id: int, user_name: str, timestamp: datetime = datetime.now(), penalty_point: int = 0):
         self.user_id = user_id 
-        self.username = username
+        self.user_name = user_name
         self.timestamp = timestamp
         self.penalty_point = penalty_point
     def to_dict(self):
         return {
             "user_id": self.user_id,
-            "username": self.username,
+            "user_name": self.user_name,
             "timestamp": self.timestamp,
             "penalty_point": self.penalty_point,
         }
@@ -178,7 +181,28 @@ class PlayerPenalty:
     def from_dict(data:dict):
         return PlayerPenalty(
             user_id=data.get("user_id", None),
-            username=data.get("username", None),
+            user_name=data.get("user_name", None),
             timestamp = data.get("timestamp", None),
             penalty_point = data.get("timestamp", 0),
+        )
+        
+#region Player Ban
+class PlayerBan:
+    def __init__(self, user_id: int, user_name: str, ban_remain: int = 0):
+        self.user_id = user_id 
+        self.user_name = user_name
+        self.ban_remain = ban_remain
+    def to_dict(self):
+        return {
+            "user_id": self.user_id,
+            "user_name": self.user_name,
+            "ban_remain": self.ban_remain,
+        }
+        
+    @staticmethod
+    def from_dict(data:dict):
+        return PlayerPenalty(
+            user_id=data.get("user_id", None),
+            user_name=data.get("user_name", None),
+            ban_remain = data.get("ban_remain", None),
         )

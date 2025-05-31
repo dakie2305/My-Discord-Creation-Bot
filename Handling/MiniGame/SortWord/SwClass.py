@@ -153,17 +153,17 @@ class SwPlayerEffect:
         )
 
 
-#region Player Ban
+#region PlayerPenalty
 class PlayerPenalty:
-    def __init__(self, user_id: int, username: str, timestamp: datetime = datetime.now(), penalty_point: int = 0):
+    def __init__(self, user_id: int, user_name: str, timestamp: datetime = datetime.now(), penalty_point: int = 0):
         self.user_id = user_id 
-        self.username = username
+        self.user_name = user_name
         self.timestamp = timestamp
         self.penalty_point = penalty_point
     def to_dict(self):
         return {
             "user_id": self.user_id,
-            "username": self.username,
+            "user_name": self.user_name,
             "timestamp": self.timestamp,
             "penalty_point": self.penalty_point,
         }
@@ -172,9 +172,9 @@ class PlayerPenalty:
     def from_dict(data:dict):
         return PlayerPenalty(
             user_id=data.get("user_id", None),
-            username=data.get("username", None),
+            user_name=data.get("user_name", None),
             timestamp = data.get("timestamp", None),
-            penalty_point = data.get("timestamp", 0),
+            penalty_point = data.get("penalty_point", 0),
         )
 
 list_special_items_cap_thap = [
