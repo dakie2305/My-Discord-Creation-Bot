@@ -1,0 +1,114 @@
+
+from datetime import datetime
+from pymongo import MongoClient
+from Handling.MiniGame.MatchWord.MwClass import MatchWordInfo, SpecialItem, PlayerProfile
+from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
+from typing import List
+
+# Connect to the MongoDB server
+if UtilitiesFunctions.USER_NAME_MONGODB != "" and UtilitiesFunctions.USER_NAME_MONGODB != None and UtilitiesFunctions.PASSWORD_MONGODB != "" and UtilitiesFunctions.PASSWORD_MONGODB != None:
+    client = MongoClient(f"mongodb://{UtilitiesFunctions.USER_NAME_MONGODB}:{UtilitiesFunctions.PASSWORD_MONGODB}@localhost:27017/")
+else:
+    client = MongoClient("mongodb://localhost:27017/")
+# Create or switch to the database
+db_specific = client["mw_database"]
+
+#region MatchWordInfo
+def find_match_word_info_by_id(lang: str, guild_id: int, channel_id: int):
+    collection = db_specific[f'{lang}_mw_guild_{guild_id}']
+    data = collection.find_one({"channel_id": channel_id})
+    if data:
+        return MatchWordInfo.from_dict(data)
+    return None
+
+def create_info(lang: str, guild_id: int, data: MatchWordInfo):
+    #Mỗi channel là một collection riêng, chia theo channel id
+    collection = db_specific[f'{lang}_mw_guild_{guild_id}']
+    existing_data = collection.find_one({"channel_id": data.channel_id})
+    if existing_data:
+        return None
+    result = collection.insert_one(data.to_dict())
+    return result
+
+def update_data_info(channel_id: int, guild_id: int, current_player_id: int, current_player_name: str, current_word: str, lang: str, existed_words: List[str] = None, special_case: bool = False):
+    collection = db_specific[f'{lang}_mw_guild_{guild_id}']
+    existing_data = collection.find_one({"channel_id": channel_id})
+    existing_info = MatchWordInfo.from_dict(existing_data)
+    if not existing_info: return
+    used_words = existing_info.used_words
+    if existed_words is not None:
+        used_words = existed_words
+    used_words.append(current_word)
+    #Cộng current round lên 1
+    current_round = existing_info.current_round+ 1
+    #Chuyển last play thành hiện tại
+    last_played = datetime.now()
+
+    result = collection.update_one({"channel_id": channel_id}, {"$set": {"current_player_id": current_player_id,
+                                                                         "current_player_name": current_player_name,
+                                                                         "current_word": current_word,
+                                                                         "current_round": current_round,
+                                                                         "special_case": special_case,
+                                                                         "last_played": last_played,
+                                                                         "used_words": [word for word in used_words], #chỉ dùng used_words
+                                                                         }})
+    return result
+
+def delete_data_info(channel_id: int, guild_id: int, lang: str):
+    collection = db_specific[f'{lang}_mw_guild_{guild_id}']
+    result = collection.delete_one({"channel_id": channel_id})
+    return result
+
+def drop_word_matching_info_collection(guild_id: int):
+    collection = db_specific[f'en_mw_guild_{guild_id}']
+    if collection != None:
+        collection.drop()
+    collection = db_specific[f'vn_mw_guild_{guild_id}']
+    if collection != None:
+        collection.drop()
+
+def update_special_point_data_info(channel_id: int, guild_id: int, language: str, special_point: int = 0):
+    collection = db_specific[f'{language}_mw_guild_{guild_id}']
+    #Cập nhật special point của channel lại
+    result = collection.update_one({"channel_id": channel_id}, {"$set": {"special_point": special_point,
+                                                                         }})
+    return result
+
+def update_special_item_data_info(channel_id: int, guild_id: int, language: str, special_item: SpecialItem = None):
+    collection = db_specific[f'{language}_mw_guild_{guild_id}']
+    #Cập nhật special item của channel lại
+    if special_item:
+        result = collection.update_one({"channel_id": channel_id}, {"$set": {"special_item": special_item.to_dict(),
+                                                                         }})
+    else:
+        result = collection.update_one({"channel_id": channel_id}, {"$set": {"special_item": None,
+                                                                         }})
+    return result
+
+
+#region PlayerProfile
+def update_player_point_data_info(channel_id: int, guild_id: int, language: str,user_id: int, user_name: str, user_display_name: str, point:int):
+    collection = db_specific[f'{language}_mw_guild_{guild_id}']
+    existing_data = collection.find_one({"channel_id": channel_id})
+    existing_info = MatchWordInfo.from_dict(existing_data)
+    list_player_profiles = existing_info.player_profiles
+    #Tìm xem có user_id trong list player_profiles chưa
+    selected_player = None
+    for player in list_player_profiles:
+        if player.user_id == user_id:
+            selected_player = player
+            break
+    if selected_player == None:
+        #Tạo mới player và thêm vào
+        new_player = PlayerProfile(user_id=user_id, user_name=user_name, user_display_name=user_display_name, point=point)
+        list_player_profiles.append(new_player)
+        result = collection.update_one({"channel_id": channel_id}, {"$set": {"player_profiles": [player.to_dict() for player in list_player_profiles],
+                                                                         }})
+        return result
+    else:
+        selected_player.point += point
+        if selected_player.point < 0: selected_player.point = 0
+        result = collection.update_one({"channel_id": channel_id, "player_profiles.user_id": user_id}, {"$set": {"player_profiles.$.point": selected_player.point,
+                                                                                                                }})
+        return result
+

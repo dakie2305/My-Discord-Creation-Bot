@@ -1676,7 +1676,7 @@ async def on_member_update(before: discord.Member, after: discord.Member):
 async def on_guild_remove(guild: discord.Guild):
     #drop collection sw guild and world matching database
     db.drop_word_matching_info_collection(guild_id=guild.id)
-    SwMongoManager.drop_word_matching_info_collection(guild_id=guild.id)
+    SwMongoManager.drop_sort_word_info_collection(guild_id=guild.id)
     print(f"Bot {bot.user.display_name} removed from guild {guild.name}. Deleted all related collection")
     
 #Khi có người bị banned
@@ -1736,6 +1736,8 @@ async def on_message(message: discord.Message):
     await bot.process_commands(message)
 
 bot_token = os.getenv("BOT_TOKENN")
+if CustomFunctions.check_if_dev_mode():
+    bot_token = os.getenv("BOT_TOKEN_NO1_DEV")
 english_words_dictionary = CustomFunctions.english_dict
 vietnamese_dict = CustomFunctions.vietnamese_dict
 message_tracker = CustomFunctions.MessageTracker()

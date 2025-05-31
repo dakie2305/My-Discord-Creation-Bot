@@ -49,7 +49,8 @@ def update_data_info(channel_id: int, guild_id: int, current_player_id: int, cur
     
     #Đảo lại current_word
     unsorted_word = get_unsorted_string(input_string= current_word)
-        
+    #Chuyển last play thành hiện tại
+    last_played = datetime.now()
     #Cộng current round lên 1
     current_round = existing_info.current_round+ 1
     result = collection.update_one({"channel_id": channel_id}, {"$set": {"current_player_id": current_player_id,
@@ -57,6 +58,7 @@ def update_data_info(channel_id: int, guild_id: int, current_player_id: int, cur
                                                                          "current_word": current_word,
                                                                          "unsorted_word": unsorted_word,
                                                                          "special_case": special_case,
+                                                                         "last_played": last_played,
                                                                          "current_round": current_round,
                                                                          "used_words": [word for word in used_words], #chỉ dùng used_words
                                                                          }})
@@ -71,8 +73,7 @@ def delete_data_info(channel_id: int, guild_id: int, lang: str):
         result = collection.delete_one({"channel_id": channel_id})
         return result
 
-def drop_word_matching_info_collection(guild_id: int):
-    db_specific = client['word_matching_database']
+def drop_sort_word_info_collection(guild_id: int):
     collection = db_specific[f'en_sw_guild_{guild_id}']
     if collection != None:
         collection.drop()
