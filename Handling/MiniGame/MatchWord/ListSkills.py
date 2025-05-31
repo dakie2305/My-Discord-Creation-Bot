@@ -316,3 +316,31 @@ list_special_items_dang_cap = [
     ),
 ]
 list_special_items_toi_thuong = [
+    SpecialItem(
+        item_id="tt_minus_all",
+        item_name="Trừ Điểm Tối Thượng",
+        item_description="Kỹ năng này sẽ trừ đi 25 điểm của toàn bộ đối thủ trong trò chơi nối chữ. Cách sử dụng rất đơn giản, chỉ việc nhập đúng lệnh như thế này:\n **!use_skill tt_minus_all**",
+        quantity = 1,
+        point=25,
+        level="Tối Thượng",
+        required_target=False
+    ),
+    SpecialItem(
+        item_id="tt_swap_3",
+        item_name="Thay Thế Top 3",
+        item_description="Kỹ năng này sẽ lập tức cộng đủ điểm để đẩy người chơi lên top 3. Cách sử dụng rất đơn giản, chỉ việc nhập đúng lệnh như thế này:\n **!use_skill tt_swap_3**",
+        quantity = 1,
+        point=5,
+        level="Tối Thượng",
+        required_target=False
+    ),
+    SpecialItem(
+        item_id="tt_swap_2",
+        item_name="Thay Thế Top 2",
+        item_description="Kỹ năng này sẽ lập tức cộng đủ điểm để đẩy người chơi lên top 2. Cách sử dụng rất đơn giản, chỉ việc nhập đúng lệnh như thế này:\n **!use_skill tt_swap_2**",
+        quantity = 1,
+        point=5,
+        level="Tối Thượng",
+        required_target=False
+    ),
+]
