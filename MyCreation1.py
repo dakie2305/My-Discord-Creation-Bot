@@ -56,7 +56,6 @@ async def global_sync_creation_1(ctx):
     else:
         await ctx.send(f"Có phải là Darkie đâu mà dùng lệnh này?")        
         
-
 @bot.command()
 @app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
 @app_commands.checks.has_role(1256989385744846989)
@@ -1322,7 +1321,7 @@ message_tracker = CustomFunctions.MessageTracker()
 #Cog command
 init_extension = [
                   "cogs.games.WordMiniGameCog",
-                  "cogs.games.SkillWordMiniGame",
+                  "cogs.games.SkillWordMiniGameCog",
                   "cogs.games.LeaderboardWordMiniGameCog",
                   "cogs.games.TruthDareCog",
                   "cogs.misc.SnipeCog",

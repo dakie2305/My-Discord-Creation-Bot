@@ -41,3 +41,7 @@ class SlashCommand(Enum):
     GA_CHALLENGE = "</ga challenge:1322835450397986867>"
 
     QUEST_DUNGEON = "</quests dungeon_channels:1315721623340318875>"
+
+
+
+    SKILL_USE = "</skill use:1378636491303026779>"
