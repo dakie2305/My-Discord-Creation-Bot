@@ -4,7 +4,6 @@ from typing import List
 from pymongo import MongoClient
 from datetime import datetime, timedelta
 from db.Class.CustomClass import UserInfo, GuildExtraInfo, UserConversationInfo, ConversationInfo, SnipeChannelInfo, SnipeMessage, SnipeMessageAttachments, PreDeleteAttachmentsInfo
-from db.Class.WordMatchingClass import WordMatchingInfo, PlayerProfile, SpecialItem, PlayerEffect, PlayerBan
 from db.Class.UserCountClass import UserCount
 import CustomFunctions
 from pathlib import Path

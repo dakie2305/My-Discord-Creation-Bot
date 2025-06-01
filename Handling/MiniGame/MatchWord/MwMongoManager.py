@@ -259,7 +259,7 @@ def create_and_update_player_bans_word_matching_info(channel_id: int, guild_id: 
             break
     if selected_player == None:
         #Tạo mới player ban và thêm vào world matching
-        new_player = PlayerBan(user_id=user_id, user_name=user_name, ban_remaining=ban_remaining)
+        new_player = PlayerBan(user_id=user_id, user_name=user_name, ban_remain=ban_remaining)
         list_player_ban.append(new_player)
     elif selected_player.ban_remain <= 0:
         list_player_ban.remove(selected_player)

@@ -232,7 +232,6 @@ class MwHandlingFunction():
                 embed = discord.Embed(title=f"Kỹ năng đặc biệt. Rank: {item.level}", description=f"", color=0x03F8FC)
                 embed.add_field(name=f"", value=f"Tên kỹ năng: {item.item_name}", inline=False)
                 embed.add_field(name=f"", value=f"Mô tả kỹ năng: {item.item_description}", inline=False)
-                embed.add_field(name=f"", value=f"Cách dùng:\n**{SlashCommand.SKILL_USE.value}**", inline=False)
                 await message.channel.send(content=text_cong_skill, embed=embed)
                 return
                 

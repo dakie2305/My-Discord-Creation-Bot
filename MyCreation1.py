@@ -11,7 +11,6 @@ from discord import app_commands
 from Handling.MiniGame.MatchWord import MwHandling, MwMongoManager
 import db.DbMongoManager as db
 from db.DbMongoManager import UserInfo
-import db.Class.WordMatchingClass as WordMatchingClass
 import random
 import string
 import CustomButton

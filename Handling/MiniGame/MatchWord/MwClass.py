@@ -205,8 +205,8 @@ class PlayerBan:
         
     @staticmethod
     def from_dict(data:dict):
-        return PlayerPenalty(
+        return PlayerBan(
             user_id=data.get("user_id", None),
             user_name=data.get("user_name", None),
-            ban_remain = data.get("ban_remain", None),
+            ban_remain = data.get("ban_remain", 0),
         )
