@@ -14,6 +14,7 @@ from Handling.MiniGame.MatchWord import ListSkills, MwClass, MwMongoManager
 from Handling.MiniGame.SortWord.SwConfirmDeleteView import SwConfirmDeleteView
 from Handling.MiniGame.SortWord.SwConfirmRestartView import SwConfirmRestartView
 from Handling.MiniGame.SortWord.SwGiveSkillView import SwGiveSkillView
+from Handling.MiniGame.SortWord.SwUseSkillView import SwUseSkillView
 from Handling.Misc.SelfDestructView import SelfDestructView
 
 async def setup(bot: commands.Bot):
@@ -79,7 +80,12 @@ class SkillWordMiniGame(commands.Cog):
         if info is not None:
             #Đoán từ
             embed = self.get_list_skills_embed(interaction=interaction, lan= lan, sw_info=info)
-            await interaction.followup.send(embed=embed)
+            profile = next((p for p in info.player_profiles if p.user_id == interaction.user.id), None)
+            view = None
+            if profile and profile.special_items:
+                view = SwUseSkillView(user=interaction.user, target=target, channel_id=interaction.channel_id, lan=lan, info=info, all_skills=profile.special_items, profile=profile, english_words_dictionary=self.english_words_dictionary, vietnamese_dict=self.vietnamese_dict)
+            mes = await interaction.followup.send(embed=embed, view= view)
+            view.message = mes
             return
         #Không có
         view = SelfDestructView(timeout=30)
