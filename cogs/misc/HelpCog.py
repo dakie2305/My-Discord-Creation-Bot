@@ -32,7 +32,6 @@ class Help(commands.Cog):
             mess = await message.channel.send(embed=first_embed, view=view)
             view.message = mess
     
-    #region keo_bua_bao command
     @discord.app_commands.command(name="help", description="Hiện danh sách lệnh của Bot!")
     async def help_slash(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=False)

@@ -80,35 +80,6 @@ async def guild_extra_info(ctx):
         db.insert_guild_extra_info(data)
         await ctx.send(f"Lưu thành công thông tin Guild Extra Info về server này.", ephemeral=True)
 
-
-#endregion
-
-#region Snipe command
-@bot.tree.command(name="snipe", description="Hiện lại message mới nhất vừa bị xoá trong channel này.")
-async def snipe(interaction: discord.Interaction):
-    await interaction.response.defer()
-    called_channel = interaction.channel
-    snipe_channel_info = db.find_snipe_channel_info_by_id(called_channel.id, interaction.guild.id)
-    if snipe_channel_info:
-        list_snipe_message = snipe_channel_info.snipe_messages
-        if list_snipe_message == None:
-            await interaction.followup.send(f"Chưa thấy bất kỳ message nào bị xoá trong channel {interaction.channel.mention}. Vui lòng thử lại sau.")
-            return
-        list_snipe_message.reverse()
-        temp_files = []
-        first_message = list_snipe_message[0]
-        if first_message != None and first_message.user_attachments!= None and len(first_message.user_attachments)>0:
-            for att in first_message.user_attachments:
-                file = await CustomFunctions.get_attachment_file_from_url(url= att.url, content_type= att.content_type)
-                if file != None: temp_files.append(file)
-        view = CustomButton.PaginationView(bot=bot, interaction=interaction, items= list_snipe_message)
-        message  = await interaction.followup.send(embed=view.embed, view=view, files=temp_files)
-        view.discord_message = message
-        await view.countdown()
-    else:
-        await interaction.followup.send(f"Chưa có dữ liệu snipe cho channel {interaction.channel.mention}. Vui lòng thử lại sau.")
-#endregion
-
 #region Random AI Talk command
 @bot.tree.command(name="random_ai_talk", description="Bật/tắt chế độ cho phép bot lâu lâu trò chuyện trong channel này.")
 async def random_ai_talk(interaction: discord.Interaction):
@@ -139,10 +110,6 @@ async def random_ai_talk(interaction: discord.Interaction):
         data = GuildExtraInfo(guild_id=interaction.guild.id, guild_name= interaction.guild.name, allowed_ai_bot=True, list_channels_ai_talk= list_channels_ai_talk)
         db.insert_guild_extra_info(data)
         await interaction.followup.send(f"Đã tạo Guild Extra Info. Bot lâu lâu sẽ nói chuyện trong channel này.", ephemeral= True)
-#endregion
-
-
-#endregion
 
 # Task: Nói chuyện tự động
 @tasks.loop(hours=3)
@@ -620,6 +587,7 @@ init_extension = ["cogs.games.RockPaperScissorCog",
                   "cogs.economy.GaCog",
                   
                   "cogs.misc.HelpCog",
+                  "cogs.misc.SnipeCog",
                   "cogs.misc.DonationCog",
                   ]
 

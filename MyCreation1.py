@@ -72,94 +72,6 @@ async def sync(ctx):
     else:
         await ctx.send(f"Có phải là Darkie đâu mà dùng lệnh này?")
         
-#region Nối Từ Commands
-@bot.command()
-@app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
-async def start_wm_en(ctx):
-    message: discord.Message = ctx.message
-    if message:
-        #Kiểm tra xem đã tồn tại WordMatchingClass cho channel này chưa
-        if db.find_word_matching_info_by_id(channel_id=message.channel.id, guild_id=message.guild.id, language='en'):
-            #Xoá word matching info
-            db.delete_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language='en')
-            await ctx.send(f"Đã xoá trò chơi nối từ trong channel này.")
-        else:
-            data = db.WordMatchingInfo(channel_id=message.channel.id, channel_name=message.channel.name, current_word="a", first_character="a",last_character="a",remaining_word=12300)
-            result = db.create_word_matching_info(data=data, guild_id=message.guild.id, language='en')
-            message_tu_hien_tai = f"\nTừ hiện tại là: `'{data.current_word}'`, và có **{data.remaining_word if data.remaining_word else 0}** bắt đầu bằng chữ cái `{data.last_character if data.last_character else 0}`"
-            await ctx.send(f"Đã tạo trò chơi nối từ tiếng Anh cho channel này. Hãy bắt đầu nối từ đi. {message_tu_hien_tai}")
-        return
-    return
-
-@bot.command()
-@app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
-async def start_wm_vn(ctx):
-    message: discord.Message = ctx.message
-    if message:
-        #Kiểm tra xem đã tồn tại WordMatchingClass cho channel này chưa
-        if db.find_word_matching_info_by_id(channel_id=message.channel.id, guild_id=message.guild.id, language='vn'):
-            #Xoá word matching info
-            db.delete_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language='vn')
-            await ctx.send(f"Đã xoá trò chơi nối từ trong channel này.")
-        else:
-            data = db.WordMatchingInfo(channel_id=message.channel.id, channel_name=message.channel.name, current_word="a", first_character="a",last_character="a",remaining_word=12300)
-            result = db.create_word_matching_info(data=data, guild_id=message.guild.id, language='vn')
-            message_tu_hien_tai = f"\nTừ hiện tại là: `'{data.current_word}'`, và có **{data.remaining_word if data.remaining_word else 0}** bắt đầu bằng chữ cái `{data.last_character if data.last_character else 0}`"
-            await ctx.send(f"Đã tạo trò chơi nối từ tiếng Việt cho channel này. Hãy bắt đầu nối từ đi. {message_tu_hien_tai}")
-        return
-    return
-
-
-#region Reset nối từ
-@bot.command()
-@app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
-async def reset_wm(ctx):
-    message: discord.Message = ctx.message
-    if message:
-        if message.guild.id == TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value:
-            #Chỉ check trong True Heaven
-            req_roles = ['Supervisor', 'Server Master', 'Moderator', 'Ultimate Admins']
-            has_required_role = any(role.name in req_roles for role in message.author.roles)
-            if not has_required_role:
-                await ctx.send("Không đủ thẩm quyền để thực hiện lệnh.")
-                return
-        #Kiểm tra xem đã tồn tại WordMatchingClass cho channel này chưa
-        word_matching_channel = db.find_word_matching_info_by_id(channel_id=message.channel.id, guild_id=message.guild.id, language='en')
-        if word_matching_channel:
-            await process_reset_word_matching(message=message, word_matching_channel=word_matching_channel, language='en')
-        else:
-            word_matching_channel = db.find_word_matching_info_by_id(channel_id=message.channel.id, guild_id=message.guild.id, language='vn')
-            if word_matching_channel:
-                await process_reset_word_matching(message=message, word_matching_channel=word_matching_channel, language='vn')
-            else:
-                await ctx.send(f"Chưa tồn tại thông tin Word Match Info cho channel này. Hãy dùng lệnh !bat_dau_noi_tu_english.")
-        return
-    return
-
-async def process_reset_word_matching(message: discord.Message, word_matching_channel: db.WordMatchingInfo, language):
-    embed = discord.Embed(title=f"Xếp hạng các player theo điểm.", description=f"Trò Chơi Nối Từ", color=0x03F8FC)
-    embed.add_field(name=f"", value="___________________", inline=False)
-    embed.add_field(name=f"", value=f"Round hiện tại: {word_matching_channel.current_round}", inline=False)
-    count = 0
-    if word_matching_channel.player_profiles:
-        word_matching_channel.player_profiles.sort(key=lambda x: x.points, reverse=True)
-        for index, profile in enumerate(word_matching_channel.player_profiles):
-            user = message.guild.get_member(profile.user_id)
-            if user != None and (profile.points!= 0 or len(profile.special_items)> 0):
-                embed.add_field(name=f"", value=f"**Hạng {index+1}.** {user.mention}. Tổng điểm: **{profile.points}**. Số lượng kỹ năng đặc biệt: **{len(profile.special_items)}**.", inline=False)
-                count+=1
-            if count >= 25: break
-    text = "Chúc mừng các player top đầu!"
-    if message.guild.id == TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value:
-        text+= " <@315835396305059840> sẽ trao role đặc biệt cho những Player thuộc top 3 nhé!"
-    await message.channel.send(content=text, embed=embed)
-    #Xoá đi tạo lại
-    db.delete_word_matching_info(channel_id=message.channel.id, guild_id=message.guild.id, language=language)
-    data = db.WordMatchingInfo(channel_id=message.channel.id, channel_name=message.channel.name, current_word="a", first_character="a",last_character="a",remaining_word=12300)
-    result = db.create_word_matching_info(data=data, guild_id=message.guild.id, language=language)
-    message_tu_hien_tai = f"\nTừ hiện tại là: `'{data.current_word}'`, và có **{data.remaining_word if data.remaining_word else 0}** bắt đầu bằng chữ cái `{data.last_character if data.last_character else 0}`"
-    await message.channel.send(f"Đã reset toàn bộ từ trong trò nối từ trong channel này. {message_tu_hien_tai}")
-
 #region Give skill
 @bot.command()
 @app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
@@ -1142,7 +1054,6 @@ async def delete_message_context(interaction: discord.Interaction, message: disc
     except Exception as e:
             await interaction.followup.send(f"<@315835396305059840> Bot gặp exception trong lúc xoá message ID {message.id}. Exception: {str(e)}. Vui lòng liên hệ Darkie!")
             print(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} tried to delete message id{message.id} but got exception {str(e)}.")
-    
 #endregion
 
 #region report command
@@ -1176,97 +1087,6 @@ async def report(interaction: discord.Interaction, user : discord.Member, reason
         #Tag bản thân
         await interaction.followup.send(f"<@315835396305059840> Bot gặp exception trong lúc thực hiện lệnh. Exception: {str(e)}. Vui lòng liên hệ Darkie!", ephemeral=True)
         commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} tried report user id {user.id} but got exception {str(e)}.")
-#endregion
-
-
-#region Snipe command
-@bot.tree.command(name="snipe", description="Hiện lại message mới nhất vừa bị xoá trong channel này.")
-async def snipe(interaction: discord.Interaction):
-    await interaction.response.defer()
-    called_channel = interaction.channel
-    
-    snipe_channel_info = db.find_snipe_channel_info_by_id(called_channel.id, interaction.guild.id)
-    if snipe_channel_info:
-        list_snipe_message = snipe_channel_info.snipe_messages
-        if list_snipe_message == None:
-            await interaction.followup.send(f"Chưa thấy bất kỳ message nào bị xoá trong channel {interaction.channel.mention}. Vui lòng thử lại sau.")
-            return
-        list_snipe_message.reverse()
-        temp_files = []
-        first_message = list_snipe_message[0]
-        if first_message != None and first_message.user_attachments!= None and len(first_message.user_attachments)>0:
-            for att in first_message.user_attachments:
-                file = await CustomFunctions.get_attachment_file_from_url(url= att.url, content_type= att.content_type)
-                if file != None: temp_files.append(file)
-                
-        view = CustomButton.PaginationView(bot=bot, interaction=interaction, items= list_snipe_message)
-        message = await interaction.followup.send(embed=view.embed, view=view, files=temp_files)
-        view.discord_message = message
-        await view.countdown()
-    else:
-        await interaction.followup.send(f"Chưa có dữ liệu snipe cho channel {interaction.channel.mention}. Vui lòng thử lại sau.")
-#endregion
-
-#region Bảng Xếp Hạng Nối Từ
-@bot.tree.command(name="bxh_noi_tu", description="Hiện bảng xếp hạng những người chơi nối từ trong channel này.")
-@app_commands.describe(user="Chọn user cần muốn xem cụ thể xếp hạng")
-async def bxh_noi_tu(interaction: discord.Interaction, user: Optional[discord.Member] = None):
-    await interaction.response.defer()
-    called_channel = interaction.channel
-    #Kiểm tra xem ở đây là bảng channel nối từ hay không
-    word_matching_channel = db.find_word_matching_info_by_id(channel_id= called_channel.id, guild_id= called_channel.guild.id, language= 'en')
-    if word_matching_channel:
-        embed = get_bxh_noi_tu(interaction=interaction, lan='en',word_matching_channel=word_matching_channel, user_mention=user)
-        await interaction.followup.send(embed= embed)
-    else:
-        word_matching_channel= db.find_word_matching_info_by_id(channel_id= called_channel.id, guild_id= called_channel.guild.id, language= 'vn')
-        if word_matching_channel:
-            embed = get_bxh_noi_tu(interaction=interaction, lan='vn',word_matching_channel=word_matching_channel, user_mention=user)
-            await interaction.followup.send(embed= embed)
-        else:
-            await interaction.followup.send(f"Đây không phải là channel dùng để chơi nối từ. Chỉ dùng lệnh này trong channel chơi nối từ thôi!")
-
-
-def get_bxh_noi_tu(interaction: discord.Interaction,lan: str, word_matching_channel: db.WordMatchingInfo, user_mention: Optional[discord.Member] = None):
-    if lan == 'en' or lan == 'eng':
-        lan = "Tiếng Anh"
-    elif lan == 'vn':
-        lan = "Tiếng Việt"
-    embed = discord.Embed(title=f"Xếp hạng các player theo điểm.", description=f"Trò Chơi Nối Từ {lan}", color=0x03F8FC)
-    embed.add_field(name=f"", value="___________________", inline=False)
-    embed.add_field(name=f"", value=f"Round thứ: **{word_matching_channel.current_round}**", inline=False)
-    count = 0
-    if word_matching_channel.player_profiles:
-        word_matching_channel.player_profiles.sort(key=lambda x: x.points, reverse=True)
-        if user_mention == None:
-            for index, profile in enumerate(word_matching_channel.player_profiles):
-                user = interaction.guild.get_member(profile.user_id)
-                if user != None and (profile.points!= 0):
-                    embed.add_field(name=f"", value=f"**Hạng {index+1}.** {user.mention}. Tổng điểm: **{profile.points}**. Số lượng kỹ năng đặc biệt: **{len(profile.special_items)}**.", inline=False)
-                    count+=1
-                if count >= 15: break
-        else:
-            matched = False
-            for index, profile in enumerate(word_matching_channel.player_profiles):
-                if profile.user_id == user_mention.id:
-                    user = interaction.guild.get_member(profile.user_id)
-                    embed.add_field(name=f"", value=f"**Hạng {index+1}.** {user.mention}. Tổng điểm: **{profile.points}**. Số lượng kỹ năng đặc biệt: **{len(profile.special_items)}**.", inline=False)
-                    #Show kỹ năng luôn
-                    if profile.special_items:
-                        embed.add_field(name=f"________________", value= f"")
-                        for index_item, item in enumerate(profile.special_items):
-                            target_require = "Có" if item.required_target else "Không"
-                            embed.add_field(name=f"Kỹ năng {index_item+1}", value= f"Tên kỹ năng: *{item.item_name}*\nRank: {item.level} \n\nMô tả kỹ năng: {item.item_description}", inline=False)  # Single-line field
-                            embed.add_field(name=f"________________", value= f"")
-                    matched = True
-                    break
-            if matched == False:
-                embed.add_field(name=f"", value=f"*Chưa có dữ liệu về người chơi này*", inline=False)     
-    else:
-        embed.add_field(name=f"", value=f"*Chưa có dữ liệu về người chơi*", inline=False)       
-    embed.add_field(name=f"", value="___________________", inline=False)
-    return embed     
-
 
 # Task: Check jail expiry
 @tasks.loop(seconds=30)
@@ -1506,7 +1326,9 @@ message_tracker = CustomFunctions.MessageTracker()
 #Cog command
 init_extension = [
                   "cogs.games.WordMiniGameCog",
+                  "cogs.games.LeaderboardWordMiniGameCog",
                   "cogs.games.TruthDareCog",
+                  "cogs.misc.SnipeCog",
                   "cogs.misc.TherapyAICog",
                   "cogs.misc.TrueHeavenCustomCommandsCog",
                   "cogs.misc.HelpCog",

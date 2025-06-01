@@ -171,7 +171,7 @@ class SwHandlingFunction():
             SwMongoManager.update_special_point_data_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_point= special_point_english)
             embed = discord.Embed(title=f"{EmojiCreation1.EXCLAIM_MARK.value} Điểm Thưởng Duy Nhất {EmojiCreation1.EXCLAIM_MARK.value}", description=f"",color=discord.Color.blue())
             embed.add_field(name=f"", value="▬▬▬▬▬▬ι═══════════>", inline=False)
-            embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Cơ hội chỉ đến một lần duy nhất, nếu ai đoán đúng sẽ nhận được **{special_point_english}** điểm! !", inline=False)
+            embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Cơ hội chỉ đến một lần duy nhất, nếu ai đoán đúng sẽ nhận được **{special_point_english}** điểm!", inline=False)
             embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} **Lưu ý**: Đoán sai sẽ mất điểm ngay, nên hãy suy nghĩ cho kỹ trước khi trả lời!", inline=False)
             await message.channel.send(embed=embed)
         else:
