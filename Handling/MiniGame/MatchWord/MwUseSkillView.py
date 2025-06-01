@@ -125,10 +125,12 @@ class UseSkillInputModal(discord.ui.Modal):
                 for word in self.english_words_dictionary.keys():
                     if len(word) > 1 and word.startswith(self.info.correct_start_word) and word not in self.info.used_words:
                         suitable_word = word
+                        break
             elif self.lan == 'vn':
                 for word in self.vietnamese_dict.keys():
                     if len(word) > 1 and word.startswith(self.info.correct_start_word) and word not in self.info.used_words:
                         suitable_word = word
+                        break
             if suitable_word == None:
                 await interaction.followup.send(f"{interaction.user.mention} đã dùng kỹ năng **`{special_item.item_name}`**.\nRất tiếc là không có từ hợp lệ... lạ ta. <@315835396305059840>", ephemeral=False)
                 flag_remove_skill = False

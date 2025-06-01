@@ -7,7 +7,7 @@ import CustomFunctions
 import random
 import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
 from CustomEnum.SlashEnum import SlashCommand 
-from Handling.MiniGame.SortWord import SwClass, SwHandling, SwMongoManager, SwView
+from Handling.MiniGame.SortWord import SwClass, SwHandling, SwMongoManager
 from Handling.MiniGame.MatchWord import MwClass, MwMongoManager
 from Handling.MiniGame.SortWord.SwConfirmDeleteView import SwConfirmDeleteView
 from Handling.MiniGame.SortWord.SwConfirmRestartView import SwConfirmRestartView

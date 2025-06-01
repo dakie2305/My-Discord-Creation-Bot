@@ -11,7 +11,7 @@ import CustomFunctions
 from Handling.MiniGame.MatchWord.MwChooseVietnamType import MwChooseVietnamType
 from Handling.MiniGame.MatchWord.MwConfirmDeleteView import MwConfirmDeleteView
 from Handling.MiniGame.MatchWord.MwConfirmRestartView import MwConfirmRestartView
-from Handling.MiniGame.SortWord import SwClass, SwHandling, SwMongoManager, SwView
+from Handling.MiniGame.SortWord import SwClass, SwHandling, SwMongoManager
 from Handling.MiniGame.MatchWord import MwClass, MwMongoManager
 from Handling.MiniGame.SortWord.SwConfirmDeleteView import SwConfirmDeleteView
 from Handling.MiniGame.SortWord.SwConfirmRestartView import SwConfirmRestartView

@@ -9,7 +9,7 @@ import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
 from CustomEnum.SlashEnum import SlashCommand 
 from Handling.MiniGame.MatchWord.MwGiveSkillView import MwGiveSkillView
 from Handling.MiniGame.MatchWord.MwUseSkillView import MwUseSkillView
-from Handling.MiniGame.SortWord import SwClass, SwHandling, SwMongoManager, SwView
+from Handling.MiniGame.SortWord import SwClass, SwHandling, SwMongoManager
 from Handling.MiniGame.MatchWord import ListSkills, MwClass, MwMongoManager
 from Handling.MiniGame.SortWord.SwConfirmDeleteView import SwConfirmDeleteView
 from Handling.MiniGame.SortWord.SwConfirmRestartView import SwConfirmRestartView
