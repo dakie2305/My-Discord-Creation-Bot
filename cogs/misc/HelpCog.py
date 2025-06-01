@@ -2,12 +2,9 @@ from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.EmojiEnum import EmojiCreation2, EmojiCreation1
 import discord
 from discord.ext import commands
-from datetime import datetime, timedelta
 import CustomFunctions
 from Handling.Misc.SelfDestructView import SelfDestructView
 from Handling.Misc.HelpPageView import HelpPageView
-from typing import List, Optional, Dict
-import random
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Help(bot=bot))
@@ -32,7 +29,6 @@ class Help(commands.Cog):
             mess = await message.channel.send(embed=first_embed, view=view)
             view.message = mess
     
-    #region keo_bua_bao command
     @discord.app_commands.command(name="help", description="Hiện danh sách lệnh của Bot!")
     async def help_slash(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=False)
@@ -50,9 +46,11 @@ class Help(commands.Cog):
         embed = discord.Embed(title=f"Tổng Hợp Lệnh Creation 1", description=f"", color=0xddede7)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
         count = 2
-        embed.add_field(name=f"", value=f"- **Trang {count}**: Tổng hợp lệnh game nối từ.", inline=False)
+        embed.add_field(name=f"", value=f"- **Trang {count}**: Tổng hợp lệnh game Nối Từ.", inline=False)
         count+=1
-        embed.add_field(name=f"", value=f"- **Trang {count}**: Tổng hợp lệnh game đoán từ.", inline=False)
+        embed.add_field(name=f"", value=f"- **Trang {count}**: Tổng hợp lệnh game Đoán Từ.", inline=False)
+        count+=1
+        embed.add_field(name=f"", value=f"- **Trang {count}**: Thông tin thêm về game Đoán Từ, Nối Từ.", inline=False)
         count+=1
         embed.add_field(name=f"", value=f"- **Trang {count}**: Tổng hợp lệnh lặt vặt.", inline=False)
         count+=1
@@ -62,27 +60,37 @@ class Help(commands.Cog):
         #Game nối từ
         embed = discord.Embed(title=f"Lệnh Game Nối Từ", description=f"Áp dụng cho mini game Nối Từ", color=0xddede7)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
-        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value}`!start_wm_en:` Bắt đầu một game nối từ tiếng Anh trong channel hiện tại. Dùng thêm một lần nữa để xoá trò chơi nối từ khỏi channel đó", inline=False)
-        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value}`!start_wm_vn:` Bắt đầu một game nối từ tiếng Việt trong channel hiện tại. Dùng thêm một lần nữa để xoá.", inline=False)
-        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value}`!reset_wm:` reset channel nối từ để bắt đầu lại từ đầu.", inline=False)
-        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value}`!wm_give_skill <id_skill> <@user>` chỉ dành cho chủ Server. Lệnh dùng để đưa kỹ năng đặc biệt cho player trong channel nối từ.", inline=False)
-        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value}`!wm_remove_skill <id_skill|all|random> <@user>`: chỉ dành cho chủ Server. Lệnh dùng để xoá kỹ năng đặc biệt cho user trong channel nối từ. (Có thể dùng all, random để xoá tất cả hoặc xoá ngẫu nhiên kỹ năng của player)", inline=False)
-        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value}`!wm_use_skill`: Lệnh dùng để hiển thị bảng kỹ năng đặc biệt của player trong channel nối từ và cách dùng kỹ năng đó.", inline=False)
-        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value}`!wm_give_ban <@user> 1`: Lệnh dùng để cấm một player không được chơi trong một round.", inline=False)
-        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value}`/bxh_noi_tu`: Lệnh dùng để hiển thị bảng xếp hạng điểm của các player trong channel nối từ.", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Bắt đầu hoặc kết thúc một game nối từ trong channel hiện tại bằng lệnh {SlashCommand.START_MATCH_WORD.value}", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Reset channel nối từ để bắt đầu lại từ đầu bằng lệnh {SlashCommand.RESTART_MATCH_WORD.value}", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Xem bảng xếp hạng bằng lệnh {SlashCommand.BXH.value}", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Sử dụng kỹ năng bằng lệnh {SlashCommand.SKILL_USE.value}", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Nối Từ Tiếng Việt có hai loại đặc biệt: **Nối Theo Từ Cuối** hoặc **Nối Theo Âm Cuối**.", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Ví dụ khi chọn **Nối Theo Từ Cuối**:\n `anh trai`   ->   `trai làng`   ->    `làng quê`", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Ví dụ khi chọn **Nối Theo Âm Cuối**:\n `anh trai`   ->   `im lặng`   ->    `gay cấn`", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
         list_embed.append(embed)
         
         #Game đoán từ
         embed = discord.Embed(title=f"Lệnh Game Đoán Từ", description=f"Áp dụng cho mini game Đoán Từ", color=0xddede7)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
-        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value}`!start_sw_en:` bắt đầu một game đoán từ tiếng Anh trong channel hiện tại. Dùng thêm một lần nữa để xoá.", inline=False)
-        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value}`!start_sw_vn:` bắt đầu một game đoán từ tiếng Việt trong channel hiện tại. Dùng thêm một lần nữa để xoá.", inline=False)
-        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value}`!reset_sw:`: reset channel game đoán từ hiện tại để bắt đầu lại từ đầu.", inline=False)
-        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value}`!sws_give_skill <id_skill> <@user>`: chỉ dành cho chủ Server. Lệnh dùng để đưa kỹ năng đặc biệt cho player trong channel đoán từ.", inline=False)
-        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value}`!sws`: Lệnh dùng để hiển thị bảng kỹ năng đặc biệt của player trong channel đoán từ và cách dùng kỹ năng đó.", inline=False)
-        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value}`!sws hint`: Lệnh dùng để nhận gợi ý. Sẽ mất ba điểm mỗi lần dùng.", inline=False)
-        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value}`/bxh_sw`: Lệnh dùng để hiển thị bảng xếp hạng điểm của các player trong channel game đoán từ.", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Trò này rất đơn giản, đó là bạn phải sắp xếp chữ cái của từ hiện tại thành một từ có nghĩa!", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Ví dụ: `olhel`  ->  `hello` ", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Bắt đầu hoặc kết thúc một game đoán từ trong channel hiện tại bằng lệnh {SlashCommand.START_SWORD_WORD.value}", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Reset channel đoán từ để bắt đầu lại từ đầu bằng lệnh {SlashCommand.RESTART_SWORD_WORD.value}", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Xem bảng xếp hạng bằng lệnh {SlashCommand.BXH.value}", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Sử dụng kỹ năng bằng lệnh {SlashCommand.SKILL_USE.value}", inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
+        list_embed.append(embed)
+        
+        #thông tin thêm
+        embed = discord.Embed(title=f"Thông Tin Thêm", description=f"Áp dụng cho mini game Đoán Từ", color=0xddede7)
+        embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Hãy cẩn thận, sai quá nhiều có thể sẽ bị trừ điểm!", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Từ khó quá, không biết kết quả? Sử dụng ngay lệnh {SlashCommand.HINT_WORD_MINIGAME.value} để đổi ba điểm và nhận được gợi ý chính xác!", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Có rất nhiều kỹ năng đặc biệt có thể xuất hiện ngẫu nhiên! Dùng kỹ năng bằng lệnh {SlashCommand.SKILL_USE.value}", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Riêng chủ server (owner) được quyền sử dụng lệnh {SlashCommand.SKILL_GIVE_WORD_MINIGAME.value} để ban phát kỹ năng đặc biệt!", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Cứ mỗi 500 lượt chơi là sẽ tự động restart lại từ đầu, hoặc cứ dùng lệnh {SlashCommand.RESTART_MATCH_WORD.value} hoặc {SlashCommand.RESTART_SWORD_WORD.value}!", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Kênh không chơi khoảng một tháng sẽ tự động bị xóa!", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
         list_embed.append(embed)
         
