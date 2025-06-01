@@ -479,8 +479,28 @@ async def clear_up_data_task():
                     QuestMongoManager.delete_quest(guild_id=guild.id, user_id=quest.user_id)
                     count+=1
         print(f"clear_up_data_task started. Deleted {count} quest data in guild {guild.name}")
+        all_mw_data = MwMongoManager.find_all_info_in_guild(guild_id=guild.id)
+        count = 0
+        if all_mw_data != None:
+            for lang, mw_data in all_mw_data:
+                if datetime.now() > mw_data.last_played + timedelta(weeks=4):
+                    MwMongoManager.delete_data_info(channel_id=mw_data.channel_id, guild_id=guild.id, lang=lang)
+                    count+=1
+        print(f"clear_up_data_task started. Deleted {count} MatchWord data in guild {guild.name} for being inactive over 1 month")
+        
+        all_sw_data = SwMongoManager.find_all_info_in_guild(guild_id=guild.id)
+        count = 0
+        if all_sw_data != None:
+            for lang, sw_data in all_sw_data:
+                if datetime.now() > sw_data.last_played + timedelta(weeks=4):
+                    SwMongoManager.delete_data_info(channel_id=sw_data.channel_id, guild_id=guild.id, lang=lang)
+                    count+=1
+            
+        print(f"clear_up_data_task started. Deleted {count} SortWord data in guild {guild.name} for being inactive over 1 month")
         #Drop quest collection nếu trống
         QuestMongoManager.drop_quest_collection_if_empty(guild_id=guild.id)
+        MwMongoManager.drop_collections_if_empty(guild_id=guild.id)
+        SwMongoManager.drop_collections_if_empty(guild_id=guild.id)
         #Kiểm tra snipe message cũ, xóa đi nếu cần
         all_snipe_channels = db.find_all_snipe_channel_info(guild_id=guild.id)
         count = 0

@@ -6,7 +6,7 @@ from pymongo import MongoClient
 import CustomFunctions
 from Handling.MiniGame.MatchWord.MwClass import MatchWordInfo, PlayerBan, PlayerEffect, PlayerPenalty, SpecialItem, PlayerProfile
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
-from typing import List
+from typing import List, Tuple
 
 # Connect to the MongoDB server
 if UtilitiesFunctions.USER_NAME_MONGODB != "" and UtilitiesFunctions.USER_NAME_MONGODB != None and UtilitiesFunctions.PASSWORD_MONGODB != "" and UtilitiesFunctions.PASSWORD_MONGODB != None:
@@ -23,6 +23,25 @@ def find_match_word_info_by_id(lang: str, guild_id: int, channel_id: int):
     if data:
         return MatchWordInfo.from_dict(data)
     return None
+
+def find_all_info_in_guild(guild_id: int) -> List[Tuple[str, MatchWordInfo]]:
+    all_infos = []
+    for lang in ['en', 'vn']:
+        collection_name = f'{lang}_mw_guild_{guild_id}'
+        if collection_name in db_specific.list_collection_names():
+            collection = db_specific[collection_name]
+            cursor = collection.find({})
+            all_infos.extend((lang, MatchWordInfo.from_dict(doc)) for doc in cursor)
+    return all_infos
+
+def drop_collections_if_empty(guild_id: int):
+    for lang in ['en', 'vn']:
+        collection_name = f'{lang}_mw_guild_{guild_id}'
+        collection = db_specific[collection_name]
+        if collection is not None and collection.estimated_document_count() == 0:
+            collection.drop()
+            print(f"Collection '{collection_name}' dropped because it was empty.")
+
 
 def create_info(lang: str, guild_id: int, data: MatchWordInfo):
     #Mỗi channel là một collection riêng, chia theo channel id
