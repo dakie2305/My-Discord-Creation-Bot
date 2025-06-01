@@ -2,12 +2,9 @@ from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.EmojiEnum import EmojiCreation2, EmojiCreation1
 import discord
 from discord.ext import commands
-from datetime import datetime, timedelta
 import CustomFunctions
 from Handling.Misc.SelfDestructView import SelfDestructView
 from Handling.Misc.HelpPageView import HelpPageView
-from typing import List, Optional, Dict
-import random
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Help(bot=bot))
