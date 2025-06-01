@@ -117,7 +117,7 @@ async def first_command(interaction: discord.Interaction, user : discord.Member,
     if not has_required_role:
         await interaction.followup.send("Không đủ thẩm quyền để tống giam.")
         return
-    has_jailed_role = any(role.name in jailed_roles for role in interaction.user.roles)
+    has_jailed_role = any(role.name in jailed_roles for role in user.roles)
     if has_jailed_role:
         await interaction.followup.send("Người này đã bị tống giam rồi.")
         return
