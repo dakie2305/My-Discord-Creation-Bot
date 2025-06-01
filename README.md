@@ -7,6 +7,7 @@
 - Database: **MongoDB**
 - AI Model: **Gemini 1.5 Flash**
 - Nền tảng hoạt động: **Discord**
+- Host Server: **Raspberry Pi**
 
 ![messenger](https://i.imgur.com/i6tG9cW.png)
 
@@ -38,8 +39,14 @@ Cả hai bot Creation 1 và Creation 2 đều có chức năng và nhiệm vụ 
 Bot Creation có sẵn một số mini-game nổi bật và độc lạ, khác biệt với những mini-game thường thấy và luôn cập nhật và chỉnh sửa thêm theo thời gian và theo kiến nghị từ user:
 - Nối từ tiếng Anh
 - Nối từ tiếng Việt
+- Đoán từ tiếng Việt
+- Đoán từ tiếng Anh
 - Sự Thật Hay Thách Thức
 - Tung đồng xu
+- Câu cá
+- Bài cào, tài xỉu, tung xúc xắc, nổ hũ,...
+- Chiến đấu theo lượt
+- Ngoài ra còn nhiều mini game khác, có thể dùng bot để biết thêm
 
 ![noi-tu-english](https://i.imgur.com/WXoia3n.gif)
 
@@ -82,6 +89,13 @@ Trước khi chúng ta nhảy vào build và chạy bot, hãy đảm bảo kỹ 
 
 Hai Creation 1 và Creation 2 được thiết kế nhằm phục vụ và quản lý server cá nhân, một số chức năng đặc biệt sẽ không hỗ trợ server ngoài.
 
-## Credit
+| Thông tin thêm  | Đường dẫn |
+| ------------- |:-------------:|
+| Discord      | [Link Server](https://discord.gg/kKzyJAuccr)     |
+| Creation 1      | [Top.gg Page](https://top.gg/bot/1257305865124581416)     |
+| Creation 2      | [Top.gg Page](https://top.gg/bot/1257713292445618239)     |
 
-- [Thanh Đức - Developer]
+---
+<p align="center">
+<strong>Copyright © Darkie 2025</strong>
+</p>
