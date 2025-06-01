@@ -69,7 +69,7 @@ class HintWordMiniGame(commands.Cog):
             #Đoán từ
             view = SwConfirmHintView(user=interaction.user, info=info, lan=lan)
             embed = self.get_hint_embed(interaction=interaction, lan= lan, sw_info=info)
-            mess = await interaction.followup.send(embed=embed)
+            mess = await interaction.followup.send(embed=embed, view= view)
             view.message = mess
             return
         #Không có

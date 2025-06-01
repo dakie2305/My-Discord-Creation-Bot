@@ -23,7 +23,7 @@ class SwConfirmHintView(discord.ui.View):
         if interaction.user.id != self.user.id: return
         await interaction.response.defer(ephemeral=True)
         message = f"{interaction.user.mention} Bạn đã chấp nhận đổi 3 điểm!"
-        await interaction.followup.send(content=f"{message}")
+        await interaction.followup.send(content=f"{message}", ephemeral=True)
         try:
             await self.message.edit(content=f"{interaction.user.mention} đã chấp nhận đánh đổi 3 điểm.\nGợi ý từ hợp lệ: **`{self.info.current_word}**`", view=None, embed= None)
         except Exception as e:
