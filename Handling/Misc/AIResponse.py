@@ -62,7 +62,7 @@ class AIResponseHandling():
                     system_instruction = f"{CustomFunctions.initial_instruction} {CustomFunctions.background_creation_1} {CustomFunctions.shared_background}"
                 else:
                     system_instruction = f"{CustomFunctions.initial_instruction} {CustomFunctions.background_creation_2} {CustomFunctions.shared_background}"
-                model = genai.GenerativeModel(model_name='gemini-1.5-flash', safety_settings= CustomFunctions.safety_settings, system_instruction=system_instruction)
+                model = genai.GenerativeModel(model_name=CustomFunctions.AI_MODEL, safety_settings= CustomFunctions.safety_settings, system_instruction=system_instruction)
                 prompt = await CustomFunctions.get_proper_prompt(message, self.bot_name, referenced_message)
                 print(f"Prompt generated from {self.bot.user}:\n {prompt}")
                 file_image_path = None

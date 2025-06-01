@@ -122,7 +122,7 @@ async def automatic_speak_randomly():
             random_channel_id = random.choice(guild_extra_info.list_channels_ai_talk)
             actual_channel = guild.get_channel(random_channel_id)
             if actual_channel:
-                model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
+                model = genai.GenerativeModel(CustomFunctions.AI_MODEL, CustomFunctions.safety_settings)
                 prompt = CustomFunctions.get_automatically_talk_prompt("Creation 2", guild, actual_channel)
                 response = model.generate_content(f"{prompt}")
                 print(f"{bot.user} started talking on its own at {guild_extra_info.guild_name}, channel {actual_channel.name}.")
@@ -534,7 +534,7 @@ async def on_member_update(before: discord.Member, after: discord.Member):
     #Tạm thời không cần chạy trong server khác
     if before.guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value: return
     
-    model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
+    model = genai.GenerativeModel(CustomFunctions.AI_MODEL, CustomFunctions.safety_settings)
     channel = bot.get_channel(1259392446987632661)
     await CustomFunctions.thanking_for_boost(bot_name="creation 2", before=before, after=after, model=model, channel=channel)
     

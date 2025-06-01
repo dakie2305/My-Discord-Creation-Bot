@@ -1,4 +1,3 @@
-import PIL.Image
 import discord
 from datetime import datetime, timedelta
 import os
@@ -6,7 +5,6 @@ from dotenv import load_dotenv
 from CustomEnum.TrueHeavenEnum import TrueHeavenEnum
 import CustomFunctions
 import google.generativeai as genai
-import time
 import DailyLogger
 from discord.ext import commands, tasks
 from discord import app_commands
@@ -24,8 +22,6 @@ from Handling.MiniGame.SortWord import SwHandling as SwHandling
 from Handling.Misc.Therapy import TherapyHandling
 from Handling.Misc.StickyMessage import StickyMessageHandling
 from discord.app_commands import Choice
-import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
-import Handling.Economy.Couple.CoupleMongoManager as CoupleMongoManager
 import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
 import Handling.MiniGame.SortWord.SwMongoManager as SwMongoManager
 from CustomEnum.EmojiEnum import EmojiCreation2, EmojiCreation1
@@ -1144,7 +1140,7 @@ async def automatic_speak_randomly():
             random_channel_id = random.choice(guild_extra_info.list_channels_ai_talk)
             actual_channel = guild.get_channel(random_channel_id)
             if actual_channel:
-                model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
+                model = genai.GenerativeModel(CustomFunctions.AI_MODEL, CustomFunctions.safety_settings)
                 prompt = CustomFunctions.get_automatically_talk_prompt("Creation 1", guild, actual_channel)
                 response = model.generate_content(f"{prompt}")
                 print(f"{bot.user} started talking on its own at {guild_extra_info.guild_name}, channel {actual_channel.name}.")
@@ -1234,7 +1230,7 @@ async def on_member_update(before: discord.Member, after: discord.Member):
     #Tạm thời không cần chạy trong server khác
     if before.guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value: return
     
-    model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
+    model = genai.GenerativeModel(CustomFunctions.AI_MODEL, CustomFunctions.safety_settings)
     channel = bot.get_channel(1259392446987632661)
     await CustomFunctions.thanking_for_boost(bot_name="creation 1", before=before, after=after, model=model, channel=channel)
     
@@ -1305,7 +1301,7 @@ async def on_message(message: discord.Message):
     guild_extra_info = db.find_guild_extra_info_by_id(guild_id=message.guild.id)
     if guild_extra_info != None and message.channel.id == guild_extra_info.therapy_channel and message.author.bot == False:
         #Xử lý therapy
-        model = genai.GenerativeModel('gemini-1.5-flash', CustomFunctions.safety_settings)
+        model = genai.GenerativeModel(CustomFunctions.AI_MODEL, CustomFunctions.safety_settings)
         asyncio.create_task(TherapyHandling(bot=bot, model=model).handling_therapy_ai(message=message))
         speakFlag = False
     if guild_extra_info != None and guild_extra_info.custom_parameter_2 != None and message.channel.id == guild_extra_info.custom_parameter_2: #Hiện tại chỉ có true heaven có
@@ -1326,6 +1322,7 @@ message_tracker = CustomFunctions.MessageTracker()
 #Cog command
 init_extension = [
                   "cogs.games.WordMiniGameCog",
+                  "cogs.games.SkillWordMiniGame",
                   "cogs.games.LeaderboardWordMiniGameCog",
                   "cogs.games.TruthDareCog",
                   "cogs.misc.SnipeCog",

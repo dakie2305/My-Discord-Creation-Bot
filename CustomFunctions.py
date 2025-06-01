@@ -19,6 +19,7 @@ import soundfile as sf
 load_dotenv()
 USER_NAME_MONGODB = os.getenv("USER_NAME_MONGODB", "")
 PASSWORD_MONGODB = os.getenv("PASSWORD_MONGODB", "")
+AI_MODEL = 'gemini-2.0-flash'
 
 def get_random_response(filename):
   """
