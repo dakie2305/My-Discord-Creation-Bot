@@ -615,7 +615,7 @@ class GaBattleView(discord.ui.View):
             if is_solo: 
                 #roll random 1 2
                 amount = random.randint(1, 2)
-            ProfileMongoManager.set_guardian_stats_points(guild_id=self.guild_id, user_id=info.player_profile.user_id, stats_point=1)
+            ProfileMongoManager.set_guardian_stats_points(guild_id=self.guild_id, user_id=info.player_profile.user_id, stats_point=amount)
             reward_text = f"x{amount} **Điểm Cộng Chỉ Số**"
             return reward_text
         #legendary weapon chance
