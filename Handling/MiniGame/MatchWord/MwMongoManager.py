@@ -70,31 +70,6 @@ def update_data_info(channel_id: int, guild_id: int, current_player_id: int, cur
                                                                          }})
     return result
 
-def get_remaining_words_english(data: str, used_words: List[str]):
-    """
-    Kiểm tra với danh sách những từ đã tồn tại, đối chiếu với dictionary để xem còn bao nhiêu từ khả dụng.
-    """
-    if data == None: return 0
-    count = 0
-    for word in english_words_dictionary.keys():
-        if word == data: continue
-        if word.startswith(data) and word not in used_words:
-            count+= 1
-    return count
-
-def get_remaining_words_vietnamese(data: str, used_words: List[str], special_case: bool = False):
-    """
-    Kiểm tra với danh sách những từ đã tồn tại, đối chiếu với dictionary để xem còn bao nhiêu từ khả dụng.
-    """
-    if data == None: return 0
-    count = 0
-    for phrase in vietnamese_words_dictionary.keys():
-        if phrase == data: continue
-        if special_case == True and phrase.split()[0] == data and phrase not in used_words:
-            count += 1
-        elif special_case == False and phrase.startswith(data) and phrase not in used_words:
-            count += 1
-    return count
 
 
 def delete_data_info(channel_id: int, guild_id: int, lang: str):
@@ -333,31 +308,30 @@ def get_remaining_words_english(data: str, used_words: List[str]):
 
 def get_remaining_words_vietnamese(data: str, used_words: List[str], special_case: bool = False):
     """
-    Kiểm tra với danh sách những từ đã tồn tại, đối chiếu vói dictionary để xem còn bao nhiêu từ khả dụng.
+    Đếm số lượng từ khả dụng trong từ điển tiếng Việt, loại bỏ những từ đã dùng.
+    Nếu là special_case (nối theo từ đầu), thì chỉ so sánh phần đầu tiên của từ.
+    Ngoài ra, nếu chính từ gốc đã bị dùng, loại trừ nó ra khỏi count.
     """
-    if data == None: return 0
+    if data is None:
+        return 0
+
     count = 0
+    used_words_set = set(used_words)  # Faster lookup
+
     for phrase in vietnamese_words_dictionary.keys():
-        if phrase == data: continue
-        if special_case == True and phrase.split()[0] == data and phrase not in used_words:
-            count += 1
-        elif special_case == False and phrase.startswith(data) and phrase not in used_words:
-            count += 1
+        if phrase == data:
+            continue
+        if special_case:
+            if phrase.split()[0] == data and phrase not in used_words_set:
+                count += 1
+        else:
+            if phrase.startswith(data) and phrase not in used_words_set:
+                count += 1
+
+    # If the base word itself is already used (and it's not being counted above), subtract 1
+    if data in used_words_set:
+        count -= 1
     return count
-
-def get_english_dict()->dict:
-    filepath = os.path.join(os.path.dirname(__file__), "json", "english_dictionary.json")
-    with open(filepath, 'r', encoding='utf-8') as f:
-        data = json.load(f)
-        return data
-    return None
-
-def get_vietnamese_dict()->dict:
-    filepath = os.path.join(os.path.dirname(__file__),"json", "vietnamese_dictionary.json")
-    with open(filepath, 'r', encoding= 'utf-8') as f:
-        data = json.load(f)
-        return data
-    return None
 
 english_words_dictionary = CustomFunctions.get_english_dict()
 vietnamese_words_dictionary = CustomFunctions.get_vietnamese_dict()
