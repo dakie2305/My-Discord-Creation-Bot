@@ -44,8 +44,8 @@ class SlashCommand(Enum):
 
 
 
-    SKILL_USE = "</skill use:1378636491303026779>"
-    BXH = "</bxh:1378608829750575166>"
+    SKILL_USE = "</skill use:1378739143106105497>"
+    BXH = "</bxh:1378739143106105498>"
     START_MATCH_WORD = "</start match_word:1378739143106105494>"
     START_SWORD_WORD = "</start sort_word:1378739143106105494>"
     RESTART_MATCH_WORD = "</restart match_word:1378739143106105495>"
