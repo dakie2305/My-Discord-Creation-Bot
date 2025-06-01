@@ -4,7 +4,7 @@ import json
 import os
 from pymongo import MongoClient
 import CustomFunctions
-from Handling.MiniGame.MatchWord.MwClass import MatchWordInfo, PlayerBan, PlayerPenalty, SpecialItem, PlayerProfile
+from Handling.MiniGame.MatchWord.MwClass import MatchWordInfo, PlayerBan, PlayerEffect, PlayerPenalty, SpecialItem, PlayerProfile
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 from typing import List
 
@@ -215,6 +215,40 @@ def update_all_players_point(channel_id: int, guild_id: int, language: str, immu
         result = collection.update_one({"channel_id": channel_id}, {"$set": {"player_profiles": [player.to_dict() for player in list_player_profiles],
                                                                          }})
         return result
+
+def update_player_effects(channel_id: int, guild_id: int, language: str,user_id: int,user_name: str, effect_id: str, effect_name: str, remove_special_effect = False):
+    collection = db_specific[f'{language}_mw_guild_{guild_id}']
+    existing_data = collection.find_one({"channel_id": channel_id})
+    existing_info = MatchWordInfo.from_dict(existing_data)
+    list_player_effect = existing_info.player_effects
+    if remove_special_effect == False:
+        #Tạo mới danh sách Player Effect
+        data = PlayerEffect(user_id= user_id, username= user_name, effect_id= effect_id, effect_name= effect_name)
+        list_player_effect.append(data)
+    else:
+        #Xoá effect id của user id khỏi danh sách
+        for item in list_player_effect:
+            if item.effect_id == effect_id and item.user_id == user_id:
+                list_player_effect.remove(item)
+                break
+    list_temp_to_remove = []
+    for player_effect in list_player_effect:
+        if player_effect.user_id == user_id:
+            list_temp_to_remove.append(player_effect)
+            
+    if list_temp_to_remove != None and len(list_temp_to_remove)>2:
+        while len(list_temp_to_remove)>2:
+            first_skill_to_remove = list_temp_to_remove[0]
+            for item in list_player_effect:
+                if item.effect_id == first_skill_to_remove.effect_id and item.user_id == first_skill_to_remove.user_id:
+                    list_player_effect.remove(item)
+                    break
+            list_temp_to_remove.pop(0)
+    #Cập nhật danh sách trong db
+    result = collection.update_one({"channel_id": channel_id}, {"$set": {"player_effects": [player_effects.to_dict() for player_effects in list_player_effect],
+                                                                         }})
+    return result
+
 
 #region player ban
 def create_and_update_player_bans_word_matching_info(channel_id: int, guild_id: int, language: str,user_id: int,user_name: str, ban_remaining: int):

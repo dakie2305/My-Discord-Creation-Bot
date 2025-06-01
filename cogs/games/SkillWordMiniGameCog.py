@@ -8,6 +8,7 @@ import random
 import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
 from CustomEnum.SlashEnum import SlashCommand 
 from Handling.MiniGame.MatchWord.MwGiveSkillView import MwGiveSkillView
+from Handling.MiniGame.MatchWord.MwUseSkillView import MwUseSkillView
 from Handling.MiniGame.SortWord import SwClass, SwHandling, SwMongoManager, SwView
 from Handling.MiniGame.MatchWord import ListSkills, MwClass, MwMongoManager
 from Handling.MiniGame.SortWord.SwConfirmDeleteView import SwConfirmDeleteView
@@ -22,6 +23,8 @@ async def setup(bot: commands.Bot):
 class SkillWordMiniGame(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+        self.english_words_dictionary = CustomFunctions.english_dict
+        self.vietnamese_dict = CustomFunctions.vietnamese_dict
     
     def check_if_message_inside_sw_game(self, guild_id: int = None, channel_id: int = None):
         langs = ['en', 'vn']
@@ -54,12 +57,23 @@ class SkillWordMiniGame(commands.Cog):
             view.message = mess
             return
         
+        if target.bot:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title="",description=f"{EmojiCreation1.CROSS.value} Không được chọn bot!",color=discord.Color.red())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
         #Kiểm tra xem tồn tại mini game nối từ hay đoán từ chưa
         info, lan = self.check_if_message_inside_mw_game(guild_id=interaction.guild_id, channel_id=interaction.channel_id)
         if info is not None:
             #Nối từ
             embed = self.get_list_skills_embed(interaction=interaction, lan= lan, mw_info=info)
-            await interaction.followup.send(embed=embed)
+            profile = next((p for p in info.player_profiles if p.user_id == interaction.user.id), None)
+            view = None
+            if profile and profile.special_items:
+                view = MwUseSkillView(user=interaction.user, target=target, channel_id=interaction.channel_id, lan=lan, info=info, all_skills=profile.special_items, profile=profile, english_words_dictionary=self.english_words_dictionary, vietnamese_dict=self.vietnamese_dict)
+            mes = await interaction.followup.send(embed=embed, view= view)
+            view.message = mes
             return
         info, lan = self.check_if_message_inside_sw_game(guild_id=interaction.guild_id, channel_id=interaction.channel_id)
         if info is not None:
@@ -86,7 +100,6 @@ class SkillWordMiniGame(commands.Cog):
             lan = "Tiếng Anh"
         elif lan == 'vn':
             lan = "Tiếng Việt"
-        
         title = "Đoán Từ"
         game_info = None
         if sw_info is not None:
@@ -103,6 +116,7 @@ class SkillWordMiniGame(commands.Cog):
                 list_effect.append(player_effect.effect_name)
 
         if game_info.player_profiles:
+            matched = False
             game_info.player_profiles.sort(key=lambda x: x.point, reverse=True)
             for profile in game_info.player_profiles:
                 if profile.user_id == interaction.user.id:
@@ -207,8 +221,6 @@ class SkillWordMiniGame(commands.Cog):
         else:
             await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
     
-
-
     def get_list_skill_embed_mw(self, user: discord.Member, target: discord.Member):
         list_embed = []
         page_size = 5

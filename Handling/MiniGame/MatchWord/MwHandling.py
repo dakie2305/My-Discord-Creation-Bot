@@ -2,6 +2,7 @@ import discord
 from typing import List, Optional
 import random
 from CustomEnum.EmojiEnum import EmojiCreation1
+from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.TrueHeavenEnum import TrueHeavenEnum
 from Handling.MiniGame.MatchWord import ListSkills, MwMongoManager, MwClass
 import CustomFunctions
@@ -188,7 +189,7 @@ class MwHandlingFunction():
                     MwMongoManager.update_player_special_item(user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= point, guild_id=message.guild.id, channel_id=message.channel.id,language=lan, special_item= mw_info.special_item)
                     chuc_mung_item = f" và nhận được kỹ năng **{mw_info.special_item.item_name}**. Nhớ đừng quên sử dụng nó nhé"
                 #Trả lời đúng thì reset special_points và special_item lại từ đầu, cập nhật lại list player ban
-                await message.channel.send(f"{message.author.mention}, bạn đã được cộng {point} điểm{chuc_mung_item}. Để kiểm tra điểm số của mình thì hãy dùng lệnh /bxh_sw nhé. {message_tu_hien_tai}")
+                await message.channel.send(f"{message.author.mention}, bạn đã được cộng {point} điểm{chuc_mung_item}. Để kiểm tra điểm số của mình thì hãy dùng lệnh {SlashCommand.BXH.value}. {message_tu_hien_tai}")
                 #Reset special point, special item, giảm ban remain của tất cả player
                 MwMongoManager.update_special_point_data_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_point= 0)
                 MwMongoManager.update_special_item_data_info(channel_id= message.channel.id, guild_id= message.guild.id, language=lan, special_item= None)
@@ -231,7 +232,7 @@ class MwHandlingFunction():
                 embed = discord.Embed(title=f"Kỹ năng đặc biệt. Rank: {item.level}", description=f"", color=0x03F8FC)
                 embed.add_field(name=f"", value=f"Tên kỹ năng: {item.item_name}", inline=False)
                 embed.add_field(name=f"", value=f"Mô tả kỹ năng: {item.item_description}", inline=False)
-                embed.add_field(name=f"", value=f"Cách dùng:\n**/skills**", inline=False)
+                embed.add_field(name=f"", value=f"Cách dùng:\n**{SlashCommand.SKILL_USE.value}**", inline=False)
                 await message.channel.send(content=text_cong_skill, embed=embed)
                 return
                 

@@ -45,3 +45,4 @@ class SlashCommand(Enum):
 
 
     SKILL_USE = "</skill use:1378636491303026779>"
+    BXH = "</bxh:1378608829750575166>"

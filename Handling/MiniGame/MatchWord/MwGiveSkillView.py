@@ -69,8 +69,13 @@ class GiveSkillInputModal(discord.ui.Modal):
         self.channel_id = channel_id
         self.lan = lan
         self.list_skills = list_skills
+        self.submitted = False
 
     async def on_submit(self, interaction: discord.Interaction):
+        if self.submitted:
+            await interaction.response.send_message("Đang xử lý, vui lòng đợi...", ephemeral=True)
+            return
+        self.submitted = True
         await interaction.response.defer(ephemeral=False)
         input_value = self.input_index_page_field.value
         try:
@@ -84,12 +89,12 @@ class GiveSkillInputModal(discord.ui.Modal):
             chosen_skill = self.list_skills[index]
             if chosen_skill is None:
                 await interaction.followup.send(f"Không tìm thấy kỹ năng đã chọn!", ephemeral=False)
+                self.submitted = False
                 return
             MwMongoManager.update_player_special_item(channel_id=self.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id=self.target.id, user_display_name=self.target.display_name, user_name=self.target.name, point=0, special_item=chosen_skill)
             await interaction.followup.send(f"{interaction.user.mention} đã cho {self.target.mention} kỹ năng **{chosen_skill.item_name}** thuộc rank **{chosen_skill.level}**!", ephemeral=False)
-            
         except Exception:
             await interaction.followup.send(f"Chỉ nhập số hợp lệ!", ephemeral=True)
             return
-        
+        self.submitted = False
         return
