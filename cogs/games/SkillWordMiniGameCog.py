@@ -70,22 +70,24 @@ class SkillWordMiniGame(commands.Cog):
             #Nối từ
             embed = self.get_list_skills_embed(interaction=interaction, lan= lan, mw_info=info)
             profile = next((p for p in info.player_profiles if p.user_id == interaction.user.id), None)
-            view = None
             if profile and profile.special_items:
                 view = MwUseSkillView(user=interaction.user, target=target, channel_id=interaction.channel_id, lan=lan, info=info, all_skills=profile.special_items, profile=profile, english_words_dictionary=self.english_words_dictionary, vietnamese_dict=self.vietnamese_dict)
-            mes = await interaction.followup.send(embed=embed, view= view)
-            view.message = mes
+                mes = await interaction.followup.send(embed=embed, view= view)
+                view.message = mes
+            else:
+                await interaction.followup.send(embed=embed)
             return
         info, lan = self.check_if_message_inside_sw_game(guild_id=interaction.guild_id, channel_id=interaction.channel_id)
         if info is not None:
             #Đoán từ
             embed = self.get_list_skills_embed(interaction=interaction, lan= lan, sw_info=info)
             profile = next((p for p in info.player_profiles if p.user_id == interaction.user.id), None)
-            view = None
             if profile and profile.special_items:
                 view = SwUseSkillView(user=interaction.user, target=target, channel_id=interaction.channel_id, lan=lan, info=info, all_skills=profile.special_items, profile=profile, english_words_dictionary=self.english_words_dictionary, vietnamese_dict=self.vietnamese_dict)
-            mes = await interaction.followup.send(embed=embed, view= view)
-            view.message = mes
+                mes = await interaction.followup.send(embed=embed, view= view)
+                view.message = mes
+            else:
+                await interaction.followup.send(embed=embed)
             return
         #Không có
         view = SelfDestructView(timeout=30)
