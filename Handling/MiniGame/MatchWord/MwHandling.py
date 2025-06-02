@@ -179,7 +179,7 @@ class MwHandlingFunction():
                 return
             else:
                 mw_info, lan = await self.check_if_message_inside_game(source=message)
-                if mw_info.remaining_word==0:
+                if mw_info.remaining_word<=0:
                     await message.channel.send(f"Kinh nhờ, chơi hết từ khả dụng rồi. Cảm ơn mọi người đã chơi nhé. Đến lúc reset thông tin từ rồi. Mọi người bắt đầu lại nhé!")
                     await self.process_reset(message=message, mw_info=mw_info, language=lan)
                     return
