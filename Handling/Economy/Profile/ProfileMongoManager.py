@@ -791,6 +791,9 @@ def update_main_guardian_profile_time(guild_id: int, user_id: int, data_type: st
     elif data_type == "last_joined_battle":
         result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"guardian.last_joined_battle": date_value,
                                                                                     }})
+    elif data_type == "last_quest":
+        result = collection.update_one({"id": "profile", "user_id": user_id}, {"$set": {"guardian.last_quest": date_value,
+                                                                                    }})
         
     return
 

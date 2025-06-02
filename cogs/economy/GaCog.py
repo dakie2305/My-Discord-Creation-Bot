@@ -1,9 +1,13 @@
+import re
 from CustomEnum.GuardianMemoryTag import GuardianMemoryTag
 from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.EmojiEnum import EmojiCreation2
 import discord
 from discord.ext import commands
+from Handling.Economy.GA import GaQuestLineExample
 from Handling.Economy.GA.GaChallengeView import GaChallengeView
+from Handling.Economy.GA.GaQuestClass import GuardianAngelQuest
+from Handling.Economy.GA.GaQuestView import GaQuestView
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 from datetime import datetime, timedelta
 import CustomFunctions
@@ -750,6 +754,122 @@ class GuardianAngelCog(commands.Cog):
     
     @ga_challenge_slash_command.error
     async def ga_challenge_slash_command_error(self, interaction: discord.Interaction, error):
+        if isinstance(error, discord.app_commands.CommandOnCooldown):
+            await interaction.response.send_message(f"⏳ Lệnh đang cooldown, vui lòng thực hiện lại trong vòng {error.retry_after:.2f}s tới.", ephemeral=True)
+        else:
+            await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
+    
+    
+    #region ga quest slash
+    @ga_group.command(name="quest", description="Cùng Hộ Vệ Thần làm nhiệm vụ và phiêu lưu!")
+    @discord.app_commands.checks.cooldown(1, 30)
+    async def ga_quest_slash_command(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=False)
+        #Không cho dùng bot nếu không phải user
+        if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
+        
+        user_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
+        if user_profile == None:
+            view = SelfDestructView(timeout=30)
+            mess = await interaction.followup.send(content=f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True, view=view)
+            view.message = mess
+            return
+        
+        elif user_profile.guardian == None or user_profile.guardian.is_dead:
+            view = SelfDestructView(timeout=30)
+            mess = await interaction.followup.send(content=f"Vui lòng mua Hộ Vệ Thần trước bằng lệnh {SlashCommand.SHOP_GUARDIAN.value} đã!", ephemeral=True, view=view)
+            view.message = mess
+            return
+        
+        if user_profile.guardian.last_quest != None:
+            time_window = timedelta(minutes=20)
+            check = UtilitiesFunctions.check_if_within_time_delta(input=user_profile.guardian.last_quest, time_window=time_window)
+            if check:
+                next_time = user_profile.guardian.last_quest + time_window
+                unix_time = int(next_time.timestamp())
+                embed = discord.Embed(title=f"", description=f"🚫 Bạn vừa cùng Hộ Vệ Thần làm nhiệm vụ rồi. Vui lòng đợi đến <t:{unix_time}:t>!", color=0xc379e0)
+                view = SelfDestructView(timeout=120)
+                mess = await interaction.followup.send(embed=embed, view=view, ephemeral=False)
+                view.message = mess
+                return
+
+        if user_profile.guardian.time_to_recover != None:
+            if user_profile.guardian.time_to_recover > datetime.now():
+                view = SelfDestructView(timeout=30)
+                next_time = user_profile.guardian.time_to_recover
+                unix_time = int(next_time.timestamp())
+                mess = await interaction.followup.send(content=f"Hộ Vệ Thần của bạn đang bị thương! Vui lòng chờ hồi phục vào lúc <t:{unix_time}:t> hoặc mua bình hồi phục trong {SlashCommand.SHOP_GLOBAL.value}!", ephemeral=True, view=view)
+                view.message = mess
+                return
+            else:
+                #Hồi phục 50% máu, 50% thể lực
+                health = int(user_profile.guardian.max_health*50/100)
+                stamina = int(user_profile.guardian.max_stamina*50/100)
+                ProfileMongoManager.update_guardian_stats(guild_id=interaction.guild_id,user_id=interaction.user.id, health=health, stamina=stamina)
+        
+        if not CustomFunctions.check_if_dev_mode():
+            ProfileMongoManager.update_main_guardian_profile_time(guild_id=interaction.guild_id,user_id=interaction.user.id, data_type="last_quest", date_value=datetime.now())
+        
+        #Chọn một quest ngẫu nhiên
+        random_quest = random.choice(GaQuestLineExample.all_quests)
+        random_quest[0].replace_guardian_name(user_profile.guardian.ga_name)
+        title = random_quest[0].title
+        description = random_quest[0].description
+        # description = description.replace("{guardian.ga_name}", user_profile.guardian.ga_name)
+        list_des = self.split_text_to_pairs(text=description)
+        
+        
+        
+        embed = discord.Embed(title=f"{EmojiCreation2.QUEST_ICON.value} {title} {EmojiCreation2.QUEST_ICON.value}", description=f"", color=discord.Color.blue())
+        embed.add_field(name=f"", value=f"*{interaction.user.mention} đã cùng Hộ Vệ Thần {user_profile.guardian.ga_emoji} - **{user_profile.guardian.ga_name}** lên đường phiêu lưu.*", inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬▬▬ι═══════════>", inline=False)
+        for des in list_des:
+            embed.add_field(name=f"", value=f"{des}", inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬▬▬ι═══════════>", inline=False)
+        embed.add_field(name=f"", value=F"{EmojiCreation2.LETTER_A.value}: {random_quest[0].choice_a}", inline=False)
+        embed.add_field(name=f"", value=F"{EmojiCreation2.LETTER_B.value}: {random_quest[0].choice_b}", inline=False)
+        embed.add_field(name=f"", value=F"{EmojiCreation2.LETTER_C.value}: {random_quest[0].choice_c}", inline=False)
+        timeout = 30
+        start_time = datetime.now()
+        end_time = start_time + timedelta(seconds=timeout)  # 30 seconds from now
+        unix_time = int(end_time.timestamp())
+        embed.add_field(name=f"", value="_____", inline=False)
+        embed.add_field(name=f"", value=f"Thời gian còn lại: <t:{unix_time}:R>", inline=False)
+        guardian_quest = GuardianAngelQuest(guardian=user_profile.guardian, user_name=interaction.user.name, user_display_name=interaction.user.display_name, channel_name=interaction.channel.name, quest_lines=random_quest)
+        view = GaQuestView(user=interaction.user, guardian_quest=guardian_quest, current_quest_lines=random_quest[0], override_title=title)
+        mess = await interaction.followup.send(embed=embed, ephemeral=False, view=view)
+        view.message = mess
+        
+        
+        
+    def split_text_to_pairs(self, text: str):
+        # Split sentences on punctuation + space
+        sentence_endings = re.compile(r'(?<=[.!?])\s+')
+        sentences = sentence_endings.split(text.strip())
+        sentences = [s.strip() for s in sentences if s.strip()]
+
+        pairs = []
+        # Step by 2 to avoid overlapping
+        for i in range(0, len(sentences), 2):
+            # If last sentence has no pair, just add it alone
+            if i + 1 < len(sentences):
+                pair = sentences[i] + " " + sentences[i + 1]
+            else:
+                pair = sentences[i]
+            pairs.append(pair)
+
+        return pairs
+
+
+    
+                
+    @ga_quest_slash_command.error
+    async def ga_quest_slash_command_error(self, interaction: discord.Interaction, error):
         if isinstance(error, discord.app_commands.CommandOnCooldown):
             await interaction.response.send_message(f"⏳ Lệnh đang cooldown, vui lòng thực hiện lại trong vòng {error.retry_after:.2f}s tới.", ephemeral=True)
         else:

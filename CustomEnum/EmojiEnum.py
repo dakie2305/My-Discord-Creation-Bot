@@ -267,6 +267,12 @@ class EmojiCreation2(Enum):
     COLOR_PINK = "<:color_pink:1375719008535449600>"
     
     
+    QUEST_ICON = "<:quest:1379118479856373931>"
+    LETTER_A = "<a:a_letter:1379121841511071776>"
+    LETTER_B = "<a:b_letter:1379121847194485007>"
+    LETTER_C = "<a:c_letter:1379121855792681120>"
+    
+    
     
 class EmojiCreation1(Enum):
     SHINY_POINT = "<a:shiny_point:1309193656887935036>"

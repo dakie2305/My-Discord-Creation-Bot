@@ -2,7 +2,7 @@ from typing import List, Optional
 from datetime import datetime
 
 class GuardianAngel:
-    def __init__(self, ga_id: str, ga_name: str, ga_emoji: str, stamina: int, max_stamina: int, health: int, max_health: int, mana: int, max_mana:int, attack_power: int = 10, buff_attack_percent: int = 0, level: int = 1, level_progressing: int = 0, stats_point: int = 0, list_skills : Optional[List['GuardianAngelSkill']] = None, max_skills: int = 1, is_injured: bool = False, time_to_recover: datetime = None, worth_amount: int = 50, worth_type: str = "D", last_feed: datetime = None, last_meditation: datetime = None, bonus_dignity_point: int = 0, bonus_exp: int = 0, last_battle: datetime = None, last_joined_battle: datetime = None, last_dungeon: datetime = None, is_dead = False, memories: Optional[List['GuardianAngelMemory']] = None, count_death: int = 0, count_resurrection: int = 0, count_injury: int = 0, count_battle_pve: int = 0, count_battle_pvp: int = 0, count_dungeon_fight: int = 0, count_meditation: int = 0, count_feed: int = 0, count_battle_pve_won: int = 0, count_battle_pvp_won: int = 0, count_dungeon_fight_won: int = 0, count_battle_pve_lose: int = 0, count_battle_pvp_lose: int = 0, count_dungeon_fight_lose: int = 0):
+    def __init__(self, ga_id: str, ga_name: str, ga_emoji: str, stamina: int, max_stamina: int, health: int, max_health: int, mana: int, max_mana:int, attack_power: int = 10, buff_attack_percent: int = 0, level: int = 1, level_progressing: int = 0, stats_point: int = 0, list_skills : Optional[List['GuardianAngelSkill']] = None, max_skills: int = 1, is_injured: bool = False, time_to_recover: datetime = None, worth_amount: int = 50, worth_type: str = "D", last_feed: datetime = None, last_meditation: datetime = None, bonus_dignity_point: int = 0, bonus_exp: int = 0, last_battle: datetime = None, last_joined_battle: datetime = None, last_dungeon: datetime = None, is_dead = False, memories: Optional[List['GuardianAngelMemory']] = None, count_death: int = 0, count_resurrection: int = 0, count_injury: int = 0, count_battle_pve: int = 0, count_battle_pvp: int = 0, count_dungeon_fight: int = 0, count_meditation: int = 0, count_feed: int = 0, count_battle_pve_won: int = 0, count_battle_pvp_won: int = 0, count_dungeon_fight_won: int = 0, count_battle_pve_lose: int = 0, count_battle_pvp_lose: int = 0, count_dungeon_fight_lose: int = 0, last_quest: datetime = None):
         self.ga_id = ga_id
         self.ga_name = ga_name
         self.ga_emoji = ga_emoji
@@ -44,6 +44,7 @@ class GuardianAngel:
         self.last_battle = last_battle if last_battle else None
         self.last_joined_battle = last_joined_battle if last_joined_battle else None
         self.last_dungeon = last_dungeon if last_dungeon else None
+        self.last_quest = last_quest if last_quest else None
         
         self.is_injured = is_injured
         self.is_dead = is_dead
@@ -82,6 +83,7 @@ class GuardianAngel:
             "last_battle": self.last_battle,
             "last_dungeon": self.last_dungeon,
             "last_joined_battle": self.last_joined_battle,
+            "last_quest": self.last_quest,
 
             "count_death": self.count_death,
             "count_resurrection": self.count_resurrection,
@@ -134,6 +136,7 @@ class GuardianAngel:
             last_battle=data.get("last_battle"),
             last_dungeon=data.get("last_dungeon"),
             last_joined_battle=data.get("last_joined_battle"),
+            last_quest=data.get("last_quest"),
 
             count_death=data.get("count_death", 0),
             count_resurrection=data.get("count_resurrection", 0),
