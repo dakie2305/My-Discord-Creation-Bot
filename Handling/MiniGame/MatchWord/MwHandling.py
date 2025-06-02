@@ -58,7 +58,9 @@ class MwHandlingFunction():
         else:
             type_label = "Nối Theo Từ Cuối" if mw_info.type == "A" else "Nối Theo Âm Cuối"
             is_special = True if mw_info.type == "A" else False
-            data = MwClass.MatchWordInfo(channel_id=message.channel.id, channel_name=message.channel.name, guild_name=message.guild.name, current_word="anh", special_case=is_special, type=mw_info.type)
+            correct_word = "anh" if mw_info.type == "A" else "h"
+            data = MwClass.MatchWordInfo(channel_id=message.channel.id, channel_name=message.channel.name, guild_name=message.guild.name, current_word="anh", special_case=is_special, type=mw_info.type, remaining_word=300, correct_start_word=correct_word)
+            MwMongoManager.create_info(data=data, guild_id=message.guild.id, lang=language)
             embed = discord.Embed(title=f"{EmojiCreation1.CHECK.value} Nối Từ {lan_label}", description=f"Thể Loại: **{type_label}**",color=discord.Color.blue())
             embed.add_field(name=f"", value="▬▬▬▬▬▬ι═══════════>", inline=False)
             embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Từ hiện tại:", inline=False)
