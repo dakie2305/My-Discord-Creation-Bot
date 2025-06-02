@@ -32,6 +32,15 @@ list_special_items_cap_thap = [
         required_target=False
     ),
     SpecialItem(
+        item_id="ct_ban_remove",
+        item_name="Gỡ Khoá Mõm",
+        item_description=f"Kỹ năng này sẽ gỡ khoá cho đối phương tiếp tục chơi.",
+        quantity = 1,
+        point =2,
+        level="Cấp Thấp",
+        required_target=True
+    ),
+    SpecialItem(
         item_id="ct_minus_first",
         item_name="Trừ Điểm Top 1",
         item_description=f"Kỹ năng này sẽ trừ 10 điểm của player top 1 trong bảng xếp hạng. Cách sử dụng rất đơn giản, chỉ việc nhập đúng lệnh như thế này: {SlashCommand.SKILL_USE.value}",
@@ -132,6 +141,15 @@ list_special_items_cap_cao = [
         point=5,
         level="Cấp Cao",
         required_target=True
+    ),
+    SpecialItem(
+        item_id="cc_ban_remove",
+        item_name="Gỡ Khoá Mõm Toàn Bộ",
+        item_description=f"Kỹ năng này sẽ gỡ khoá cho toàn bộ người chơi trong kênh. Cách sử dụng rất đơn giản, chỉ việc nhập đúng lệnh như thế này: {SlashCommand.SKILL_USE.value}",
+        quantity = 1,
+        point=5,
+        level="Cấp Cao",
+        required_target=False
     ),
     SpecialItem(
         item_id="cc_minus_all",

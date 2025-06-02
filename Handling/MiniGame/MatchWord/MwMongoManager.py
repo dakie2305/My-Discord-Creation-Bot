@@ -267,6 +267,12 @@ def create_and_update_player_bans_word_matching_info(channel_id: int, guild_id: 
                                                                          }})
     return result
     
+def delete_player_bans(channel_id: int, guild_id: int, language: str):
+    collection = db_specific[f'{language}_mw_guild_{guild_id}']
+    result = collection.update_one({"channel_id": channel_id}, {"$set": {"player_ban": [],
+                                                                         }})
+    return result
+    
 def reduce_player_bans_word_matching_info_after_round(channel_id: int, guild_id: int, language: str):
     collection = db_specific[f'{language}_mw_guild_{guild_id}']
     existing_data = collection.find_one({"channel_id": channel_id})

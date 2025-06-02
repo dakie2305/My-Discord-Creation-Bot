@@ -429,6 +429,30 @@ class UseSkillInputModal(discord.ui.Modal):
                 #khoá mõm đối thủ
                 MwMongoManager.create_and_update_player_bans_word_matching_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id= self.target.id, user_name=self.target.name, ban_remaining=special_item.point)
                 await interaction.followup.send(f"{interaction.user.mention} đã dùng kỹ năng **`{special_item.item_name}`** để khoá mõm {self.target.mention} trong {special_item.point} lượt chơi tiếp theo.\n")
+        
+        #Đây là những kỹ năng bỏ khoá mõm player
+        elif special_item.item_id == "ct_ban_remove":
+            if self.target == None:
+                await interaction.followup.send(f"Kỹ năng **`{special_item.item_name}`** cần phải tag tên của đối phương mới có hiệu nghiệm.\n")
+                return
+            elif self.target.id == interaction.user.id:
+                await interaction.followup.send(f"Ôi bạn ơi, kỹ năng **`{special_item.item_name}`** chỉ dành cho người khác chứ không phải dành cho bạn. Muốn tự khoá mõm mình à?\n")
+                return
+            #Bỏ khoá mõm đối thủ
+            MwMongoManager.create_and_update_player_bans_word_matching_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id= self.target.id, user_name=self.target.name, ban_remaining=0)
+            await interaction.followup.send(f"{interaction.user.mention} đã dùng kỹ năng **`{special_item.item_name}`** để gỡ khoá cho {self.target.mention}.\n")
+
+        #Đây là những kỹ năng bỏ khoá mõm player
+        elif special_item.item_id == "ct_ban_remove":
+            #Bỏ khoá mõm đối thủ
+            MwMongoManager.create_and_update_player_bans_word_matching_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id= self.target.id, user_name=self.target.name, ban_remaining=0)
+            await interaction.followup.send(f"{interaction.user.mention} đã dùng kỹ năng **`{special_item.item_name}`** để gỡ khoá cho {self.target.mention}.\n")
+
+        #Đây là những kỹ năng bỏ khoá mõm toàn bộ
+        elif special_item.item_id == "cc_ban_remove":
+            #Bỏ khoá mõm toàn bộ
+            MwMongoManager.delete_player_bans(channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan)
+            await interaction.followup.send(f"{interaction.user.mention} đã dùng kỹ năng **`{special_item.item_name}`** để gỡ khoá cho toàn bộ mọi người trong kênh.\n")
         else:
             await interaction.followup.send(f"{interaction.user.mention}, Darkie vẫn chưa hoàn thành kỹ năng **`{special_item.item_name}`**.\nVui lòng đợi sau!")
             flag_remove_skill = False

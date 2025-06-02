@@ -122,7 +122,7 @@ class MwHandlingFunction():
         if selected_ban:
             view = SelfDestructView(timeout=30)
             embed = discord.Embed(title="",description=f"{EmojiCreation1.CROSS.value} Bạn đã bị khoá lượt chơi trong vòng **{selected_ban.ban_remain}** lượt chơi tới!",color=discord.Color.red())
-            embed.add_field(name=f"", value=f"\nOwner server có thể dùng lệnh `!wm_give_ban {message.author.mention} 0` để mở khoá giam", inline=False)
+            embed.add_field(name=f"", value=f"\nOwner server có thể dùng lệnh {SlashCommand.SKILL_GIVE_WORD_MINIGAME.value} để lấy kỹ năng **Gỡ Khoá Mõm** hoặc **Gỡ Khoá Toàn Bộ** để mở khoá!", inline=False)
             mess = await message.reply(embed=embed)
             view.message = mess
             return
