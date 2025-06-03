@@ -1027,7 +1027,7 @@ quest_broken_oath = [
             choice_c="ignore_plea_outcome",
             timeout="ga_urgent_timeout_1"
         ),
-        gold=10, silver=50, ga_exp=10, dignity_point=5
+        gold=50, silver=250, ga_exp=40, dignity_point=20
     ),
 
     GuardianQuestLines(
@@ -1059,7 +1059,8 @@ quest_broken_oath = [
             choice_b="enter_barren_lands",
             choice_c="abandon_quest_broken_oath",
             timeout="ga_urgent_timeout_1"
-        )
+        ),
+        gold=75, silver=300, ga_exp=60, dignity_point=30
     ),
 
     GuardianQuestLines(
@@ -1094,7 +1095,68 @@ quest_broken_oath = [
         )
     ),
 
-    # Bad Ending Stage
+    # New branching path: Seek Tragedy Clues
+    GuardianQuestLines(
+        id="seek_tragedy_clues",
+        title="Dấu Vết Bi Kịch",
+        description="Bạn và {guardian.ga_name} tìm kiếm xung quanh tượng đài và phát hiện một ngôi mộ cổ không tên, được bao phủ bởi những bông hoa héo úa. {guardian.ga_name} cảm nhận được một nỗi buồn sâu sắc. 'Có lẽ đây là nơi tình yêu đã chấm dứt.'",
+        choice_a="Kiểm tra ngôi mộ.",
+        choice_b="Tìm kiếm những ghi chép cổ gần đó.",
+        choice_c="Cố gắng cảm nhận năng lượng còn sót lại.",
+        choice_timeout="{guardian.ga_name} cau mày. 'Nỗi buồn ở đây quá mạnh mẽ, Ngài.'",
+        next_steps=NextSteps(
+            choice_a="examine_tomb",
+            choice_b="search_nearby_records",
+            choice_c="sense_residual_energy",
+            timeout="tomb_collapses_timeout"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="examine_tomb",
+        title="Nghiên Cứu Ngôi Mộ",
+        description="Bên trong ngôi mộ, bạn tìm thấy một chiếc vòng cổ được khắc tên 'Lysander' và một dòng chữ 'Tình yêu vĩnh cửu, bị chia cắt bởi thù hận.' {guardian.ga_name} thì thầm. 'Lysander... tên của người đàn ông mà Elara yêu.'",
+        choice_a="Mang chiếc vòng cổ đến cho Elara.",
+        choice_b="Tìm cách kết nối với linh hồn Lysander.",
+        choice_c="Chôn cất chiếc vòng cổ trở lại.",
+        choice_timeout="Ngôi mộ bắt đầu rung chuyển. 'Có lẽ chúng ta đã làm phiền sự yên nghỉ,' {guardian.ga_name} nói.",
+        next_steps=NextSteps(
+            choice_a="bring_locket_to_elara",
+            choice_b="connect_with_lysander_spirit",
+            choice_c="rebury_locket",
+            timeout="tomb_collapses_timeout"
+        ),
+        gold=50, silver=150, ga_exp=30, dignity_point=10
+    ),
+
+    GuardianQuestLines(
+        id="bring_locket_to_elara",
+        title="Chiếc Vòng Cổ Của Ký Ức",
+        description="Bạn trao chiếc vòng cổ cho Elara. Bà ấy ôm chặt nó, nước mắt chảy dài. 'Lysander... anh ấy vẫn ở đây.' Nỗi đau trong bà vơi đi một chút, thay vào đó là sự chấp nhận. 'Có lẽ... có lẽ tôi có thể thử lại lời thề, vì anh ấy.'",
+        choice_a="Giúp Elara lập lại lời thề.",
+        choice_b="Khuyên Elara từ bỏ quá khứ.",
+        choice_c="",
+        choice_timeout="{guardian.ga_name} nói khẽ. 'Hy vọng đang le lói, Ngài.'",
+        next_steps=NextSteps(
+            choice_a="help_elara_renew_oath",
+            choice_b="advise_elara_move_on",
+            choice_c="",
+            timeout="elara_despair_timeout"
+        ),
+        dignity_point=20, ga_exp=50
+    ),
+
+    GuardianQuestLines(
+        id="help_elara_renew_oath",
+        title="Hồi Sinh Lời Thề",
+        description="Bạn và {guardian.ga_name} hướng dẫn Elara thực hiện nghi lễ tái lập lời thề. Khi lời thề được cất lên, một luồng năng lượng xanh biếc lan tỏa khắp Vùng Đất Cằn Cỗi. Cây cối bắt đầu đâm chồi nảy lộc, sông ngòi chảy lại, và không khí trở nên trong lành. Elara mỉm cười. 'Tôi cảm thấy anh ấy đang ở đây.' {guardian.ga_name} gật đầu. 'Sự cân bằng đã trở lại, Ngài. Nhờ lòng dũng cảm và sự đồng cảm của Ngài.'",
+        choice_a="Lời thề được tái lập, vùng đất hồi sinh.",
+        choice_b="", choice_c="", choice_timeout="",
+        next_steps=NextSteps("quest_success_broken_oath", "quest_success_broken_oath", "quest_success_broken_oath", "quest_success_broken_oath"),
+        gold=1000, silver=5000, ga_exp=500, dignity_point=250
+    ),
+
+    # Continue existing story lines
     GuardianQuestLines(
         id="learn_elaras_story",
         title="Bi Kịch Tình Yêu",
@@ -1102,7 +1164,7 @@ quest_broken_oath = [
         choice_a="Cố gắng an ủi Elara, nhưng nhận ra rằng không có cách nào sửa chữa được sự đổ vỡ này.",
         choice_b="", choice_c="", choice_timeout="",
         next_steps=NextSteps("broken_oath_bad_ending", "broken_oath_bad_ending", "broken_oath_bad_ending", "broken_oath_bad_ending"),
-        dignity_point=-10, ga_exp=-75, silver=-200, gold=-100,
+        dignity_point=-25, ga_exp=-100, silver=-300, gold=-150,
     ),
 
     # Failures and generic endings
@@ -1112,7 +1174,7 @@ quest_broken_oath = [
         description="Bạn và {guardian.ga_name} quyết định phớt lờ lời cầu cứu. Vài tuần sau, tin tức về Vùng Đất Cằn Cỗi hoàn toàn chết khô lan truyền, kéo theo nạn đói và sự hỗn loạn. {guardian.ga_name} nhìn bạn đầy thất vọng. 'Ta hy vọng Ngài sẽ không phải hối tiếc về quyết định này.'",
         choice_a="Cảm thấy một nỗi hối tiếc lạnh lẽo. (Nhiệm vụ thất bại)",
         choice_b="", choice_c="", choice_timeout="",
-        dignity_point=-15, ga_exp=-75, silver=-150, gold=-75,
+        dignity_point=-50, ga_exp=-200, silver=-500, gold=-250,
         next_steps=NextSteps("quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1")
     ),
 
@@ -1123,7 +1185,7 @@ quest_broken_oath = [
         choice_a="Bạn cảm thấy bất lực. (Nhiệm vụ thất bại)",
         choice_b="", choice_c="", choice_timeout="",
         next_steps=NextSteps("quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1"),
-        dignity_point=-10, ga_exp=-50, silver=-100, gold=-50,
+        dignity_point=-30, ga_exp=-150, silver=-250, gold=-125,
     ),
 
     GuardianQuestLines(
@@ -1132,7 +1194,7 @@ quest_broken_oath = [
         description="Bạn chần chừ quá lâu trong việc kiểm tra tượng đài. Những vết nứt lan rộng, và nó sụp đổ hoàn toàn, chôn vùi mọi manh mối bên dưới. 'Đã quá muộn rồi,' {guardian.ga_name} nói với giọng buồn bã.",
         choice_a="Bạn cảm thấy một sự mất mát. (Nhiệm vụ thất bại)",
         choice_b="", choice_c="", choice_timeout="",
-        dignity_point=-5, ga_exp=-50, silver=-75, gold=-25,
+        dignity_point=-20, ga_exp=-125, silver=-200, gold=-100,
         next_steps=NextSteps("quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1")
     ),
 
@@ -1142,7 +1204,7 @@ quest_broken_oath = [
         description="Bạn và {guardian.ga_name} quyết định rút lui. Bạn quay lưng lại với Vùng Đất Cằn Cỗi, bỏ mặc số phận của nó. 'Thật đáng tiếc khi chúng ta không thể giúp được gì,' {guardian.ga_name} nói, giọng đầy tiếc nuối.",
         choice_a="Bạn cảm thấy thất bại. (Nhiệm vụ thất bại)",
         choice_b="", choice_c="", choice_timeout="",
-        dignity_point=-10, ga_exp=-50, silver=-50, gold=-50,
+        dignity_point=-30, ga_exp=-150, silver=-150, gold=-150,
         next_steps=NextSteps("quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1")
     ),
 
@@ -1184,7 +1246,7 @@ quest_broken_oath = [
         description="Bạn và {guardian.ga_name} đối mặt với nhóm pháp sư hắc ám. Họ mạnh hơn bạn nghĩ và cuộc chiến diễn ra khốc liệt. Mặc dù bạn và {guardian.ga_name} chiến đấu dũng cảm, số lượng và phép thuật của họ áp đảo. Cuối cùng, bạn và {guardian.ga_name} bị đánh bại và buộc phải rút lui trong đau đớn. 'Ta đã không thể bảo vệ Ngài khỏi hiểm nguy này,' {guardian.ga_name} thều thào, cơ thể đầy thương tích.",
         choice_a="Bạn bị thương nặng và nhiệm vụ thất bại.",
         choice_b="", choice_c="", choice_timeout="",
-        dignity_point=-15, ga_exp=-100, silver=-300, gold=-150, ga_health=-100, ga_mana=-100, ga_stamina=-100,
+        dignity_point=-50, ga_exp=-250, silver=-750, gold=-375, ga_health=-250, ga_mana=-250, ga_stamina=-250,
         next_steps=NextSteps("broken_oath_bad_ending", "broken_oath_bad_ending", "broken_oath_bad_ending", "broken_oath_bad_ending")
     ),
 
@@ -1194,7 +1256,7 @@ quest_broken_oath = [
         description="Bạn cố gắng khôi phục tượng đài bằng phép thuật, nhưng năng lượng của nó đã cạn kiệt. Tượng đài tiếp tục nứt rạn và cuối cùng sụp đổ, chôn vùi mọi thứ. 'Phép thuật không thể sửa chữa những gì đã tan vỡ,' {guardian.ga_name} nói buồn bã.",
         choice_a="Tượng đài sụp đổ, nhiệm vụ thất bại.",
         choice_b="", choice_c="", choice_timeout="",
-        dignity_point=-5, ga_exp=-50, silver=-50, gold=-25,
+        dignity_point=-20, ga_exp=-125, silver=-150, gold=-75,
         next_steps=NextSteps("quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1")
     ),
 
@@ -1204,7 +1266,7 @@ quest_broken_oath = [
         description="Bạn và {guardian.ga_name} quyết định bỏ qua tượng đài, hy vọng tìm thấy manh mối ở nơi khác. Tuy nhiên, mọi con đường đều dẫn đến ngõ cụt. 'Có lẽ chúng ta đã bỏ lỡ điều quan trọng nhất,' {guardian.ga_name} nói với vẻ hối tiếc.",
         choice_a="Bạn cảm thấy bế tắc. (Nhiệm vụ thất bại)",
         choice_b="", choice_c="", choice_timeout="",
-        dignity_point=-5, ga_exp=-50, silver=-50, gold=-25,
+        dignity_point=-20, ga_exp=-125, silver=-150, gold=-75,
         next_steps=NextSteps("quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1")
     ),
 
@@ -1214,7 +1276,7 @@ quest_broken_oath = [
         description="Bạn chần chừ quá lâu trong việc nói chuyện với Elara. Bà ấy gục xuống, nỗi tuyệt vọng nhấn chìm bà. 'Quá muộn rồi... không còn hy vọng nào nữa,' bà thì thầm. {guardian.ga_name} nhìn bạn với ánh mắt đầy trách móc. 'Chúng ta đã không thể mang lại hy vọng cho bà ấy.'",
         choice_a="Elara chìm trong tuyệt vọng, nhiệm vụ thất bại.",
         choice_b="", choice_c="", choice_timeout="",
-        dignity_point=-10, ga_exp=-50, silver=-100, gold=-50,
+        dignity_point=-30, ga_exp=-150, silver=-250, gold=-125,
         next_steps=NextSteps("quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1")
     ),
 
@@ -1224,7 +1286,7 @@ quest_broken_oath = [
         description="Bạn cố gắng buộc Elara phải lập lại lời thề, nhưng bà ấy phản kháng dữ dội. Nỗi đau và sự phẫn uất trong bà bùng phát, tạo ra một làn sóng năng lượng tiêu cực lan khắp vùng đất, khiến mọi thứ càng trở nên tồi tệ hơn. 'Ngài đã đẩy bà ấy vào vực thẳm,' {guardian.ga_name} nói, ánh mắt đầy thất vọng.",
         choice_a="Vùng đất trở nên tồi tệ hơn. Nhiệm vụ thất bại.",
         choice_b="", choice_c="", choice_timeout="",
-        dignity_point=-20, ga_exp=-100, silver=-200, gold=-100, ga_health=-50, ga_mana=-50, ga_stamina=-50,
+        dignity_point=-75, ga_exp=-250, silver=-500, gold=-250, ga_health=-125, ga_mana=-125, ga_stamina=-125,
         next_steps=NextSteps("broken_oath_bad_ending", "broken_oath_bad_ending", "broken_oath_bad_ending", "broken_oath_bad_ending")
     ),
 
@@ -1234,17 +1296,285 @@ quest_broken_oath = [
         description="Bạn cố gắng thuyết phục Elara lập lại lời thề, nhưng bà ấy vẫn không thể vượt qua nỗi đau mất mát. 'Tôi không thể... không còn lý do gì nữa,' bà nói, nước mắt chảy dài. Vùng đất tiếp tục héo úa. {guardian.ga_name} nói: 'Ta e là bà ấy đã mất đi tất cả niềm tin.'",
         choice_a="Elara không thể vượt qua, nhiệm vụ thất bại.",
         choice_b="", choice_c="", choice_timeout="",
-        dignity_point=-5, ga_exp=-50, silver=-50, gold=-25,
+        dignity_point=-20, ga_exp=-125, silver=-150, gold=-75,
         next_steps=NextSteps("broken_oath_bad_ending", "broken_oath_bad_ending", "broken_oath_bad_ending", "broken_oath_bad_ending")
     ),
 
+    # New branching path: search_nearby_records
+    GuardianQuestLines(
+        id="search_nearby_records",
+        title="Ghi Chép Cổ Xưa",
+        description="Bạn tìm thấy một bộ sưu tập những cuộn giấy da cổ gần ngôi mộ. Chúng ghi lại câu chuyện tình yêu bi thảm giữa Elara và Lysander, một người từ bộ tộc đối địch, và việc cái chết của Lysander đã khiến Elara từ bỏ lời thề. {guardian.ga_name} nói. 'Kiến thức này sẽ giúp chúng ta hiểu rõ hơn về tình hình.'",
+        choice_a="Tìm Elara để chia sẻ những gì đã tìm thấy.",
+        choice_b="Tìm kiếm một cách để hóa giải nỗi đau của Elara.",
+        choice_c="Giữ lại thông tin và tiếp tục điều tra.",
+        choice_timeout="{guardian.ga_name} thúc giục. 'Thời gian đang chống lại chúng ta, Ngài.'",
+        next_steps=NextSteps(
+            choice_a="share_records_with_elara",
+            choice_b="seek_elaras_healing",
+            choice_c="keep_info_investigate",
+            timeout="elara_despair_timeout"
+        ),
+        gold=75, silver=200, ga_exp=50, dignity_point=15
+    ),
+
+    GuardianQuestLines(
+        id="share_records_with_elara",
+        title="Tiết Lộ Sự Thật",
+        description="Bạn chia sẻ những ghi chép cổ với Elara. Ban đầu, bà ấy đau khổ hơn, nhưng sau đó, một sự bình yên lạ lùng đến với bà. 'Anh ấy không bao giờ muốn điều này,' bà nói, nước mắt đã khô. 'Tôi đã hiểu lầm anh ấy.' Bà ấy nhìn bạn. 'Tôi đã sẵn sàng tái lập lời thề, nếu có cách.'",
+        choice_a="Tìm hiểu cách tái lập lời thề.",
+        choice_b="Củng cố tinh thần Elara trước khi tái lập lời thề.",
+        choice_c="",
+        choice_timeout="{guardian.ga_name} nói. 'Bà ấy đang cần sự dẫn dắt của Ngài.'",
+        next_steps=NextSteps(
+            choice_a="learn_oath_renewal_method",
+            choice_b="strengthen_elara_resolve",
+            choice_c="",
+            timeout="elara_despair_timeout"
+        ),
+        dignity_point=30, ga_exp=75
+    ),
+
+    GuardianQuestLines(
+        id="learn_oath_renewal_method",
+        title="Phương Pháp Tái Lập Lời Thề",
+        description="Bạn và {guardian.ga_name} tìm thấy một ghi chép khác, mô tả nghi lễ tái lập lời thề. Nó yêu cầu một vật phẩm biểu tượng cho tình yêu đích thực và sự tha thứ. {guardian.ga_name} nói: 'Chiếc vòng cổ của Lysander có thể là vật phẩm đó.'",
+        choice_a="Thực hiện nghi lễ tái lập lời thề với Elara.",
+        choice_b="Tìm kiếm một vật phẩm khác.",
+        choice_c="",
+        choice_timeout="{guardian.ga_name} thúc giục. 'Không còn thời gian để tìm kiếm nữa.'",
+        next_steps=NextSteps(
+            choice_a="perform_oath_renewal",
+            choice_b="search_for_alternative_item",
+            choice_c="",
+            timeout="elara_despair_timeout"
+        ),
+        gold=100, silver=250, ga_exp=60, dignity_point=20
+    ),
+
+    GuardianQuestLines(
+        id="perform_oath_renewal",
+        title="Lời Thề Được Tái Lập",
+        description="Bạn và {guardian.ga_name} cùng Elara thực hiện nghi lễ. Với chiếc vòng cổ của Lysander và lòng tha thứ của Elara, lời thề được tái lập. Vùng Đất Cằn Cỗi dần xanh tươi trở lại, hoa nở rộ, và tiếng nước chảy róc rách. Elara cảm ơn bạn với một nụ cười rạng rỡ. 'Tôi đã tìm thấy bình yên.' {guardian.ga_name} nói: 'Ngài đã mang lại sự sống cho vùng đất này, Ngài.'",
+        choice_a="Vùng đất hồi sinh, nhiệm vụ thành công rực rỡ.",
+        choice_b="", choice_c="", choice_timeout="",
+        next_steps=NextSteps("quest_success_broken_oath", "quest_success_broken_oath", "quest_success_broken_oath", "quest_success_broken_oath"),
+        gold=1250, silver=6000, ga_exp=600, dignity_point=300
+    ),
+
+    # New branching path: sense_residual_energy
+    GuardianQuestLines(
+        id="sense_residual_energy",
+        title="Năng Lượng Bi Ai",
+        description="Bạn cố gắng cảm nhận năng lượng còn sót lại từ tượng đài. Một dòng chảy năng lượng lạnh lẽo, đầy bi ai lướt qua bạn, mang theo hình ảnh của một tình yêu tan vỡ và sự tuyệt vọng. {guardian.ga_name} lùi lại. 'Năng lượng này... nó có thể làm suy yếu ý chí của Ngài.'",
+        choice_a="Cố gắng thâm nhập sâu hơn vào năng lượng.",
+        choice_b="Rút lui và tìm cách khác.",
+        choice_c="Tìm kiếm nguồn gốc của năng lượng này.",
+        choice_timeout="{guardian.ga_name} cảnh báo. 'Ngài đang gặp nguy hiểm, Ngài!'",
+        next_steps=NextSteps(
+            choice_a="deep_dive_into_energy",
+            choice_b="retreat_from_energy",
+            choice_c="find_energy_source",
+            timeout="overwhelmed_by_sorrow"
+        ),
+        gold=-20, silver=-50, ga_exp=-10, ga_mana=-10, ga_stamina=-10
+    ),
+
+    GuardianQuestLines(
+        id="deep_dive_into_energy",
+        title="Hố Sâu Tuyệt Vọng",
+        description="Bạn thâm nhập sâu hơn vào dòng năng lượng. Những ký ức đau khổ của Elara và Lysander ập đến, nhấn chìm bạn trong nỗi buồn và sự mất mát. Bạn cảm thấy sức lực cạn kiệt, ý chí suy yếu. {guardian.ga_name} cố gắng kéo bạn ra, nhưng bạn đã quá chìm sâu. 'Ngài phải chống lại nó!' hắn gầm lên.",
+        choice_a="Bạn bị nhấn chìm trong nỗi tuyệt vọng, nhiệm vụ thất bại.",
+        choice_b="", choice_c="", choice_timeout="",
+        next_steps=NextSteps("broken_oath_bad_ending", "broken_oath_bad_ending", "broken_oath_bad_ending", "broken_oath_bad_ending"),
+        dignity_point=-40, ga_exp=-150, silver=-400, gold=-200, ga_health=-100, ga_mana=-100, ga_stamina=-100,
+    ),
+
+    # Failures and generic endings continued
+    GuardianQuestLines(
+        id="tomb_collapses_timeout",
+        title="Ngôi Mộ Sụp Đổ",
+        description="Bạn chần chừ quá lâu, và ngôi mộ cuối cùng cũng sụp đổ, chôn vùi mọi bí mật. 'Chúng ta đã bỏ lỡ cơ hội cuối cùng,' {guardian.ga_name} nói với vẻ thất thần.",
+        choice_a="Ngôi mộ sụp đổ, nhiệm vụ thất bại.",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-15, ga_exp=-75, silver=-150, gold=-75,
+        next_steps=NextSteps("quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1")
+    ),
+
+    GuardianQuestLines(
+        id="rebury_locket",
+        title="Chôn Vùi Ký Ức",
+        description="Bạn quyết định chôn cất chiếc vòng cổ trở lại, tin rằng nó nên được yên nghỉ. 'Có lẽ đó là cách tốt nhất,' {guardian.ga_name} nói, dù giọng hắn vẫn còn chút băn khoăn. Bạn đã bỏ lỡ cơ hội để giải quyết vấn đề.",
+        choice_a="Bạn chôn vùi chiếc vòng cổ, nhiệm vụ không được giải quyết triệt để.",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-10, ga_exp=-50, silver=-100, gold=-50,
+        next_steps=NextSteps("broken_oath_bad_ending", "broken_oath_bad_ending", "broken_oath_bad_ending", "broken_oath_bad_ending")
+    ),
+
+    GuardianQuestLines(
+        id="advise_elara_move_on",
+        title="Khuyên Elara Buông Bỏ",
+        description="Bạn khuyên Elara nên từ bỏ quá khứ. Bà ấy gật đầu buồn bã, nhưng nỗi đau vẫn còn đó. 'Có lẽ Ngài đúng, nhưng trái tim tôi không thể quên.' Vùng đất chỉ phục hồi một phần, không hoàn toàn. {guardian.ga_name} thở dài. 'Đôi khi, nỗi đau quá lớn để buông bỏ hoàn toàn.'",
+        choice_a="Vùng đất phục hồi một phần, nhưng Elara vẫn đau khổ.",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=10, ga_exp=25, silver=100, gold=50,
+        next_steps=NextSteps("partial_success_haunted_by_past", "partial_success_haunted_by_past", "partial_success_haunted_by_past", "partial_success_haunted_by_past")
+    ),
+
+    GuardianQuestLines(
+        id="partial_success_haunted_by_past",
+        title="Chiến Thắng Mong Manh",
+        description="Vùng Đất Cằn Cỗi đã hồi sinh một phần, nhưng nỗi ám ảnh về lời thề tan vỡ và bi kịch tình yêu vẫn còn đó. Elara sống những ngày còn lại trong sự bình yên mong manh, nhưng không bao giờ thực sự thoát khỏi quá khứ. {guardian.ga_name} nói: 'Chúng ta đã làm những gì có thể, Ngài, nhưng một số vết thương không bao giờ lành hoàn toàn.'",
+        choice_a="Nhiệm vụ thành công một phần, nhưng vẫn còn nỗi buồn.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=500, silver=2000, ga_exp=250, dignity_point=100,
+        next_steps=NextSteps("continue_adventure_1", "continue_adventure_1", "continue_adventure_1", "continue_adventure_1")
+    ),
+
+    GuardianQuestLines(
+        id="seek_elaras_healing",
+        title="Tìm Kiếm Liệu Pháp Chữa Lành",
+        description="Bạn tìm kiếm các phương pháp chữa lành tâm hồn cho Elara, từ các pháp sư chữa bệnh đến những phương thuốc thảo dược cổ xưa. Cuối cùng, bạn tìm thấy một bài hát ru cổ có khả năng xoa dịu nỗi đau. {guardian.ga_name} nói: 'Một phương pháp nhẹ nhàng hơn, nhưng có lẽ hiệu quả.'",
+        choice_a="Hát bài hát ru cho Elara.",
+        choice_b="Tìm kiếm một phương pháp mạnh mẽ hơn.",
+        choice_c="",
+        choice_timeout="{guardian.ga_name} thúc giục. 'Bà ấy đang cần sự giúp đỡ của Ngài!'",
+        next_steps=NextSteps(
+            choice_a="sing_lullaby_to_elara",
+            choice_b="seek_stronger_healing",
+            choice_c="",
+            timeout="elara_despair_timeout"
+        ),
+        gold=75, silver=200, ga_exp=40, dignity_point=15
+    ),
+
+    GuardianQuestLines(
+        id="sing_lullaby_to_elara",
+        title="Giai Điệu Bình Yên",
+        description="Bạn hát bài hát ru cổ cho Elara. Giai điệu nhẹ nhàng thấm vào tâm hồn bà, xoa dịu nỗi đau và mang lại sự bình yên. Elara ngủ thiếp đi, lần đầu tiên sau nhiều năm, một nụ cười nhẹ nhàng nở trên môi. Khi tỉnh dậy, bà ấy nói: 'Tôi... tôi đã sẵn sàng tái lập lời thề. Vì tương lai, không chỉ vì quá khứ.'",
+        choice_a="Giúp Elara tái lập lời thề.",
+        choice_b="Để Elara nghỉ ngơi thêm.",
+        choice_c="",
+        choice_timeout="{guardian.ga_name} nói. 'Hy vọng đã trở lại, Ngài.'",
+        next_steps=NextSteps(
+            choice_a="help_elara_renew_oath",
+            choice_b="let_elara_rest",
+            choice_c="",
+            timeout="elara_despair_timeout"
+        ),
+        dignity_point=40, ga_exp=100
+    ),
+
+    GuardianQuestLines(
+        id="let_elara_rest",
+        title="Bình Yên Tạm Thời",
+        description="Bạn để Elara nghỉ ngơi thêm. Bà ấy có được một giấc ngủ sâu, nhưng sự chần chừ của bạn đã khiến bạn mất đi động lực. 'Chúng ta cần hành động nhanh chóng, Ngài,' {guardian.ga_name} nói. 'Vùng đất đang chờ đợi.'",
+        choice_a="Trở lại để giúp Elara tái lập lời thề.",
+        choice_b="Tìm kiếm các giải pháp khác.",
+        choice_c="",
+        choice_timeout="{guardian.ga_name} nói. 'Sự bình yên này sẽ không kéo dài mãi.'",
+        next_steps=NextSteps(
+            choice_a="help_elara_renew_oath",
+            choice_b="seek_alternative_solutions",
+            choice_c="",
+            timeout="elara_despair_timeout"
+        ),
+        gold=-20, silver=-50, ga_exp=-10, dignity_point=-5
+    ),
+
+    # New branching path: connect_with_lysander_spirit
+    GuardianQuestLines(
+        id="connect_with_lysander_spirit",
+        title="Thần Giao Cách Cảm Với Linh Hồn",
+        description="Bạn cố gắng kết nối với linh hồn của Lysander. Một linh hồn mờ ảo hiện ra, đầy đau khổ và tiếc nuối. Lysander muốn Elara tìm thấy hạnh phúc và giải thoát khỏi lời nguyền. 'Hãy nói với cô ấy... hãy tha thứ,' linh hồn thì thầm rồi tan biến. {guardian.ga_name} nói. 'Một linh hồn cao thượng.'",
+        choice_a="Đến nói chuyện với Elara.",
+        choice_b="Tìm cách giúp Lysander siêu thoát hoàn toàn.",
+        choice_c="",
+        choice_timeout="{guardian.ga_name} thúc giục. 'Lysander đã nói, Ngài.'",
+        next_steps=NextSteps(
+            choice_a="talk_to_elara_about_lysander",
+            choice_b="help_lysander_pass_on",
+            choice_c="",
+            timeout="tomb_collapses_timeout"
+        ),
+        gold=100, silver=300, ga_exp=75, dignity_point=25
+    ),
+
+    GuardianQuestLines(
+        id="talk_to_elara_about_lysander",
+        title="Lời Nhắn Từ Quá Khứ",
+        description="Bạn kể cho Elara nghe về cuộc gặp gỡ với linh hồn Lysander và lời nhắn của anh ấy. Elara bật khóc, nhưng đó là những giọt nước mắt của sự giải thoát. 'Anh ấy muốn tôi tha thứ... cho chính mình.' Bà ấy đứng dậy, một quyết tâm mới trong mắt. 'Tôi sẽ tái lập lời thề. Vì anh ấy, và vì vùng đất này.'",
+        choice_a="Giúp Elara tái lập lời thề.",
+        choice_b="Tìm một vật phẩm kỷ niệm của Lysander.",
+        choice_c="",
+        choice_timeout="{guardian.ga_name} nói. 'Hy vọng đã đến, Ngài.'",
+        next_steps=NextSteps(
+            choice_a="help_elara_renew_oath",
+            choice_b="find_lysander_memento",
+            choice_c="",
+            timeout="elara_despair_timeout"
+        ),
+        dignity_point=50, ga_exp=125
+    ),
+
+    # New branching path: reverse_spell_attempt
+    GuardianQuestLines(
+        id="reverse_spell_attempt",
+        title="Đảo Ngược Phép Thuật",
+        description="Bạn và {guardian.ga_name} tìm thấy cuộn kinh cổ về cách đảo ngược phép thuật chuyển hướng dòng chảy. Quá trình này phức tạp và nguy hiểm, đòi hỏi sự tập trung tuyệt đối. {guardian.ga_name} căng thẳng. 'Chúng ta phải cẩn thận, Ngài.'",
+        choice_a="Cố gắng đảo ngược phép thuật.",
+        choice_b="Tìm kiếm sự giúp đỡ từ một pháp sư.",
+        choice_c="Rút lui và tìm cách khác.",
+        choice_timeout="Phép thuật bắt đầu phản ứng dữ dội. 'Nó đang trở nên mất kiểm soát!' {guardian.ga_name} hét lên.",
+        next_steps=NextSteps(
+            choice_a="attempt_reverse_spell",
+            choice_b="seek_mage_assistance",
+            choice_c="retreat_from_spell",
+            timeout="spell_backlash_timeout"
+        ),
+        gold=75, silver=200, ga_exp=50, dignity_point=15
+    ),
+
+    GuardianQuestLines(
+        id="attempt_reverse_spell",
+        title="Nỗ Lực Thất Bại",
+        description="Bạn cố gắng đảo ngược phép thuật, nhưng sự phức tạp của nó vượt quá khả năng của bạn. Năng lượng ma thuật bùng phát, gây ra một vụ nổ nhỏ và làm bạn và {guardian.ga_name} bị thương nhẹ. 'Quá khó,' {guardian.ga_name} nói, phủi bụi.",
+        choice_a="Bạn và {guardian.ga_name} bị thương nhẹ, nhiệm vụ gặp trở ngại.",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-10, ga_exp=-30, silver=-75, gold=-40, ga_health=-10, ga_mana=-10, ga_stamina=-10,
+        next_steps=NextSteps("investigate_sabotage", "investigate_sabotage", "investigate_sabotage", "investigate_sabotage")
+    ),
+
+    # New branching path: report_authorities_outcome
+    GuardianQuestLines(
+        id="report_authorities_outcome",
+        title="Báo Động Chính Quyền",
+        description="Bạn và {guardian.ga_name} báo động cho chính quyền địa phương về nhóm pháp sư hắc ám. Họ cử binh lính đến điều tra, nhưng quá trình này chậm chạp. Vài ngày sau, bạn nhận được tin rằng pháp sư hắc ám đã hoàn thành nghi lễ của họ, và đầm lầy độc hại đã lan rộng. 'Đã quá muộn rồi,' {guardian.ga_name} nói với vẻ mặt u ám.",
+        choice_a="Chính quyền quá chậm trễ, nhiệm vụ thất bại.",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-20, ga_exp=-100, silver=-250, gold=-125,
+        next_steps=NextSteps("broken_oath_bad_ending", "broken_oath_bad_ending", "broken_oath_bad_ending", "broken_oath_bad_ending")
+    ),
+
+    # New branching path: quest_success_broken_oath - Add new intermediate steps here!
+    GuardianQuestLines(
+        id="quest_success_broken_oath",
+        title="Bình Minh Trở Lại",
+        description="Vùng Đất Cằn Cỗi đã hoàn toàn hồi sinh, vượt xa kỳ vọng. Cây cối xanh tươi rậm rạp, sông hồ đầy ắp nước trong lành, và muông thú trở về. Người dân địa phương tổ chức lễ hội lớn để tôn vinh bạn và {guardian.ga_name}. Elara, giờ đã bình yên, trở thành người gìn giữ lời thề mới. {guardian.ga_name} mỉm cười. 'Ngài đã mang lại sự sống và hy vọng cho một vùng đất tưởng chừng đã chết. Một kỳ công vĩ đại!'",
+        choice_a="Nhiệm vụ hoàn thành xuất sắc, vùng đất thịnh vượng.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=2500, silver=12000, ga_exp=1000, dignity_point=500,
+        next_steps=NextSteps("continue_adventure_1", "continue_adventure_1", "continue_adventure_1", "continue_adventure_1")
+    ),
+
+    # Final Bad Endings
     GuardianQuestLines(
         id="broken_oath_bad_ending",
         title="Vùng Đất Vĩnh Viễn Chết",
         description="Bi kịch tình yêu đã phá hủy lời thề, và không có gì có thể hàn gắn được sự đổ vỡ này. Vùng Đất Cằn Cỗi chìm trong sự hoang tàn vĩnh viễn, trở thành một minh chứng cho tình yêu bị phản bội và lời thề bị phá vỡ. {guardian.ga_name} đứng bên bạn, ánh mắt buồn bã nhìn về phía chân trời. 'Thật đáng buồn khi ta không thể thay đổi được số phận này, Ngài.'",
         choice_a="Bạn và {guardian.ga_name} rời đi, mang theo nỗi đau thất bại.",
         choice_b="", choice_c="", choice_timeout="",
-        dignity_point=-25, ga_exp=-200, silver=-500, gold=-250, ga_health=-100, ga_mana=-100, ga_stamina=-100,
+        dignity_point=-75, ga_exp=-500, silver=-1250, gold=-625, ga_health=-250, ga_mana=-250, ga_stamina=-250,
         next_steps=NextSteps("continue_adventure_1", "continue_adventure_1", "continue_adventure_1", "continue_adventure_1")
     ),
 
@@ -1253,7 +1583,7 @@ quest_broken_oath = [
         title="Thất Bại Đau Đớn",
         description="Nhiệm vụ thất bại. Vùng Đất Cằn Cỗi vẫn chìm trong cảnh hoang tàn, và lời thề bị phá vỡ vẫn còn đó. {guardian.ga_name} nhìn bạn với ánh mắt thất vọng. 'Ta hy vọng Ngài sẽ rút ra được bài học từ thất bại này.'",
         choice_a="Rút ra bài học đau đớn.",
-        dignity_point=-10, ga_exp=-50, silver=-50, gold=-50,
+        dignity_point=-30, ga_exp=-150, silver=-150, gold=-150,
         choice_b="", choice_c="", choice_timeout="",
         next_steps=NextSteps("continue_adventure_1", "continue_adventure_1", "continue_adventure_1", "continue_adventure_1")
     ),
@@ -1264,7 +1594,7 @@ quest_broken_oath = [
         description="Bạn và {guardian.ga_name} rời khỏi Vùng Đất Cằn Cỗi, mang theo những ký ức về hành trình vừa qua. Những cuộc phiêu lưu mới đang chờ đợi...",
         choice_a="",
         choice_b="", choice_c="", choice_timeout="",
-        ga_exp=300, silver=10000, gold=500,
+        ga_exp=750, silver=25000, gold=1250,
         next_steps=NextSteps("", "", "", "")
     )
 ]
@@ -1285,7 +1615,7 @@ quest_ruin_whisper = [
             choice_c="ignore_ruins",
             timeout="guardian_urges_investigation"
         ),
-        gold=30, silver=150, ga_exp=20, dignity_point=10
+        gold=100, silver=500, ga_exp=75, dignity_point=25
     ),
 
     GuardianQuestLines(
@@ -1318,7 +1648,7 @@ quest_ruin_whisper = [
             choice_c="abandon_ruins_quest",
             timeout="guardian_urges_investigation"
         ),
-        gold=10, silver=50, ga_exp=10, dignity_point=5
+        gold=50, silver=200, ga_exp=30, dignity_point=15
     ),
 
     GuardianQuestLines(
@@ -1351,7 +1681,7 @@ quest_ruin_whisper = [
             choice_c="destroy_amulet_outcome",
             timeout="use_amulet_deflect"
         ),
-        gold=20, silver=80, ga_exp=10, dignity_point=5
+        gold=75, silver=250, ga_exp=40, dignity_point=15
     ),
 
     GuardianQuestLines(
@@ -1384,7 +1714,7 @@ quest_ruin_whisper = [
             choice_c="leave_with_scrolls",
             timeout="whispers_overwhelm"
         ),
-        gold=25, silver=100, ga_exp=15, dignity_point=10
+        gold=100, silver=300, ga_exp=60, dignity_point=20
     ),
 
     GuardianQuestLines(
@@ -1394,7 +1724,7 @@ quest_ruin_whisper = [
         choice_a="Linh hồn bạn bị Kẻ Thì Thầm chiếm đoạt hoàn toàn.",
         choice_b="", choice_c="", choice_timeout="",
         next_steps=NextSteps("quest_failed_end_possessed_whispers", "quest_failed_end_possessed_whispers", "quest_failed_end_possessed_whispers", "quest_failed_end_possessed_whispers"),
-        gold=-800, silver=-800, ga_exp=-300, dignity_point=-70, ga_health=-999, ga_mana=-999, ga_stamina=-999, force_dead=True
+        gold=-2000, silver=-2000, ga_exp=-750, dignity_point=-150, ga_health=-999, ga_mana=-999, ga_stamina=-999, force_dead=True
     ),
 
     GuardianQuestLines(
@@ -1430,7 +1760,7 @@ quest_ruin_whisper = [
         description="Bạn quyết định bỏ qua Tàn Tích Thì Thầm. Theo thời gian, những câu chuyện về những người mất trí, những giọng nói trong đầu họ bắt đầu lan truyền. {guardian.ga_name} nhìn bạn với ánh mắt nặng trĩu. 'Đôi khi, nguy hiểm lớn nhất không phải là thứ chúng ta đối mặt, mà là thứ chúng ta phớt lờ.'",
         choice_a="Cảm thấy hối tiếc. (Nhiệm vụ thất bại)",
         choice_b="", choice_c="", choice_timeout="",
-        gold=-30, silver=-100, ga_exp=-30, dignity_point=-10,
+        gold=-75, silver=-250, ga_exp=-75, dignity_point=-25,
         next_steps=NextSteps("quest_failed_end_5", "quest_failed_end_5", "quest_failed_end_5", "quest_failed_end_5")
     ),
 
@@ -1440,7 +1770,7 @@ quest_ruin_whisper = [
         description="Bạn chần chừ quá lâu. {guardian.ga_name} thở dài. 'Sự do dự của Ngài đã tước đi cơ hội can thiệp. Ta cảm thấy tiếng thì thầm đang lan rộng.' Nhiệm vụ kết thúc trong sự không chắc chắn.",
         choice_a="Bạn cảm thấy bất lực. (Nhiệm vụ thất bại)",
         choice_b="", choice_c="", choice_timeout="",
-        gold=-20, silver=-50, ga_exp=-20, dignity_point=-5,
+        gold=-50, silver=-150, ga_exp=-50, dignity_point=-10,
         next_steps=NextSteps("quest_failed_end_5", "quest_failed_end_5", "quest_failed_end_5", "quest_failed_end_5")
     ),
 
@@ -1450,7 +1780,7 @@ quest_ruin_whisper = [
         description="Bạn chần chừ quá lâu. Tiếng thì thầm từ tàn tích trở nên mạnh mẽ hơn, xâm nhập vào tâm trí bạn, gây ra ảo ảnh và sự hoang mang. {guardian.ga_name} cố gắng bảo vệ bạn, nhưng cả hai đều bị ảnh hưởng. 'Chúng ta phải thoát ra!' {guardian.ga_name} gầm lên.",
         choice_a="Bạn và {guardian.ga_name} bị ảnh hưởng bởi tàn tích.",
         choice_b="", choice_c="", choice_timeout="",
-        gold=-50, silver=-100, ga_exp=-50, dignity_point=-10, ga_health=-25, ga_mana=-25, ga_stamina=-25,
+        gold=-125, silver=-250, ga_exp=-125, dignity_point=-25, ga_health=-50, ga_mana=-50, ga_stamina=-50,
         next_steps=NextSteps("quest_failed_end_haunted", "quest_failed_end_haunted", "quest_failed_end_haunted", "quest_failed_end_haunted")
     ),
 
@@ -1460,7 +1790,7 @@ quest_ruin_whisper = [
         description="Bạn và {guardian.ga_name} cắm trại bên ngoài tàn tích. Suốt đêm, tiếng thì thầm dày vò tâm trí bạn, mang đến những cơn ác mộng sống động. {guardian.ga_name} cũng tỏ ra bồn chồn. 'Nơi này không cho phép ai yên ổn, Ngài.'",
         choice_a="Cảm thấy kiệt sức, nhiệm vụ gặp trở ngại.",
         choice_b="", choice_c="", choice_timeout="",
-        gold=-10, silver=-20, ga_exp=-10, ga_health=-5, ga_stamina=-5,
+        gold=-25, silver=-50, ga_exp=-25, ga_health=-10, ga_stamina=-10,
         next_steps=NextSteps("journey_to_ruins", "journey_to_ruins", "journey_to_ruins", "journey_to_ruins")
     ),
 
@@ -1470,7 +1800,7 @@ quest_ruin_whisper = [
         description="Bạn quyết định phá hủy bùa hộ mệnh. Ngay lập tức, tiếng thì thầm trở nên to hơn, và một cảm giác lạnh lẽo bao trùm lấy bạn. {guardian.ga_name} cau mày. 'Ta không nghĩ đây là một quyết định khôn ngoan, Ngài. Chúng ta đã mất đi một công cụ hữu ích.'",
         choice_a="Bạn mất đi một vật phẩm quan trọng, nhiệm vụ trở nên khó khăn hơn.",
         choice_b="", choice_c="", choice_timeout="",
-        gold=-10, silver=-30, ga_exp=-10, dignity_point=-5,
+        gold=-25, silver=-75, ga_exp=-25, dignity_point=-10,
         next_steps=NextSteps("search_artifacts", "search_artifacts", "search_artifacts", "search_artifacts")
     ),
 
@@ -1480,7 +1810,7 @@ quest_ruin_whisper = [
         description="Bạn chần chừ quá lâu trong tàn tích. Tiếng thì thầm trở nên chói tai, xâm nhập sâu vào tâm trí bạn, gây ra sự hoang tưởng và ảo giác. {guardian.ga_name} cố gắng kéo bạn ra, nhưng cả hai đều bị mắc kẹt trong cơn hỗn loạn. 'Ý chí Ngài đang bị bào mòn!' {guardian.ga_name} gầm lên.",
         choice_a="Bạn và {guardian.ga_name} bị áp đảo bởi tiếng thì thầm.",
         choice_b="", choice_c="", choice_timeout="",
-        gold=-70, silver=-150, ga_exp=-70, dignity_point=-15, ga_health=-50, ga_mana=-50, ga_stamina=-50,
+        gold=-175, silver=-375, ga_exp=-175, dignity_point=-35, ga_health=-125, ga_mana=-125, ga_stamina=-125,
         next_steps=NextSteps("quest_failed_end_haunted", "quest_failed_end_haunted", "quest_failed_end_haunted", "quest_failed_end_haunted")
     ),
 
@@ -1490,7 +1820,7 @@ quest_ruin_whisper = [
         description="Bạn và {guardian.ga_name} cố gắng tìm lối thoát. Nhưng mọi con đường dường như dẫn trở lại trung tâm của tàn tích. Những bức tường như đang di chuyển, đóng sập lại sau lưng bạn. 'Chúng ta đã bị mắc kẹt, Ngài!' {guardian.ga_name} nói với vẻ tuyệt vọng.",
         choice_a="Bạn bị mắc kẹt trong tàn tích. Nhiệm vụ thất bại.",
         choice_b="", choice_c="", choice_timeout="",
-        gold=-60, silver=-120, ga_exp=-60, dignity_point=-15, ga_health=-30, ga_mana=-30, ga_stamina=-30,
+        gold=-150, silver=-300, ga_exp=-150, dignity_point=-30, ga_health=-75, ga_mana=-75, ga_stamina=-75,
         next_steps=NextSteps("quest_failed_end_haunted", "quest_failed_end_haunted", "quest_failed_end_haunted", "quest_failed_end_haunted")
     ),
 
@@ -1500,7 +1830,7 @@ quest_ruin_whisper = [
         description="Bạn và {guardian.ga_name} tấn công nguồn phát ra tiếng thì thầm. Một luồng năng lượng đen tối bùng nổ, đẩy bạn lùi lại và gây ra thiệt hại đáng kể. Nguồn gốc chỉ rung chuyển, không bị phá hủy hoàn toàn. {guardian.ga_name} thở hổn hển. 'Nó quá mạnh, Ngài! Chúng ta cần một kế hoạch khác.'",
         choice_a="Bạn và {guardian.ga_name} bị thương, nhiệm vụ gặp trở ngại.",
         choice_b="", choice_c="", choice_timeout="",
-        gold=-40, silver=-80, ga_exp=-40, dignity_point=-10, ga_health=-20, ga_mana=-20, ga_stamina=-20,
+        gold=-100, silver=-200, ga_exp=-100, dignity_point=-25, ga_health=-40, ga_mana=-40, ga_stamina=-40,
         next_steps=NextSteps("pursue_whispers", "pursue_whispers", "pursue_whispers", "pursue_whispers")
     ),
 
@@ -1510,7 +1840,7 @@ quest_ruin_whisper = [
         description="Bạn và {guardian.ga_name} cố gắng phong tỏa căn phòng dội âm. {guardian.ga_name} dùng sức mạnh của hắn để tạo ra một kết giới tạm thời, nhưng tiếng thì thầm vẫn lọt qua, yếu ớt hơn. 'Không đủ để ngăn chặn nó hoàn toàn, Ngài,' {guardian.ga_name} nói, vẻ mặt mệt mỏi.",
         choice_a="Bạn và {guardian.ga_name} bị kiệt sức, chỉ có thể phong tỏa tạm thời.",
         choice_b="", choice_c="", choice_timeout="",
-        gold=-20, silver=-50, ga_exp=-20, ga_mana=-15, ga_stamina=-15,
+        gold=-50, silver=-125, ga_exp=-50, ga_mana=-30, ga_stamina=-30,
         next_steps=NextSteps("enter_ruins", "enter_ruins", "enter_ruins", "enter_ruins")
     ),
 
@@ -1536,7 +1866,7 @@ quest_ruin_whisper = [
         description="Bạn và {guardian.ga_name} cố gắng tạo ra ánh sáng tinh khiết. {guardian.ga_name} dồn năng lượng của mình, nhưng nó không đủ để xuyên qua bóng tối của Kẻ Thì Thầm. 'Ta cần thêm sức mạnh, Ngài,' {guardian.ga_name} thở hổn hển.",
         choice_a="Bạn và {guardian.ga_name} kiệt sức, ánh sáng không đủ mạnh.",
         choice_b="", choice_c="", choice_timeout="",
-        gold=-30, silver=-60, ga_exp=-30, ga_mana=-20, ga_stamina=-20,
+        gold=-75, silver=-150, ga_exp=-75, ga_mana=-40, ga_stamina=-40,
         next_steps=NextSteps("find_research_rooms", "find_research_rooms", "find_research_rooms", "find_research_rooms")
     ),
 
@@ -1546,7 +1876,7 @@ quest_ruin_whisper = [
         description="Bạn đối mặt với Kẻ Thì Thầm bằng sự thật về bản chất của nó và sự hủy diệt nó đã gây ra. Nó gào lên trong đau đớn, nhưng không bị tiêu diệt. 'Lời nói không thể làm hại ta, Ngài! Chỉ có sức mạnh thực sự mới có thể!' {guardian.ga_name} nói, vẻ mặt nghiêm nghị. 'Nó đang mạnh lên, Ngài!'",
         choice_a="Bạn làm Kẻ Thì Thầm suy yếu nhưng không tiêu diệt được.",
         choice_b="", choice_c="", choice_timeout="",
-        gold=-20, silver=-40, ga_exp=-20, dignity_point=0,
+        gold=-50, silver=-100, ga_exp=-50, dignity_point=0,
         next_steps=NextSteps("pursue_whispers", "pursue_whispers", "pursue_whispers", "pursue_whispers")
     ),
 
@@ -1556,7 +1886,7 @@ quest_ruin_whisper = [
         description="Bạn và {guardian.ga_name} mang theo những cuộn giấy cổ và rời khỏi tàn tích. Tiếng thì thầm vẫn văng vẳng trong tai bạn một thời gian, nhưng dần lắng xuống. 'Chúng ta đã có được tri thức, Ngài, nhưng cái giá phải trả là sự bình yên của chính chúng ta,' {guardian.ga_name} nói.",
         choice_a="Bạn và {guardian.ga_name} thoát ra với tri thức, nhưng bị ám ảnh.",
         choice_b="", choice_c="", choice_timeout="",
-        gold=80, silver=200, ga_exp=40, dignity_point=20, ga_mana=-10, ga_stamina=-10,
+        gold=200, silver=750, ga_exp=150, dignity_point=50, ga_mana=-20, ga_stamina=-20,
         next_steps=NextSteps("quest_success_haunted_by_knowledge", "quest_success_haunted_by_knowledge", "quest_success_haunted_by_knowledge", "quest_success_haunted_by_knowledge")
     ),
 
@@ -1566,7 +1896,7 @@ quest_ruin_whisper = [
         description="Bạn và {guardian.ga_name} cố gắng tìm một phương pháp phong ấn không cần hy sinh, nhưng mọi nỗ lực đều vô vọng. Kẻ Thì Thầm ngày càng mạnh hơn khi thời gian trôi qua. 'Ta e rằng không có con đường nào khác, Ngài,' {guardian.ga_name} thở dài.",
         choice_a="Không tìm thấy cách thay thế, nhiệm vụ bế tắc.",
         choice_b="", choice_c="", choice_timeout="",
-        gold=-40, silver=-80, ga_exp=-40, dignity_point=-10, ga_mana=-20, ga_stamina=-20,
+        gold=-100, silver=-200, ga_exp=-100, dignity_point=-25, ga_mana=-40, ga_stamina=-40,
         next_steps=NextSteps("learn_sealing_ritual", "learn_sealing_ritual", "learn_sealing_ritual", "learn_sealing_ritual")
     ),
 
@@ -1576,7 +1906,7 @@ quest_ruin_whisper = [
         description="Bạn sử dụng bùa hộ mệnh. Nó phát ra một luồng sáng ấm áp, đẩy lùi tiếng thì thầm và khiến bạn cảm thấy an toàn hơn. {guardian.ga_name} gật đầu. 'Thứ này rất hữu ích, Ngài. Nó làm suy yếu ảnh hưởng của Kẻ Thì Thầm.'",
         choice_a="Bùa hộ mệnh giúp bạn chống lại tiếng thì thầm.",
         choice_b="", choice_c="", choice_timeout="",
-        gold=15, silver=30, ga_exp=10, dignity_point=5, ga_mana=5, ga_stamina=5,
+        gold=50, silver=100, ga_exp=30, dignity_point=10, ga_mana=10, ga_stamina=10,
         next_steps=NextSteps("enter_ruins", "enter_ruins", "enter_ruins", "enter_ruins")
     ),
 
@@ -1586,7 +1916,7 @@ quest_ruin_whisper = [
         description="Bạn giữ lại bùa hộ mệnh và tiếp tục khám phá. Nó thỉnh thoảng phát sáng yếu ớt, như một lời nhắc nhở về sự hiện diện của Kẻ Thì Thầm. {guardian.ga_name} nói. 'Đó là một tia hy vọng nhỏ, Ngài.'",
         choice_a="Bạn vẫn giữ bùa hộ mệnh và tiếp tục hành trình.",
         choice_b="", choice_c="", choice_timeout="",
-        gold=10, silver=20, ga_exp=5,
+        gold=25, silver=75, ga_exp=15,
         next_steps=NextSteps("enter_ruins", "enter_ruins", "enter_ruins", "enter_ruins")
     ),
 
@@ -1596,7 +1926,7 @@ quest_ruin_whisper = [
         description="Bạn quyết định từ bỏ nhiệm vụ, cho rằng rủi ro quá lớn. {guardian.ga_name} không nói gì, nhưng bạn cảm nhận được sự thất vọng từ hắn. Vài năm sau, những tin đồn về Tàn Tích Thì Thầm ngày càng đáng sợ, về những linh hồn bị mắc kẹt và tiếng thì thầm điên loạn vang vọng khắp vùng đất. 'Ta hy vọng Ngài không bao giờ phải đối mặt với những gì chúng ta đã phớt lờ,' {guardian.ga_name} cuối cùng cũng lên tiếng.",
         choice_a="Bạn từ bỏ nhiệm vụ, nhưng nỗi sợ hãi vẫn còn đó.",
         choice_b="", choice_c="", choice_timeout="",
-        gold=0, silver=0, ga_exp=-75, dignity_point=-20,
+        gold=0, silver=0, ga_exp=-175, dignity_point=-50,
         next_steps=NextSteps("quest_failed_end_5", "quest_failed_end_5", "quest_failed_end_5", "quest_failed_end_5")
     ),
 
@@ -1607,7 +1937,7 @@ quest_ruin_whisper = [
         description="Linh hồn bạn bị Kẻ Thì Thầm hoàn toàn chiếm đoạt. Bạn trở thành một vật chứa rỗng tuếch, chỉ biết thì thầm những bí mật và lời nguyền rủa của nó, mãi mãi là một công cụ để nó lan rộng ảnh hưởng. {guardian.ga_name} gào thét trong tuyệt vọng khi nhìn thấy bạn biến thành thứ đó, hắn cố gắng chiến đấu, nhưng bị hàng ngàn giọng nói vô hình áp đảo. Cuối cùng, {guardian.ga_name} cũng gục ngã, linh hồn hắn bị xé toạc bởi Kẻ Thì Thầm, cả hai trở thành một phần của nỗi kinh hoàng vĩnh cửu trong Tàn Tích Thì Thầm. Tiếng thì thầm của Kẻ Thì Thầm vang vọng khắp thế giới, mang theo tiếng cười điên dại của bạn và nỗi đau khổ của {guardian.ga_name}, mãi mãi... ",
         choice_a="Bạn và {guardian.ga_name} bị chiếm đoạt và hủy diệt hoàn toàn.",
         choice_b="", choice_c="", choice_timeout="",
-        gold=-999, silver=-999, ga_exp=-999, dignity_point=-999, ga_health=-999, ga_mana=-999, ga_stamina=-999, force_dead=True,
+        gold=-2000, silver=-2000, ga_exp=-750, dignity_point=-150, ga_health=-999, ga_mana=-999, ga_stamina=-999, force_dead=True,
         next_steps=NextSteps("continue_adventure_5", "continue_adventure_5", "continue_adventure_5", "continue_adventure_5")
     ),
 
@@ -1617,7 +1947,7 @@ quest_ruin_whisper = [
         description="{guardian.ga_name} đã hy sinh chính mình để phong ấn Kẻ Thì Thầm, cứu bạn và thế giới. Tàn tích chìm vào im lặng, nhưng bạn vẫn nghe thấy giọng nói cuối cùng của hắn vang vọng trong tâm trí. Nỗi đau mất mát quá lớn, khiến bạn suy sụp. Bạn đã chiến thắng, nhưng chiến thắng này quá đắt giá, vì nó phải đánh đổi bằng sự tồn tại của người bạn đồng hành trung thành nhất. Bạn tiếp tục hành trình, nhưng mỗi bước đi đều nặng trĩu nỗi đau, và thế giới dường như mất đi màu sắc tươi sáng khi không có {guardian.ga_name} bên cạnh. Bạn sẽ mãi mãi sống trong nỗi ân hận và tiếc nuối, mang theo gánh nặng của sự hy sinh đó, không bao giờ thực sự được giải thoát khỏi bóng ma của quá khứ.",
         choice_a="Kẻ Thì Thầm bị phong ấn, nhưng {guardian.ga_name} đã hy sinh.",
         choice_b="", choice_c="", choice_timeout="",
-        gold=100, silver=500, ga_exp=50, dignity_point=100, ga_health=-50, ga_mana=-50, ga_stamina=-50,
+        gold=500, silver=1500, ga_exp=200, dignity_point=300, ga_health=-100, ga_mana=-100, ga_stamina=-100,
         next_steps=NextSteps("continue_adventure_5", "continue_adventure_5", "continue_adventure_5", "continue_adventure_5")
     ),
 
@@ -1627,7 +1957,7 @@ quest_ruin_whisper = [
         description="Bạn và {guardian.ga_name} đã thoát khỏi Tàn Tích Thì Thầm, nhưng tiếng thì thầm của Kẻ Thì Thầm đã ám ảnh cả hai mãi mãi. Những giọng nói vang vọng trong tâm trí bạn mỗi đêm, phá hoại giấc ngủ và sự tỉnh táo. {guardian.ga_name} cũng bị ảnh hưởng, hắn trở nên cáu kỉnh và khó chịu, luôn trong trạng thái cảnh giác, không bao giờ tìm thấy sự bình yên. Mặc dù sống sót, cả hai bạn đều mang theo một gánh nặng vô hình, một phần linh hồn bị tổn thương không bao giờ có thể chữa lành. Bạn và {guardian.ga_name} sống phần đời còn lại trong sự dày vò của những tiếng thì thầm, không bao giờ thực sự thoát khỏi Tàn Tích.",
         choice_a="Bạn và {guardian.ga_name} sống sót nhưng bị ám ảnh vĩnh viễn.",
         choice_b="", choice_c="", choice_timeout="",
-        gold=50, silver=100, ga_exp=-100, dignity_point=-25, ga_health=-50, ga_mana=-50, ga_stamina=-50,
+        gold=125, silver=300, ga_exp=-250, dignity_point=-75, ga_health=-125, ga_mana=-125, ga_stamina=-125,
         next_steps=NextSteps("continue_adventure_5", "continue_adventure_5", "continue_adventure_5", "continue_adventure_5")
     ),
 
@@ -1637,7 +1967,7 @@ quest_ruin_whisper = [
         description="Nhiệm vụ thất bại. Tàn Tích Thì Thầm vẫn là một mối đe dọa, và Kẻ Thì Thầm vẫn tiếp tục lan truyền ảnh hưởng của nó. {guardian.ga_name} nhìn bạn với ánh mắt thất vọng. 'Ta hy vọng Ngài sẽ rút ra được bài học từ thất bại này.'",
         choice_a="Rút ra bài học đau đớn.",
         choice_b="", choice_c="", choice_timeout="",
-        gold=-30, silver=-70, ga_exp=-30, dignity_point=-5,
+        gold=-75, silver=-175, ga_exp=-75, dignity_point=-10,
         next_steps=NextSteps("continue_adventure_5", "continue_adventure_5", "continue_adventure_5", "continue_adventure_5")
     ),
 
@@ -1647,7 +1977,7 @@ quest_ruin_whisper = [
         description="Bạn và {guardian.ga_name} đã thoát khỏi Tàn Tích Thì Thầm với những cuộn giấy cổ chứa đựng kiến thức quý giá về Kẻ Thì Thầm và các nghi lễ cổ đại. Tiếng thì thầm vẫn đôi khi vang vọng trong tâm trí bạn, một lời nhắc nhở về những gì bạn đã trải qua. {guardian.ga_name} vẫn cảnh giác, nhưng hắn tự hào về bạn. 'Tri thức này sẽ giúp chúng ta đối phó với những mối đe dọa tương tự trong tương lai, Ngài,' hắn nói. Bạn đã đạt được một chiến thắng quan trọng, nhưng cái giá là sự ám ảnh không ngừng và một phần ký ức vĩnh viễn bị giằng xé bởi những tiếng thì thầm của quá khứ. Tuy nhiên, với tri thức này, bạn và {guardian.ga_name} đã trở nên mạnh mẽ hơn, sẵn sàng đối mặt với bất kỳ hiểm nguy nào sắp tới, dù cho nỗi ám ảnh vẫn luôn tồn tại.",
         choice_a="Bạn và {guardian.ga_name} thoát ra với tri thức quan trọng.",
         choice_b="", choice_c="", choice_timeout="",
-        gold=150, silver=300, ga_exp=75, dignity_point=30, ga_mana=10, ga_stamina=10,
+        gold=375, silver=900, ga_exp=225, dignity_point=75, ga_mana=25, ga_stamina=25,
         next_steps=NextSteps("continue_adventure_5", "continue_adventure_5", "continue_adventure_5", "continue_adventure_5")
     ),
 
@@ -1657,7 +1987,7 @@ quest_ruin_whisper = [
         description="Bạn và {guardian.ga_name} rời khỏi Tàn Tích Thì Thầm, mang theo những bài học và nỗi ám ảnh. Những cuộc phiêu lưu mới đang chờ đợi...",
         choice_a="",
         choice_b="", choice_c="", choice_timeout="",
-        gold=20, silver=80, ga_exp=15,
+        gold=50, silver=200, ga_exp=40,
         next_steps=NextSteps("", "", "", "")
     )
 ]
