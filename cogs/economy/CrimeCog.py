@@ -147,10 +147,10 @@ class CrimeEconomy(commands.Cog):
             return
         
         elif user_profile != None and user_profile.last_crime != None:
-            time_window = timedelta(hours=1)
+            time_window = timedelta(minutes=30)
             check = self.check_if_within_time_delta(input=user_profile.last_crime, time_window=time_window)
             if check:
-                #Lấy thời gian cũ để cộng vào 1h xem chừng nào mới crime được tiếp
+                #Lấy thời gian cũ để cộng vào xem chừng nào mới crime được tiếp
                 crime_next_time = user_profile.last_crime + time_window
                 unix_time = int(crime_next_time.timestamp())
                 embed = discord.Embed(title=f"", description=f"🚫 Bạn đã làm việc xấu rồi. Vui lòng thực hiện lại lệnh {SlashCommand.CRIME.value} vào lúc <t:{unix_time}:t> !", color=0xc379e0)

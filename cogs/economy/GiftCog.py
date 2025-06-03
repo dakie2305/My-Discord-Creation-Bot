@@ -73,7 +73,7 @@ class GiftEconomy(commands.Cog):
         
         #Không cho thực hiện nếu còn last_gift
         elif user_profile != None and user_profile.last_gift != None:
-            time_window = timedelta(hours=1)
+            time_window = timedelta(minutes=30)
             check = self.check_if_within_time_delta(input=user_profile.last_gift, time_window=time_window)
             if check:
                 next_time = user_profile.last_gift + time_window
