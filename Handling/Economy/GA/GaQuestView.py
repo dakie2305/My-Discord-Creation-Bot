@@ -37,15 +37,16 @@ class GaQuestView(discord.ui.View):
     async def choice_a_button_function(self, interaction: discord.Interaction):
         if interaction.user.id != self.user.id:
             await interaction.response.send_message("Đây không phải nhiệm vụ của bạn!", ephemeral=True)
+            return
         self.not_choose = False
         await interaction.response.defer(ephemeral=True)
         await interaction.followup.send(content=f"Bạn đã chọn A!", ephemeral=True)
-        
         await self.handle_choice("A")
     
     async def choice_b_button_function(self, interaction: discord.Interaction):
         if interaction.user.id != self.user.id:
             await interaction.response.send_message("Đây không phải nhiệm vụ của bạn!", ephemeral=True)
+            return
         self.not_choose = False
         await interaction.response.defer(ephemeral=True)
         await interaction.followup.send(content=f"Bạn đã chọn B!", ephemeral=True)
@@ -54,6 +55,7 @@ class GaQuestView(discord.ui.View):
     async def choice_c_button_function(self, interaction: discord.Interaction):
         if interaction.user.id != self.user.id:
             await interaction.response.send_message("Đây không phải nhiệm vụ của bạn!", ephemeral=True)
+            return
         self.not_choose = False
         await interaction.response.defer(ephemeral=True)
         await interaction.followup.send(content=f"Bạn đã chọn C!", ephemeral=True)
@@ -69,12 +71,14 @@ class GaQuestView(discord.ui.View):
         next_id = self.current_quest_lines.next_steps.get_next_id(choice)
         if not next_id:
             await self.message.edit(content="Không thể tìm thấy bước tiếp theo! Liên hệ Darkie ngay!", embed=None, view=None)
+            print(f"User {self.user.name} at channel {self.guardian_quest.channel_name} cant find next step id in quest {self.override_title}, choice {choice}, current line {self.current_quest_lines.title}")
             return
 
         # Find the next GuardianQuestLines by ID
         next_quest_line = next((q for q in self.guardian_quest.quest_lines if q.id == next_id), None)
         if not next_quest_line:
             await self.message.edit(content="Câu chuyện kết thúc!", embed=None, view=None)
+            print(f"User {self.user.name} at channel {self.guardian_quest.channel_name} cant find next quest line in {self.override_title}, choice {choice}, current line {self.current_quest_lines.title}")
             return
         next_quest_line.replace_guardian_name(guardian_name=self.guardian_quest.guardian.ga_name)
         title = next_quest_line.title
@@ -104,6 +108,8 @@ class GaQuestView(discord.ui.View):
             #end
             try:
                 await self.message.edit(embed=embed, view=None)  # Remove view
+                print(f"User {self.user.name} at channel {self.guardian_quest.channel_name} finished their GA quest")
+
             except Exception as e:
                 print(f"Exception when trying to end quest line for user {self.user.name} at channel {self.guardian_quest.channel_name}: {e}")
             return

@@ -844,6 +844,7 @@ class GuardianAngelCog(commands.Cog):
         view = GaQuestView(user=interaction.user, guardian_quest=guardian_quest, current_quest_lines=random_quest[0], override_title=title)
         mess = await interaction.followup.send(embed=embed, ephemeral=False, view=view)
         view.message = mess
+        print(f"User {interaction.user.name} started guardian quest at {interaction.channel.name} in guild {interaction.guild.name}.")
         
         
         
@@ -862,12 +863,8 @@ class GuardianAngelCog(commands.Cog):
             else:
                 pair = sentences[i]
             pairs.append(pair)
-
         return pairs
 
-
-    
-                
     @ga_quest_slash_command.error
     async def ga_quest_slash_command_error(self, interaction: discord.Interaction, error):
         if isinstance(error, discord.app_commands.CommandOnCooldown):
