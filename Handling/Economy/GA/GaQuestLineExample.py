@@ -1992,4 +1992,373 @@ quest_ruin_whisper = [
     )
 ]
 
-all_quests = [quest_ghost_of_forrest, quest_night_market, quest_the_ruin_call, quest_broken_oath, quest_ruin_whisper]
+#region quest_dying_whisper
+quest_dying_whisper = [
+        GuardianQuestLines(
+        id="start",
+        title="Lời Nguyền Của Hòn Đảo Quên Lãng",
+        description="Một lời nguyền cổ xưa bao trùm Hòn Đảo Quên Lãng, khiến mọi ký ức về nó dần phai nhạt khỏi tâm trí mọi người. {guardian.ga_name} nhìn bạn với vẻ lo lắng. 'Ta cảm nhận được sự lãng quên đang bao trùm. Một sự bất công đang xảy ra.'",
+        choice_a="Du hành đến Hòn Đảo Quên Lãng.",
+        choice_b="Tìm kiếm những ghi chép cổ về lời nguyền.",
+        choice_c="Bỏ qua, cho rằng đó chỉ là một truyền thuyết.",
+        choice_timeout="{guardian.ga_name} nói với giọng khẩn thiết. 'Nếu chúng ta không hành động, Hòn Đảo sẽ biến mất mãi mãi, Ngài!'",
+        next_steps=NextSteps(
+            choice_a="journey_to_forgotten_isle",
+            choice_b="research_ancient_curse",
+            choice_c="ignore_curse_outcome",
+            timeout="ga_urgent_timeout_curse_1"
+        ),
+        gold=60, silver=280, ga_exp=45, dignity_point=25
+    ),
+
+    GuardianQuestLines(
+        id="journey_to_forgotten_isle",
+        title="Bước Chân Lên Hòn Đảo Lãng Quên",
+        description="Bạn và {guardian.ga_name} đặt chân lên Hòn Đảo Quên Lãng. Không khí tĩnh lặng đến rợn người, cây cối mục nát và những công trình đổ nát gợi lên một quá khứ huy hoàng bị lãng quên. {guardian.ga_name} chỉ vào một tượng đài hình chiếc chìa khóa khổng lồ. 'Đây là cổng dẫn đến ký ức, nhưng nó đã bị khóa chặt bởi lời nguyền.'",
+        choice_a="Kiểm tra tượng đài chìa khóa.",
+        choice_b="Tìm kiếm những người còn sót lại trên đảo.",
+        choice_c="Tìm kiếm một lối thoát khỏi hòn đảo.",
+        choice_timeout="{guardian.ga_name} thúc giục. 'Chúng ta phải tìm hiểu điều gì đã xảy ra ở đây!'",
+        next_steps=NextSteps(
+            choice_a="examine_key_monument",
+            choice_b="search_for_survivors",
+            choice_c="seek_escape_from_isle",
+            timeout="monument_fades_timeout"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="research_ancient_curse",
+        title="Giải Mã Lời Nguyền Quên Lãng",
+        description="Bạn và {guardian.ga_name} đến một kho lưu trữ kiến thức cổ xưa. Một cuộn giấy da cũ kỹ hé lộ về lời nguyền được tạo ra bởi một pháp sư hùng mạnh nhằm bảo vệ một bí mật. Bất cứ ai cố gắng khám phá bí mật sẽ bị lời nguyền cuốn đi, và hòn đảo sẽ dần bị lãng quên.",
+        choice_a="Tìm kiếm hậu duệ của pháp sư tạo ra lời nguyền.",
+        choice_b="Trở lại Hòn Đảo Quên Lãng, tìm hiểu tại chỗ.",
+        choice_c="Rời bỏ nhiệm vụ, cho rằng lời nguyền quá nguy hiểm.",
+        choice_timeout="{guardian.ga_name} nói. 'Chúng ta cần tìm hiểu ý định thực sự của pháp sư này, Ngài.'",
+        next_steps=NextSteps(
+            choice_a="find_curse_creator_descendant",
+            choice_b="journey_to_forgotten_isle",
+            choice_c="abandon_curse_quest",
+            timeout="ga_urgent_timeout_curse_1"
+        ),
+        gold=85, silver=320, ga_exp=65, dignity_point=35
+    ),
+
+    GuardianQuestLines(
+        id="examine_key_monument",
+        title="Bí Ẩn Đằng Sau Chiếc Chìa Khóa",
+        description="Bạn và {guardian.ga_name} kiểm tra tượng đài chìa khóa. Một dòng chữ ẩn hiện: 'Ký ức là chìa khóa, quên lãng là xiềng xích.' {guardian.ga_name} cau mày. 'Lời nguyền này không chỉ xóa đi ký ức, mà còn giam giữ chúng.'",
+        choice_a="Tìm kiếm những mảnh ký ức bị lãng quên.",
+        choice_b="Thử giải mã dòng chữ bằng phép thuật.",
+        choice_c="Bỏ qua, tìm kiếm nơi khác trên đảo.",
+        choice_timeout="Tượng đài bắt đầu mờ dần. 'Chúng ta không còn nhiều thời gian trước khi nó biến mất hoàn toàn!' {guardian.ga_name} cảnh báo.",
+        next_steps=NextSteps(
+            choice_a="seek_forgotten_memories",
+            choice_b="attempt_magic_decipher",
+            choice_c="abandon_monument_isle",
+            timeout="monument_fades_timeout"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="find_curse_creator_descendant",
+        title="Truy Tìm Hậu Duệ Pháp Sư",
+        description="Dựa trên thông tin, bạn và {guardian.ga_name} tìm đến một thung lũng ẩn. Bạn gặp một học giả ẩn dật tên là Lyra, hậu duệ của pháp sư tạo ra lời nguyền. Bà ấy sống trong sự cô lập, bị ám ảnh bởi lỗi lầm của tổ tiên. 'Cha tôi đã tạo ra lời nguyền để bảo vệ một bí mật, nhưng ông ấy đã đi quá xa,' Lyra nói, giọng run run.",
+        choice_a="Tìm hiểu về bí mật mà lời nguyền bảo vệ.",
+        choice_b="Thuyết phục Lyra giúp phá giải lời nguyền.",
+        choice_c="Buộc Lyra phải tiết lộ bí mật.",
+        choice_timeout="{guardian.ga_name} nói nhỏ. 'Hãy cẩn thận, Ngài. Bà ấy đang mang gánh nặng của quá khứ.'",
+        next_steps=NextSteps(
+            choice_a="learn_secret_curse_protects",
+            choice_b="persuade_lyra_to_help",
+            choice_c="force_lyra_reveal_secret",
+            timeout="lyra_despair_timeout"
+        ),
+        gold=90, silver=350, ga_exp=70, dignity_point=40
+    ),
+
+    GuardianQuestLines(
+        id="seek_forgotten_memories",
+        title="Mảnh Ghép Ký Ức",
+        description="Bạn và {guardian.ga_name} tìm kiếm khắp hòn đảo, thu thập những mảnh ký ức mờ nhạt từ những vật phẩm còn sót lại: một bức thư tình ố vàng, một món đồ chơi trẻ con bị bỏ quên, một cuốn nhật ký cháy dở. {guardian.ga_name} cảm nhận được sự đau khổ. 'Những ký ức này... chúng đang đấu tranh để tồn tại.'",
+        choice_a="Ghép nối các mảnh ký ức.",
+        choice_b="Sử dụng phép thuật để phục hồi ký ức.",
+        choice_c="Bỏ qua, cho rằng những ký ức này không quan trọng.",
+        choice_timeout="{guardian.ga_name} cau mày. 'Chúng ta cần nhanh chóng, Ngài. Ký ức đang biến mất!'",
+        next_steps=NextSteps(
+            choice_a="piece_together_memories",
+            choice_b="magic_restore_memories",
+            choice_c="ignore_memories",
+            timeout="memories_fade_completely_timeout"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="piece_together_memories",
+        title="Bức Tranh Quá Khứ",
+        description="Bạn và {guardian.ga_name} đã ghép nối các mảnh ký ức. Chúng vẽ nên một bức tranh về một nền văn minh thịnh vượng, được bảo vệ bởi một tinh thể quyền năng. Nhưng sự đố kỵ và tham lam đã khiến tinh thể bị lạm dụng, dẫn đến một cuộc chiến tranh tàn khốc và lời nguyền quên lãng được tạo ra để chôn vùi sự thật. {guardian.ga_name} nói: 'Thảm kịch này cần được phơi bày.'",
+        choice_a="Tìm cách giải phóng tinh thể.",
+        choice_b="Tìm Lyra để chia sẻ câu chuyện.",
+        choice_c="Thử tìm kiếm dấu vết của tinh thể.",
+        choice_timeout="Bức tranh ký ức bắt đầu tan biến. 'Thời gian không chờ đợi, Ngài!' {guardian.ga_name} thúc giục.",
+        next_steps=NextSteps(
+            choice_a="free_crystal",
+            choice_b="share_story_with_lyra",
+            choice_c="seek_crystal_traces",
+            timeout="memories_fade_completely_timeout"
+        ),
+        gold=150, silver=700, ga_exp=120, dignity_point=70
+    ),
+
+    GuardianQuestLines(
+        id="learn_secret_curse_protects",
+        title="Bí Mật Bị Chôn Vùi",
+        description="Lyra miễn cưỡng kể về bí mật: Lời nguyền bảo vệ một Tinh Thể Ký Ức, nơi chứa đựng lịch sử và kiến thức của toàn bộ nền văn minh trên Hòn Đảo Quên Lãng. Cha của Lyra, pháp sư, đã tạo ra lời nguyền để ngăn chặn việc lạm dụng tinh thể sau khi một cuộc chiến tranh tàn khốc gần như hủy diệt hòn đảo. 'Ông ấy sợ rằng con người sẽ lặp lại sai lầm,' Lyra nói, giọng đầy chua xót. {guardian.ga_name} nói: 'Vậy ra lời nguyền là một sự bảo vệ... nhưng nó đã trở thành một xiềng xích.'",
+        choice_a="Tìm cách giải phóng tinh thể một cách an toàn.",
+        choice_b="Thuyết phục Lyra cùng phá giải lời nguyền.",
+        choice_c="Để Lyra tự mình giải quyết.",
+        choice_timeout="{guardian.ga_name} thúc giục. 'Chúng ta cần tìm một cách để giải phóng tinh thể, Ngài.'",
+        next_steps=NextSteps(
+            choice_a="release_crystal_safely",
+            choice_b="convince_lyra_to_join",
+            choice_c="leave_lyra_to_her_fate",
+            timeout="lyra_despair_timeout"
+        ),
+        gold=100, silver=400, ga_exp=80, dignity_point=45
+    ),
+
+    GuardianQuestLines(
+        id="release_crystal_safely",
+        title="Giải Phóng Tinh Thể Hồi Ức",
+        description="Bạn và {guardian.ga_name} cùng Lyra đến vị trí của Tinh Thể Ký Ức, nằm sâu dưới lòng đất. Với sự hướng dẫn của Lyra và sức mạnh của {guardian.ga_name}, bạn thực hiện nghi lễ giải phóng tinh thể. Một luồng ánh sáng rực rỡ bùng lên, lan tỏa khắp Hòn Đảo Quên Lãng. Ký ức ùa về như thác lũ, những công trình đổ nát dần được phục hồi, và những con người từng bị lãng quên giờ đây hồi sinh trong tâm trí mọi người. Lyra mỉm cười, nước mắt chảy dài. 'Cuối cùng... hòn đảo đã được nhớ lại.' {guardian.ga_name} đặt tay lên vai bạn. 'Ngài đã mang lại sự thật và sự sống cho một nơi tưởng chừng đã mất, Ngài.'",
+        choice_a="Hòn đảo hồi sinh, ký ức trở lại.",
+        choice_b="", choice_c="", choice_timeout="",
+        next_steps=NextSteps("quest_success_forgotten_isle", "quest_success_forgotten_isle", "quest_success_forgotten_isle", "quest_success_forgotten_isle"),
+        gold=1500, silver=7500, ga_exp=750, dignity_point=350
+    ),
+
+    GuardianQuestLines(
+        id="quest_success_forgotten_isle",
+        title="Khúc Ca Ký Ức Vang Mãi",
+        description="Hòn Đảo Quên Lãng giờ đây được biết đến là Hòn Đảo Ký Ức, một ngọn hải đăng của sự thật và sự tha thứ. Tinh Thể Ký Ức tỏa sáng rực rỡ, kể lại câu chuyện về quá khứ để không ai phải lặp lại sai lầm. Lyra trở thành người bảo vệ tinh thể, chia sẻ kiến thức của nó với thế giới. {guardian.ga_name} nhìn bạn với ánh mắt tự hào. 'Hành trình của chúng ta đã thay đổi số phận của cả một vùng đất. Ngài đã cho thấy rằng ngay cả những điều bị lãng quên nhất cũng có thể tìm thấy con đường trở về.' Hòn đảo nay trở thành một điểm đến cho những ai tìm kiếm sự thật và nguồn cảm hứng, và câu chuyện về hành trình của bạn cùng {guardian.ga_name} được lưu truyền qua nhiều thế hệ.",
+        choice_a="Câu chuyện về Hòn Đảo Ký Ức sẽ được ghi nhớ mãi mãi.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=2000, silver=10000, ga_exp=1000, dignity_point=500
+    ),
+
+    GuardianQuestLines(
+        id="ignore_curse_outcome",
+        title="Thờ Ơ Với Lãng Quên",
+        description="Bạn và {guardian.ga_name} quyết định phớt lờ lời nguyền. Dần dần, những ký ức cuối cùng về Hòn Đảo Quên Lãng biến mất khỏi tâm trí mọi người, như thể nó chưa từng tồn tại. {guardian.ga_name} nhìn bạn đầy thất vọng. 'Ngài đã cho phép một phần lịch sử bị xóa sổ.'",
+        choice_a="Bạn cảm thấy một sự hối tiếc lạnh lẽo. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-60, ga_exp=-250, silver=-600, gold=-300,
+        next_steps=NextSteps("quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2")
+    ),
+
+    GuardianQuestLines(
+        id="ga_urgent_timeout_curse_1",
+        title="Sự Mờ Nhạt Của Thời Gian",
+        description="Bạn chần chừ quá lâu. {guardian.ga_name} thở dài. 'Thời gian không chờ đợi. Hòn đảo đã chìm sâu hơn vào quên lãng.' Nhiệm vụ kết thúc trong sự thất bại đau đớn.",
+        choice_a="Bạn cảm thấy bất lực. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        next_steps=NextSteps("quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2"),
+        dignity_point=-40, ga_exp=-180, silver=-300, gold=-150,
+    ),
+
+    GuardianQuestLines(
+        id="monument_fades_timeout",
+        title="Tượng Đài Tan Biến",
+        description="Bạn chần chừ quá lâu trong việc kiểm tra tượng đài. Những nét khắc mờ dần, và nó biến mất hoàn toàn, mang theo mọi manh mối. 'Đã quá muộn rồi,' {guardian.ga_name} nói với giọng buồn bã.",
+        choice_a="Bạn cảm thấy một sự mất mát. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-25, ga_exp=-140, silver=-220, gold=-110,
+        next_steps=NextSteps("quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2")
+    ),
+
+    GuardianQuestLines(
+        id="seek_escape_from_isle",
+        title="Lối Thoát Tuyệt Vọng",
+        description="Bạn và {guardian.ga_name} quyết định tìm một lối thoát khỏi Hòn Đảo Quên Lãng. Nhưng càng đi, bạn càng cảm thấy mọi thứ xung quanh mình trở nên mơ hồ, như thể hòn đảo đang cố gắng xóa đi sự hiện diện của bạn. 'Lời nguyền quá mạnh,' {guardian.ga_name} nói, giọng yếu ớt.",
+        choice_a="Bạn bị mắc kẹt trên đảo, nhiệm vụ thất bại.",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-35, ga_exp=-160, silver=-180, gold=-120,
+        next_steps=NextSteps("quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2")
+    ),
+
+    GuardianQuestLines(
+        id="lyra_despair_timeout",
+        title="Nỗi Ám Ảnh Của Lyra",
+        description="Bạn chần chừ quá lâu trong việc nói chuyện với Lyra. Bà ấy chìm sâu hơn vào nỗi ám ảnh về lỗi lầm của tổ tiên. 'Tôi không thể... gánh nặng này quá lớn,' bà thì thào. {guardian.ga_name} nhìn bạn với ánh mắt đầy trách móc. 'Chúng ta đã không thể mang lại hy vọng cho bà ấy.'",
+        choice_a="Lyra chìm trong tuyệt vọng, nhiệm vụ thất bại.",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-35, ga_exp=-160, silver=-280, gold=-140,
+        next_steps=NextSteps("quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2")
+    ),
+
+    GuardianQuestLines(
+        id="force_lyra_reveal_secret",
+        title="Cưỡng Ép Sự Thật",
+        description="Bạn cố gắng buộc Lyra phải tiết lộ bí mật. Bà ấy phản kháng dữ dội, nỗi sợ hãi và tức giận bùng phát, tạo ra một làn sóng năng lượng tiêu cực khiến lời nguyền trên hòn đảo càng mạnh hơn. 'Ngài đã đẩy bà ấy vào nguy hiểm,' {guardian.ga_name} nói, ánh mắt đầy thất vọng.",
+        choice_a="Lời nguyền trở nên mạnh hơn. Nhiệm vụ thất bại.",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-80, ga_exp=-280, silver=-550, gold=-270, ga_health=-130, ga_mana=-130, ga_stamina=-130,
+        next_steps=NextSteps("quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2")
+    ),
+
+    GuardianQuestLines(
+        id="memories_fade_completely_timeout",
+        title="Ký Ức Tan Biến Hoàn Toàn",
+        description="Bạn chần chừ quá lâu, và những mảnh ký ức cuối cùng cũng tan biến, không còn sót lại bất kỳ dấu vết nào. 'Mọi thứ đã bị lãng quên mãi mãi,' {guardian.ga_name} nói với vẻ thất thần.",
+        choice_a="Ký ức tan biến, nhiệm vụ thất bại.",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-20, ga_exp=-80, silver=-160, gold=-80,
+        next_steps=NextSteps("quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2")
+    ),
+
+    GuardianQuestLines(
+        id="search_for_survivors",
+        title="Tìm Kiếm Bóng Người",
+        description="Bạn và {guardian.ga_name} tìm kiếm những người còn sót lại trên Hòn Đảo Quên Lãng. Bạn chỉ tìm thấy những hình bóng mờ ảo, lang thang vô định, không có ký ức về bản thân hay hòn đảo. {guardian.ga_name} nói: 'Họ đã bị lời nguyền chiếm đoạt hoàn toàn.'",
+        choice_a="Cố gắng giao tiếp với những linh hồn này.",
+        choice_b="Tìm kiếm một nơi trú ẩn cho họ.",
+        choice_c="Rút lui, cho rằng họ đã mất.",
+        choice_timeout="{guardian.ga_name} hối thúc. 'Chúng ta cần tìm cách giúp họ thoát khỏi lời nguyền!'",
+        next_steps=NextSteps(
+            choice_a="communicate_with_spirits",
+            choice_b="seek_shelter_for_them",
+            choice_c="abandon_lost_souls",
+            timeout="spirits_fade_timeout"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="communicate_with_spirits",
+        title="Lời Thì Thầm Của Linh Hồn",
+        description="Bạn cố gắng giao tiếp với những linh hồn mờ ảo. Họ thì thầm những câu chuyện rời rạc về một quá khứ xa xăm, về một tinh thể lấp lánh và sự đổ vỡ. {guardian.ga_name} lắng nghe chăm chú. 'Những ký ức bị giam cầm... Chúng ta cần giải thoát chúng.'",
+        choice_a="Cố gắng giúp các linh hồn tìm lại ký ức.",
+        choice_b="Tìm cách kết nối các mảnh ký ức của họ.",
+        choice_c="Rút lui khi cảm thấy quá sức.",
+        choice_timeout="{guardian.ga_name} cảnh báo. 'Họ đang mờ dần, Ngài!'",
+        next_steps=NextSteps(
+            choice_a="help_spirits_regain_memories",
+            choice_b="connect_spirit_memory_fragments",
+            choice_c="retreat_from_spirits",
+            timeout="spirits_fade_timeout"
+        ),
+        gold=70, silver=250, ga_exp=50, dignity_point=20
+    ),
+
+    GuardianQuestLines(
+        id="help_spirits_regain_memories",
+        title="Hồi Sinh Linh Hồn",
+        description="Bạn và {guardian.ga_name} đã cùng nhau giúp các linh hồn tìm lại ký ức bằng cách chiếu sáng những mảnh ký ức bạn đã thu thập được. Dần dần, những hình bóng mờ ảo trở nên rõ ràng hơn, và họ bắt đầu nhớ lại mình là ai. Họ không thể rời khỏi hòn đảo, nhưng họ đã được giải thoát khỏi sự quên lãng. 'Cảm ơn Ngài,' một linh hồn thì thầm. {guardian.ga_name} nói: 'Họ đã tìm thấy bình yên, Ngài.'",
+        choice_a="Các linh hồn được giải thoát, nhiệm vụ thành công một phần.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=550, silver=2200, ga_exp=280, dignity_point=120,
+        next_steps=NextSteps("partial_success_spirits_at_peace", "partial_success_spirits_at_peace", "partial_success_spirits_at_peace", "partial_success_spirits_at_peace")
+    ),
+
+    GuardianQuestLines(
+        id="partial_success_spirits_at_peace",
+        title="Bình Yên Cho Linh Hồn",
+        description="Hòn Đảo Quên Lãng vẫn bị bao trùm bởi lời nguyền, nhưng những linh hồn bị mắc kẹt giờ đây đã tìm thấy sự bình yên. Họ trở thành những người bảo vệ hòn đảo, giữ gìn những ký ức mà họ đã lấy lại được. {guardian.ga_name} nói: 'Ngài đã mang lại sự an ủi cho những linh hồn lạc lối. Đó là một chiến thắng đáng trân trọng, dù không hoàn toàn.'",
+        choice_a="Nhiệm vụ thành công một phần, linh hồn được an ủi.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=700, silver=3000, ga_exp=350, dignity_point=150,
+        next_steps=NextSteps("continue_adventure_2", "continue_adventure_2", "continue_adventure_2", "continue_adventure_2")
+    ),
+
+    GuardianQuestLines(
+        id="attempt_magic_decipher",
+        title="Giải Mã Thất Bại",
+        description="Bạn cố gắng giải mã dòng chữ bằng phép thuật, nhưng nó quá phức tạp và cổ xưa. Năng lượng ma thuật phản tác dụng, khiến bạn choáng váng và tượng đài mờ đi nhanh hơn. 'Phép thuật không phải là câu trả lời cho mọi thứ,' {guardian.ga_name} nói, đỡ bạn dậy.",
+        choice_a="Phép thuật thất bại, nhiệm vụ gặp trở ngại.",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-15, ga_exp=-80, silver=-100, gold=-50, ga_mana=-50,
+        next_steps=NextSteps("monument_fades_timeout", "monument_fades_timeout", "monument_fades_timeout", "monument_fades_timeout")
+    ),
+
+    GuardianQuestLines(
+        id="abandon_monument_isle",
+        title="Bỏ Qua Tượng Đài",
+        description="Bạn và {guardian.ga_name} quyết định bỏ qua tượng đài, hy vọng tìm thấy manh mối ở nơi khác trên đảo. Tuy nhiên, mọi con đường đều dẫn đến sự trống rỗng và im lặng. 'Có lẽ chúng ta đã bỏ lỡ điều quan trọng nhất,' {guardian.ga_name} nói với vẻ hối tiếc.",
+        choice_a="Bạn cảm thấy bế tắc. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-25, ga_exp=-140, silver=-160, gold=-80,
+        next_steps=NextSteps("quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2")
+    ),
+
+    GuardianQuestLines(
+        id="persuade_lyra_to_help",
+        title="Niềm Tin Được Thắp Sáng",
+        description="Bạn cố gắng thuyết phục Lyra giúp phá giải lời nguyền. Ban đầu, bà ấy do dự, nhưng sau khi nghe bạn nói về sự đau khổ của hòn đảo, một tia hy vọng lóe lên trong mắt bà. 'Tôi sẽ giúp... vì tổ tiên tôi đã sai lầm.' {guardian.ga_name} nói: 'Ngài đã chạm đến trái tim bà ấy, Ngài.'",
+        choice_a="Lyra đồng ý giúp đỡ.",
+        choice_b="Tìm kiếm những công cụ cần thiết cho nghi lễ.",
+        choice_c="",
+        choice_timeout="{guardian.ga_name} thúc giục. 'Thời gian đang chống lại chúng ta, Ngài.'",
+        next_steps=NextSteps(
+            choice_a="lyra_joins_cause",
+            choice_b="seek_ritual_tools",
+            choice_c="",
+            timeout="lyra_despair_timeout"
+        ),
+        dignity_point=50, ga_exp=100
+    ),
+
+    GuardianQuestLines(
+        id="lyra_joins_cause",
+        title="Liên Minh Vì Hòn Đảo",
+        description="Lyra, với kiến thức sâu rộng về lời nguyền và lịch sử của tinh thể, đã trở thành một đồng minh vô giá. Cùng với Lyra và {guardian.ga_name}, bạn có một cơ hội thực sự để giải thoát Hòn Đảo Quên Lãng. 'Chúng ta hãy bắt đầu nghi lễ,' Lyra nói với quyết tâm.",
+        choice_a="Thực hiện nghi lễ giải phóng tinh thể.",
+        choice_b="Tìm hiểu thêm về tác dụng phụ của việc giải phóng tinh thể.",
+        choice_c="",
+        choice_timeout="{guardian.ga_name} nói. 'Đã đến lúc hành động, Ngài!'",
+        next_steps=NextSteps(
+            choice_a="release_crystal_safely",
+            choice_b="learn_crystal_side_effects",
+            choice_c="",
+            timeout="lyra_despair_timeout"
+        ),
+        gold=120, silver=500, ga_exp=90, dignity_point=55
+    ),
+
+    GuardianQuestLines(
+        id="ignore_memories",
+        title="Bỏ Qua Ký Ức",
+        description="Bạn và {guardian.ga_name} quyết định bỏ qua những mảnh ký ức, tin rằng chúng không phải là chìa khóa. Nhưng càng đi sâu vào hòn đảo, cảm giác trống rỗng càng lớn. 'Chúng ta đã bỏ lỡ điều gì đó quan trọng,' {guardian.ga_name} nói, giọng đầy tiếc nuối.",
+        choice_a="Bạn cảm thấy hối tiếc. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-10, ga_exp=-60, silver=-120, gold=-60,
+        next_steps=NextSteps("memories_fade_completely_timeout", "memories_fade_completely_timeout", "memories_fade_completely_timeout", "memories_fade_completely_timeout")
+    ),
+
+    GuardianQuestLines(
+        id="learn_crystal_side_effects",
+        title="Mặt Trái Của Sự Hồi Sinh",
+        description="Lyra cảnh báo rằng việc giải phóng tinh thể có thể mang lại những ký ức đau khổ và sự hỗn loạn ban đầu khi quá khứ ùa về. 'Sự thật có thể tàn khốc, nhưng nó cần được chấp nhận,' bà nói. {guardian.ga_name} nói: 'Chúng ta phải sẵn sàng đối mặt với mọi điều, Ngài.'",
+        choice_a="Tiếp tục nghi lễ, chấp nhận rủi ro.",
+        choice_b="Tìm cách giảm thiểu tác động tiêu cực.",
+        choice_c="",
+        choice_timeout="{guardian.ga_name} thúc giục. 'Không còn đường lui, Ngài!'",
+        next_steps=NextSteps(
+            choice_a="release_crystal_safely",
+            choice_b="mitigate_negative_effects",
+            choice_c="",
+            timeout="lyra_despair_timeout"
+        ),
+        gold=50, silver=150, ga_exp=30, dignity_point=10
+    ),
+
+    GuardianQuestLines(
+        id="mitigate_negative_effects",
+        title="Lá Chắn Cảm Xúc",
+        description="Bạn, {guardian.ga_name} và Lyra đã tạo ra một lá chắn cảm xúc để giảm thiểu tác động tiêu cực của dòng ký ức ùa về. Khi tinh thể được giải phóng, dù vẫn có sự hỗn loạn, nhưng nỗi đau không quá sức chịu đựng. 'Chúng ta đã làm giảm nhẹ gánh nặng,' {guardian.ga_name} nói, thở phào.",
+        choice_a="Tiếp tục nghi lễ giải phóng tinh thể.",
+        choice_b="", choice_c="", choice_timeout="",
+        next_steps=NextSteps("release_crystal_safely", "release_crystal_safely", "release_crystal_safely", "release_crystal_safely"),
+        gold=70, silver=200, ga_exp=40, dignity_point=15
+    )
+]
+
+all_quests = [quest_ghost_of_forrest, quest_night_market, quest_the_ruin_call, quest_broken_oath, quest_ruin_whisper, quest_dying_whisper]
