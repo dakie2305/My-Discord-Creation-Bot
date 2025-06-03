@@ -13,8 +13,8 @@ import CustomFunctions
 from Handling.Economy.Inventory_Shop.ItemClass import Item, list_small_copper_fish,list_gold_fish, list_silver_fish, list_gift_items, list_trash, list_plant, list_legend_weapon_1, list_legend_weapon_2, list_support_ga_items, list_protection_items,list_attack_items,list_support_items
 
 class GaQuestView(discord.ui.View):
-    def __init__(self, user: discord.Member, guardian_quest: GuardianAngelQuest, current_quest_lines: GuardianQuestLines, override_title: str, channel: discord.TextChannel, total_dignity = 0, total_gold = 0, total_silver = 0, total_ga_exp = 0, total_ga_hp = 0, total_ga_mana = 0, total_ga_stamina = 0, force_injury = False, force_dead = False):
-        super().__init__(timeout=30)
+    def __init__(self, user: discord.Member, guardian_quest: GuardianAngelQuest, current_quest_lines: GuardianQuestLines, override_title: str, channel: discord.TextChannel, total_dignity = 0, total_gold = 0, total_silver = 0, total_ga_exp = 0, total_ga_hp = 0, total_ga_mana = 0, total_ga_stamina = 0, force_injury = False, force_dead = False, timeout = 30):
+        super().__init__(timeout=timeout)
         self.message: discord.Message = None
         self.guardian_quest = guardian_quest
         self.current_quest_lines = current_quest_lines
@@ -31,6 +31,7 @@ class GaQuestView(discord.ui.View):
         self.channel = channel
         self.force_injury = force_injury
         self.force_dead = force_dead
+        self.timeout = timeout
         
         if current_quest_lines.choice_a and current_quest_lines.choice_a.strip() != "":
             self.choice_a_button = discord.ui.Button(label="A", style=discord.ButtonStyle.primary)
@@ -147,7 +148,7 @@ class GaQuestView(discord.ui.View):
         embed.add_field(name=f"", value="_____", inline=False)
         embed.add_field(name=f"", value=f"Thời gian còn lại: <t:{unix_time}:R>", inline=False)
         # Create new view with the next step
-        new_view = GaQuestView(self.user, self.guardian_quest, next_quest_line, override_title=self.override_title, total_dignity=self.total_dignity, total_gold=self.total_gold, total_silver=self.total_silver, total_ga_exp=self.total_ga_exp, total_ga_hp=self.total_ga_hp, total_ga_mana=self.total_ga_mana, total_ga_stamina=self.total_ga_stamina, channel=self.channel, force_dead=self.force_dead, force_injury=self.force_injury)
+        new_view = GaQuestView(self.user, self.guardian_quest, next_quest_line, override_title=self.override_title, total_dignity=self.total_dignity, total_gold=self.total_gold, total_silver=self.total_silver, total_ga_exp=self.total_ga_exp, total_ga_hp=self.total_ga_hp, total_ga_mana=self.total_ga_mana, total_ga_stamina=self.total_ga_stamina, channel=self.channel, force_dead=self.force_dead, force_injury=self.force_injury, timeout=self.timeout)
         try:
             mess = await self.message.edit(embed=embed,view=new_view)
             new_view.message = mess
