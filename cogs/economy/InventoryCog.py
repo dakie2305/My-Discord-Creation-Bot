@@ -231,7 +231,7 @@ class InventoryEconomy(commands.Cog):
             view.message = mess
             return
         elif user_profile.last_attack_item_used != None:
-            time_window = timedelta(hours=1)
+            time_window = timedelta(minutes=30)
             check = UtilitiesFunctions.check_if_within_time_delta(input=user_profile.last_attack_item_used, time_window=time_window)
             if check:
                 #Lấy thời gian cũ để cộng vào timedelta xem chừng nào mới làm tiếp được
