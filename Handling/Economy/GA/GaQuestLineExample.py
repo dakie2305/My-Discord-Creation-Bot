@@ -16,7 +16,8 @@ quest_ghost_of_forrest = [
             choice_b="research_forest_history",
             choice_c="ignore_spirits_outcome",
             timeout="ga_worried_timeout_3"
-        )
+        ),
+        gold=10, silver=100, ga_exp=10, dignity_point=5
     ),
 
     GuardianQuestLines(
@@ -114,6 +115,7 @@ quest_ghost_of_forrest = [
         title="Thanh Tẩy Không Thành Công",
         description="Bạn cố gắng thanh tẩy linh hồn bằng phép thuật, nhưng nó quá mạnh và kháng cự. Linh hồn gầm lên giận dữ, đẩy bạn và {guardian.ga_name} lùi lại. 'Nó không thể bị thanh tẩy dễ dàng!' {guardian.ga_name} nói.",
         choice_a="Bạn bị thương nhẹ. Nhiệm vụ thất bại.",
+        ga_exp= 50, silver = -50, gold=-50, ga_health=-50, ga_mana=-50, ga_stamina=-50,
         choice_b="", choice_c="", choice_timeout="",
         next_steps=NextSteps("quest_failed_end_3", "quest_failed_end_3", "quest_failed_end_3", "quest_failed_end_3")
     ),
@@ -167,6 +169,7 @@ quest_ghost_of_forrest = [
         description="Bạn và {guardian.ga_name} mang Cổ Vật Thanh Tẩy trở lại khu rừng. Khi bạn đặt cổ vật lên bệ đá gần linh hồn, một luồng sáng mạnh mẽ bùng lên, thanh tẩy linh hồn và hóa giải lời nguyền khỏi khu rừng.",
         choice_a="Nhiệm vụ hoàn thành! Khu rừng được giải thoát.",
         choice_b="", choice_c="", choice_timeout="",
+        ga_exp= 300, silver = 1000, gold=500, ga_health=50, ga_mana=50, ga_stamina=50, dignity_point=10,
         next_steps=NextSteps("quest_success_end_3", "quest_success_end_3", "quest_success_end_3", "quest_success_end_3")
     ),
 
@@ -177,6 +180,7 @@ quest_ghost_of_forrest = [
         description="Bạn quyết định bỏ qua. Vài ngày sau, khu rừng trở nên u ám hơn, và những câu chuyện về linh hồn quấy phá lan rộng. {guardian.ga_name} nhìn bạn với vẻ thất vọng.",
         choice_a="Cảm thấy hối tiếc. (Nhiệm vụ thất bại)",
         choice_b="", choice_c="", choice_timeout="",
+        dignity_point= -5, ga_exp= -50, silver = -50, gold=-50,
         next_steps=NextSteps("quest_failed_end_3", "quest_failed_end_3", "quest_failed_end_3", "quest_failed_end_3")
     ),
 
@@ -186,7 +190,8 @@ quest_ghost_of_forrest = [
         description="Bạn chần chừ quá lâu. {guardian.ga_name} lắc đầu thất vọng. 'Chúng ta không thể cứu họ nếu cứ đứng đây!' Nhiệm vụ kết thúc vì sự thiếu quyết đoán.",
         choice_a="Cảm thấy bất lực. (Nhiệm vụ thất bại)",
         choice_b="", choice_c="", choice_timeout="",
-        next_steps=NextSteps("quest_failed_end_3", "quest_failed_end_3", "quest_failed_end_3", "quest_failed_end_3")
+        next_steps=NextSteps("quest_failed_end_3", "quest_failed_end_3", "quest_failed_end_3", "quest_failed_end_3"),
+        dignity_point= -10, ga_exp= -50, silver = -100, gold=-50,
     ),
 
     GuardianQuestLines(
@@ -195,6 +200,7 @@ quest_ghost_of_forrest = [
         description="Bạn và {guardian.ga_name} chần chừ. Linh hồn yếu ớt dần dần tan biến vào hư vô, không thể được cứu vớt. {guardian.ga_name} thở dài buồn bã. 'Đã quá muộn rồi.'",
         choice_a="Cảm thấy nuối tiếc. (Nhiệm vụ thất bại)",
         choice_b="", choice_c="", choice_timeout="",
+        dignity_point= -5, ga_exp= -50, silver = -100, gold=-50,
         next_steps=NextSteps("quest_failed_end_3", "quest_failed_end_3", "quest_failed_end_3", "quest_failed_end_3")
     ),
 
@@ -204,6 +210,7 @@ quest_ghost_of_forrest = [
         description="Bạn và {guardian.ga_name} cố gắng tìm đường vòng, nhưng khu rừng dường như không cho phép. Bạn lạc lối và không thể tìm thấy lối thoát. 'Chúng ta đã đi sai đường rồi, chủ nhân,' {guardian.ga_name} nói.",
         choice_a="Bạn bị lạc và nhiệm vụ thất bại.",
         choice_b="", choice_c="", choice_timeout="",
+        dignity_point= -5, ga_exp= -50, silver = -100, gold=-50,
         next_steps=NextSteps("quest_failed_end_3", "quest_failed_end_3", "quest_failed_end_3", "quest_failed_end_3")
     ),
 
@@ -213,6 +220,7 @@ quest_ghost_of_forrest = [
         description="Bạn quyết định rằng nhiệm vụ này quá phức tạp và nguy hiểm. Bạn và {guardian.ga_name} quay lưng lại với số phận của khu rừng. 'Tôi hy vọng có ai đó khác có thể giúp đỡ,' {guardian.ga_name} nói với giọng buồn bã.",
         choice_a="Cảm thấy nhẹ nhõm, nhưng cũng có chút hối tiếc. (Nhiệm vụ thất bại)",
         choice_b="", choice_c="", choice_timeout="",
+        dignity_point= -10, ga_exp= -150, silver = -500, gold=-50,
         next_steps=NextSteps("quest_failed_end_3", "quest_failed_end_3", "quest_failed_end_3", "quest_failed_end_3")
     ),
 
@@ -221,6 +229,7 @@ quest_ghost_of_forrest = [
         title="Linh Hồn Nổi Giận",
         description="Bạn chần chừ trong việc quyết định cách tiếp cận. Linh hồn gầm lên giận dữ, nó trở nên mạnh hơn và tấn công bạn. {guardian.ga_name} phải tạo lá chắn để bảo vệ bạn.",
         choice_a="Bạn bị tấn công và phải rút lui. Nhiệm vụ thất bại.",
+        dignity_point= -5, ga_exp= -50, silver = -50, gold=-50,
         choice_b="", choice_c="", choice_timeout="",
         next_steps=NextSteps("quest_failed_end_3", "quest_failed_end_3", "quest_failed_end_3", "quest_failed_end_3")
     ),
@@ -231,6 +240,7 @@ quest_ghost_of_forrest = [
         description="Bạn quyết định để linh hồn tự giải thoát. Tuy nhiên, linh hồn không thể tự mình vượt qua lời nguyền và cuối cùng tan biến hoàn toàn. 'Chúng ta đã không thể giúp nó,' {guardian.ga_name} nói buồn bã.",
         choice_a="Bạn cảm thấy bất lực. (Nhiệm vụ thất bại)",
         choice_b="", choice_c="", choice_timeout="",
+        dignity_point= -5, ga_exp= -50, silver = -50, gold=-50,
         next_steps=NextSteps("quest_failed_end_3", "quest_failed_end_3", "quest_failed_end_3", "quest_failed_end_3")
     ),
 
@@ -240,6 +250,7 @@ quest_ghost_of_forrest = [
         description="Bạn và {guardian.ga_name} quyết định rút lui khỏi khu rừng cổ. Bạn cảm thấy một nỗi buồn man mác khi rời đi, biết rằng linh hồn vẫn đang mắc kẹt ở đó. 'Chúng ta không thể làm gì lúc này,' {guardian.ga_name} thở dài.",
         choice_a="Rút lui và nhiệm vụ thất bại.",
         choice_b="", choice_c="", choice_timeout="",
+        dignity_point= -10, ga_exp= -50, silver = -50, gold=-50,
         next_steps=NextSteps("quest_failed_end_3", "quest_failed_end_3", "quest_failed_end_3", "quest_failed_end_3")
     ),
 
@@ -249,6 +260,7 @@ quest_ghost_of_forrest = [
         description="Bạn chần chừ quá lâu trước cổ vật. Năng lượng của lời nguyền bùng phát mạnh mẽ, khiến cổ vật biến mất vào hư vô. 'Không! Đã quá muộn rồi!' {guardian.ga_name} thốt lên.",
         choice_a="Cổ vật biến mất, nhiệm vụ thất bại.",
         choice_b="", choice_c="", choice_timeout="",
+        dignity_point= -10, ga_exp= -50, silver = -50, gold=-50,
         next_steps=NextSteps("quest_failed_end_3", "quest_failed_end_3", "quest_failed_end_3", "quest_failed_end_3")
     ),
 
@@ -257,6 +269,7 @@ quest_ghost_of_forrest = [
         id="quest_success_end_3",
         title="Hòa Bình Cho Khu Rừng",
         description="Khu rừng cổ đã tìm thấy sự bình yên. Những linh hồn được giải thoát, và không khí trở nên trong lành. {guardian.ga_name} mỉm cười. 'Chúng ta đã mang lại sự bình yên cho nơi đây, chủ nhân.'",
+        ga_exp= 200, silver = 1000, gold=500, ga_health=50, ga_mana=50, ga_stamina=50, dignity_point=10,
         choice_a="Bạn cảm thấy tự hào về bản thân và {guardian.ga_name}.",
         choice_b="", choice_c="", choice_timeout="",
         next_steps=NextSteps("continue_adventure_3", "continue_adventure_3", "continue_adventure_3", "continue_adventure_3")
@@ -267,6 +280,7 @@ quest_ghost_of_forrest = [
         title="Bóng Tối Tiếp Diễn",
         description="Khu rừng cổ vẫn chìm trong sự đau khổ của những linh hồn mắc kẹt. {guardian.ga_name} cúi đầu, vẻ mặt buồn bã. 'Chúng ta... đã không thể thay đổi số phận của họ.'",
         choice_a="Rút ra bài học đau đớn.",
+        dignity_point= -10, ga_exp= -50, silver = -50, gold=-50,
         choice_b="", choice_c="", choice_timeout="",
         next_steps=NextSteps("continue_adventure_3", "continue_adventure_3", "continue_adventure_3", "continue_adventure_3")
     ),
@@ -277,262 +291,440 @@ quest_ghost_of_forrest = [
         description="Bạn và {guardian.ga_name} rời khỏi khu rừng cổ, mang theo những ký ức về hành trình vừa qua. Những cuộc phiêu lưu mới đang chờ đợi...",
         choice_a="",
         choice_b="", choice_c="", choice_timeout="",
+        ga_exp= 50, silver = 1000, gold=10,
         next_steps=NextSteps("", "", "", "")
     )
 ]
 
-#region quest lake mystery
-quest_lake_mystery = [
+#region quest_night_market 
+quest_night_market = [
     GuardianQuestLines(
         id="start",
-        title="Bí Ẩn Của Hồ Nước Ngừng Đọng",
-        description="Một sự tĩnh lặng bất thường bao trùm hồ nước. {guardian.ga_name} nhìn chằm chằm vào mặt nước. 'Tôi cảm thấy một năng lượng kỳ lạ, như thể thời gian ở đây đã ngừng lại.'",
-        choice_a="Tiến đến gần hồ để điều tra.",
-        choice_b="Tìm kiếm thông tin về lịch sử hồ.",
-        choice_c="Bỏ qua, hồ nước có vẻ nguy hiểm.",
-        choice_timeout="{guardian.ga_name} cau mày. 'Chúng ta không thể phớt lờ điều này!'",
+        title="Lễ Hội Vĩnh Hằng Của Thung Lũng Ảo Ảnh",
+        description="Một tấm thiệp mời bí ẩn dẫn bạn và {guardian.ga_name} đến một thung lũng hẻo lánh, nơi một lễ hội lộng lẫy đang diễn ra. Âm nhạc vang vọng, người dân tươi cười, nhưng {guardian.ga_name} khẽ cau mày. 'Ta cảm thấy một sự giả dối ẩn sâu dưới vẻ rạng rỡ này, Ngài.'",
+        choice_a="Hòa mình vào lễ hội, tìm hiểu dân làng.",
+        choice_b="Tìm kiếm những điều bất thường trong lễ hội.",
+        choice_c="Rời đi ngay lập tức, cảm giác không lành.",
+        choice_timeout="{guardian.ga_name} thúc giục. 'Nếu ta bỏ qua, liệu có điều gì tồi tệ hơn sẽ xảy ra không, Ngài?'",
         next_steps=NextSteps(
-            choice_a="approach_lake",
-            choice_b="research_lake_history",
-            choice_c="ignore_lake_outcome",
-            timeout="ga_insist_timeout_1"
+            choice_a="join_festival",
+            choice_b="investigate_oddities",
+            choice_c="leave_festival_early",
+            timeout="ga_uneasy_timeout"
+        ),
+        gold=20, silver=100, ga_exp=15, dignity_point=5
+    ),
+
+    GuardianQuestLines(
+        id="join_festival",
+        title="Bữa Tiệc Bất Tận",
+        description="Bạn và {guardian.ga_name} tham gia vào lễ hội. Mọi người mời bạn nhảy múa, ca hát và ăn uống. Thức ăn ngọt ngào, âm nhạc mê hoặc. {guardian.ga_name} thì thầm: 'Thật kỳ lạ, không ai dường như mệt mỏi cả.'",
+        choice_a="Tham gia một điệu nhảy truyền thống.",
+        choice_b="Cố gắng nói chuyện riêng với một người dân.",
+        choice_c="Tìm một nơi yên tĩnh để quan sát.",
+        choice_timeout="{guardian.ga_name} nói khẽ. 'Chúng ta không thể mãi bị cuốn theo điệu nhạc này, Ngài.'",
+        next_steps=NextSteps(
+            choice_a="participate_dance",
+            choice_b="talk_to_villager",
+            choice_c="observe_quietly",
+            timeout="dance_hypnosis_timeout"
         )
     ),
 
     GuardianQuestLines(
-        id="approach_lake",
-        title="Bước Chân Đến Bờ Hồ",
-        description="Bạn và {guardian.ga_name} đến gần hồ. Mặt nước phẳng lặng như gương, nhưng không có sự sống nào xung quanh. {guardian.ga_name} chỉ vào một vật thể lấp lánh dưới đáy hồ. 'Có vẻ như có thứ gì đó ở đó.'",
-        choice_a="Thử lặn xuống để lấy vật thể.",
-        choice_b="Sử dụng phép thuật để đưa vật thể lên.",
-        choice_c="Quan sát thêm, không hành động vội vàng.",
-        choice_timeout="{guardian.ga_name} thúc giục. 'Vật thể đó đang gọi chúng ta!'",
+        id="investigate_oddities",
+        title="Dấu Vết Kỳ Lạ",
+        description="Bạn và {guardian.ga_name} bắt đầu điều tra. Bạn nhận thấy rằng tất cả các cánh cửa nhà đều bị khóa từ bên ngoài, và có những ký hiệu lạ được khắc trên các cây cổ thụ xung quanh thung lũng. {guardian.ga_name} chạm vào một ký hiệu. 'Đây là ma thuật cầm tù, Ngài.'",
+        choice_a="Thử giải mã các ký hiệu.",
+        choice_b="Tìm một con đường bí mật ra khỏi thung lũng.",
+        choice_c="Đối mặt với trưởng làng để hỏi rõ.",
+        choice_timeout="{guardian.ga_name} thúc giục. 'Chúng ta phải tìm ra ý nghĩa của chúng trước khi quá muộn!'",
         next_steps=NextSteps(
-            choice_a="dive_for_object",
-            choice_b="use_magic_to_retrieve",
-            choice_c="observe_more",
-            timeout="object_disappears_timeout"
+            choice_a="decipher_symbols",
+            choice_b="seek_secret_path",
+            choice_c="confront_elder_early",
+            timeout="symbols_activate_timeout"
         )
     ),
 
     GuardianQuestLines(
-        id="research_lake_history",
-        title="Khám Phá Lịch Sử Hồ",
-        description="Bạn và {guardian.ga_name} đến thư viện cổ. Bạn tìm thấy một truyền thuyết kể về một viên đá thời gian bị mất tích trong hồ, có khả năng làm ngừng đọng thời gian. 'Chúng ta phải tìm viên đá đó!' {guardian.ga_name} nói.",
-        choice_a="Tìm kiếm viên đá thời gian trong hồ.",
-        choice_b="Trở lại hồ, thử cách khác.",
-        choice_c="Từ bỏ nhiệm vụ, quá rủi ro.",
-        choice_timeout="{guardian.ga_name} nói. 'Chúng ta không có nhiều thời gian đâu!'",
-        next_steps=NextSteps(
-            choice_a="approach_lake", # Dẫn đến tìm vật thể dưới hồ
-            choice_b="approach_lake",
-            choice_c="abandon_quest_lake",
-            timeout="ga_insist_timeout_1"
-        )
-    ),
-
-    GuardianQuestLines(
-        id="dive_for_object",
-        title="Lặn Xuống Hồ Sâu",
-        description="Bạn lặn xuống làn nước lạnh giá. {guardian.ga_name} tạo một lớp bảo vệ xung quanh bạn. Dưới đáy hồ, bạn thấy một viên đá phát sáng kỳ lạ. Khi bạn chạm vào, thời gian xung quanh dường như chậm lại.",
-        choice_a="Cố gắng đưa viên đá lên mặt nước.",
-        choice_b="Nghiên cứu viên đá dưới nước.",
-        choice_c="Quay lại ngay, có điều gì đó không ổn.",
-        choice_timeout="{guardian.ga_name} lo lắng. 'Hãy nhanh lên, năng lượng đang thay đổi!'",
-        next_steps=NextSteps(
-            choice_a="retrieve_stone",
-            choice_b="examine_stone_underwater",
-            choice_c="retreat_from_lake",
-            timeout="time_distortion_outcome"
-        )
-    ),
-
-    GuardianQuestLines(
-        id="use_magic_to_retrieve",
-        title="Sử Dụng Phép Thuật",
-        description="Bạn và {guardian.ga_name} tập trung năng lượng. Một luồng ánh sáng từ tay bạn kéo vật thể lên. Đó là một viên đá lấp lánh, phát ra năng lượng kỳ lạ. {guardian.ga_name} nói: 'Đây chính là viên đá thời gian trong truyền thuyết!'",
-        choice_a="Kiểm tra viên đá thời gian.",
-        choice_b="Mang viên đá đến một nơi an toàn.",
-        choice_c="Vứt bỏ viên đá, nó quá nguy hiểm.",
-        choice_timeout="{guardian.ga_name} thúc giục. 'Chúng ta phải hành động nhanh với nó!'",
-        next_steps=NextSteps(
-            choice_a="examine_time_stone",
-            choice_b="secure_time_stone",
-            choice_c="discard_stone_outcome",
-            timeout="time_distortion_outcome"
-        )
-    ),
-
-    # Final Stages (Success/Failure)
-    GuardianQuestLines(
-        id="retrieve_stone",
-        title="Viên Đá Được Đưa Lên",
-        description="Bạn thành công đưa viên đá lên bờ. Ngay lập tức, dòng chảy thời gian của hồ trở lại bình thường, những bông hoa nở rộ và chim hót líu lo. {guardian.ga_name} mỉm cười rạng rỡ. 'Chúng ta đã giải thoát hồ khỏi sự ngừng đọng!'",
-        choice_a="Nhiệm vụ hoàn thành! Hồ nước trở lại sự sống.",
-        choice_b="", choice_c="", choice_timeout="",
-        next_steps=NextSteps("quest_success_end_1", "quest_success_end_1", "quest_success_end_1", "quest_success_end_1")
-    ),
-
-    GuardianQuestLines(
-        id="examine_stone_underwater",
-        title="Nghiên Cứu Dưới Nước",
-        description="Bạn cố gắng nghiên cứu viên đá dưới nước, nhưng năng lượng của nó quá mạnh. Thời gian xung quanh bạn bị bóp méo, khiến bạn cảm thấy chóng mặt. {guardian.ga_name} kéo bạn lên kịp thời. 'Nguy hiểm quá!'",
-        choice_a="Bạn bị choáng váng nhẹ. Nhiệm vụ thất bại.",
-        choice_b="", choice_c="", choice_timeout="",
-        next_steps=NextSteps("quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1")
-    ),
-
-    GuardianQuestLines(
-        id="examine_time_stone",
-        title="Kiểm Tra Viên Đá Thời Gian",
-        description="Bạn và {guardian.ga_name} kiểm tra viên đá thời gian. Nó phát ra một luồng sáng ấm áp, có khả năng điều chỉnh dòng chảy thời gian. {guardian.ga_name} nói: 'Chúng ta có thể dùng nó để giúp đỡ người khác!'",
-        choice_a="Đưa viên đá trở lại hồ để khôi phục thời gian.",
-        choice_b="Giữ viên đá để sử dụng trong tương lai.",
+        id="participate_dance",
+        title="Điệu Nhảy Không Ngừng",
+        description="Bạn tham gia điệu nhảy. Nhạc ngày càng nhanh, ánh sáng càng rực rỡ. {guardian.ga_name} cố gắng kéo bạn lại. 'Chủ nhân, dừng lại! Ngài đang mất kiểm soát!' Nhưng cơ thể bạn không tuân lệnh. Một nụ cười vô hồn nở trên môi dân làng.",
+        choice_a="Cố gắng kháng cự lại sự thôi miên của điệu nhạc.",
+        choice_b="Để cơ thể cuốn theo điệu nhảy, xem điều gì sẽ xảy ra.",
         choice_c="",
-        choice_timeout="{guardian.ga_name} nói. 'Đừng chần chừ, năng lượng của nó đang dần ổn định!'",
+        choice_timeout="Điệu nhảy trở nên cuồng loạn. 'Ngài đang bị hấp dẫn!' {guardian.ga_name} gầm lên.",
         next_steps=NextSteps(
-            choice_a="retrieve_stone", # Dẫn đến việc trả lại hồ
-            choice_b="keep_time_stone_outcome",
+            choice_a="resist_hypnosis",
+            choice_b="yield_to_dance",
             choice_c="",
-            timeout="time_distortion_outcome"
+            timeout="yield_to_dance" # Force this outcome if timeout
         )
     ),
 
     GuardianQuestLines(
-        id="secure_time_stone",
-        title="Bảo Vệ Viên Đá",
-        description="Bạn và {guardian.ga_name} đưa viên đá thời gian đến một nơi an toàn, cất giữ cẩn thận để không ai có thể lạm dụng sức mạnh của nó. {guardian.ga_name} gật đầu. 'Một quyết định khôn ngoan, chủ nhân.'",
-        choice_a="Nhiệm vụ hoàn thành! Viên đá được bảo vệ.",
-        choice_b="", choice_c="", choice_timeout="",
-        next_steps=NextSteps("quest_success_end_1", "quest_success_end_1", "quest_success_end_1", "quest_success_end_1")
-    ),
-
-    # Failures
-    GuardianQuestLines(
-        id="ignore_lake_outcome",
-        title="Phớt Lờ Hồ Nước",
-        description="Bạn quyết định bỏ qua hồ. Vài ngày sau, tin đồn về việc thời gian bị bóp méo quanh hồ lan rộng, gây ra sự hỗn loạn. {guardian.ga_name} thở dài. 'Chúng ta đã bỏ lỡ cơ hội giúp đỡ.'",
-        choice_a="Cảm thấy hối tiếc. (Nhiệm vụ thất bại)",
-        choice_b="", choice_c="", choice_timeout="",
-        next_steps=NextSteps("quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1")
+        id="talk_to_villager",
+        title="Lời Thì Thầm Trong Bóng Tối",
+        description="Bạn kéo một người dân làng ra khỏi đám đông. Anh ta nhìn bạn với đôi mắt trống rỗng. 'Lễ hội... không bao giờ kết thúc... đó là... lời nguyền.' Anh ta thì thầm trước khi bị một lực vô hình kéo trở lại. {guardian.ga_name} nắm chặt tay. 'Ta biết mà! Có điều gì đó đang điều khiển họ!'",
+        choice_a="Tìm kiếm nguồn gốc của lời nguyền.",
+        choice_b="Cố gắng cảnh báo những người khác.",
+        choice_c="",
+        choice_timeout="{guardian.ga_name} nói khẽ. 'Chúng ta không còn nhiều thời gian để lãng phí nữa, Ngài.'",
+        next_steps=NextSteps(
+            choice_a="seek_curse_source",
+            choice_b="warn_others_outcome",
+            choice_c="",
+            timeout="curse_absorbs_timeout"
+        )
     ),
 
     GuardianQuestLines(
-        id="ga_insist_timeout_1",
-        title="Lời Thúc Giục Của Guardian",
-        description="Bạn chần chừ quá lâu. {guardian.ga_name} nắm tay bạn. 'Chúng ta phải hành động, chủ nhân! Mọi thứ đang trở nên tệ hơn.' Nhiệm vụ kết thúc vì sự thiếu quyết đoán.",
-        choice_a="Cảm thấy bất lực. (Nhiệm vụ thất bại)",
-        choice_b="", choice_c="", choice_timeout="",
-        next_steps=NextSteps("quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1")
+        id="seek_curse_source",
+        title="Bệ Thờ Cổ",
+        description="Bạn và {guardian.ga_name} tìm đến một bệ thờ cổ nằm sâu trong rừng, nơi những linh hồn bị mắc kẹt dường như đang cung cấp năng lượng cho lễ hội. Một thực thể vô hình, với hàng trăm con mắt, lơ lửng phía trên bệ thờ. {guardian.ga_name} chuẩn bị chiến đấu. 'Đây là thứ đang giam cầm họ, Ngài!'",
+        choice_a="Cố gắng phá hủy bệ thờ.",
+        choice_b="Tìm cách nói chuyện với thực thể.",
+        choice_c="Rút lui và tìm kế hoạch khác.",
+        choice_timeout="Thực thể bắt đầu tập trung năng lượng. 'Nó đang tấn công!' {guardian.ga_name} hét lên.",
+        next_steps=NextSteps(
+            choice_a="destroy_altar_attempt",
+            choice_b="commune_with_entity",
+            choice_c="retreat_from_altar",
+            timeout="entity_attacks_outcome"
+        )
     ),
 
     GuardianQuestLines(
-        id="object_disappears_timeout",
-        title="Vật Thể Biến Mất",
-        description="Bạn và {guardian.ga_name} chần chừ quá lâu. Ánh sáng từ vật thể dưới hồ dần mờ đi và biến mất hoàn toàn. {guardian.ga_name} thở dài. 'Đã quá muộn rồi.'",
-        choice_a="Cảm thấy nuối tiếc. (Nhiệm vụ thất bại)",
+        id="yield_to_dance",
+        title="Hòa Mình Vào Hư Vô",
+        description="Bạn buông bỏ mọi kháng cự, để cơ thể mình cuốn theo điệu nhảy cuồng loạn. Mọi ký ức, mọi suy nghĩ dần tan biến. {guardian.ga_name} gọi tên bạn trong vô vọng, nhưng bạn chỉ thấy một nụ cười vô hồn nở trên môi mình. Bạn trở thành một phần của lễ hội, mãi mãi nhảy múa, mãi mãi mỉm cười trong sự trống rỗng. {guardian.ga_name} lao vào đám đông, cố gắng kéo bạn ra, nhưng bị những bàn tay vô hình đẩy lùi. Hắn nhìn bạn, nước mắt tuôn rơi khi bạn biến thành một bức tượng sống, mãi mãi là một hình ảnh rạng rỡ của sự hủy diệt, còn hắn thì phải mang theo nỗi đau mất mát không thể chịu đựng.",
+        choice_a="Bạn trở thành một phần vĩnh cửu của lễ hội.",
         choice_b="", choice_c="", choice_timeout="",
-        next_steps=NextSteps("quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1")
+        next_steps=NextSteps("quest_failed_end_festival_trap", "quest_failed_end_festival_trap", "quest_failed_end_festival_trap", "quest_failed_end_festival_trap"),
+        gold=-500, silver=-500, ga_exp=-200, dignity_point=-50, ga_health=-999, ga_mana=-999, ga_stamina=-999, force_dead=True,
     ),
 
     GuardianQuestLines(
-        id="observe_more",
-        title="Quan Sát Không Hành Động",
-        description="Bạn và {guardian.ga_name} tiếp tục quan sát hồ, nhưng không có gì thay đổi. Vật thể dưới đáy hồ vẫn ở đó, nhưng bạn không tìm ra cách tiếp cận an toàn. 'Chúng ta cần một kế hoạch tốt hơn,' {guardian.ga_name} nói.",
-        choice_a="Không tìm được cách. Nhiệm vụ thất bại.",
-        choice_b="", choice_c="", choice_timeout="",
-        next_steps=NextSteps("quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1")
+        id="commune_with_entity",
+        title="Thỏa Thuận Với Thực Thể",
+        description="Bạn cố gắng giao tiếp với thực thể. Nó mở ra hàng trăm con mắt, hiển thị những hình ảnh về nỗi sợ hãi và khao khát sâu thẳm nhất của bạn. 'Ngươi muốn gì?' một giọng nói đồng loạt vang lên. {guardian.ga_name} cảnh báo. 'Cẩn thận, Ngài! Nó đang cố gắng thao túng Ngài!'",
+        choice_a="Cố gắng thương lượng để giải thoát dân làng.",
+        choice_b="Cầu xin nó dừng lại.",
+        choice_c="Chấp nhận sức mạnh mà nó có thể ban tặng.",
+        choice_timeout="Thực thể cười khúc khích. 'Ngươi đã chọn.'",
+        next_steps=NextSteps(
+            choice_a="negotiate_entity",
+            choice_b="beg_entity_outcome",
+            choice_c="accept_entity_power_outcome",
+            timeout="accept_entity_power_outcome" # Force this outcome if timeout
+        )
     ),
 
     GuardianQuestLines(
-        id="abandon_quest_lake",
-        title="Từ Bỏ Hồ Nước",
-        description="Bạn quyết định rằng bí ẩn của hồ nước quá phức tạp. Bạn và {guardian.ga_name} rời đi, bỏ mặc hồ chìm trong sự tĩnh lặng bất thường. 'Tôi hy vọng hồ sẽ tìm được sự bình yên,' {guardian.ga_name} nói với giọng buồn bã.",
-        choice_a="Cảm thấy nhẹ nhõm, nhưng cũng có chút hối tiếc. (Nhiệm vụ thất bại)",
+        id="accept_entity_power_outcome",
+        title="Sức Mạnh Đổi Lấy Linh Hồn",
+        description="Bạn đồng ý nhận sức mạnh từ thực thể. Một luồng năng lượng đen tối bao trùm lấy bạn, đốt cháy linh hồn. Bạn cảm thấy sức mạnh dâng trào, nhưng cùng lúc đó, ý chí của bạn bị tước đoạt. Bạn trở thành một người hầu vô tri của thực thể, một phần của lễ hội vĩnh hằng. {guardian.ga_name} gầm lên, lao vào tấn công thực thể, nhưng vô ích. Hắn bị hất văng, nhìn bạn biến thành một con rối không hồn. Từ đó, {guardian.ga_name} lang thang, mang theo sự ám ảnh về đôi mắt trống rỗng của bạn, và hắn biết, bạn đã hoàn toàn mất đi.",
+        choice_a="Bạn trở thành con rối của thực thể, {guardian.ga_name} bị tổn thương sâu sắc.",
         choice_b="", choice_c="", choice_timeout="",
-        next_steps=NextSteps("quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1")
+        next_steps=NextSteps("quest_failed_end_enslaved", "quest_failed_end_enslaved", "quest_failed_end_enslaved", "quest_failed_end_enslaved"),
+        gold=-700, silver=-700, ga_exp=-300, dignity_point=-70, ga_health=-999, ga_mana=-999, ga_stamina=-999, force_dead=True
+    ),
+
+    # Failures and generic endings
+    GuardianQuestLines(
+        id="leave_festival_early",
+        title="Rời Bỏ Bóng Tối",
+        description="Bạn và {guardian.ga_name} quyết định rời khỏi thung lũng. Cảm giác nhẹ nhõm xen lẫn một nỗi lo lắng không tên. Vài ngày sau, tin đồn về thung lũng biến mất khỏi bản đồ lan truyền. 'Có lẽ đó là một quyết định đúng đắn, Ngài,' {guardian.ga_name} thở phào.",
+        choice_a="Rời khỏi và nhiệm vụ kết thúc.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=50, silver=100, ga_exp=20, dignity_point=0,
+        next_steps=NextSteps("quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4")
     ),
 
     GuardianQuestLines(
-        id="time_distortion_outcome",
-        title="Thời Gian Biến Dạng",
-        description="Bạn chần chừ trong việc quyết định cách tiếp cận. Năng lượng từ viên đá bùng phát mạnh mẽ, làm thời gian xung quanh bạn bị biến dạng. {guardian.ga_name} phải dùng hết sức để bảo vệ bạn khỏi tác động.",
-        choice_a="Bạn bị ảnh hưởng bởi sự biến dạng thời gian. Nhiệm vụ thất bại.",
+        id="ga_uneasy_timeout",
+        title="Cảm Giác Bất An",
+        description="Bạn chần chừ quá lâu. {guardian.ga_name} thở dài. 'Có vẻ như sự chần chừ của Ngài đã tước đi cơ hội can thiệp. Ta cảm thấy một sự sợ hãi đang bao trùm thung lũng.' Nhiệm vụ kết thúc trong sự không chắc chắn.",
+        choice_a="Bạn cảm thấy bất lực. (Nhiệm vụ thất bại)",
         choice_b="", choice_c="", choice_timeout="",
-        next_steps=NextSteps("quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1")
+        gold=-20, silver=-50, ga_exp=-20, dignity_point=-5,
+        next_steps=NextSteps("quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4")
     ),
 
     GuardianQuestLines(
-        id="retreat_from_lake",
-        title="Rút Lui Khỏi Hồ",
-        description="Bạn và {guardian.ga_name} quyết định rút lui khỏi hồ nước. Bạn cảm thấy một nỗi lo lắng khi rời đi, biết rằng bí ẩn của hồ vẫn chưa được giải đáp. 'Chúng ta không thể mạo hiểm hơn nữa,' {guardian.ga_name} thở dài.",
+        id="dance_hypnosis_timeout",
+        title="Điệu Nhảy Chiếm Hữu",
+        description="Bạn chần chừ trong điệu nhảy. Âm nhạc và chuyển động ngày càng mạnh mẽ, áp đảo ý chí của bạn. {guardian.ga_name} cố gắng kéo bạn ra, nhưng vô ích. Bạn bị cuốn vào điệu nhảy, ý thức dần mờ đi. 'Ngài đang mất chính mình!' {guardian.ga_name} gào lên.",
+        choice_a="Bạn bị cuốn vào điệu nhảy vĩnh cửu.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=-50, silver=-100, ga_exp=-50, dignity_point=-10, ga_health=-25, ga_mana=-25, ga_stamina=-25,
+        next_steps=NextSteps("quest_failed_end_festival_trap", "quest_failed_end_festival_trap", "quest_failed_end_festival_trap", "quest_failed_end_festival_trap")
+    ),
+
+    GuardianQuestLines(
+        id="symbols_activate_timeout",
+        title="Ký Hiệu Tức Giận",
+        description="Bạn chần chừ quá lâu trước các ký hiệu. Chúng bắt đầu phát sáng rực rỡ, một làn sóng năng lượng giam cầm bao trùm thung lũng, khiến không khí trở nên nặng nề hơn. 'Chúng ta đã lãng phí thời gian, Ngài!' {guardian.ga_name} nói, vẻ mặt nghiêm trọng.",
+        choice_a="Bạn cảm thấy bị mắc kẹt. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=-30, silver=-80, ga_exp=-30, dignity_point=-5,
+        next_steps=NextSteps("quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4")
+    ),
+
+    GuardianQuestLines(
+        id="observe_quietly",
+        title="Quan Sát Đáng Sợ",
+        description="Bạn và {guardian.ga_name} quan sát từ xa. Bạn thấy những người dân làng, khi ở một mình, lại có ánh mắt vô hồn và thốt ra những lời thì thầm vô nghĩa. {guardian.ga_name} nói. 'Họ đã không còn là chính mình nữa, Ngài.'",
+        choice_a="Tìm kiếm nguồn gốc của sự biến đổi này.",
+        choice_b="Cố gắng tìm lối thoát bí mật.",
+        choice_c="",
+        choice_timeout="{guardian.ga_name} thúc giục. 'Nguy hiểm đang đến gần!'",
+        next_steps=NextSteps(
+            choice_a="seek_curse_source",
+            choice_b="seek_secret_path",
+            choice_c="",
+            timeout="curse_absorbs_timeout"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="decipher_symbols",
+        title="Lời Nguyền Cổ Xưa",
+        description="Bạn và {guardian.ga_name} giải mã các ký hiệu. Chúng là một lời nguyền cổ xưa, trói buộc linh hồn dân làng vào một vòng lặp vĩnh cửu để cung cấp năng lượng cho một thực thể bị giam cầm. {guardian.ga_name} nắm chặt tay. 'Chúng ta phải giải phóng họ!'",
+        choice_a="Tìm kiếm nơi thực thể bị giam cầm.",
+        choice_b="Cố gắng phá hủy các ký hiệu.",
+        choice_c="",
+        choice_timeout="{guardian.ga_name} nghiêm nghị. 'Chúng ta không có nhiều thời gian, Ngài!'",
+        next_steps=NextSteps(
+            choice_a="seek_curse_source",
+            choice_b="destroy_symbols_attempt",
+            choice_c="",
+            timeout="symbols_activate_timeout"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="destroy_symbols_attempt",
+        title="Phá Hủy Bất Thành",
+        description="Bạn cố gắng phá hủy các ký hiệu, nhưng chúng quá mạnh. Một luồng năng lượng phản kháng bắn ngược lại, khiến bạn choáng váng. {guardian.ga_name} đỡ bạn. 'Chúng ta cần một cách khác, Ngài. Chúng được bảo vệ bởi một thứ gì đó rất mạnh.'",
+        choice_a="Bạn bị choáng váng, nhiệm vụ gặp trở ngại.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=-30, silver=-50, ga_exp=-30, ga_health=-10, ga_mana=-10, ga_stamina=-10,
+        next_steps=NextSteps("investigate_oddities", "investigate_oddities", "investigate_oddities", "investigate_oddities")
+    ),
+
+    GuardianQuestLines(
+        id="seek_secret_path",
+        title="Con Đường Cụt",
+        description="Bạn và {guardian.ga_name} tìm kiếm một con đường bí mật. Bạn tìm thấy một hang động ẩn giấu, nhưng nó dẫn đến một vách đá thẳng đứng. Không có lối thoát. 'Có vẻ như chúng ta đã bị mắc kẹt, Ngài,' {guardian.ga_name} nói với vẻ thất vọng.",
+        choice_a="Bạn bị mắc kẹt, nhiệm vụ thất bại.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=-40, silver=-100, ga_exp=-40, dignity_point=-10,
+        next_steps=NextSteps("quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4")
+    ),
+
+    GuardianQuestLines(
+        id="confront_elder_early",
+        title="Trưởng Làng Lạnh Lùng",
+        description="Bạn và {guardian.ga_name} đối mặt với trưởng làng. Ông ta mỉm cười lạnh lẽo. 'Ngài không thể thay đổi những gì đã định sẵn.' Một lớp sương mù dày đặc bao trùm lấy bạn và {guardian.ga_name}, mọi thứ mờ dần. 'Chúng ta đã mắc bẫy!' {guardian.ga_name} gầm lên.",
+        choice_a="Bạn bị mắc kẹt trong sương mù. Nhiệm vụ thất bại.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=-50, silver=-150, ga_exp=-50, dignity_point=-15, ga_health=-25, ga_mana=-25, ga_stamina=-25,
+        next_steps=NextSteps("quest_failed_end_fog_trap", "quest_failed_end_fog_trap", "quest_failed_end_fog_trap", "quest_failed_end_fog_trap")
+    ),
+
+    GuardianQuestLines(
+        id="resist_hypnosis",
+        title="Ý Chí Kiên Cường",
+        description="Bạn tập trung ý chí, chống lại sự thôi miên của điệu nhạc. {guardian.ga_name} hỗ trợ bạn bằng năng lượng của hắn. Dần dần, bạn cảm thấy mình thoát khỏi ảnh hưởng, nhưng dân làng nhìn bạn với đôi mắt trống rỗng và thù địch. 'Họ đã nhận ra chúng ta là kẻ ngoại lai,' {guardian.ga_name} nói. 'Chúng ta phải tìm ra cách giải thoát họ.'",
+        choice_a="Tìm kiếm nguồn gốc của sự mê hoặc.",
+        choice_b="Cố gắng thoát khỏi vòng vây của dân làng.",
+        choice_c="",
+        choice_timeout="{guardian.ga_name} thúc giục. 'Họ đang tiến đến gần!'",
+        next_steps=NextSteps(
+            choice_a="seek_curse_source",
+            choice_b="escape_villagers_attempt",
+            choice_c="",
+            timeout="yield_to_dance"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="warn_others_outcome",
+        title="Cảnh Báo Vô Vọng",
+        description="Bạn cố gắng cảnh báo những người dân làng khác, nhưng họ chỉ mỉm cười trống rỗng và quay lưng đi, tiếp tục nhảy múa. 'Họ không thể nghe thấy chúng ta, Ngài,' {guardian.ga_name} nói với giọng buồn bã. 'Họ đã bị trói buộc quá chặt rồi.'",
+        choice_a="Cảnh báo không thành, nhiệm vụ thất bại.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=-20, silver=-40, ga_exp=-20, dignity_point=-5,
+        next_steps=NextSteps("quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4")
+    ),
+
+    GuardianQuestLines(
+        id="curse_absorbs_timeout",
+        title="Lời Nguyền Cạn Kiệt",
+        description="Bạn chần chừ quá lâu. Năng lượng của lời nguyền bao trùm thung lũng trở nên mạnh mẽ hơn. Bạn cảm thấy mình bị hút cạn sức lực, và ý thức dần mờ đi. 'Ngài đang bị hấp thụ!' {guardian.ga_name} thét lên, nhưng đã quá muộn.",
+        choice_a="Bạn bị hấp thụ vào lời nguyền.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=-70, silver=-150, ga_exp=-70, dignity_point=-15, ga_health=-50, ga_mana=-50, ga_stamina=-50,
+        next_steps=NextSteps("quest_failed_end_festival_trap", "quest_failed_end_festival_trap", "quest_failed_end_festival_trap", "quest_failed_end_festival_trap")
+    ),
+
+    GuardianQuestLines(
+        id="entity_attacks_outcome",
+        title="Cuộc Tấn Công Hủy Diệt",
+        description="Bạn chần chừ. Thực thể bị giam cầm bùng nổ trong cơn thịnh nộ, bắn ra hàng ngàn xúc tu vô hình. Bạn và {guardian.ga_name} bị đâm xuyên, cơ thể tan rã trong ánh sáng xanh quỷ dị. Linh hồn của cả hai bị thực thể hấp thụ hoàn toàn, trở thành một phần vĩnh viễn của sự giam cầm. {guardian.ga_name} cố gắng chiến đấu đến hơi thở cuối cùng, nhưng không thể cứu vãn được số phận của cả hai.",
+        choice_a="Bạn và {guardian.ga_name} bị hủy diệt hoàn toàn.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=-900, silver=-900, ga_exp=-400, dignity_point=-90, ga_health=-999, ga_mana=-999, ga_stamina=-999, force_dead=True,
+        next_steps=NextSteps("quest_failed_end_total_annihilation_2", "quest_failed_end_total_annihilation_2", "quest_failed_end_total_annihilation_2", "quest_failed_end_total_annihilation_2")
+    ),
+
+    GuardianQuestLines(
+        id="destroy_altar_attempt",
+        title="Sức Mạnh Áp Đảo",
+        description="Bạn và {guardian.ga_name} tấn công bệ thờ. Thực thể gầm lên, phản công dữ dội. Mặc dù bạn và {guardian.ga_name} chiến đấu dũng cảm, năng lượng của thực thể quá lớn. Bạn bị đẩy lùi, cảm thấy sức mạnh kiệt quệ, và bệ thờ vẫn đứng vững. {guardian.ga_name} thở hổn hển. 'Nó quá mạnh, Ngài!'",
+        choice_a="Bạn và {guardian.ga_name} bị kiệt sức. Nhiệm vụ thất bại.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=-50, silver=-100, ga_exp=-50, dignity_point=-10, ga_health=-30, ga_mana=-30, ga_stamina=-30,
+        next_steps=NextSteps("quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4")
+    ),
+
+    GuardianQuestLines(
+        id="retreat_from_altar",
+        title="Rút Lui Khỏi Nguy Hiểm",
+        description="Bạn và {guardian.ga_name} quyết định rút lui khỏi bệ thờ. Cảm giác bất lực bao trùm khi bạn quay lưng lại với những linh hồn đang bị giam cầm. 'Chúng ta không thể đối phó với thứ đó ngay bây giờ,' {guardian.ga_name} nói với giọng buồn bã.",
         choice_a="Rút lui và nhiệm vụ thất bại.",
         choice_b="", choice_c="", choice_timeout="",
-        next_steps=NextSteps("quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1")
+        gold=-30, silver=-70, ga_exp=-30, dignity_point=-5,
+        next_steps=NextSteps("quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4")
     ),
 
     GuardianQuestLines(
-        id="discard_stone_outcome",
-        title="Vứt Bỏ Viên Đá",
-        description="Bạn quyết định vứt bỏ viên đá thời gian. Tuy nhiên, năng lượng của nó quá mạnh, và nó gây ra một vụ nổ nhỏ khi bạn ném đi. {guardian.ga_name} phải nhanh chóng kéo bạn ra xa.",
-        choice_a="Bạn bị choáng váng nhẹ. Nhiệm vụ thất bại.",
+        id="negotiate_entity",
+        title="Lời Hứa Phản Bội",
+        description="Bạn cố gắng thương lượng để giải thoát dân làng. Thực thể im lặng một lúc, rồi giọng nói của nó vang lên: 'Ta sẽ giải thoát chúng... nếu ngươi thay thế.' {guardian.ga_name} hét lên. 'Đừng tin nó, Ngài!'",
+        choice_a="Chấp nhận trở thành vật hiến tế.",
+        choice_b="Từ chối lời đề nghị.",
+        choice_c="",
+        choice_timeout="Thực thể cười khúc khích. 'Ngươi không có lựa chọn nào khác.'",
+        next_steps=NextSteps(
+            choice_a="become_sacrifice",
+            choice_b="entity_attacks_outcome", # Re-direct to attack if refused after negotiation
+            choice_c="",
+            timeout="become_sacrifice"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="become_sacrifice",
+        title="Hy Sinh Vô Nghĩa",
+        description="Bạn chấp nhận trở thành vật hiến tế. Thực thể lao vào bạn, hấp thụ linh hồn bạn một cách tàn bạo. Trong giây phút cuối cùng, bạn nhìn thấy dân làng vẫn tiếp tục nhảy múa, mắt họ trống rỗng, không hề được giải thoát. Thực thể đã lừa dối bạn. {guardian.ga_name} gào thét tên bạn, nhưng bạn đã biến mất, chỉ còn lại một tiếng vang đau đớn trong không gian. {guardian.ga_name} đứng đó, nhìn những người dân làng không hồn, hiểu rằng sự hy sinh của bạn là vô ích, và bạn đã vĩnh viễn là một phần của lễ hội mục nát này.",
+        choice_a="Bạn bị hy sinh, linh hồn bạn bị hấp thụ, dân làng không được giải thoát.",
         choice_b="", choice_c="", choice_timeout="",
-        next_steps=NextSteps("quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1")
+        next_steps=NextSteps("quest_failed_end_enslaved", "quest_failed_end_enslaved", "quest_failed_end_enslaved", "quest_failed_end_enslaved"),
+        gold=-800, silver=-800, ga_exp=-350, dignity_point=-80, ga_health=-999, ga_mana=-999, ga_stamina=-999, force_dead=True,
     ),
 
     GuardianQuestLines(
-        id="keep_time_stone_outcome",
-        title="Giữ Lại Viên Đá Thời Gian",
-        description="Bạn và {guardian.ga_name} quyết định giữ lại viên đá thời gian. Sức mạnh của nó rất lớn và có thể được sử dụng trong tương lai. {guardian.ga_name} nói: 'Hãy cẩn thận khi sử dụng nó, chủ nhân.'",
-        choice_a="Bạn có được một vật phẩm mạnh mẽ. Nhiệm vụ thành công.",
+        id="beg_entity_outcome",
+        title="Lời Cầu Xin Vô Vọng",
+        description="Bạn cầu xin thực thể dừng lại. Nó chỉ cười khẩy, giọng nói vang vọng khắp căn phòng. 'Sự yếu đuối của ngươi không có giá trị ở đây.' Thực thể trừng phạt bạn bằng một luồng năng lượng. {guardian.ga_name} nhanh chóng tạo lá chắn để bảo vệ bạn, nhưng cả hai đều bị đẩy lùi và bị thương. 'Nó không thể được thuyết phục, Ngài!' {guardian.ga_name} nói, vẻ mặt đau đớn.",
+        choice_a="Bạn và {guardian.ga_name} bị thương. Nhiệm vụ thất bại.",
         choice_b="", choice_c="", choice_timeout="",
-        next_steps=NextSteps("quest_success_end_1", "quest_success_end_1", "quest_success_end_1", "quest_success_end_1")
+        gold=-50, silver=-100, ga_exp=-50, dignity_point=-10, ga_health=-20, ga_mana=-20, ga_stamina=-20,
+        next_steps=NextSteps("quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4")
     ),
 
-    # Generic Endings
     GuardianQuestLines(
-        id="quest_success_end_1",
-        title="Sự An Bình Trở Lại",
-        description="Hồ nước đã trở lại bình thường, sự sống và thời gian chảy trôi như vốn có. {guardian.ga_name} mỉm cười. 'Chúng ta đã hoàn thành nhiệm vụ một cách xuất sắc, chủ nhân!'",
-        choice_a="Bạn cảm thấy hài lòng về thành quả của mình.",
+        id="escape_villagers_attempt",
+        title="Không Lối Thoát",
+        description="Bạn và {guardian.ga_name} cố gắng thoát khỏi vòng vây của dân làng, nhưng họ đông hơn và di chuyển với một tốc độ kỳ lạ. Họ không ngừng mỉm cười khi họ đẩy bạn sâu hơn vào trung tâm lễ hội. 'Chúng ta bị mắc kẹt rồi, Ngài!' {guardian.ga_name} hét lên.",
+        choice_a="Bạn bị dồn vào đường cùng. Nhiệm vụ thất bại.",
         choice_b="", choice_c="", choice_timeout="",
-        next_steps=NextSteps("continue_adventure_1", "continue_adventure_1", "continue_adventure_1", "continue_adventure_1")
+        gold=-60, silver=-120, ga_exp=-60, dignity_point=-15, ga_health=-30, ga_mana=-30, ga_stamina=-30,
+        next_steps=NextSteps("quest_failed_end_festival_trap", "quest_failed_end_festival_trap", "quest_failed_end_festival_trap", "quest_failed_end_festival_trap")
     ),
 
+    # Final Bad Endings
     GuardianQuestLines(
-        id="quest_failed_end_1",
-        title="Hồ Nước Ngừng Đọng Vĩnh Viễn",
-        description="Hồ nước vẫn chìm trong sự tĩnh lặng kỳ lạ, thời gian ngừng trôi. {guardian.ga_name} cúi đầu, vẻ mặt buồn bã. 'Tôi ước chúng ta có thể làm được nhiều hơn.'",
-        choice_a="Bạn cảm thấy thất vọng. (Nhiệm vụ thất bại)",
+        id="quest_failed_end_festival_trap",
+        title="Cái Bẫy Vĩnh Cửu",
+        description="Bạn trở thành một phần của lễ hội vĩnh hằng, linh hồn bị mắc kẹt trong điệu nhảy không ngừng. Bạn mỉm cười mãi mãi, nhưng bên trong là sự trống rỗng và nỗi kinh hoàng. {guardian.ga_name} bị ám ảnh bởi hình ảnh bạn, không thể quên được đôi mắt vô hồn đó. Hắn lang thang khắp thế giới, là một cái bóng của chính mình, mang theo nỗi đau và sự bất lực, biết rằng bạn đã mãi mãi mất đi dưới ánh sáng lộng lẫy nhưng tàn độc của lễ hội. Sự sống của hắn trở thành một sự trừng phạt cho sự thất bại của hắn khi không thể cứu lấy bạn, người bạn đồng hành thân thiết nhất.",
+        choice_a="Bạn bị giam cầm, {guardian.ga_name} đau khổ.",
         choice_b="", choice_c="", choice_timeout="",
-        next_steps=NextSteps("continue_adventure_1", "continue_adventure_1", "continue_adventure_1", "continue_adventure_1")
+        gold=-500, silver=-500, ga_exp=-200, dignity_point=-50, ga_health=-999, ga_mana=-999, ga_stamina=-999, force_dead=True,
+        next_steps=NextSteps("continue_adventure_4", "continue_adventure_4", "continue_adventure_4", "continue_adventure_4")
     ),
 
     GuardianQuestLines(
-        id="continue_adventure_1",
+        id="quest_failed_end_enslaved",
+        title="Linh Hồn Nô Lệ",
+        description="Bạn bị thực thể chiếm hữu hoàn toàn, trở thành một con rối vô tri, phục vụ cho những mục đích hắc ám của nó. Mọi ý chí tự do của bạn đều biến mất, chỉ còn lại một cái xác biết cử động theo mệnh lệnh. {guardian.ga_name} đau đớn chứng kiến cảnh tượng này, nỗi tuyệt vọng nhấn chìm hắn. Hắn thề sẽ trả thù cho bạn, nhưng sâu thẳm trong lòng, hắn biết rằng bạn đã không còn nữa, chỉ còn một hình hài trống rỗng. Cuộc sống của hắn giờ đây chỉ còn là một hành trình trả thù vô vọng, không có mục đích hay hy vọng nào nữa.",
+        choice_a="Bạn trở thành nô lệ, {guardian.ga_name} sống trong đau khổ và báo thù.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=-700, silver=-700, ga_exp=-300, dignity_point=-70, ga_health=-999, ga_mana=-999, ga_stamina=-999, force_dead=True,
+        next_steps=NextSteps("continue_adventure_4", "continue_adventure_4", "continue_adventure_4", "continue_adventure_4")
+    ),
+
+    GuardianQuestLines(
+        id="quest_failed_end_total_annihilation_2",
+        title="Sự Hủy Diệt Vĩnh Hằng",
+        description="Bạn và {guardian.ga_name} bị thực thể nghiền nát và hấp thụ hoàn toàn. Không còn dấu vết nào của sự tồn tại của cả hai. Tên của bạn và {guardian.ga_name} bị xóa sổ khỏi lịch sử, trở thành những linh hồn vô danh trong cơn đói khát bất tận của thực thể. Thung lũng tiếp tục tồn tại với lễ hội vĩnh hằng, và không ai còn nhớ đến sự tồn tại của hai người đã từng cố gắng giải thoát nó. Cả hai bạn mãi mãi là một phần của cơn thịnh nộ không ngừng của thực thể, không bao giờ được giải thoát hay tìm thấy sự bình yên.",
+        choice_a="Bạn và {guardian.ga_name} bị xóa sổ khỏi sự tồn tại.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=-900, silver=-900, ga_exp=-400, dignity_point=-90, ga_health=-999, ga_mana=-999, ga_stamina=-999, force_dead=True,
+        next_steps=NextSteps("continue_adventure_4", "continue_adventure_4", "continue_adventure_4", "continue_adventure_4")
+    ),
+
+    GuardianQuestLines(
+        id="quest_failed_end_fog_trap",
+        title="Mắc Kẹt Trong Sương Mù",
+        description="Bạn và {guardian.ga_name} bị mắc kẹt trong một làn sương mù dày đặc, không thể tìm thấy lối thoát. Từng ngày trôi qua, sương mù càng đặc quánh, và cả hai dần mất đi ý thức, chìm vào giấc ngủ vĩnh cửu không bao giờ tỉnh lại. 'Đây là kết thúc của chúng ta,' {guardian.ga_name} thì thầm trước khi bóng tối nuốt chửng cả hai. Hai linh hồn bị giam cầm trong màn sương mù, mãi mãi là một phần của thung lũng bị nguyền rủa, không bao giờ được giải thoát.",
+        choice_a="Bạn và {guardian.ga_name} bị mắc kẹt và chìm vào giấc ngủ vĩnh cửu.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=-50, silver=-150, ga_exp=-50, dignity_point=-15, ga_health=-25, ga_mana=-25, ga_stamina=-25,
+        next_steps=NextSteps("continue_adventure_4", "continue_adventure_4", "continue_adventure_4", "continue_adventure_4")
+    ),
+
+    GuardianQuestLines(
+        id="quest_failed_end_4",
+        title="Thất Bại Đắng Cay",
+        description="Nhiệm vụ thất bại. Thung lũng vẫn chìm trong lời nguyền của lễ hội, và những người dân làng vẫn tiếp tục nhảy múa trong vô vọng. {guardian.ga_name} nhìn bạn với ánh mắt thất vọng. 'Ta hy vọng Ngài sẽ rút ra được bài học từ thất bại này.'",
+        choice_a="Rút ra bài học đau đớn.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=-30, silver=-70, ga_exp=-30, dignity_point=-5,
+        next_steps=NextSteps("continue_adventure_4", "continue_adventure_4", "continue_adventure_4", "continue_adventure_4")
+    ),
+
+    GuardianQuestLines(
+        id="continue_adventure_4",
         title="Hành Trình Tiếp Nối",
-        description="Bạn và {guardian.ga_name} rời khỏi hồ nước, mang theo những ký ức về cuộc phiêu lưu. Những thử thách mới đang chờ đợi...",
+        description="Bạn và {guardian.ga_name} rời khỏi thung lũng, mang theo những ký ức ám ảnh về hành trình vừa qua. Những cuộc phiêu lưu mới đang chờ đợi...",
         choice_a="",
         choice_b="", choice_c="", choice_timeout="",
+        gold=10, silver=50, ga_exp=10,
         next_steps=NextSteps("", "", "", "")
     )
 ]
+
 
 quest_the_ruin_call = [
     GuardianQuestLines(
         id="start",
         title="Tiếng Gọi Từ Phế Tích Lãng Quên",
-        description="Một luồng gió lạnh buốt mang theo tiếng vọng ai oán từ phế tích cổ xưa. {guardian.ga_name} khẽ rùng mình. 'Ta cảm nhận được sự tuyệt vọng sâu sắc, bạn. Có lẽ chúng ta nên tìm hiểu.'",
+        description="Một luồng gió lạnh buốt mang theo tiếng vọng ai oán từ phế tích cổ xưa. {guardian.ga_name} khẽ rùng mình. 'Ta cảm nhận được sự tuyệt vọng sâu sắc. Có lẽ chúng ta nên tìm hiểu.'",
         choice_a="Đi thẳng đến phế tích để điều tra.",
         choice_b="Tìm thông tin về lịch sử của phế tích trước.",
         choice_c="Bỏ qua, phế tích này có vẻ nguy hiểm.",
-        choice_timeout="{guardian.ga_name} nhìn bạn đầy lo lắng. 'Những tiếng kêu đó không thể phớt lờ, bạn!'",
+        choice_timeout="{guardian.ga_name} nhìn bạn đầy lo lắng. 'Những tiếng kêu đó không thể phớt lờ!'",
         next_steps=NextSteps(
             choice_a="enter_ruins",
             choice_b="research_ruins_history",
             choice_c="ignore_ruins_outcome",
             timeout="ga_worried_timeout_2"
-        )
+        ),
+        gold=10, silver=100, ga_exp=10, dignity_point=5
     ),
 
     GuardianQuestLines(
@@ -558,7 +750,7 @@ quest_the_ruin_call = [
         choice_a="Tìm kiếm Pha Lê Hồi Sinh.",
         choice_b="Trở lại phế tích, thử cách khác.",
         choice_c="Từ bỏ nhiệm vụ vì quá phức tạp.",
-        choice_timeout="{guardian.ga_name} nói. 'Chúng ta không có nhiều thời gian để tìm kiếm đâu, bạn!'",
+        choice_timeout="{guardian.ga_name} nói. 'Chúng ta không có nhiều thời gian để tìm kiếm đâu!'",
         next_steps=NextSteps(
             choice_a="seek_revival_crystal",
             choice_b="enter_ruins",
@@ -574,10 +766,10 @@ quest_the_ruin_call = [
         choice_a="Tiếp tục phá vỡ phong ấn.",
         choice_b="Tìm kiếm cách khác để mở phong ấn.",
         choice_c="Rút lui ngay lập tức.",
-        choice_timeout="Năng lượng phong ấn trở nên dữ dội. 'Nó sẽ nuốt chửng chúng ta, bạn!' {guardian.ga_name} cảnh báo.",
+        choice_timeout="Năng lượng phong ấn trở nên dữ dội. 'Nó sẽ nuốt chửng chúng ta!' {guardian.ga_name} cảnh báo.",
         next_steps=NextSteps(
             choice_a="continue_break_seal",
-            choice_b="seek_revival_crystal", # Dẫn đến tìm pha lê
+            choice_b="seek_revival_crystal",
             choice_c="retreat_from_ruins",
             timeout="seal_overwhelm_outcome"
         )
@@ -606,7 +798,7 @@ quest_the_ruin_call = [
         choice_a="Tiến lên lấy pha lê.",
         choice_b="Tìm cách vô hiệu hóa chướng khí.",
         choice_c="Kiểm tra xung quanh xem có nguy hiểm nào không.",
-        choice_timeout="{guardian.ga_name} nói. 'Pha lê ở ngay trước mắt chúng ta, bạn!'",
+        choice_timeout="{guardian.ga_name} nói. 'Pha lê ở ngay trước mắt chúng ta!'",
         next_steps=NextSteps(
             choice_a="take_crystal",
             choice_b="deactivate_poison_gas",
@@ -615,7 +807,7 @@ quest_the_ruin_call = [
         )
     ),
 
-    # Final Stage Outcomes
+    # Final Stage Outcomes (Leading to Bad Endings)
     GuardianQuestLines(
         id="continue_break_seal",
         title="Phong Ấn Vỡ Tan",
@@ -623,9 +815,9 @@ quest_the_ruin_call = [
         choice_a="Sử dụng phép thuật chữa lành.",
         choice_b="Rút lui ngay, linh hồn rồng quá đáng sợ.",
         choice_c="",
-        choice_timeout="{guardian.ga_name} nói. 'Chúng ta không thể để nó lại trong tình trạng này, bạn!'",
+        choice_timeout="{guardian.ga_name} nói. 'Chúng ta không thể để nó lại trong tình trạng này!'",
         next_steps=NextSteps(
-            choice_a="heal_dragon_spirit",
+            choice_a="heal_dragon_spirit_fail", # Changed to lead to a bad ending
             choice_b="retreat_from_ruins",
             choice_c="",
             timeout="dragon_anger_outcome"
@@ -639,9 +831,9 @@ quest_the_ruin_call = [
         choice_a="Sử dụng Viên Đá Giải Thoát.",
         choice_b="Tìm kiếm thêm thông tin.",
         choice_c="",
-        choice_timeout="{guardian.ga_name} thúc giục. 'Chúng ta phải sử dụng nó ngay, bạn!'",
+        choice_timeout="{guardian.ga_name} thúc giục. 'Chúng ta phải sử dụng nó ngay!'",
         next_steps=NextSteps(
-            choice_a="use_release_stone",
+            choice_a="use_release_stone_fail", # Changed to lead to a bad ending
             choice_b="research_ruins_history",
             choice_c="",
             timeout="stone_breaks_timeout"
@@ -651,10 +843,10 @@ quest_the_ruin_call = [
     GuardianQuestLines(
         id="take_crystal",
         title="Lấy Pha Lê Thành Công",
-        description="Bạn chạm vào Pha Lê Hồi Sinh. Một luồng năng lượng thuần khiết lan tỏa, xua tan chướng khí. {guardian.ga_name} reo lên: 'Chúng ta đã có nó, bạn! Hãy mang nó về phế tích!'",
+        description="Bạn chạm vào Pha Lê Hồi Sinh. Một luồng năng lượng thuần khiết lan tỏa, xua tan chướng khí. {guardian.ga_name} reo lên: 'Tuyệt vời! Giờ hãy mang nó về phế tích!'",
         choice_a="Mang pha lê trở lại phế tích.",
         choice_b="", choice_c="", choice_timeout="",
-        next_steps=NextSteps("return_to_ruins_with_crystal", "", "", "")
+        next_steps=NextSteps("return_to_ruins_with_crystal_fail", "", "", "") # Changed to lead to a bad ending
     ),
 
     GuardianQuestLines(
@@ -675,50 +867,56 @@ quest_the_ruin_call = [
         next_steps=NextSteps("take_crystal", "", "", "")
     ),
 
+    # Specific Bad Endings from choices
     GuardianQuestLines(
-        id="return_to_ruins_with_crystal",
-        title="Sức Mạnh Hồi Sinh",
-        description="Bạn và {guardian.ga_name} mang Pha Lê Hồi Sinh trở lại phế tích. Khi bạn đặt pha lê lên bệ đá gần linh hồn rồng, một luồng sáng mạnh mẽ bùng lên, hồi sinh linh hồn và hóa giải lời nguyền khỏi phế tích.",
-        choice_a="Nhiệm vụ hoàn thành! Linh hồn được giải thoát.",
+        id="heal_dragon_spirit_fail",
+        title="Linh Hồn Rồng Nổi Giận",
+        description="Bạn và {guardian.ga_name} cố gắng chữa lành linh hồn rồng, nhưng do thiếu kinh nghiệm, phép thuật của bạn vô tình khiến nó thêm đau đớn. Linh hồn rồng gầm lên, sức mạnh hỗn loạn nuốt chửng cả phế tích.",
+        choice_a="Phế tích bị hủy diệt, nhiệm vụ thất bại hoàn toàn.",
         choice_b="", choice_c="", choice_timeout="",
-        next_steps=NextSteps("quest_success_end_2", "quest_success_end_2", "quest_success_end_2", "quest_success_end_2")
+        dignity_point=-20, ga_exp=-100, silver=-200, gold=-100, ga_health=-100, ga_mana=-100, ga_stamina=-100,
+        next_steps=NextSteps("quest_failed_end_unique", "quest_failed_end_unique", "quest_failed_end_unique", "quest_failed_end_unique")
     ),
 
     GuardianQuestLines(
-        id="heal_dragon_spirit",
-        title="Linh Hồn Rồng Được Chữa Lành",
-        description="Bạn và {guardian.ga_name} sử dụng phép thuật chữa lành. Linh hồn rồng dần bình phục, ánh sáng của nó trở nên mạnh mẽ hơn, rồi cất cánh bay lên trời, mang theo sự bình yên trở lại phế tích.",
-        choice_a="Nhiệm vụ hoàn thành! Phế tích trở nên yên bình.",
+        id="use_release_stone_fail",
+        title="Viên Đá Phản Phệ",
+        description="Bạn sử dụng Viên Đá Giải Thoát. Tuy nhiên, năng lượng từ lời nguyền quá mạnh, khiến viên đá phản phệ. Một làn sóng năng lượng đen tối bao trùm bạn và {guardian.ga_name}, biến phế tích thành một vùng đất hoang tàn vĩnh viễn.",
+        choice_a="Bạn và {guardian.ga_name} bị mắc kẹt vĩnh viễn trong lời nguyền. Nhiệm vụ thất bại.",
         choice_b="", choice_c="", choice_timeout="",
-        next_steps=NextSteps("quest_success_end_2", "quest_success_end_2", "quest_success_end_2", "quest_success_end_2")
+        dignity_point=-20, ga_exp=-100, silver=-200, gold=-100, ga_health=-100, ga_mana=-100, ga_stamina=-100,
+        next_steps=NextSteps("quest_failed_end_unique", "quest_failed_end_unique", "quest_failed_end_unique", "quest_failed_end_unique")
     ),
 
     GuardianQuestLines(
-        id="use_release_stone",
-        title="Sử Dụng Viên Đá Giải Thoát",
-        description="Bạn sử dụng Viên Đá Giải Thoát. Một luồng ánh sáng mạnh mẽ từ viên đá phá vỡ hoàn toàn lời nguyền, giải thoát linh hồn rồng. Linh hồn rồng bay lên trời, để lại phế tích trong sự bình yên.",
-        choice_a="Nhiệm vụ hoàn thành! Phế tích được giải thoát.",
+        id="return_to_ruins_with_crystal_fail",
+        title="Pha Lê Không Hoàn Hảo",
+        description="Bạn và {guardian.ga_name} mang Pha Lê Hồi Sinh trở lại phế tích. Khi bạn đặt pha lê lên bệ đá, thay vì giải phóng, nó chỉ tạm thời trấn áp lời nguyền. Linh hồn rồng vẫn còn đó, nhưng giờ nó bị ràng buộc bởi pha lê, trở thành một nô lệ vĩnh viễn.",
+        choice_a="Linh hồn bị biến thành nô lệ, nhiệm vụ thất bại bi thảm.",
         choice_b="", choice_c="", choice_timeout="",
-        next_steps=NextSteps("quest_success_end_2", "quest_success_end_2", "quest_success_end_2", "quest_success_end_2")
+        dignity_point=-20, ga_exp=-100, silver=-200, gold=-100, ga_health=-100, ga_mana=-100, ga_stamina=-100,
+        next_steps=NextSteps("quest_failed_end_unique", "quest_failed_end_unique", "quest_failed_end_unique", "quest_failed_end_unique")
     ),
 
-    # Failures
+    # Failures (from timeouts/bad choices)
     GuardianQuestLines(
         id="ignore_ruins_outcome",
         title="Phớt Lờ Tiếng Kêu Cứu",
         description="Bạn quyết định bỏ qua. Vài ngày sau, phế tích trở nên u ám hơn, và những câu chuyện về các linh hồn quấy phá lan rộng. {guardian.ga_name} nhìn bạn với vẻ thất vọng.",
         choice_a="Cảm thấy hối tiếc. (Nhiệm vụ thất bại)",
         choice_b="", choice_c="", choice_timeout="",
-        next_steps=NextSteps("quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2")
+        dignity_point=-5, ga_exp=-50, silver=-50, gold=-50,
+        next_steps=NextSteps("quest_failed_end_unique", "quest_failed_end_unique", "quest_failed_end_unique", "quest_failed_end_unique")
     ),
 
     GuardianQuestLines(
         id="ga_worried_timeout_2",
         title="Ánh Mắt Lo Lắng",
-        description="Bạn chần chừ quá lâu. {guardian.ga_name} lắc đầu thất vọng. 'Chúng ta không thể cứu họ nếu cứ đứng đây, bạn!' Nhiệm vụ kết thúc vì sự thiếu quyết đoán.",
+        description="Bạn chần chừ quá lâu. {guardian.ga_name} lắc đầu thất vọng. 'Chúng ta không thể cứu họ nếu cứ đứng đây!' Nhiệm vụ kết thúc vì sự thiếu quyết đoán.",
         choice_a="Cảm thấy bất lực. (Nhiệm vụ thất bại)",
         choice_b="", choice_c="", choice_timeout="",
-        next_steps=NextSteps("quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2")
+        dignity_point=-10, ga_exp=-50, silver=-100, gold=-50,
+        next_steps=NextSteps("quest_failed_end_unique", "quest_failed_end_unique", "quest_failed_end_unique", "quest_failed_end_unique")
     ),
 
     GuardianQuestLines(
@@ -727,16 +925,18 @@ quest_the_ruin_call = [
         description="Bạn và {guardian.ga_name} chần chừ. Một phần phế tích sụp đổ, chặn mất lối vào và vật thể quý giá. {guardian.ga_name} thở dài buồn bã. 'Đã quá muộn rồi.'",
         choice_a="Cảm thấy nuối tiếc. (Nhiệm vụ thất bại)",
         choice_b="", choice_c="", choice_timeout="",
-        next_steps=NextSteps("quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2")
+        dignity_point=-5, ga_exp=-50, silver=-100, gold=-50,
+        next_steps=NextSteps("quest_failed_end_unique", "quest_failed_end_unique", "quest_failed_end_unique", "quest_failed_end_unique")
     ),
 
     GuardianQuestLines(
         id="retreat_from_ruins",
         title="Rút Lui Khỏi Phế Tích",
-        description="Bạn và {guardian.ga_name} quyết định rút lui khỏi phế tích. Bạn cảm thấy một nỗi buồn man mác khi rời đi, biết rằng linh hồn vẫn đang bị giam cầm. 'Chúng ta không thể làm gì lúc này, bạn,' {guardian.ga_name} thở dài.",
+        description="Bạn và {guardian.ga_name} quyết định rút lui khỏi phế tích. Bạn cảm thấy một nỗi buồn man mác khi rời đi, biết rằng linh hồn vẫn đang bị giam cầm. 'Chúng ta không thể làm gì lúc này,' {guardian.ga_name} thở dài.",
         choice_a="Rút lui và nhiệm vụ thất bại.",
         choice_b="", choice_c="", choice_timeout="",
-        next_steps=NextSteps("quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2")
+        dignity_point=-10, ga_exp=-50, silver=-50, gold=-50,
+        next_steps=NextSteps("quest_failed_end_unique", "quest_failed_end_unique", "quest_failed_end_unique", "quest_failed_end_unique")
     ),
 
     GuardianQuestLines(
@@ -745,25 +945,28 @@ quest_the_ruin_call = [
         description="Bạn quyết định rằng nhiệm vụ này quá phức tạp và nguy hiểm. Bạn và {guardian.ga_name} quay lưng lại với số phận của phế tích. 'Ta hy vọng có ai đó khác có thể giúp đỡ,' {guardian.ga_name} nói với giọng buồn bã.",
         choice_a="Cảm thấy nhẹ nhõm, nhưng cũng có chút hối tiếc. (Nhiệm vụ thất bại)",
         choice_b="", choice_c="", choice_timeout="",
-        next_steps=NextSteps("quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2")
+        dignity_point=-10, ga_exp=-150, silver=-500, gold=-50,
+        next_steps=NextSteps("quest_failed_end_unique", "quest_failed_end_unique", "quest_failed_end_unique", "quest_failed_end_unique")
     ),
 
     GuardianQuestLines(
         id="seal_overwhelm_outcome",
         title="Phong Ấn Quá Mạnh",
-        description="Bạn chần chừ trong việc quyết định cách tiếp cận. Năng lượng phong ấn bùng phát mạnh mẽ, tấn công bạn và {guardian.ga_name}. {guardian.ga_name} phải tạo lá chắn để bảo vệ bạn.",
+        description="Bạn chần chừ trong việc quyết định cách tiếp cận. Năng lượng phong ấn bùng phát mạnh mẽ, tấn công bạn và {guardian.ga_name}. {guardian.ga_name} phải tạo lá chắn để bảo vệ bạn, nhưng bị thương nặng.",
         choice_a="Bạn bị tấn công và phải rút lui. Nhiệm vụ thất bại.",
         choice_b="", choice_c="", choice_timeout="",
-        next_steps=NextSteps("quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2")
+        dignity_point=-5, ga_exp=-50, silver=-50, gold=-50, ga_health=-50,
+        next_steps=NextSteps("quest_failed_end_unique", "quest_failed_end_unique", "quest_failed_end_unique", "quest_failed_end_unique")
     ),
 
     GuardianQuestLines(
         id="dragon_anger_outcome",
         title="Linh Hồn Rồng Phẫn Nộ",
-        description="Bạn chần chừ trong việc quyết định cách tiếp cận linh hồn rồng. Nó gầm lên giận dữ, trở nên mạnh hơn và tấn công bạn. {guardian.ga_name} phải tạo lá chắn để bảo vệ bạn.",
+        description="Bạn chần chừ trong việc quyết định cách tiếp cận linh hồn rồng. Nó gầm lên giận dữ, trở nên mạnh hơn và tấn công bạn. {guardian.ga_name} phải tạo lá chắn để bảo vệ bạn, nhưng đã kiệt sức.",
         choice_a="Bạn bị tấn công và phải rút lui. Nhiệm vụ thất bại.",
         choice_b="", choice_c="", choice_timeout="",
-        next_steps=NextSteps("quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2")
+        dignity_point=-5, ga_exp=-50, silver=-50, gold=-50, ga_stamina=-50,
+        next_steps=NextSteps("quest_failed_end_unique", "quest_failed_end_unique", "quest_failed_end_unique", "quest_failed_end_unique")
     ),
 
     GuardianQuestLines(
@@ -772,7 +975,8 @@ quest_the_ruin_call = [
         description="Bạn chần chừ quá lâu trước Viên Đá Giải Thoát. Năng lượng của lời nguyền bùng phát mạnh mẽ, khiến viên đá nứt vỡ và tan biến. 'Không! Đã quá muộn rồi!' {guardian.ga_name} thốt lên.",
         choice_a="Viên đá biến mất, nhiệm vụ thất bại.",
         choice_b="", choice_c="", choice_timeout="",
-        next_steps=NextSteps("quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2")
+        dignity_point=-10, ga_exp=-50, silver=-50, gold=-50,
+        next_steps=NextSteps("quest_failed_end_unique", "quest_failed_end_unique", "quest_failed_end_unique", "quest_failed_end_unique")
     ),
 
     GuardianQuestLines(
@@ -781,36 +985,681 @@ quest_the_ruin_call = [
         description="Bạn chần chừ quá lâu trước pha lê. Chướng khí bùng phát mạnh mẽ, khiến pha lê tan biến vào hư vô. 'Không! Đã quá muộn rồi!' {guardian.ga_name} thốt lên.",
         choice_a="Pha lê biến mất, nhiệm vụ thất bại.",
         choice_b="", choice_c="", choice_timeout="",
-        next_steps=NextSteps("quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2", "quest_failed_end_2")
+        dignity_point=-10, ga_exp=-50, silver=-50, gold=-50,
+        next_steps=NextSteps("quest_failed_end_unique", "quest_failed_end_unique", "quest_failed_end_unique", "quest_failed_end_unique")
     ),
 
-    # Generic Endings
+    # Unique Bad Ending
     GuardianQuestLines(
-        id="quest_success_end_2",
-        title="Bình Yên Cho Phế Tích",
-        description="Phế tích cổ xưa đã tìm thấy sự bình yên. Linh hồn rồng được giải thoát, và không khí trở nên trong lành. {guardian.ga_name} mỉm cười. 'Chúng ta đã mang lại sự bình yên cho nơi đây, bạn.'",
-        choice_a="Bạn cảm thấy tự hào về bản thân và {guardian.ga_name}.",
+        id="quest_failed_end_unique",
+        title="Lời Nguyền Vĩnh Cửu",
+        description="Phế tích cổ xưa không chỉ không được giải thoát mà còn trở nên nguy hiểm hơn. Năng lượng đen tối lan rộng khắp vùng đất, biến mọi thứ thành hoang tàn. {guardian.ga_name} nhìn bạn với ánh mắt đau buồn sâu sắc, 'Có lẽ... chúng ta không bao giờ nên chạm vào bí ẩn này.'",
+        choice_a="Bạn cảm thấy gánh nặng của sự thất bại đè nặng lên vai.",
         choice_b="", choice_c="", choice_timeout="",
-        next_steps=NextSteps("continue_adventure_2", "continue_adventure_2", "continue_adventure_2", "continue_adventure_2")
+        dignity_point=-25, ga_exp=-200, silver=-1000, gold=-500, ga_health=-100, ga_mana=-100, ga_stamina=-100,
+        next_steps=NextSteps("continue_adventure_4", "continue_adventure_4", "continue_adventure_4", "continue_adventure_4")
     ),
 
     GuardianQuestLines(
-        id="quest_failed_end_2",
-        title="Bóng Tối Tiếp Diễn",
-        description="Phế tích cổ xưa vẫn chìm trong sự giam cầm của lời nguyền. {guardian.ga_name} cúi đầu, vẻ mặt buồn bã. 'Chúng ta... đã không thể thay đổi số phận của họ.'",
-        choice_a="Rút ra bài học đau đớn.",
-        choice_b="", choice_c="", choice_timeout="",
-        next_steps=NextSteps("continue_adventure_2", "continue_adventure_2", "continue_adventure_2", "continue_adventure_2")
-    ),
-
-    GuardianQuestLines(
-        id="continue_adventure_2",
-        title="Hành Trình Tiếp Nối",
-        description="Bạn và {guardian.ga_name} rời khỏi phế tích, mang theo những ký ức về hành trình vừa qua. Những cuộc phiêu lưu mới đang chờ đợi...",
+        id="continue_adventure_4",
+        title="Hành Trình Tiếp Nối Trong Bóng Tối",
+        description="Bạn và {guardian.ga_name} rời khỏi phế tích, mang theo nỗi ám ảnh về thất bại. Vùng đất từng tươi đẹp giờ đây chìm trong bóng tối vĩnh cửu, như một lời nhắc nhở về những gì đã mất...",
         choice_a="",
         choice_b="", choice_c="", choice_timeout="",
+        gold=10, silver=100, ga_exp=50,
         next_steps=NextSteps("", "", "", "")
     )
 ]
 
-all_quests = [quest_ghost_of_forrest, quest_lake_mystery, quest_the_ruin_call]
+#region quest broken oath
+quest_broken_oath = [
+    GuardianQuestLines(
+        id="start",
+        title="Lời Thề Tan Vỡ Của Vùng Đất Cằn Cỗi",
+        description="Một lời cầu cứu khẩn thiết vang vọng từ Vùng Đất Cằn Cỗi, nơi mà cây cối héo úa và nước biến mất. {guardian.ga_name} nhìn bạn với ánh mắt kiên định. 'Có vẻ như một lời thề cổ xưa đã bị phá vỡ. Ta cảm thấy sự mất cân bằng sâu sắc.'",
+        choice_a="Đi đến Vùng Đất Cằn Cỗi để điều tra.",
+        choice_b="Tìm hiểu về lịch sử của lời thề cổ xưa.",
+        choice_c="Bỏ qua lời cầu cứu, cho rằng đó là chuyện của người địa phương.",
+        choice_timeout="{guardian.ga_name} nói với vẻ lo lắng. 'Những lời thề bị phá vỡ có thể dẫn đến thảm họa lớn hơn, Ngài!'",
+        next_steps=NextSteps(
+            choice_a="enter_barren_lands",
+            choice_b="research_ancient_oath",
+            choice_c="ignore_plea_outcome",
+            timeout="ga_urgent_timeout_1"
+        ),
+        gold=10, silver=50, ga_exp=10, dignity_point=5
+    ),
+
+    GuardianQuestLines(
+        id="enter_barren_lands",
+        title="Bước Vào Vùng Đất Héo Khô",
+        description="Bạn và {guardian.ga_name} đặt chân đến Vùng Đất Cằn Cỗi. Cây cối khô héo thành bụi, sông ngòi cạn kiệt, và không khí nặng nề. {guardian.ga_name} chỉ vào một tượng đài đổ nát. 'Nơi này từng là một khu vườn tươi tốt. Có lẽ bí mật nằm ở đây.'",
+        choice_a="Kiểm tra tượng đài đổ nát.",
+        choice_b="Tìm kiếm nguồn nước bị biến mất.",
+        choice_c="Quay lại, vùng đất này quá nguy hiểm.",
+        choice_timeout="{guardian.ga_name} thúc giục. 'Chúng ta cần tìm hiểu nguyên nhân gây ra sự tàn phá này!'",
+        next_steps=NextSteps(
+            choice_a="examine_ruined_monument",
+            choice_b="search_for_missing_water",
+            choice_c="retreat_from_barren_lands",
+            timeout="monument_cracks_timeout"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="research_ancient_oath",
+        title="Giải Mã Lời Thề Cổ Xưa",
+        description="Bạn và {guardian.ga_name} đến một thư viện xa xôi, tìm thấy một cuốn sách cổ ghi chép về 'Lời Thề Giao Ước'. Lời thề này bảo vệ vùng đất, nhưng đòi hỏi sự cống hiến từ một dòng họ. Nếu lời thề bị phá vỡ, vùng đất sẽ chết dần.",
+        choice_a="Tìm kiếm hậu duệ của dòng họ đã lập lời thề.",
+        choice_b="Trở lại Vùng Đất Cằn Cỗi, tìm hiểu tại chỗ.",
+        choice_c="Rời bỏ nhiệm vụ, cho rằng nó quá phức tạp.",
+        choice_timeout="{guardian.ga_name} nói. 'Ta tin rằng manh mối nằm ở hậu duệ của dòng họ này, Ngài.'",
+        next_steps=NextSteps(
+            choice_a="find_descendant",
+            choice_b="enter_barren_lands",
+            choice_c="abandon_quest_broken_oath",
+            timeout="ga_urgent_timeout_1"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="examine_ruined_monument",
+        title="Bí Mật Trong Tượng Đài",
+        description="Bạn và {guardian.ga_name} kiểm tra tượng đài. Một dòng chữ cổ xuất hiện: 'Khi tình yêu cạn, lời thề tan.' {guardian.ga_name} cau mày. 'Ta cảm thấy một bi kịch đã xảy ra ở đây.'",
+        choice_a="Tìm kiếm dấu vết của bi kịch.",
+        choice_b="Thử khôi phục tượng đài bằng phép thuật.",
+        choice_c="Bỏ qua, tìm kiếm nơi khác.",
+        choice_timeout="Tượng đài bắt đầu nứt rạn. 'Chúng ta không còn nhiều thời gian!' {guardian.ga_name} cảnh báo.",
+        next_steps=NextSteps(
+            choice_a="seek_tragedy_clues",
+            choice_b="restore_monument_attempt",
+            choice_c="abandon_monument",
+            timeout="monument_cracks_timeout"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="find_descendant",
+        title="Truy Tìm Hậu Duệ",
+        description="Dựa trên thông tin, bạn và {guardian.ga_name} tìm đến một ngôi làng hẻo lánh. Bạn gặp một người phụ nữ già, vẻ mặt u sầu, tên là Elara, hậu duệ cuối cùng của dòng họ. 'Tôi đã phá vỡ lời thề... vì tình yêu,' bà nói.",
+        choice_a="Tìm hiểu về câu chuyện của Elara.",
+        choice_b="Thuyết phục Elara lập lại lời thề.",
+        choice_c="Buộc Elara phải sửa chữa lỗi lầm.",
+        choice_timeout="{guardian.ga_name} nói nhỏ. 'Hãy cẩn thận, Ngài. Bà ấy đang đau khổ.'",
+        next_steps=NextSteps(
+            choice_a="learn_elaras_story",
+            choice_b="persuade_elara",
+            choice_c="force_elara_outcome",
+            timeout="elara_despair_timeout"
+        )
+    ),
+
+    # Bad Ending Stage
+    GuardianQuestLines(
+        id="learn_elaras_story",
+        title="Bi Kịch Tình Yêu",
+        description="Elara kể về tình yêu cấm đoán của bà với một người đàn ông từ bộ tộc đối địch, người đã chết trong một cuộc xung đột. Vì quá đau khổ, bà đã bỏ rơi lời thề, tin rằng tình yêu của bà đã phản bội tất cả. 'Vùng đất này đã chịu hậu quả của sự yếu đuối của tôi,' bà nói, nước mắt lưng tròng. {guardian.ga_name} nhìn bạn với ánh mắt nặng trĩu. 'Bi kịch này quá sâu sắc để một lời thề có thể hàn gắn, Ngài.'",
+        choice_a="Cố gắng an ủi Elara, nhưng nhận ra rằng không có cách nào sửa chữa được sự đổ vỡ này.",
+        choice_b="", choice_c="", choice_timeout="",
+        next_steps=NextSteps("broken_oath_bad_ending", "broken_oath_bad_ending", "broken_oath_bad_ending", "broken_oath_bad_ending"),
+        dignity_point=-10, ga_exp=-75, silver=-200, gold=-100,
+    ),
+
+    # Failures and generic endings
+    GuardianQuestLines(
+        id="ignore_plea_outcome",
+        title="Thờ Ơ Với Số Phận",
+        description="Bạn và {guardian.ga_name} quyết định phớt lờ lời cầu cứu. Vài tuần sau, tin tức về Vùng Đất Cằn Cỗi hoàn toàn chết khô lan truyền, kéo theo nạn đói và sự hỗn loạn. {guardian.ga_name} nhìn bạn đầy thất vọng. 'Ta hy vọng Ngài sẽ không phải hối tiếc về quyết định này.'",
+        choice_a="Cảm thấy một nỗi hối tiếc lạnh lẽo. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-15, ga_exp=-75, silver=-150, gold=-75,
+        next_steps=NextSteps("quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1")
+    ),
+
+    GuardianQuestLines(
+        id="ga_urgent_timeout_1",
+        title="Sự Chần Chừ Tai Hại",
+        description="Bạn chần chừ quá lâu. {guardian.ga_name} thở dài. 'Thời gian đã không còn cho chúng ta. Vùng đất này sẽ không thể chờ đợi.' Nhiệm vụ kết thúc trong sự thất bại đau đớn.",
+        choice_a="Bạn cảm thấy bất lực. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        next_steps=NextSteps("quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1"),
+        dignity_point=-10, ga_exp=-50, silver=-100, gold=-50,
+    ),
+
+    GuardianQuestLines(
+        id="monument_cracks_timeout",
+        title="Tượng Đài Sụp Đổ",
+        description="Bạn chần chừ quá lâu trong việc kiểm tra tượng đài. Những vết nứt lan rộng, và nó sụp đổ hoàn toàn, chôn vùi mọi manh mối bên dưới. 'Đã quá muộn rồi,' {guardian.ga_name} nói với giọng buồn bã.",
+        choice_a="Bạn cảm thấy một sự mất mát. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-5, ga_exp=-50, silver=-75, gold=-25,
+        next_steps=NextSteps("quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1")
+    ),
+
+    GuardianQuestLines(
+        id="retreat_from_barren_lands",
+        title="Rút Lui Khỏi Sự Tuyệt Vọng",
+        description="Bạn và {guardian.ga_name} quyết định rút lui. Bạn quay lưng lại với Vùng Đất Cằn Cỗi, bỏ mặc số phận của nó. 'Thật đáng tiếc khi chúng ta không thể giúp được gì,' {guardian.ga_name} nói, giọng đầy tiếc nuối.",
+        choice_a="Bạn cảm thấy thất bại. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-10, ga_exp=-50, silver=-50, gold=-50,
+        next_steps=NextSteps("quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1")
+    ),
+
+    GuardianQuestLines(
+        id="search_for_missing_water",
+        title="Nguồn Nước Biến Mất",
+        description="Bạn và {guardian.ga_name} tìm kiếm nguồn nước. Bạn tìm thấy dấu vết của một con sông ngầm đã bị chuyển hướng một cách bí ẩn. {guardian.ga_name} nói: 'Có ai đó đã cố tình làm điều này.'",
+        choice_a="Điều tra kẻ gây ra vụ chuyển hướng nước.",
+        choice_b="Thử dùng phép thuật để phục hồi dòng chảy.",
+        choice_c="Từ bỏ việc tìm kiếm nước.",
+        choice_timeout="{guardian.ga_name} hối thúc. 'Nguồn sống của vùng đất này đang bị đe dọa!'",
+        next_steps=NextSteps(
+            choice_a="investigate_sabotage",
+            choice_b="restore_water_flow_attempt",
+            choice_c="abandon_water_search",
+            timeout="water_source_collapses_timeout"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="investigate_sabotage",
+        title="Dấu Vết Kẻ Phá Hoại",
+        description="Bạn và {guardian.ga_name} tìm thấy dấu vết của một nhóm pháp sư hắc ám đã chuyển hướng con sông ngầm để tạo ra một đầm lầy độc hại cho nghi lễ của họ. {guardian.ga_name} chuẩn bị vũ khí. 'Chúng ta phải ngăn chặn chúng!'",
+        choice_a="Đối đầu với pháp sư hắc ám.",
+        choice_b="Tìm cách đảo ngược phép thuật mà không đối đầu.",
+        choice_c="Báo động cho chính quyền địa phương.",
+        choice_timeout="{guardian.ga_name} cảnh báo. 'Chúng ta không thể chần chừ, Ngài! Chúng sẽ hoàn thành nghi lễ!'",
+        next_steps=NextSteps(
+            choice_a="confront_dark_mages_outcome",
+            choice_b="reverse_spell_attempt",
+            choice_c="report_authorities_outcome",
+            timeout="dark_mages_succeed_timeout"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="confront_dark_mages_outcome",
+        title="Đối Đầu Với Pháp Sư Hắc Ám",
+        description="Bạn và {guardian.ga_name} đối mặt với nhóm pháp sư hắc ám. Họ mạnh hơn bạn nghĩ và cuộc chiến diễn ra khốc liệt. Mặc dù bạn và {guardian.ga_name} chiến đấu dũng cảm, số lượng và phép thuật của họ áp đảo. Cuối cùng, bạn và {guardian.ga_name} bị đánh bại và buộc phải rút lui trong đau đớn. 'Ta đã không thể bảo vệ Ngài khỏi hiểm nguy này,' {guardian.ga_name} thều thào, cơ thể đầy thương tích.",
+        choice_a="Bạn bị thương nặng và nhiệm vụ thất bại.",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-15, ga_exp=-100, silver=-300, gold=-150, ga_health=-100, ga_mana=-100, ga_stamina=-100,
+        next_steps=NextSteps("broken_oath_bad_ending", "broken_oath_bad_ending", "broken_oath_bad_ending", "broken_oath_bad_ending")
+    ),
+
+    GuardianQuestLines(
+        id="restore_monument_attempt",
+        title="Khôi Phục Thất Bại",
+        description="Bạn cố gắng khôi phục tượng đài bằng phép thuật, nhưng năng lượng của nó đã cạn kiệt. Tượng đài tiếp tục nứt rạn và cuối cùng sụp đổ, chôn vùi mọi thứ. 'Phép thuật không thể sửa chữa những gì đã tan vỡ,' {guardian.ga_name} nói buồn bã.",
+        choice_a="Tượng đài sụp đổ, nhiệm vụ thất bại.",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-5, ga_exp=-50, silver=-50, gold=-25,
+        next_steps=NextSteps("quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1")
+    ),
+
+    GuardianQuestLines(
+        id="abandon_monument",
+        title="Bỏ Qua Tượng Đài",
+        description="Bạn và {guardian.ga_name} quyết định bỏ qua tượng đài, hy vọng tìm thấy manh mối ở nơi khác. Tuy nhiên, mọi con đường đều dẫn đến ngõ cụt. 'Có lẽ chúng ta đã bỏ lỡ điều quan trọng nhất,' {guardian.ga_name} nói với vẻ hối tiếc.",
+        choice_a="Bạn cảm thấy bế tắc. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-5, ga_exp=-50, silver=-50, gold=-25,
+        next_steps=NextSteps("quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1")
+    ),
+
+    GuardianQuestLines(
+        id="elara_despair_timeout",
+        title="Nỗi Tuyệt Vọng Của Elara",
+        description="Bạn chần chừ quá lâu trong việc nói chuyện với Elara. Bà ấy gục xuống, nỗi tuyệt vọng nhấn chìm bà. 'Quá muộn rồi... không còn hy vọng nào nữa,' bà thì thầm. {guardian.ga_name} nhìn bạn với ánh mắt đầy trách móc. 'Chúng ta đã không thể mang lại hy vọng cho bà ấy.'",
+        choice_a="Elara chìm trong tuyệt vọng, nhiệm vụ thất bại.",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-10, ga_exp=-50, silver=-100, gold=-50,
+        next_steps=NextSteps("quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1", "quest_failed_end_1")
+    ),
+
+    GuardianQuestLines(
+        id="force_elara_outcome",
+        title="Cưỡng Ép Elara",
+        description="Bạn cố gắng buộc Elara phải lập lại lời thề, nhưng bà ấy phản kháng dữ dội. Nỗi đau và sự phẫn uất trong bà bùng phát, tạo ra một làn sóng năng lượng tiêu cực lan khắp vùng đất, khiến mọi thứ càng trở nên tồi tệ hơn. 'Ngài đã đẩy bà ấy vào vực thẳm,' {guardian.ga_name} nói, ánh mắt đầy thất vọng.",
+        choice_a="Vùng đất trở nên tồi tệ hơn. Nhiệm vụ thất bại.",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-20, ga_exp=-100, silver=-200, gold=-100, ga_health=-50, ga_mana=-50, ga_stamina=-50,
+        next_steps=NextSteps("broken_oath_bad_ending", "broken_oath_bad_ending", "broken_oath_bad_ending", "broken_oath_bad_ending")
+    ),
+
+    GuardianQuestLines(
+        id="persuade_elara",
+        title="Thuyết Phục Không Thành",
+        description="Bạn cố gắng thuyết phục Elara lập lại lời thề, nhưng bà ấy vẫn không thể vượt qua nỗi đau mất mát. 'Tôi không thể... không còn lý do gì nữa,' bà nói, nước mắt chảy dài. Vùng đất tiếp tục héo úa. {guardian.ga_name} nói: 'Ta e là bà ấy đã mất đi tất cả niềm tin.'",
+        choice_a="Elara không thể vượt qua, nhiệm vụ thất bại.",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-5, ga_exp=-50, silver=-50, gold=-25,
+        next_steps=NextSteps("broken_oath_bad_ending", "broken_oath_bad_ending", "broken_oath_bad_ending", "broken_oath_bad_ending")
+    ),
+
+    GuardianQuestLines(
+        id="broken_oath_bad_ending",
+        title="Vùng Đất Vĩnh Viễn Chết",
+        description="Bi kịch tình yêu đã phá hủy lời thề, và không có gì có thể hàn gắn được sự đổ vỡ này. Vùng Đất Cằn Cỗi chìm trong sự hoang tàn vĩnh viễn, trở thành một minh chứng cho tình yêu bị phản bội và lời thề bị phá vỡ. {guardian.ga_name} đứng bên bạn, ánh mắt buồn bã nhìn về phía chân trời. 'Thật đáng buồn khi ta không thể thay đổi được số phận này, Ngài.'",
+        choice_a="Bạn và {guardian.ga_name} rời đi, mang theo nỗi đau thất bại.",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-25, ga_exp=-200, silver=-500, gold=-250, ga_health=-100, ga_mana=-100, ga_stamina=-100,
+        next_steps=NextSteps("continue_adventure_1", "continue_adventure_1", "continue_adventure_1", "continue_adventure_1")
+    ),
+
+    GuardianQuestLines(
+        id="quest_failed_end_1",
+        title="Thất Bại Đau Đớn",
+        description="Nhiệm vụ thất bại. Vùng Đất Cằn Cỗi vẫn chìm trong cảnh hoang tàn, và lời thề bị phá vỡ vẫn còn đó. {guardian.ga_name} nhìn bạn với ánh mắt thất vọng. 'Ta hy vọng Ngài sẽ rút ra được bài học từ thất bại này.'",
+        choice_a="Rút ra bài học đau đớn.",
+        dignity_point=-10, ga_exp=-50, silver=-50, gold=-50,
+        choice_b="", choice_c="", choice_timeout="",
+        next_steps=NextSteps("continue_adventure_1", "continue_adventure_1", "continue_adventure_1", "continue_adventure_1")
+    ),
+
+    GuardianQuestLines(
+        id="continue_adventure_1",
+        title="Hành Trình Tiếp Nối",
+        description="Bạn và {guardian.ga_name} rời khỏi Vùng Đất Cằn Cỗi, mang theo những ký ức về hành trình vừa qua. Những cuộc phiêu lưu mới đang chờ đợi...",
+        choice_a="",
+        choice_b="", choice_c="", choice_timeout="",
+        ga_exp=300, silver=10000, gold=500,
+        next_steps=NextSteps("", "", "", "")
+    )
+]
+
+#region quest_unamed_village
+quest_ruin_whisper = [
+    GuardianQuestLines(
+        id="start",
+        title="Bí Mật Của Tàn Tích Thì Thầm",
+        description="Bạn và {guardian.ga_name} phát hiện một bản đồ cổ xưa dẫn đến 'Tàn Tích Thì Thầm' - một nơi được đồn đại chứa đựng tri thức vô tận hoặc một lời nguyền kinh hoàng. {guardian.ga_name} khẽ nghiêng đầu. 'Nơi này mang một năng lượng rất... cổ xưa, Ngài.'",
+        choice_a="Lập tức lên đường đến tàn tích.",
+        choice_b="Tìm hiểu thêm thông tin về 'Tàn Tích Thì Thầm'.",
+        choice_c="Bỏ qua, tin đồn thường chỉ là mê tín.",
+        choice_timeout="{guardian.ga_name} cau mày. 'Sự im lặng của nơi này khiến ta lo lắng, Ngài.'",
+        next_steps=NextSteps(
+            choice_a="journey_to_ruins",
+            choice_b="research_ruins",
+            choice_c="ignore_ruins",
+            timeout="guardian_urges_investigation"
+        ),
+        gold=30, silver=150, ga_exp=20, dignity_point=10
+    ),
+
+    GuardianQuestLines(
+        id="journey_to_ruins",
+        title="Hành Trình Qua Lãng Quên",
+        description="Bạn và {guardian.ga_name} vượt qua những khu rừng rậm rạp và đầm lầy âm u để đến được Tàn Tích Thì Thầm. Những công trình đá đổ nát, phủ đầy rêu phong, đứng sừng sững như những bóng ma. Một luồng gió lạnh buốt mang theo những tiếng thì thầm không rõ nguồn gốc. {guardian.ga_name} nắm chặt vũ khí. 'Những tiếng nói này... chúng không đến từ thế giới của chúng ta, Ngài.'",
+        choice_a="Đi sâu vào tàn tích, khám phá lối vào chính.",
+        choice_b="Tìm kiếm những dấu vết hoặc hiện vật xung quanh tàn tích.",
+        choice_c="Cẩn thận dựng trại ở ngoại vi, quan sát qua đêm.",
+        choice_timeout="{guardian.ga_name} nhìn quanh cảnh vật. 'Ta không nghĩ chúng ta nên ở lại đây quá lâu, Ngài.'",
+        next_steps=NextSteps(
+            choice_a="enter_ruins",
+            choice_b="search_artifacts",
+            choice_c="camp_outside_ruins",
+            timeout="ruins_influence_timeout"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="research_ruins",
+        title="Những Cuốn Sách Bụi Bặm",
+        description="Bạn và {guardian.ga_name} dành thời gian tìm hiểu về Tàn Tích Thì Thầm trong các thư viện cổ. Bạn phát hiện ra rằng nó từng là một học viện cổ đại bị hủy hoại bởi một nghi lễ thất bại, giải phóng một thực thể tâm linh gọi là 'Kẻ Thì Thầm'. {guardian.ga_name} nghiêm nghị. 'Đây không phải là một nơi để tìm kiếm kho báu, Ngài, mà là một lăng mộ.'",
+        choice_a="Chuẩn bị kỹ lưỡng và tiến vào tàn tích.",
+        choice_b="Tìm kiếm các nghi lễ hoặc cách để phong ấn Kẻ Thì Thầm.",
+        choice_c="Cân nhắc từ bỏ nhiệm vụ vì quá nguy hiểm.",
+        choice_timeout="{guardian.ga_name} thở dài. 'Sự im lặng này có thể nuốt chửng chúng ta, Ngài.'",
+        next_steps=NextSteps(
+            choice_a="journey_to_ruins",
+            choice_b="seek_sealing_rituals",
+            choice_c="abandon_ruins_quest",
+            timeout="guardian_urges_investigation"
+        ),
+        gold=10, silver=50, ga_exp=10, dignity_point=5
+    ),
+
+    GuardianQuestLines(
+        id="enter_ruins",
+        title="Hành Lang Vô Tận",
+        description="Bạn và {guardian.ga_name} tiến vào tàn tích qua một cổng đá khổng lồ. Bên trong là một mê cung của những hành lang tối tăm và những căn phòng đổ nát. Tiếng thì thầm càng rõ ràng hơn, như hàng ngàn giọng nói cùng gọi tên bạn. {guardian.ga_name} nhíu mày. 'Những tiếng thì thầm này đang cố gắng xâm nhập tâm trí Ngài!'",
+        choice_a="Tiến sâu hơn, cố gắng tìm nguồn gốc tiếng thì thầm.",
+        choice_b="Tìm kiếm các thư viện hoặc phòng nghiên cứu cổ.",
+        choice_c="Cố gắng tìm lối thoát an toàn.",
+        choice_timeout="Tiếng thì thầm trở nên chói tai. 'Ta không thể chịu đựng thêm nữa!' {guardian.ga_name} hét lên.",
+        next_steps=NextSteps(
+            choice_a="pursue_whispers",
+            choice_b="find_research_rooms",
+            choice_c="seek_safe_exit_ruins",
+            timeout="whispers_overwhelm"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="search_artifacts",
+        title="Vật Phẩm Bị Lãng Quên",
+        description="Bạn và {guardian.ga_name} tìm thấy một chiếc bùa hộ mệnh cũ kỹ bị chôn vùi trong đất. Nó phát ra một luồng sáng yếu ớt khi tiếng thì thầm vọng đến gần. {guardian.ga_name} cầm lấy nó. 'Thứ này có thể giúp chúng ta chống lại Kẻ Thì Thầm.'",
+        choice_a="Sử dụng bùa hộ mệnh để khuếch tán tiếng thì thầm.",
+        choice_b="Giữ lại bùa hộ mệnh, tiếp tục khám phá.",
+        choice_c="Phá hủy bùa hộ mệnh vì sợ nó có thể là bẫy.",
+        choice_timeout="Bùa hộ mệnh phát sáng mạnh hơn. 'Nó đang phản ứng với Ngài!' {guardian.ga_name} nói.",
+        next_steps=NextSteps(
+            choice_a="use_amulet_deflect",
+            choice_b="keep_amulet_explore",
+            choice_c="destroy_amulet_outcome",
+            timeout="use_amulet_deflect"
+        ),
+        gold=20, silver=80, ga_exp=10, dignity_point=5
+    ),
+
+    GuardianQuestLines(
+        id="pursue_whispers",
+        title="Căn Phòng Dội Âm",
+        description="Tiếng thì thầm dẫn bạn và {guardian.ga_name} đến một căn phòng lớn, nơi không khí đặc quánh năng lượng. Những tiếng nói vọng ra từ mọi phía, thì thầm những bí mật đen tối và những lời hứa hẹn cám dỗ. {guardian.ga_name} bịt tai. 'Ngài phải chống lại chúng, Ngài! Chúng là ảo ảnh!'",
+        choice_a="Lắng nghe những lời thì thầm để tìm ra sự thật.",
+        choice_b="Cố gắng phá hủy nguồn phát ra tiếng thì thầm.",
+        choice_c="Tìm cách phong tỏa căn phòng này.",
+        choice_timeout="{guardian.ga_name} hét lên. 'Chúng đang cố gắng phá vỡ ý chí Ngài!'",
+        next_steps=NextSteps(
+            choice_a="listen_to_whispers",
+            choice_b="destroy_whisper_source",
+            choice_c="seal_whisper_room",
+            timeout="whispers_overwhelm"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="find_research_rooms",
+        title="Thư Viện Tan Hoang",
+        description="Bạn và {guardian.ga_name} tìm thấy thư viện. Sách vở nằm rải rác, nhưng một số cuộn giấy da vẫn còn nguyên vẹn. Bạn đọc được về những nỗ lực phong ấn Kẻ Thì Thầm của các học giả cổ đại. {guardian.ga_name} chỉ vào một bản vẽ. 'Đây là một nghi lễ... nhưng nó cần một sự hy sinh.'",
+        choice_a="Tìm hiểu thêm về nghi lễ phong ấn.",
+        choice_b="Tìm kiếm thông tin về điểm yếu của Kẻ Thì Thầm.",
+        choice_c="Mang theo những cuộn giấy quan trọng và rời đi.",
+        choice_timeout="{guardian.ga_name} hối thúc. 'Thời gian không chờ đợi chúng ta, Ngài!'",
+        next_steps=NextSteps(
+            choice_a="learn_sealing_ritual",
+            choice_b="find_whisper_weakness",
+            choice_c="leave_with_scrolls",
+            timeout="whispers_overwhelm"
+        ),
+        gold=25, silver=100, ga_exp=15, dignity_point=10
+    ),
+
+    GuardianQuestLines(
+        id="listen_to_whispers",
+        title="Lời Hứa Giả Dối",
+        description="Bạn cố gắng lắng nghe những lời thì thầm. Chúng hứa hẹn cho bạn sức mạnh, tri thức, và quyền năng không giới hạn, đổi lại linh hồn bạn. {guardian.ga_name} cố gắng kéo bạn lại. 'Chủ nhân, đừng nghe chúng! Đó là lời nguyền rủa!' Nhưng những lời hứa ngọt ngào dần cuốn lấy bạn. {guardian.ga_name} nhìn bạn với ánh mắt đau đớn, hắn hiểu rằng bạn đã rơi vào cạm bẫy của Kẻ Thì Thầm. Bạn cười một nụ cười trống rỗng, và Kẻ Thì Thầm thì thầm trong tâm trí bạn: 'Ngươi đã thuộc về ta, mãi mãi...'",
+        choice_a="Linh hồn bạn bị Kẻ Thì Thầm chiếm đoạt hoàn toàn.",
+        choice_b="", choice_c="", choice_timeout="",
+        next_steps=NextSteps("quest_failed_end_possessed_whispers", "quest_failed_end_possessed_whispers", "quest_failed_end_possessed_whispers", "quest_failed_end_possessed_whispers"),
+        gold=-800, silver=-800, ga_exp=-300, dignity_point=-70, ga_health=-999, ga_mana=-999, ga_stamina=-999, force_dead=True
+    ),
+
+    GuardianQuestLines(
+        id="learn_sealing_ritual",
+        title="Nghi Lễ Tối Thượng",
+        description="Bạn và {guardian.ga_name} nghiên cứu sâu hơn. Nghi lễ phong ấn yêu cầu một linh hồn tinh khiết và một sức mạnh ý chí phi thường để trói buộc Kẻ Thì Thầm vĩnh viễn. {guardian.ga_name} nhìn bạn. 'Ta sẽ giúp Ngài thực hiện nghi lễ, Ngài.'",
+        choice_a="Thực hiện nghi lễ phong ấn.",
+        choice_b="Tìm kiếm một cách khác, không cần hy sinh.",
+        choice_c="",
+        choice_timeout="{guardian.ga_name} nói khẽ. 'Chúng ta không còn nhiều thời gian để do dự, Ngài.'",
+        next_steps=NextSteps(
+            choice_a="perform_sealing_ritual",
+            choice_b="seek_alternative_method",
+            choice_c="",
+            timeout="whispers_overwhelm"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="perform_sealing_ritual",
+        title="Sự Hy Sinh Cuối Cùng",
+        description="Bạn và {guardian.ga_name} bắt đầu nghi lễ. Kẻ Thì Thầm gào thét, tấn công dữ dội. {guardian.ga_name} dồn toàn bộ sức mạnh, tạo ra một lá chắn bảo vệ bạn. Khi nghi lễ gần hoàn tất, một linh hồn tinh khiết cần được dâng hiến. {guardian.ga_name} mỉm cười với bạn, 'Ta... sẽ luôn bên Ngài, Chủ nhân.' Hắn lao vào trung tâm nghi lễ, linh hồn hắn tan biến để trói buộc Kẻ Thì Thầm vĩnh viễn. Tàn tích rung chuyển, và khi mọi thứ lắng xuống, chỉ còn lại sự im lặng. Kẻ Thì Thầm đã bị phong ấn, nhưng {guardian.ga_name} đã không còn nữa. Bạn gục xuống, tiếng thì thầm cuối cùng trong tâm trí bạn là giọng nói của hắn. Bạn đã cứu thế giới, nhưng đổi lại một cái giá quá đắt, một nỗi đau không thể xóa nhòa, mãi mãi là một cái bóng của người bạn đồng hành trung thành đã hy sinh vì bạn.",
+        choice_a="Kẻ Thì Thầm bị phong ấn, nhưng {guardian.ga_name} đã hy sinh.",
+        choice_b="", choice_c="", choice_timeout="",
+        next_steps=NextSteps("quest_failed_end_guardian_sacrifice", "quest_failed_end_guardian_sacrifice", "quest_failed_end_guardian_sacrifice", "quest_failed_end_guardian_sacrifice"),
+        gold=0, silver=0, ga_exp=-999, dignity_point=-999, ga_health=-999, ga_mana=-999, ga_stamina=-999
+    ),
+
+    # Failures and generic endings
+    GuardianQuestLines(
+        id="ignore_ruins",
+        title="Phớt Lờ Lời Nguyền",
+        description="Bạn quyết định bỏ qua Tàn Tích Thì Thầm. Theo thời gian, những câu chuyện về những người mất trí, những giọng nói trong đầu họ bắt đầu lan truyền. {guardian.ga_name} nhìn bạn với ánh mắt nặng trĩu. 'Đôi khi, nguy hiểm lớn nhất không phải là thứ chúng ta đối mặt, mà là thứ chúng ta phớt lờ.'",
+        choice_a="Cảm thấy hối tiếc. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=-30, silver=-100, ga_exp=-30, dignity_point=-10,
+        next_steps=NextSteps("quest_failed_end_5", "quest_failed_end_5", "quest_failed_end_5", "quest_failed_end_5")
+    ),
+
+    GuardianQuestLines(
+        id="guardian_urges_investigation",
+        title="Lời Thúc Giục Bị Bỏ Qua",
+        description="Bạn chần chừ quá lâu. {guardian.ga_name} thở dài. 'Sự do dự của Ngài đã tước đi cơ hội can thiệp. Ta cảm thấy tiếng thì thầm đang lan rộng.' Nhiệm vụ kết thúc trong sự không chắc chắn.",
+        choice_a="Bạn cảm thấy bất lực. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=-20, silver=-50, ga_exp=-20, dignity_point=-5,
+        next_steps=NextSteps("quest_failed_end_5", "quest_failed_end_5", "quest_failed_end_5", "quest_failed_end_5")
+    ),
+
+    GuardianQuestLines(
+        id="ruins_influence_timeout",
+        title="Ảnh Hưởng Của Tàn Tích",
+        description="Bạn chần chừ quá lâu. Tiếng thì thầm từ tàn tích trở nên mạnh mẽ hơn, xâm nhập vào tâm trí bạn, gây ra ảo ảnh và sự hoang mang. {guardian.ga_name} cố gắng bảo vệ bạn, nhưng cả hai đều bị ảnh hưởng. 'Chúng ta phải thoát ra!' {guardian.ga_name} gầm lên.",
+        choice_a="Bạn và {guardian.ga_name} bị ảnh hưởng bởi tàn tích.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=-50, silver=-100, ga_exp=-50, dignity_point=-10, ga_health=-25, ga_mana=-25, ga_stamina=-25,
+        next_steps=NextSteps("quest_failed_end_haunted", "quest_failed_end_haunted", "quest_failed_end_haunted", "quest_failed_end_haunted")
+    ),
+
+    GuardianQuestLines(
+        id="camp_outside_ruins",
+        title="Đêm Kinh Hoàng",
+        description="Bạn và {guardian.ga_name} cắm trại bên ngoài tàn tích. Suốt đêm, tiếng thì thầm dày vò tâm trí bạn, mang đến những cơn ác mộng sống động. {guardian.ga_name} cũng tỏ ra bồn chồn. 'Nơi này không cho phép ai yên ổn, Ngài.'",
+        choice_a="Cảm thấy kiệt sức, nhiệm vụ gặp trở ngại.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=-10, silver=-20, ga_exp=-10, ga_health=-5, ga_stamina=-5,
+        next_steps=NextSteps("journey_to_ruins", "journey_to_ruins", "journey_to_ruins", "journey_to_ruins")
+    ),
+
+    GuardianQuestLines(
+        id="destroy_amulet_outcome",
+        title="Phá Hủy Lầm Lỗi",
+        description="Bạn quyết định phá hủy bùa hộ mệnh. Ngay lập tức, tiếng thì thầm trở nên to hơn, và một cảm giác lạnh lẽo bao trùm lấy bạn. {guardian.ga_name} cau mày. 'Ta không nghĩ đây là một quyết định khôn ngoan, Ngài. Chúng ta đã mất đi một công cụ hữu ích.'",
+        choice_a="Bạn mất đi một vật phẩm quan trọng, nhiệm vụ trở nên khó khăn hơn.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=-10, silver=-30, ga_exp=-10, dignity_point=-5,
+        next_steps=NextSteps("search_artifacts", "search_artifacts", "search_artifacts", "search_artifacts")
+    ),
+
+    GuardianQuestLines(
+        id="whispers_overwhelm",
+        title="Tiếng Thì Thầm Áp Đảo",
+        description="Bạn chần chừ quá lâu trong tàn tích. Tiếng thì thầm trở nên chói tai, xâm nhập sâu vào tâm trí bạn, gây ra sự hoang tưởng và ảo giác. {guardian.ga_name} cố gắng kéo bạn ra, nhưng cả hai đều bị mắc kẹt trong cơn hỗn loạn. 'Ý chí Ngài đang bị bào mòn!' {guardian.ga_name} gầm lên.",
+        choice_a="Bạn và {guardian.ga_name} bị áp đảo bởi tiếng thì thầm.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=-70, silver=-150, ga_exp=-70, dignity_point=-15, ga_health=-50, ga_mana=-50, ga_stamina=-50,
+        next_steps=NextSteps("quest_failed_end_haunted", "quest_failed_end_haunted", "quest_failed_end_haunted", "quest_failed_end_haunted")
+    ),
+
+    GuardianQuestLines(
+        id="seek_safe_exit_ruins",
+        title="Lối Thoát Bế Tắc",
+        description="Bạn và {guardian.ga_name} cố gắng tìm lối thoát. Nhưng mọi con đường dường như dẫn trở lại trung tâm của tàn tích. Những bức tường như đang di chuyển, đóng sập lại sau lưng bạn. 'Chúng ta đã bị mắc kẹt, Ngài!' {guardian.ga_name} nói với vẻ tuyệt vọng.",
+        choice_a="Bạn bị mắc kẹt trong tàn tích. Nhiệm vụ thất bại.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=-60, silver=-120, ga_exp=-60, dignity_point=-15, ga_health=-30, ga_mana=-30, ga_stamina=-30,
+        next_steps=NextSteps("quest_failed_end_haunted", "quest_failed_end_haunted", "quest_failed_end_haunted", "quest_failed_end_haunted")
+    ),
+
+    GuardianQuestLines(
+        id="destroy_whisper_source",
+        title="Phá Hủy Nguồn Gốc",
+        description="Bạn và {guardian.ga_name} tấn công nguồn phát ra tiếng thì thầm. Một luồng năng lượng đen tối bùng nổ, đẩy bạn lùi lại và gây ra thiệt hại đáng kể. Nguồn gốc chỉ rung chuyển, không bị phá hủy hoàn toàn. {guardian.ga_name} thở hổn hển. 'Nó quá mạnh, Ngài! Chúng ta cần một kế hoạch khác.'",
+        choice_a="Bạn và {guardian.ga_name} bị thương, nhiệm vụ gặp trở ngại.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=-40, silver=-80, ga_exp=-40, dignity_point=-10, ga_health=-20, ga_mana=-20, ga_stamina=-20,
+        next_steps=NextSteps("pursue_whispers", "pursue_whispers", "pursue_whispers", "pursue_whispers")
+    ),
+
+    GuardianQuestLines(
+        id="seal_whisper_room",
+        title="Nghi Lễ Phong Tỏa Khẩn Cấp",
+        description="Bạn và {guardian.ga_name} cố gắng phong tỏa căn phòng dội âm. {guardian.ga_name} dùng sức mạnh của hắn để tạo ra một kết giới tạm thời, nhưng tiếng thì thầm vẫn lọt qua, yếu ớt hơn. 'Không đủ để ngăn chặn nó hoàn toàn, Ngài,' {guardian.ga_name} nói, vẻ mặt mệt mỏi.",
+        choice_a="Bạn và {guardian.ga_name} bị kiệt sức, chỉ có thể phong tỏa tạm thời.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=-20, silver=-50, ga_exp=-20, ga_mana=-15, ga_stamina=-15,
+        next_steps=NextSteps("enter_ruins", "enter_ruins", "enter_ruins", "enter_ruins")
+    ),
+
+    GuardianQuestLines(
+        id="find_whisper_weakness",
+        title="Điểm Yếu Bị Lãng Quên",
+        description="Bạn và {guardian.ga_name} tìm thấy một cuộn giấy ghi lại điểm yếu của Kẻ Thì Thầm: ánh sáng tinh khiết và sự thật không lay chuyển. {guardian.ga_name} nhìn bạn. 'Chúng ta có thể sử dụng điều này, Ngài!'",
+        choice_a="Tìm cách tạo ra ánh sáng tinh khiết mạnh mẽ.",
+        choice_b="Cố gắng đối mặt Kẻ Thì Thầm bằng sự thật.",
+        choice_c="",
+        choice_timeout="{guardian.ga_name} thúc giục. 'Thời gian không còn nhiều!'",
+        next_steps=NextSteps(
+            choice_a="create_pure_light",
+            choice_b="confront_whisper_truth",
+            choice_c="",
+            timeout="whispers_overwhelm"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="create_pure_light",
+        title="Ánh Sáng Yếu Ớt",
+        description="Bạn và {guardian.ga_name} cố gắng tạo ra ánh sáng tinh khiết. {guardian.ga_name} dồn năng lượng của mình, nhưng nó không đủ để xuyên qua bóng tối của Kẻ Thì Thầm. 'Ta cần thêm sức mạnh, Ngài,' {guardian.ga_name} thở hổn hển.",
+        choice_a="Bạn và {guardian.ga_name} kiệt sức, ánh sáng không đủ mạnh.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=-30, silver=-60, ga_exp=-30, ga_mana=-20, ga_stamina=-20,
+        next_steps=NextSteps("find_research_rooms", "find_research_rooms", "find_research_rooms", "find_research_rooms")
+    ),
+
+    GuardianQuestLines(
+        id="confront_whisper_truth",
+        title="Sự Thật Đắng Cay",
+        description="Bạn đối mặt với Kẻ Thì Thầm bằng sự thật về bản chất của nó và sự hủy diệt nó đã gây ra. Nó gào lên trong đau đớn, nhưng không bị tiêu diệt. 'Lời nói không thể làm hại ta, Ngài! Chỉ có sức mạnh thực sự mới có thể!' {guardian.ga_name} nói, vẻ mặt nghiêm nghị. 'Nó đang mạnh lên, Ngài!'",
+        choice_a="Bạn làm Kẻ Thì Thầm suy yếu nhưng không tiêu diệt được.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=-20, silver=-40, ga_exp=-20, dignity_point=0,
+        next_steps=NextSteps("pursue_whispers", "pursue_whispers", "pursue_whispers", "pursue_whispers")
+    ),
+
+    GuardianQuestLines(
+        id="leave_with_scrolls",
+        title="Rút Lui Với Tri Thức",
+        description="Bạn và {guardian.ga_name} mang theo những cuộn giấy cổ và rời khỏi tàn tích. Tiếng thì thầm vẫn văng vẳng trong tai bạn một thời gian, nhưng dần lắng xuống. 'Chúng ta đã có được tri thức, Ngài, nhưng cái giá phải trả là sự bình yên của chính chúng ta,' {guardian.ga_name} nói.",
+        choice_a="Bạn và {guardian.ga_name} thoát ra với tri thức, nhưng bị ám ảnh.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=80, silver=200, ga_exp=40, dignity_point=20, ga_mana=-10, ga_stamina=-10,
+        next_steps=NextSteps("quest_success_haunted_by_knowledge", "quest_success_haunted_by_knowledge", "quest_success_haunted_by_knowledge", "quest_success_haunted_by_knowledge")
+    ),
+
+    GuardianQuestLines(
+        id="seek_alternative_method",
+        title="Tìm Kiếm Phương Pháp Khác",
+        description="Bạn và {guardian.ga_name} cố gắng tìm một phương pháp phong ấn không cần hy sinh, nhưng mọi nỗ lực đều vô vọng. Kẻ Thì Thầm ngày càng mạnh hơn khi thời gian trôi qua. 'Ta e rằng không có con đường nào khác, Ngài,' {guardian.ga_name} thở dài.",
+        choice_a="Không tìm thấy cách thay thế, nhiệm vụ bế tắc.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=-40, silver=-80, ga_exp=-40, dignity_point=-10, ga_mana=-20, ga_stamina=-20,
+        next_steps=NextSteps("learn_sealing_ritual", "learn_sealing_ritual", "learn_sealing_ritual", "learn_sealing_ritual")
+    ),
+
+    GuardianQuestLines(
+        id="use_amulet_deflect",
+        title="Lá Chắn Linh Hồn",
+        description="Bạn sử dụng bùa hộ mệnh. Nó phát ra một luồng sáng ấm áp, đẩy lùi tiếng thì thầm và khiến bạn cảm thấy an toàn hơn. {guardian.ga_name} gật đầu. 'Thứ này rất hữu ích, Ngài. Nó làm suy yếu ảnh hưởng của Kẻ Thì Thầm.'",
+        choice_a="Bùa hộ mệnh giúp bạn chống lại tiếng thì thầm.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=15, silver=30, ga_exp=10, dignity_point=5, ga_mana=5, ga_stamina=5,
+        next_steps=NextSteps("enter_ruins", "enter_ruins", "enter_ruins", "enter_ruins")
+    ),
+
+    GuardianQuestLines(
+        id="keep_amulet_explore",
+        title="Giữ Lại Hy Vọng",
+        description="Bạn giữ lại bùa hộ mệnh và tiếp tục khám phá. Nó thỉnh thoảng phát sáng yếu ớt, như một lời nhắc nhở về sự hiện diện của Kẻ Thì Thầm. {guardian.ga_name} nói. 'Đó là một tia hy vọng nhỏ, Ngài.'",
+        choice_a="Bạn vẫn giữ bùa hộ mệnh và tiếp tục hành trình.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=10, silver=20, ga_exp=5,
+        next_steps=NextSteps("enter_ruins", "enter_ruins", "enter_ruins", "enter_ruins")
+    ),
+
+    GuardianQuestLines(
+        id="abandon_ruins_quest",
+        title="Thoát Ly Khỏi Nỗi Ám Ảnh",
+        description="Bạn quyết định từ bỏ nhiệm vụ, cho rằng rủi ro quá lớn. {guardian.ga_name} không nói gì, nhưng bạn cảm nhận được sự thất vọng từ hắn. Vài năm sau, những tin đồn về Tàn Tích Thì Thầm ngày càng đáng sợ, về những linh hồn bị mắc kẹt và tiếng thì thầm điên loạn vang vọng khắp vùng đất. 'Ta hy vọng Ngài không bao giờ phải đối mặt với những gì chúng ta đã phớt lờ,' {guardian.ga_name} cuối cùng cũng lên tiếng.",
+        choice_a="Bạn từ bỏ nhiệm vụ, nhưng nỗi sợ hãi vẫn còn đó.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=0, silver=0, ga_exp=-75, dignity_point=-20,
+        next_steps=NextSteps("quest_failed_end_5", "quest_failed_end_5", "quest_failed_end_5", "quest_failed_end_5")
+    ),
+
+    # Final Bad Endings
+    GuardianQuestLines(
+        id="quest_failed_end_possessed_whispers",
+        title="Linh Hồn Bị Chiếm Đoạt",
+        description="Linh hồn bạn bị Kẻ Thì Thầm hoàn toàn chiếm đoạt. Bạn trở thành một vật chứa rỗng tuếch, chỉ biết thì thầm những bí mật và lời nguyền rủa của nó, mãi mãi là một công cụ để nó lan rộng ảnh hưởng. {guardian.ga_name} gào thét trong tuyệt vọng khi nhìn thấy bạn biến thành thứ đó, hắn cố gắng chiến đấu, nhưng bị hàng ngàn giọng nói vô hình áp đảo. Cuối cùng, {guardian.ga_name} cũng gục ngã, linh hồn hắn bị xé toạc bởi Kẻ Thì Thầm, cả hai trở thành một phần của nỗi kinh hoàng vĩnh cửu trong Tàn Tích Thì Thầm. Tiếng thì thầm của Kẻ Thì Thầm vang vọng khắp thế giới, mang theo tiếng cười điên dại của bạn và nỗi đau khổ của {guardian.ga_name}, mãi mãi... ",
+        choice_a="Bạn và {guardian.ga_name} bị chiếm đoạt và hủy diệt hoàn toàn.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=-999, silver=-999, ga_exp=-999, dignity_point=-999, ga_health=-999, ga_mana=-999, ga_stamina=-999, force_dead=True,
+        next_steps=NextSteps("continue_adventure_5", "continue_adventure_5", "continue_adventure_5", "continue_adventure_5")
+    ),
+
+    GuardianQuestLines(
+        id="quest_failed_end_guardian_sacrifice",
+        title="Hy Sinh Cô Độc",
+        description="{guardian.ga_name} đã hy sinh chính mình để phong ấn Kẻ Thì Thầm, cứu bạn và thế giới. Tàn tích chìm vào im lặng, nhưng bạn vẫn nghe thấy giọng nói cuối cùng của hắn vang vọng trong tâm trí. Nỗi đau mất mát quá lớn, khiến bạn suy sụp. Bạn đã chiến thắng, nhưng chiến thắng này quá đắt giá, vì nó phải đánh đổi bằng sự tồn tại của người bạn đồng hành trung thành nhất. Bạn tiếp tục hành trình, nhưng mỗi bước đi đều nặng trĩu nỗi đau, và thế giới dường như mất đi màu sắc tươi sáng khi không có {guardian.ga_name} bên cạnh. Bạn sẽ mãi mãi sống trong nỗi ân hận và tiếc nuối, mang theo gánh nặng của sự hy sinh đó, không bao giờ thực sự được giải thoát khỏi bóng ma của quá khứ.",
+        choice_a="Kẻ Thì Thầm bị phong ấn, nhưng {guardian.ga_name} đã hy sinh.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=100, silver=500, ga_exp=50, dignity_point=100, ga_health=-50, ga_mana=-50, ga_stamina=-50,
+        next_steps=NextSteps("continue_adventure_5", "continue_adventure_5", "continue_adventure_5", "continue_adventure_5")
+    ),
+
+    GuardianQuestLines(
+        id="quest_failed_end_haunted",
+        title="Ám Ảnh Vĩnh Viễn",
+        description="Bạn và {guardian.ga_name} đã thoát khỏi Tàn Tích Thì Thầm, nhưng tiếng thì thầm của Kẻ Thì Thầm đã ám ảnh cả hai mãi mãi. Những giọng nói vang vọng trong tâm trí bạn mỗi đêm, phá hoại giấc ngủ và sự tỉnh táo. {guardian.ga_name} cũng bị ảnh hưởng, hắn trở nên cáu kỉnh và khó chịu, luôn trong trạng thái cảnh giác, không bao giờ tìm thấy sự bình yên. Mặc dù sống sót, cả hai bạn đều mang theo một gánh nặng vô hình, một phần linh hồn bị tổn thương không bao giờ có thể chữa lành. Bạn và {guardian.ga_name} sống phần đời còn lại trong sự dày vò của những tiếng thì thầm, không bao giờ thực sự thoát khỏi Tàn Tích.",
+        choice_a="Bạn và {guardian.ga_name} sống sót nhưng bị ám ảnh vĩnh viễn.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=50, silver=100, ga_exp=-100, dignity_point=-25, ga_health=-50, ga_mana=-50, ga_stamina=-50,
+        next_steps=NextSteps("continue_adventure_5", "continue_adventure_5", "continue_adventure_5", "continue_adventure_5")
+    ),
+
+    GuardianQuestLines(
+        id="quest_failed_end_5",
+        title="Thất Bại Đắng Cay",
+        description="Nhiệm vụ thất bại. Tàn Tích Thì Thầm vẫn là một mối đe dọa, và Kẻ Thì Thầm vẫn tiếp tục lan truyền ảnh hưởng của nó. {guardian.ga_name} nhìn bạn với ánh mắt thất vọng. 'Ta hy vọng Ngài sẽ rút ra được bài học từ thất bại này.'",
+        choice_a="Rút ra bài học đau đớn.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=-30, silver=-70, ga_exp=-30, dignity_point=-5,
+        next_steps=NextSteps("continue_adventure_5", "continue_adventure_5", "continue_adventure_5", "continue_adventure_5")
+    ),
+
+    GuardianQuestLines(
+        id="quest_success_haunted_by_knowledge",
+        title="Chiến Thắng Nặng Nề",
+        description="Bạn và {guardian.ga_name} đã thoát khỏi Tàn Tích Thì Thầm với những cuộn giấy cổ chứa đựng kiến thức quý giá về Kẻ Thì Thầm và các nghi lễ cổ đại. Tiếng thì thầm vẫn đôi khi vang vọng trong tâm trí bạn, một lời nhắc nhở về những gì bạn đã trải qua. {guardian.ga_name} vẫn cảnh giác, nhưng hắn tự hào về bạn. 'Tri thức này sẽ giúp chúng ta đối phó với những mối đe dọa tương tự trong tương lai, Ngài,' hắn nói. Bạn đã đạt được một chiến thắng quan trọng, nhưng cái giá là sự ám ảnh không ngừng và một phần ký ức vĩnh viễn bị giằng xé bởi những tiếng thì thầm của quá khứ. Tuy nhiên, với tri thức này, bạn và {guardian.ga_name} đã trở nên mạnh mẽ hơn, sẵn sàng đối mặt với bất kỳ hiểm nguy nào sắp tới, dù cho nỗi ám ảnh vẫn luôn tồn tại.",
+        choice_a="Bạn và {guardian.ga_name} thoát ra với tri thức quan trọng.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=150, silver=300, ga_exp=75, dignity_point=30, ga_mana=10, ga_stamina=10,
+        next_steps=NextSteps("continue_adventure_5", "continue_adventure_5", "continue_adventure_5", "continue_adventure_5")
+    ),
+
+    GuardianQuestLines(
+        id="continue_adventure_5",
+        title="Hành Trình Tiếp Nối",
+        description="Bạn và {guardian.ga_name} rời khỏi Tàn Tích Thì Thầm, mang theo những bài học và nỗi ám ảnh. Những cuộc phiêu lưu mới đang chờ đợi...",
+        choice_a="",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=20, silver=80, ga_exp=15,
+        next_steps=NextSteps("", "", "", "")
+    )
+]
+
+all_quests = [quest_ghost_of_forrest, quest_night_market, quest_the_ruin_call, quest_broken_oath, quest_ruin_whisper]

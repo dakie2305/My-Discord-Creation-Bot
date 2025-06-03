@@ -841,7 +841,7 @@ class GuardianAngelCog(commands.Cog):
         embed.add_field(name=f"", value="_____", inline=False)
         embed.add_field(name=f"", value=f"Thời gian còn lại: <t:{unix_time}:R>", inline=False)
         guardian_quest = GuardianAngelQuest(guardian=user_profile.guardian, user_name=interaction.user.name, user_display_name=interaction.user.display_name, channel_name=interaction.channel.name, quest_lines=random_quest)
-        view = GaQuestView(user=interaction.user, guardian_quest=guardian_quest, current_quest_lines=random_quest[0], override_title=title)
+        view = GaQuestView(user=interaction.user, guardian_quest=guardian_quest, current_quest_lines=random_quest[0], override_title=title, total_ga_stamina=random_quest[0].ga_stamina, total_dignity=random_quest[0].dignity_point, total_gold=random_quest[0].gold, total_silver=random_quest[0].silver, total_ga_exp=random_quest[0].ga_exp, total_ga_hp=random_quest[0].ga_health, total_ga_mana=random_quest[0].ga_mana, channel=interaction.channel)
         mess = await interaction.followup.send(embed=embed, ephemeral=False, view=view)
         view.message = mess
         print(f"User {interaction.user.name} started guardian quest at {interaction.channel.name} in guild {interaction.guild.name}.")

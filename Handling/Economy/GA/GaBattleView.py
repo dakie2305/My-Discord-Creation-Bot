@@ -674,10 +674,12 @@ class GaBattleView(discord.ui.View):
                 item.item_worth_amount = 1000
             else:
                 amount = 1
-                if is_solo: amount * 2
+                if is_solo: amount * 3
                 item_id = "ga_all_restored"
                 additional_dice = UtilitiesFunctions.get_chance(35)
                 if additional_dice: item_id = "ga_resurrection"
+                additional_dice = UtilitiesFunctions.get_chance(35)
+                if additional_dice: item_id = "ga_boss_summoning"
                 for randomitem in list_support_ga_items:
                     if randomitem.item_id == item_id:
                         item = copy.deepcopy(randomitem)
