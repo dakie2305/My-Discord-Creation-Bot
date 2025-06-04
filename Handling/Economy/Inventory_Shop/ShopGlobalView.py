@@ -156,7 +156,7 @@ class TextShopInputModal(discord.ui.Modal):
                 new_worth_amount = int(item.item_worth_amount/2)
                 item.item_worth_amount = new_worth_amount
             ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, item=item, amount=amount)
-
+            profile_user = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
             maintenance_text = ""
             maintenance_money = 3500
             maintenance_emoji = EmojiCreation2.COPPER.value
