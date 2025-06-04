@@ -1,18 +1,22 @@
+import datetime
 import discord
 from discord.ext import commands
 import PIL
 from CustomEnum.TrueHeavenEnum import TrueHeavenEnum
+from CustomEnum.UserEnum import UserId
 import db.DbMongoManager as db
 import CustomFunctions
 import os
 import google.generativeai as genai
 import PIL.Image
 import asyncio
+from collections import defaultdict
 
 class AIResponseHandling():
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.bot_name = "Creation 2" if bot.user.id == 1257713292445618239 else "Creation 1"
+        self.bot_name = "Creation 2" if bot.user.id == UserId.CREATION_2.value else "Creation 1"
+        self.user_response_history = defaultdict(list)
 
     async def sub_function_ai_response(self, message: discord.Message, speakFlag: bool = True):
         if speakFlag == False: return
@@ -22,7 +26,17 @@ class AIResponseHandling():
         bots_creation_2_name = ["creation 2", "creation số 2", "creation no 2", "creatiom 2", "creation no. 2"]
         bots_creation_1_name = ["creation 1", "creation số 1", "creation no 1", "creation no. 1"]
         
-        bots_creation_name = bots_creation_2_name if self.bot.user.id == 1257713292445618239 else bots_creation_1_name
+        if message.author.id == UserId.CREATION_2.value:
+            #Nếu creation 2 tương tác với creation 1 quá nhiều thì lock lại
+            now = datetime.datetime.now()
+            history = self.user_response_history[message.author.id]
+            history = [timestamp for timestamp in history if now - timestamp < datetime.timedelta(minutes=5)]
+            history.append(now)
+            self.user_response_history[message.author.id] = history
+            if len(history) >= 5:
+                return
+        
+        bots_creation_name = bots_creation_2_name if self.bot.user.id == UserId.CREATION_2.value else bots_creation_1_name
         is_reply_message = False
         referenced_message = None
         if message.reference is not None and message.reference.resolved is not None:
