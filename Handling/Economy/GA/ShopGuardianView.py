@@ -1,3 +1,4 @@
+import copy
 import discord
 from CustomEnum.GuardianMemoryTag import GuardianMemoryTag
 from Handling.Economy.Profile.ProfileClass import Profile
@@ -52,8 +53,7 @@ class ShopGuardianView(discord.ui.View):
     @discord.ui.button(label="Mua", style=discord.ButtonStyle.green)
     async def buy_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.defer(ephemeral=False)
-        self.current_ga = self.list_ga[self.current_page]
-        
+        self.current_ga = copy.deepcopy(self.list_ga[self.current_page])
         profile_user = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
         if profile_user == None:
             await interaction.followup.send(f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True)
