@@ -1991,6 +1991,840 @@ quest_ruin_whisper = [
         next_steps=NextSteps("", "", "", "")
     )
 ]
+#region quest_abyss
+quest_abyss = [
+    GuardianQuestLines(
+        id="start",
+        title="Tiếng Gọi Từ Vực Thẳm",
+        description="Một thông điệp khẩn cấp từ một ngôi làng xa xôi đến tai bạn, nói về một vực thẳm bí ẩn đã xuất hiện, nuốt chửng ánh sáng và hy vọng. {guardian.ga_name} nhìn bạn với ánh mắt kiên định. 'Đây là một mối đe dọa. Ta tin rằng chúng ta phải hành động.'",
+        choice_a="Lập tức lên đường đến ngôi làng.",
+        choice_b="Tìm hiểu về nguồn gốc của vực thẳm.",
+        choice_c="Phớt lờ, đây không phải chuyện của mình.",
+        choice_timeout="{guardian.ga_name} cau mày. 'Thời gian là vàng bạc khi sinh mạng đang bị đe dọa, chủ nhân!'",
+        next_steps=NextSteps(
+            choice_a="travel_to_village",
+            choice_b="research_abyss_origin",
+            choice_c="ignore_abyss_outcome",
+            timeout="abyss_timeout_start"
+        ),
+        gold=20, silver=150, ga_exp=15, dignity_point=10
+    ),
+
+    GuardianQuestLines(
+        id="travel_to_village",
+        title="Trên Đường Đến Ngôi Làng",
+        description="Bạn và {guardian.ga_name} vượt qua những con đường gập ghềnh. Không khí càng gần ngôi làng càng trở nên nặng nề và lạnh lẽo. Những tiếng thì thầm vô định vờn quanh. 'Ngài có cảm nhận được không, chủ nhân? Một thứ gì đó đang gọi chúng ta,' {guardian.ga_name} thì thầm.",
+        choice_a="Tiến thẳng vào trung tâm làng.",
+        choice_b="Tìm gặp trưởng làng trước tiên.",
+        choice_c="Dò xét khu vực xung quanh vực thẳm.",
+        choice_timeout="{guardian.ga_name} hối thúc. 'Chúng ta không thể chần chừ khi những linh hồn đang đau khổ!'",
+        next_steps=NextSteps(
+            choice_a="enter_village_center",
+            choice_b="meet_village_elder",
+            choice_c="scout_abyss_area",
+            timeout="village_delay_outcome"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="research_abyss_origin",
+        title="Nghiên Cứu Về Vực Thẳm",
+        description="Bạn và {guardian.ga_name} đến thư viện cổ đại. Các cuốn sách cũ kỹ hé lộ về một thực thể cổ xưa được gọi là 'Kẻ Săn Đuổi Ánh Sáng', bị phong ấn từ lâu và giờ đây đang trỗi dậy từ vực thẳm. Để chống lại nó, cần có 'Viên Pha Lê Hồi Sinh'.",
+        choice_a="Tìm kiếm Viên Pha Lê Hồi Sinh.",
+        choice_b="Trở lại ngôi làng để đối mặt trực tiếp.",
+        choice_c="Tìm cách ngăn chặn sự trỗi dậy của Kẻ Săn Đuổi Ánh Sáng mà không cần pha lê.",
+        choice_timeout="{guardian.ga_name} nói. 'Chúng ta phải nhanh chóng, trước khi nó quá mạnh để kiểm soát!'",
+        next_steps=NextSteps(
+            choice_a="seek_revival_crystal",
+            choice_b="travel_to_village",
+            choice_c="find_way_to_stop_rise",
+            timeout="abyss_timeout_research"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="enter_village_center",
+        title="Trung Tâm Làng, Một Nơi Tan Hoang",
+        description="Bạn và {guardian.ga_name} đến trung tâm ngôi làng. Mọi thứ đổ nát, những người dân co ro trong sợ hãi, ánh mắt họ tràn ngập tuyệt vọng. Vực thẳm hiện ra như một vết thương hở trên mặt đất. {guardian.ga_name} nắm chặt tay. 'Ta cảm thấy năng lượng đen tối đang bao trùm nơi này.'",
+        choice_a="Cố gắng trấn an người dân.",
+        choice_b="Tiếp cận vực thẳm để điều tra.",
+        choice_c="Tìm kiếm dấu vết của 'Kẻ Săn Đuổi Ánh Sáng'.",
+        choice_timeout="{guardian.ga_name} thúc giục. 'Ngài phải hành động, chủ nhân! Nỗi sợ hãi đang nuốt chửng họ!'",
+        next_steps=NextSteps(
+            choice_a="comfort_villagers",
+            choice_b="approach_abyss",
+            choice_c="seek_traces_of_hunter",
+            timeout="village_panic_outcome"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="meet_village_elder",
+        title="Trưởng Làng Và Lời Tiên Tri Cổ",
+        description="Bạn và {guardian.ga_name} tìm thấy trưởng làng. Ông ấy kể về một lời tiên tri cổ xưa về 'Kẻ Săn Đuổi Ánh Sáng' và cách duy nhất để phong ấn nó là dùng 'Viên Pha Lê Hồi Sinh', được giấu trong 'Thánh Địa Lãng Quên'. 'Ngài ấy đã biết trước điều này,' {guardian.ga_name} nói, ánh mắt suy tư.",
+        choice_a="Tìm kiếm Viên Pha Lê Hồi Sinh.",
+        choice_b="Thử phong ấn vực thẳm bằng sức mạnh của mình.",
+        choice_c="Tìm kiếm thêm thông tin về Kẻ Săn Đuổi Ánh Sáng.",
+        choice_timeout="{guardian.ga_name} nói. 'Thời gian không còn nhiều, chủ nhân! Viên pha lê là hy vọng duy nhất!'",
+        next_steps=NextSteps(
+            choice_a="seek_revival_crystal",
+            choice_b="attempt_seal_abyss",
+            choice_c="seek_more_info_hunter",
+            timeout="elder_despair_outcome"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="scout_abyss_area",
+        title="Dò Xét Vùng Xung Quanh Vực Thẳm",
+        description="Bạn và {guardian.ga_name} lẩn tránh vào khu vực xung quanh vực thẳm. Bạn phát hiện ra những dấu hiệu của một ma thuật cổ xưa, và một con đường ẩn dẫn sâu vào lòng đất. {guardian.ga_name} cảnh báo. 'Cẩn thận, chủ nhân. Năng lượng ở đây rất đáng sợ.'",
+        choice_a="Đi theo con đường ẩn.",
+        choice_b="Quay lại trung tâm làng để tìm người trợ giúp.",
+        choice_c="Cố gắng phong ấn vực thẳm ngay lập tức.",
+        choice_timeout="{guardian.ga_name} lo lắng. 'Bóng tối đang lan rộng, chúng ta không thể chờ đợi!'",
+        next_steps=NextSteps(
+            choice_a="follow_hidden_path",
+            choice_b="enter_village_center",
+            choice_c="attempt_seal_abyss",
+            timeout="abyss_spreads_outcome"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="seek_revival_crystal",
+        title="Hành Trình Đến Thánh Địa Lãng Quên",
+        description="Bạn và {guardian.ga_name} bắt đầu hành trình đến Thánh Địa Lãng Quên. Con đường đầy thử thách, với những cạm bẫy cổ xưa và những sinh vật bị ảnh hưởng bởi năng lượng của vực thẳm. 'Ta sẽ luôn ở bên Ngài, chủ nhân,' {guardian.ga_name} nói, sẵn sàng đối mặt.",
+        choice_a="Vượt qua cạm bẫy một cách cẩn trọng.",
+        choice_b="Đối đầu với những sinh vật cản đường.",
+        choice_c="Tìm con đường an toàn hơn, dù mất thời gian.",
+        choice_timeout="{guardian.ga_name} thúc giục. 'Thời gian đang chống lại chúng ta! Viên pha lê rất quan trọng!'",
+        next_steps=NextSteps(
+            choice_a="overcome_traps",
+            choice_b="confront_creatures",
+            choice_c="find_safer_path",
+            timeout="crystal_lost_timeout"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="find_way_to_stop_rise",
+        title="Tìm Cách Ngăn Chặn Sự Trỗi Dậy",
+        description="Bạn và {guardian.ga_name} cố gắng tìm một phương pháp khác để ngăn chặn 'Kẻ Săn Đuổi Ánh Sáng'. Bạn phát hiện ra một nghiên cứu cũ về cách làm suy yếu thực thể này bằng cách phá hủy các cột đá cổ xung quanh vực thẳm. 'Đây là một rủi ro, nhưng có thể là cơ hội,' {guardian.ga_name} nhận định.",
+        choice_a="Tìm và phá hủy các cột đá.",
+        choice_b="Quay lại tìm Viên Pha Lê Hồi Sinh.",
+        choice_c="Thử dùng sức mạnh để đẩy lùi Kẻ Săn Đuổi Ánh Sáng.",
+        choice_timeout="{guardian.ga_name} cảnh báo. 'Sự trỗi dậy của nó đang rất nhanh! Quyết định đi, chủ nhân!'",
+        next_steps=NextSteps(
+            choice_a="destroy_ancient_pillars",
+            choice_b="seek_revival_crystal",
+            choice_c="push_back_hunter_attempt",
+            timeout="hunter_full_power_timeout"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="comfort_villagers",
+        title="An Ủi Những Kẻ Đau Khổ",
+        description="Bạn và {guardian.ga_name} dành thời gian trấn an người dân. Họ kể về những linh hồn bị kéo vào vực thẳm, và ánh sáng của họ bị hút cạn. {guardian.ga_name} cảm thấy nỗi đau của họ. 'Chúng ta phải giải thoát họ, chủ nhân. Đây là sứ mệnh của chúng ta.'",
+        choice_a="Hứa sẽ tìm cách giải thoát các linh hồn.",
+        choice_b="Hỏi về cách để phong ấn vực thẳm.",
+        choice_c="Cung cấp đồ tiếp tế cho người dân.",
+        choice_timeout="{guardian.ga_name} nói. 'Họ cần sự giúp đỡ ngay lập tức, chủ nhân!'",
+        next_steps=NextSteps(
+            choice_a="promise_to_free_spirits",
+            choice_b="meet_village_elder",
+            choice_c="provide_supplies_villagers",
+            timeout="villagers_lose_hope"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="approach_abyss",
+        title="Đối Diện Với Vực Thẳm",
+        description="Bạn và {guardian.ga_name} tiến gần vực thẳm. Một luồng khí lạnh lẽo, ghê rợn tỏa ra. Bên trong, bạn có thể thấy những hình ảnh mờ ảo của các linh hồn đang bị giam cầm. {guardian.ga_name} đặt tay lên vai bạn. 'Ta sẽ bảo vệ Ngài, chủ nhân.'",
+        choice_a="Cố gắng giao tiếp với các linh hồn.",
+        choice_b="Phân tích năng lượng của vực thẳm.",
+        choice_c="Thử ném một vật xuống để kiểm tra độ sâu.",
+        choice_timeout="{guardian.ga_name} cảnh báo. 'Đừng chần chừ, chủ nhân. Mọi thứ đang bị nuốt chửng!'",
+        next_steps=NextSteps(
+            choice_a="communicate_with_spirits",
+            choice_b="analyze_abyss_energy",
+            choice_c="throw_object_into_abyss",
+            timeout="abyss_grows_stronger"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="seek_traces_of_hunter",
+        title="Dấu Vết Của Kẻ Săn Đuổi Ánh Sáng",
+        description="Bạn và {guardian.ga_name} tìm kiếm xung quanh trung tâm làng. Bạn phát hiện ra những dấu vết kỳ lạ, như thể năng lượng sống đã bị hút cạn khỏi mặt đất. Dấu vết dẫn đến một hang động ẩn gần đó. 'Kẻ Săn Đuổi Ánh Sáng đang ở gần đây,' {guardian.ga_name} nói với giọng căng thẳng.",
+        choice_a="Tiến vào hang động.",
+        choice_b="Quay lại gặp trưởng làng để hỏi thêm.",
+        choice_c="Tìm cách chuẩn bị cho cuộc đối đầu.",
+        choice_timeout="{guardian.ga_name} thúc giục. 'Chúng ta phải đối mặt với nó, chủ nhân!'",
+        next_steps=NextSteps(
+            choice_a="enter_hunter_cave",
+            choice_b="meet_village_elder",
+            choice_c="prepare_for_confrontation",
+            timeout="hunter_escapes_outcome"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="attempt_seal_abyss",
+        title="Cố Gắng Phong Ấn Vực Thẳm",
+        description="Bạn và {guardian.ga_name} cố gắng phong ấn vực thẳm bằng sức mạnh của mình. Tuy nhiên, năng lượng đen tối quá mạnh, và vực thẳm kháng cự dữ dội. {guardian.ga_name} bị đẩy lùi, đau đớn. 'Nó quá mạnh, chủ nhân! Ta không thể cầm cự được!'",
+        choice_a="Rút lui và tìm cách khác.",
+        choice_b="Cố gắng tiếp tục phong ấn, bất chấp rủi ro.",
+        choice_c="Tìm kiếm Viên Pha Lê Hồi Sinh.",
+        choice_timeout="{guardian.ga_name} hét lên. 'Ngài sẽ bị nuốt chửng nếu cứ tiếp tục, chủ nhân!'",
+        next_steps=NextSteps(
+            choice_a="retreat_from_abyss_attempt_failed",
+            choice_b="continue_seal_attempt_fail",
+            choice_c="seek_revival_crystal",
+            timeout="abyss_consumes_you"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="seek_more_info_hunter",
+        title="Tìm Kiếm Thêm Thông Tin Về Kẻ Săn Đuổi",
+        description="Bạn và {guardian.ga_name} quay lại thư viện. Bạn tìm thấy một cuộn giấy cổ mô tả 'Kẻ Săn Đuổi Ánh Sáng' là một thực thể cô đơn, bị giam cầm trong sự vĩnh cửu. Để giải thoát nó, cần phải đưa nó trở lại nguồn gốc của sự sáng tạo. 'Đây là một cách tiếp cận khác, chủ nhân,' {guardian.ga_name} suy nghĩ.",
+        choice_a="Tìm cách đưa Kẻ Săn Đuổi Ánh Sáng trở lại nguồn gốc.",
+        choice_b="Quay lại tìm Viên Pha Lê Hồi Sinh.",
+        choice_c="Thử giao tiếp với Kẻ Săn Đuổi Ánh Sáng.",
+        choice_timeout="{guardian.ga_name} nói. 'Chúng ta không có thời gian để tìm kiếm nữa! Hãy quyết định đi!'",
+        next_steps=NextSteps(
+            choice_a="return_hunter_to_source",
+            choice_b="seek_revival_crystal",
+            choice_c="communicate_with_hunter",
+            timeout="hunter_becomes_uncontrollable"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="follow_hidden_path",
+        title="Con Đường Dẫn Lối Xuống Địa Ngục",
+        description="Bạn và {guardian.ga_name} đi theo con đường ẩn. Nó dẫn sâu xuống lòng đất, qua những đường hầm tối tăm và ẩm ướt. Tiếng gầm gừ yếu ớt vọng lại từ phía trước. {guardian.ga_name} chuẩn bị sẵn sàng. 'Sắp tới nơi rồi, chủ nhân.'",
+        choice_a="Tiếp tục đi thẳng.",
+        choice_b="Tìm một lối thoát khác.",
+        choice_c="Kiểm tra xem có bất kỳ cạm bẫy nào không.",
+        choice_timeout="{guardian.ga_name} thúc giục. 'Chúng ta không thể chần chừ ở đây!'",
+        next_steps=NextSteps(
+            choice_a="continue_straight_in_path",
+            choice_b="find_alternative_exit_path",
+            choice_c="check_for_traps_hidden_path",
+            timeout="path_collapses_timeout"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="overcome_traps",
+        title="Vượt Qua Cạm Bẫy",
+        description="Bạn và {guardian.ga_name} khéo léo vượt qua những cạm bẫy cổ xưa. Có những mũi tên độc, những hố sụt và những bức tường di chuyển. {guardian.ga_name} sử dụng khả năng của mình để hóa giải chúng. 'May mắn là ta đã luôn cảnh giác, chủ nhân,' {guardian.ga_name} nói.",
+        choice_a="Tiếp tục tiến vào Thánh Địa Lãng Quên.",
+        choice_b="", choice_c="", choice_timeout="",
+        next_steps=NextSteps("enter_forgotten_sanctuary", "", "", "")
+    ),
+
+    GuardianQuestLines(
+        id="confront_creatures",
+        title="Đối Đầu Với Sinh Vật Biến Dạng",
+        description="Bạn và {guardian.ga_name} đối đầu với những sinh vật bị ảnh hưởng bởi năng lượng của vực thẳm. Chúng hung hãn và mạnh mẽ, nhưng bạn và {guardian.ga_name} phối hợp ăn ý để đánh bại chúng. 'Chúng ta đã vượt qua, chủ nhân,' {guardian.ga_name} thở hổn hển.",
+        choice_a="Tiếp tục tiến vào Thánh Địa Lãng Quên.",
+        choice_b="", choice_c="", choice_timeout="",
+        ga_exp=50, dignity_point=5,
+        next_steps=NextSteps("enter_forgotten_sanctuary", "", "", "")
+    ),
+
+    GuardianQuestLines(
+        id="find_safer_path",
+        title="Tìm Con Đường An Toàn Hơn",
+        description="Bạn và {guardian.ga_name} dành thêm thời gian để tìm một con đường an toàn hơn. Tuy mất thời gian, nhưng bạn tránh được nhiều rủi ro. 'Sự cẩn trọng luôn là cần thiết, chủ nhân,' {guardian.ga_name} nói.",
+        choice_a="Tiếp tục tiến vào Thánh Địa Lãng Quên.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold= -50, silver=-200, ga_exp=-20,
+        next_steps=NextSteps("enter_forgotten_sanctuary", "", "", "")
+    ),
+
+    GuardianQuestLines(
+        id="destroy_ancient_pillars",
+        title="Phá Hủy Các Cột Đá Cổ",
+        description="Bạn và {guardian.ga_name} tìm thấy các cột đá cổ xung quanh vực thẳm. Chúng phát ra một năng lượng đen tối. Bạn và {guardian.ga_name} bắt đầu phá hủy chúng. Khi cột đá cuối cùng đổ sập, một luồng năng lượng hỗn loạn bùng lên, làm suy yếu 'Kẻ Săn Đuổi Ánh Sáng' nhưng cũng khiến nó trở nên điên loạn. 'Nó đang trở nên nguy hiểm hơn!' {guardian.ga_name} hét lên.",
+        choice_a="Chuẩn bị đối đầu với Kẻ Săn Đuổi Ánh Sáng đã bị suy yếu.",
+        choice_b="Tìm cách phong ấn nó ngay lập tức.",
+        choice_c="",
+        choice_timeout="{guardian.ga_name} thúc giục. 'Chúng ta không có thời gian để chần chừ!'",
+        next_steps=NextSteps(
+            choice_a="confront_weakened_hunter",
+            choice_b="attempt_seal_abyss",
+            choice_c="",
+            timeout="hunter_rampage_timeout"
+        ),
+        gold=100, silver=300, ga_exp=75, dignity_point=10
+    ),
+
+    GuardianQuestLines(
+        id="promise_to_free_spirits",
+        title="Lời Hứa Với Linh Hồn",
+        description="Bạn hứa với người dân sẽ giải thoát các linh hồn bị giam cầm. Lời hứa mang lại một chút hy vọng cho họ. {guardian.ga_name} gật đầu. 'Một lời hứa là một lời hứa, chủ nhân. Ta tin tưởng Ngài.'",
+        choice_a="Tìm kiếm cách để giải thoát linh hồn (tìm Viên Pha Lê Hồi Sinh).",
+        choice_b="Thử phong ấn vực thẳm.",
+        choice_c="",
+        choice_timeout="{guardian.ga_name} nhắc nhở. 'Ngài đã hứa, chủ nhân! Hãy hành động!'",
+        next_steps=NextSteps(
+            choice_a="seek_revival_crystal",
+            choice_b="attempt_seal_abyss",
+            choice_c="",
+            timeout="villagers_lose_hope"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="provide_supplies_villagers",
+        title="Cung Cấp Đồ Tiếp Tế",
+        description="Bạn và {guardian.ga_name} chia sẻ một phần vật phẩm mang theo cho người dân. Họ biết ơn, nhưng ánh mắt vẫn lộ rõ vẻ tuyệt vọng trước vực thẳm. {guardian.ga_name} thở dài. 'Giúp đỡ vật chất là cần thiết, nhưng nỗi sợ hãi vẫn còn đó.'",
+        choice_a="Tìm cách giải quyết vấn đề vực thẳm.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=-50, silver=-100, dignity_point=5,
+        next_steps=NextSteps("enter_village_center", "", "", "")
+    ),
+
+    GuardianQuestLines(
+        id="communicate_with_spirits",
+        title="Giao Tiếp Với Linh Hồn",
+        description="Bạn cố gắng giao tiếp với các linh hồn trong vực thẳm. Họ truyền đạt những hình ảnh về 'Kẻ Săn Đuổi Ánh Sáng' và sự đau khổ mà nó gây ra. Họ cũng nhắc đến 'Viên Pha Lê Hồi Sinh' là hy vọng cuối cùng. 'Ngài đã nghe thấy họ, chủ nhân,' {guardian.ga_name} nói, ánh mắt nặng trĩu.",
+        choice_a="Tìm kiếm Viên Pha Lê Hồi Sinh.",
+        choice_b="Thử thanh tẩy linh hồn bằng phép thuật.",
+        choice_c="Tìm cách phong ấn vực thẳm.",
+        choice_timeout="{guardian.ga_name} thúc giục. 'Linh hồn đang dần yếu đi!'",
+        next_steps=NextSteps(
+            choice_a="seek_revival_crystal",
+            choice_b="purify_abyss_spirits_attempt",
+            choice_c="attempt_seal_abyss",
+            timeout="spirits_fade_in_abyss"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="analyze_abyss_energy",
+        title="Phân Tích Năng Lượng Vực Thẳm",
+        description="Bạn và {guardian.ga_name} phân tích năng lượng tỏa ra từ vực thẳm. Đó là một sự kết hợp của ma thuật bóng tối và năng lượng của sự tuyệt vọng. {guardian.ga_name} nhận ra. 'Đây là năng lượng của một thực thể cổ xưa, nó đang hút cạn sự sống.'",
+        choice_a="Tìm cách đối phó với thực thể này.",
+        choice_b="Tìm kiếm Viên Pha Lê Hồi Sinh.",
+        choice_c="Rút lui để tìm hiểu thêm.",
+        choice_timeout="{guardian.ga_name} thúc giục. 'Nó đang mạnh lên, chủ nhân!'",
+        next_steps=NextSteps(
+            choice_a="seek_traces_of_hunter",
+            choice_b="seek_revival_crystal",
+            choice_c="retreat_from_abyss_attempt_failed",
+            timeout="abyss_grows_stronger"
+        )
+    ),
+
+    GuardianQuestLines(
+        id="throw_object_into_abyss",
+        title="Vật Thể Rơi Vào Vực Thẳm",
+        description="Bạn ném một viên đá xuống vực thẳm. Âm thanh kéo dài mãi mãi, không chạm đáy. Không có gì phản ứng, chỉ có một cảm giác trống rỗng đáng sợ. 'Nó vô tận... và đó là một cảnh báo,' {guardian.ga_name} thì thầm.",
+        choice_a="Cảm thấy bất lực. Quay lại tìm cách khác.",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-5, ga_exp=-20,
+        next_steps=NextSteps("enter_village_center", "", "", "")
+    ),
+
+    GuardianQuestLines(
+        id="enter_hunter_cave",
+        title="Hang Động Của Kẻ Săn Đuổi",
+        description="Bạn và {guardian.ga_name} tiến vào hang động. Bên trong, một luồng năng lượng đen tối cuồn cuộn. Ở trung tâm, bạn thấy một hình bóng mờ ảo, lớn dần lên – đó là 'Kẻ Săn Đuổi Ánh Sáng'. 'Nó đây rồi, chủ nhân! Hãy chuẩn bị!' {guardian.ga_name} cảnh báo.",
+        choice_a="Trực tiếp tấn công Kẻ Săn Đuổi Ánh Sáng.",
+        choice_b="Tìm điểm yếu của nó.",
+        choice_c="Cố gắng phong ấn nó ngay lập tức.",
+        choice_timeout="{guardian.ga_name} hét lên. 'Đừng chần chừ! Nó đang trỗi dậy!'",
+        next_steps=NextSteps(
+            choice_a="attack_hunter_directly",
+            choice_b="find_hunter_weakness",
+            choice_c="attempt_seal_abyss",
+            timeout="hunter_becomes_uncontrollable"
+        ),
+        gold=50, silver=200
+    ),
+
+    GuardianQuestLines(
+        id="prepare_for_confrontation",
+        title="Chuẩn Bị Đối Đầu",
+        description="Bạn và {guardian.ga_name} dành thời gian để chuẩn bị, kiểm tra trang bị và lập kế hoạch tấn công. 'Sự chuẩn bị kỹ lưỡng sẽ tăng cơ hội thành công của chúng ta, chủ nhân,' {guardian.ga_name} nói. 'Ta tin vào Ngài.'",
+        choice_a="Tiến vào hang động của Kẻ Săn Đuổi Ánh Sáng.",
+        choice_b="Tìm kiếm thêm thông tin về Kẻ Săn Đuổi.",
+        choice_c="",
+        choice_timeout="{guardian.ga_name} thúc giục. 'Thời gian không cho phép chúng ta chờ đợi quá lâu!'",
+        next_steps=NextSteps(
+            choice_a="enter_hunter_cave",
+            choice_b="seek_more_info_hunter",
+            choice_c="",
+            timeout="hunter_escapes_outcome"
+        ),
+        ga_exp=20, dignity_point=5
+    ),
+
+    GuardianQuestLines(
+        id="return_hunter_to_source",
+        title="Đưa Kẻ Săn Đuổi Trở Về Nguồn Gốc",
+        description="Bạn và {guardian.ga_name} nghiên cứu cách đưa 'Kẻ Săn Đuổi Ánh Sáng' trở về nguồn gốc của sự sáng tạo. Điều này đòi hỏi một nghi thức cổ xưa và sự hy sinh lớn. 'Đây là một con đường khó khăn, chủ nhân, nhưng có thể mang lại sự bình yên thực sự,' {guardian.ga_name} nói với vẻ mặt nghiêm trọng.",
+        choice_a="Thực hiện nghi thức cổ xưa.",
+        choice_b="Tìm kiếm một giải pháp ít rủi ro hơn.",
+        choice_c="Đối đầu với Kẻ Săn Đuổi Ánh Sáng bằng vũ lực.",
+        choice_timeout="{guardian.ga_name} nói. 'Chúng ta không thể chần chừ được nữa, chủ nhân. Nghi thức phải được thực hiện!'",
+        next_steps=NextSteps(
+            choice_a="perform_ancient_ritual",
+            choice_b="seek_revival_crystal",
+            choice_c="attack_hunter_directly",
+            timeout="ritual_fail_hunter_unleashed"
+        ),
+        ga_exp=100, dignity_point=15
+    ),
+
+    GuardianQuestLines(
+        id="communicate_with_hunter",
+        title="Trò Chuyện Với Kẻ Săn Đuổi Ánh Sáng",
+        description="Bạn cố gắng giao tiếp với 'Kẻ Săn Đuổi Ánh Sáng'. Trong một khoảnh khắc ngắn ngủi, bạn cảm nhận được nỗi cô đơn và giận dữ sâu sắc của nó. Nó từng là một linh hồn bị bỏ rơi, bị nuốt chửng bởi bóng tối. 'Nó chỉ muốn được giải thoát, chủ nhân,' {guardian.ga_name} thì thầm, ánh mắt buồn bã.",
+        choice_a="Tìm cách giải thoát nó khỏi sự giam cầm.",
+        choice_b="Cố gắng thanh tẩy nó.",
+        choice_c="Tấn công nó khi nó yếu đuối.",
+        choice_timeout="{guardian.ga_name} cảnh báo. 'Nó đang trở nên bất ổn! Nhanh lên, chủ nhân!'",
+        next_steps=NextSteps(
+            choice_a="return_hunter_to_source",
+            choice_b="purify_abyss_spirits_attempt",
+            choice_c="attack_hunter_directly",
+            timeout="hunter_anger_escalates"
+        ),
+        ga_exp=50, dignity_point=10
+    ),
+
+    GuardianQuestLines(
+        id="continue_straight_in_path",
+        title="Tiến Sâu Vào Lòng Đất",
+        description="Bạn và {guardian.ga_name} tiếp tục tiến thẳng. Con đường dẫn đến một hang động khổng lồ, nơi trung tâm là một đài thờ cổ. Trên đài thờ, Viên Pha Lê Hồi Sinh đang phát sáng yếu ớt, bị bao quanh bởi một hàng rào năng lượng đen tối. 'Đó là nó, chủ nhân!' {guardian.ga_name} reo lên.",
+        choice_a="Tiếp cận và lấy Viên Pha Lê Hồi Sinh.",
+        choice_b="Phân tích hàng rào năng lượng trước.",
+        choice_c="Tìm cách vô hiệu hóa hàng rào năng lượng.",
+        choice_timeout="{guardian.ga_name} thúc giục. 'Nó đang bị suy yếu! Nhanh lên, chủ nhân!'",
+        next_steps=NextSteps(
+            choice_a="take_revival_crystal",
+            choice_b="analyze_energy_barrier",
+            choice_c="deactivate_energy_barrier",
+            timeout="crystal_corrupts_timeout"
+        ),
+        gold=75, silver=250
+    ),
+
+    # Endings and Failures
+    GuardianQuestLines(
+        id="enter_forgotten_sanctuary",
+        title="Bên Trong Thánh Địa Lãng Quên",
+        description="Bạn và {guardian.ga_name} tiến vào Thánh Địa Lãng Quên. Nơi đây từng là một trung tâm của ánh sáng, giờ bị bao phủ bởi bóng tối. Ở trung tâm là một bệ đá cổ, nơi Viên Pha Lê Hồi Sinh đang phát ra ánh sáng mờ nhạt, bị kiềm hãm bởi những sợi xích năng lượng. 'Chúng ta đã tìm thấy nó, chủ nhân!' {guardian.ga_name} nói, ánh mắt kiên quyết.",
+        choice_a="Giải phóng Viên Pha Lê Hồi Sinh.",
+        choice_b="Quan sát xung quanh để tìm hiểu thêm.",
+        choice_c="Thử phá hủy các sợi xích năng lượng.",
+        choice_timeout="{guardian.ga_name} thúc giục. 'Thời gian không còn nhiều, chủ nhân! Viên pha lê đang bị nuốt chửng!'",
+        next_steps=NextSteps(
+            choice_a="free_revival_crystal",
+            choice_b="observe_sanctuary",
+            choice_c="break_energy_chains",
+            timeout="crystal_corrupts_timeout"
+        ),
+        gold=150, silver=500, ga_exp=100
+    ),
+
+    GuardianQuestLines(
+        id="confront_weakened_hunter",
+        title="Đối Đầu Với Kẻ Săn Đuổi Bị Suy Yếu",
+        description="Bạn và {guardian.ga_name} đối đầu với 'Kẻ Săn Đuổi Ánh Sáng' đã bị suy yếu. Nó gầm lên trong giận dữ và điên loạn, tấn công bạn một cách vô định. Bạn và {guardian.ga_name} phối hợp ăn ý, lợi dụng sự hỗn loạn của nó để giáng đòn quyết định. 'Đây là lúc kết thúc, chủ nhân!' {guardian.ga_name} hét lên.",
+        choice_a="Giáng đòn cuối cùng.",
+        choice_b="Cố gắng phong ấn nó một lần nữa.",
+        choice_c="",
+        choice_timeout="{guardian.ga_name} cảnh báo. 'Nó đang hồi phục, chủ nhân!'",
+        next_steps=NextSteps(
+            choice_a="deliver_final_blow_hunter",
+            choice_b="attempt_seal_abyss",
+            choice_c="",
+            timeout="hunter_full_power_timeout"
+        ),
+        gold=300, silver=800, ga_exp=150, dignity_point=20
+    ),
+
+    GuardianQuestLines(
+        id="deliver_final_blow_hunter",
+        title="Cú Đánh Cuối Cùng",
+        description="Bạn và {guardian.ga_name} giáng đòn cuối cùng. 'Kẻ Săn Đuổi Ánh Sáng' gầm lên một tiếng cuối cùng rồi tan biến vào hư vô. Vực thẳm bắt đầu thu hẹp, và ánh sáng trở lại ngôi làng. {guardian.ga_name} mỉm cười. 'Chúng ta đã thành công, chủ nhân. Những linh hồn đã được giải thoát.'",
+        choice_a="Nhiệm vụ hoàn thành! Ngôi làng được cứu rỗi.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=1000, silver=3000, ga_exp=500, dignity_point=50, ga_health=100, ga_mana=100, ga_stamina=100,
+        next_steps=NextSteps("quest_success_end_4", "quest_success_end_4", "quest_success_end_4", "quest_success_end_4")
+    ),
+
+    GuardianQuestLines(
+        id="free_revival_crystal",
+        title="Giải Phóng Viên Pha Lê Hồi Sinh",
+        description="Bạn và {guardian.ga_name} giải phóng Viên Pha Lê Hồi Sinh khỏi những sợi xích năng lượng. Pha lê phát ra ánh sáng chói lọi, xua tan bóng tối trong Thánh Địa. {guardian.ga_name} cầm viên pha lê, ánh mắt rạng rỡ. 'Chúng ta hãy mang nó trở lại vực thẳm!'",
+        choice_a="Mang Viên Pha Lê Hồi Sinh trở lại vực thẳm.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=200, silver=600, ga_exp=120, dignity_point=15,
+        next_steps=NextSteps("return_to_abyss_with_crystal", "", "", "")
+    ),
+
+    GuardianQuestLines(
+        id="observe_sanctuary",
+        title="Quan Sát Thánh Địa",
+        description="Bạn và {guardian.ga_name} quan sát Thánh Địa Lãng Quên. Bạn nhận ra rằng những sợi xích năng lượng đang kiềm hãm viên pha lê được kết nối với các trụ đá xung quanh, có thể vô hiệu hóa từ xa. 'Nếu chúng ta phá hủy các trụ đá, viên pha lê sẽ được giải phóng,' {guardian.ga_name} nói.",
+        choice_a="Phá hủy các trụ đá.",
+        choice_b="Cố gắng giải phóng viên pha lê trực tiếp.",
+        choice_c="",
+        choice_timeout="{guardian.ga_name} thúc giục. 'Thời gian không còn nhiều!'",
+        next_steps=NextSteps(
+            choice_a="destroy_sanctuary_pillars",
+            choice_b="free_revival_crystal",
+            choice_c="",
+            timeout="crystal_corrupts_timeout"
+        ),
+        ga_exp=30
+    ),
+
+    GuardianQuestLines(
+        id="break_energy_chains",
+        title="Phá Vỡ Xích Năng Lượng",
+        description="Bạn và {guardian.ga_name} cố gắng phá vỡ các sợi xích năng lượng trực tiếp. Năng lượng phản vệ mạnh mẽ, khiến bạn và {guardian.ga_name} bị tổn thương nhẹ. 'Chúng ta cần một cách khác, chủ nhân,' {guardian.ga_name} nói với vẻ đau đớn.",
+        choice_a="Tìm một cách khác để giải phóng pha lê.",
+        choice_b="", choice_c="", choice_timeout="",
+        ga_exp=-30, ga_health=-10, ga_mana=-10, ga_stamina=-10,
+        next_steps=NextSteps("observe_sanctuary", "", "", "")
+    ),
+
+    GuardianQuestLines(
+        id="destroy_sanctuary_pillars",
+        title="Phá Hủy Các Trụ Đá",
+        description="Bạn và {guardian.ga_name} tìm và phá hủy các trụ đá xung quanh Thánh Địa. Mỗi khi một trụ đá sụp đổ, một luồng ánh sáng từ Viên Pha Lê Hồi Sinh lại mạnh thêm. Khi trụ cuối cùng đổ xuống, pha lê hoàn toàn được giải phóng. 'Giờ thì nó đã sẵn sàng!' {guardian.ga_name} reo lên.",
+        choice_a="Mang Viên Pha Lê Hồi Sinh trở lại vực thẳm.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=100, silver=400, ga_exp=80, dignity_point=10,
+        next_steps=NextSteps("return_to_abyss_with_crystal", "", "", "")
+    ),
+
+    GuardianQuestLines(
+        id="return_to_abyss_with_crystal",
+        title="Sức Mạnh Của Sự Hồi Sinh",
+        description="Bạn và {guardian.ga_name} mang Viên Pha Lê Hồi Sinh trở lại vực thẳm. Khi bạn đặt viên pha lê vào trung tâm của vực thẳm, một luồng ánh sáng mạnh mẽ bùng nổ, xua tan bóng tối và phong ấn 'Kẻ Săn Đuổi Ánh Sáng' một lần nữa, đồng thời giải thoát các linh hồn bị giam cầm. Ngôi làng được bao phủ bởi ánh sáng và hy vọng.",
+        choice_a="Nhiệm vụ hoàn thành! Ngôi làng được cứu rỗi.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=1000, silver=3000, ga_exp=500, dignity_point=50, ga_health=100, ga_mana=100, ga_stamina=100,
+        next_steps=NextSteps("quest_success_end_4", "quest_success_end_4", "quest_success_end_4", "quest_success_end_4")
+    ),
+
+    GuardianQuestLines(
+        id="take_revival_crystal",
+        title="Thu Nhận Viên Pha Lê Hồi Sinh",
+        description="Bạn và {guardian.ga_name} tiếp cận đài thờ và lấy Viên Pha Lê Hồi Sinh. Khi pha lê nằm trong tay bạn, một luồng năng lượng thuần khiết bao trùm lấy bạn. 'Đây là hy vọng của chúng ta, chủ nhân,' {guardian.ga_name} nói với vẻ mặt nhẹ nhõm.",
+        choice_a="Mang Viên Pha Lê Hồi Sinh trở lại vực thẳm.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=200, silver=600, ga_exp=120, dignity_point=15,
+        next_steps=NextSteps("return_to_abyss_with_crystal", "", "", "")
+    ),
+
+    GuardianQuestLines(
+        id="analyze_energy_barrier",
+        title="Phân Tích Hàng Rào Năng Lượng",
+        description="Bạn và {guardian.ga_name} phân tích hàng rào năng lượng đen tối bao quanh Viên Pha Lê Hồi Sinh. Nó là một kết cấu phức tạp của ma thuật bóng tối, được liên kết với sự tuyệt vọng của các linh hồn. 'Nếu chúng ta hóa giải sự tuyệt vọng của các linh hồn, hàng rào này sẽ suy yếu,' {guardian.ga_name} nhận định.",
+        choice_a="Tìm cách làm dịu các linh hồn xung quanh vực thẳm.",
+        choice_b="Cố gắng phá vỡ hàng rào bằng vũ lực.",
+        choice_c="",
+        choice_timeout="{guardian.ga_name} thúc giục. 'Thời gian không còn nhiều!'",
+        next_steps=NextSteps(
+            choice_a="communicate_with_spirits",
+            choice_b="break_energy_chains",
+            choice_c="",
+            timeout="crystal_corrupts_timeout"
+        ),
+        ga_exp=30
+    ),
+
+    GuardianQuestLines(
+        id="deactivate_energy_barrier",
+        title="Vô Hiệu Hóa Hàng Rào Năng Lượng",
+        description="Bạn và {guardian.ga_name} tìm ra một điểm yếu trong hàng rào năng lượng và vô hiệu hóa nó. Hàng rào tan biến, để lộ Viên Pha Lê Hồi Sinh hoàn toàn. 'Giờ thì nó đã sẵn sàng!' {guardian.ga_name} reo lên.",
+        choice_a="Lấy Viên Pha Lê Hồi Sinh.",
+        choice_b="", choice_c="", choice_timeout="",
+        gold=100, silver=400, ga_exp=80, dignity_point=10,
+        next_steps=NextSteps("take_revival_crystal", "", "", "")
+    ),
+
+    GuardianQuestLines(
+        id="purify_abyss_spirits_attempt",
+        title="Thanh Tẩy Linh Hồn Vực Thẳm",
+        description="Bạn cố gắng thanh tẩy các linh hồn trong vực thẳm bằng phép thuật. Một vài linh hồn yếu ớt được giải thoát, nhưng đa số vẫn bị giam cầm. 'Nó quá lớn, chủ nhân. Chúng ta cần một sức mạnh lớn hơn để giải thoát tất cả,' {guardian.ga_name} nói buồn bã.",
+        choice_a="Tìm kiếm Viên Pha Lê Hồi Sinh để thanh tẩy hoàn toàn.",
+        choice_b="Rút lui và tìm cách khác.",
+        choice_c="",
+        choice_timeout="{guardian.ga_name} thở dài. 'Nỗ lực của chúng ta là vô ích nếu không có phương tiện phù hợp!'",
+        next_steps=NextSteps(
+            choice_a="seek_revival_crystal",
+            choice_b="retreat_from_abyss_attempt_failed",
+            choice_c="",
+            timeout="spirits_fade_in_abyss"
+        ),
+        ga_exp=50, dignity_point=5
+    ),
+
+    # Failures
+    GuardianQuestLines(
+        id="ignore_abyss_outcome",
+        title="Vực Thẳm Lan Rộng",
+        description="Bạn quyết định phớt lờ lời kêu gọi. Vài ngày sau, vực thẳm lan rộng, nuốt chửng ngôi làng và đe dọa cả vùng đất. {guardian.ga_name} nhìn bạn với vẻ thất vọng sâu sắc. 'Ngài đã từ bỏ họ, chủ nhân.'",
+        choice_a="Hối hận và nhận ra sai lầm. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-20, ga_exp=-100, silver=-200, gold=-100,
+        next_steps=NextSteps("quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4")
+    ),
+
+    GuardianQuestLines(
+        id="abyss_timeout_start",
+        title="Sự Chần Chừ Ngu Ngốc",
+        description="Bạn chần chừ quá lâu khi quyết định hành động. Vực thẳm nhanh chóng nuốt chửng ngôi làng. {guardian.ga_name} nhìn bạn với vẻ mặt lạnh lùng. 'Sự thiếu quyết đoán của Ngài đã phải trả giá bằng cả một ngôi làng, chủ nhân.'",
+        choice_a="Cảm thấy bất lực và tội lỗi. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-15, ga_exp=-80, silver=-150, gold=-75,
+        next_steps=NextSteps("quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4")
+    ),
+
+    GuardianQuestLines(
+        id="village_delay_outcome",
+        title="Làng Đã Quá Muộn",
+        description="Bạn và {guardian.ga_name} đến ngôi làng nhưng đã quá muộn. Vực thẳm đã nuốt chửng gần hết, chỉ còn lại những tàn tích đau thương. {guardian.ga_name} cúi đầu. 'Chúng ta đã không thể cứu họ.'",
+        choice_a="Cảm thấy hối tiếc. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-10, ga_exp=-50, silver=-100, gold=-50,
+        next_steps=NextSteps("quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4")
+    ),
+
+    GuardianQuestLines(
+        id="abyss_timeout_research",
+        title="Kẻ Săn Đuổi Trỗi Dậy Hoàn Toàn",
+        description="Bạn và {guardian.ga_name} dành quá nhiều thời gian nghiên cứu. 'Kẻ Săn Đuổi Ánh Sáng' trỗi dậy hoàn toàn từ vực thẳm, sức mạnh của nó lan tỏa khắp vùng đất. {guardian.ga_name} nhìn bạn với vẻ mặt tuyệt vọng. 'Đã quá muộn rồi, chủ nhân. Nó đã quá mạnh để bị ngăn chặn.'",
+        choice_a="Đối mặt với hậu quả khủng khiếp. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-20, ga_exp=-150, silver=-300, gold=-150,
+        next_steps=NextSteps("quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4")
+    ),
+
+    GuardianQuestLines(
+        id="village_panic_outcome",
+        title="Nỗi Sợ Hãi Chế Ngự Làng",
+        description="Bạn chần chừ quá lâu khi ở trung tâm làng. Nỗi sợ hãi của người dân lên đến đỉnh điểm, họ trở nên hoảng loạn và chạy tán loạn, bị năng lượng từ vực thẳm nuốt chửng từng người một. 'Nỗi sợ hãi đã chiến thắng, chủ nhân,' {guardian.ga_name} nói với vẻ mặt đau đớn.",
+        choice_a="Cảm thấy bất lực. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-10, ga_exp=-60, silver=-120, gold=-60,
+        next_steps=NextSteps("quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4")
+    ),
+
+    GuardianQuestLines(
+        id="elder_despair_outcome",
+        title="Trưởng Làng Tuyệt Vọng",
+        description="Bạn không đưa ra quyết định kịp thời. Trưởng làng gục xuống, đôi mắt trống rỗng vì tuyệt vọng. Ông ấy không còn tin vào bất kỳ hy vọng nào nữa. 'Ngài đã đánh mất niềm tin của họ, chủ nhân,' {guardian.ga_name} thở dài.",
+        choice_a="Cảm thấy hối tiếc. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-10, ga_exp=-50, silver=-100, gold=-50,
+        next_steps=NextSteps("quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4")
+    ),
+
+    GuardianQuestLines(
+        id="abyss_spreads_outcome",
+        title="Vực Thẳm Không Ngừng Lan Rộng",
+        description="Bạn chần chừ khi dò xét khu vực. Vực thẳm bắt đầu lan rộng nhanh chóng, nuốt chửng cả khu rừng và những con đường xung quanh. 'Chúng ta đã lãng phí thời gian, chủ nhân. Giờ đây nó đã vượt ra ngoài tầm kiểm soát,' {guardian.ga_name} nói với vẻ mặt căng thẳng.",
+        choice_a="Cảm thấy bất lực. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-15, ga_exp=-80, silver=-150, gold=-75,
+        next_steps=NextSteps("quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4")
+    ),
+
+    GuardianQuestLines(
+        id="crystal_lost_timeout",
+        title="Viên Pha Lê Mất Tích",
+        description="Bạn và {guardian.ga_name} chần chừ quá lâu trên đường đến Thánh Địa Lãng Quên. Khi đến nơi, Viên Pha Lê Hồi Sinh đã biến mất, có lẽ bị 'Kẻ Săn Đuổi Ánh Sáng' hấp thụ. 'Hy vọng của chúng ta đã tan biến rồi, chủ nhân,' {guardian.ga_name} nói buồn bã.",
+        choice_a="Tuyệt vọng. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-15, ga_exp=-100, silver=-200, gold=-100,
+        next_steps=NextSteps("quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4")
+    ),
+
+    GuardianQuestLines(
+        id="hunter_full_power_timeout",
+        title="Kẻ Săn Đuổi Mạnh Mẽ",
+        description="Bạn chần chừ quá lâu khi cố gắng ngăn chặn sự trỗi dậy của 'Kẻ Săn Đuổi Ánh Sáng'. Nó đã đạt đến sức mạnh tối đa, trở thành một thực thể hủy diệt không thể ngăn cản. 'Không còn cách nào để cứu vãn nữa, chủ nhân,' {guardian.ga_name} nói với vẻ mặt tuyệt vọng.",
+        choice_a="Đối mặt với sự hủy diệt. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-20, ga_exp=-150, silver=-300, gold=-150,
+        next_steps=NextSteps("quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4")
+    ),
+
+    GuardianQuestLines(
+        id="villagers_lose_hope",
+        title="Người Dân Mất Hết Hy Vọng",
+        description="Bạn chần chừ trong việc đưa ra lời hứa hoặc hành động cho người dân. Nỗi sợ hãi và tuyệt vọng của họ tăng lên đến mức không thể kiểm soát. 'Họ đã mất hết hy vọng, chủ nhân,' {guardian.ga_name} nói với vẻ mặt buồn bã.",
+        choice_a="Cảm thấy tội lỗi. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-10, ga_exp=-50, silver=-100, gold=-50,
+        next_steps=NextSteps("quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4")
+    ),
+
+    GuardianQuestLines(
+        id="abyss_grows_stronger",
+        title="Vực Thẳm Càng Mạnh Hơn",
+        description="Bạn chần chừ khi tiếp cận vực thẳm. Năng lượng của nó cuộn trào mạnh mẽ hơn, nuốt chửng nhiều linh hồn và vật chất xung quanh. 'Nó đang trở nên không thể kiểm soát, chủ nhân!' {guardian.ga_name} hét lên.",
+        choice_a="Rút lui trong sợ hãi. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-10, ga_exp=-60, silver=-120, gold=-60,
+        next_steps=NextSteps("quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4")
+    ),
+
+    GuardianQuestLines(
+        id="hunter_escapes_outcome",
+        title="Kẻ Săn Đuổi Thoát Khỏi",
+        description="Bạn chần chừ khi tìm kiếm dấu vết của 'Kẻ Săn Đuổi Ánh Sáng'. Nó đã cảm nhận được sự hiện diện của bạn và rút lui sâu vào lòng đất, không thể tìm thấy nữa. 'Nó đã trốn thoát rồi, chủ nhân. Chúng ta đã mất dấu nó,' {guardian.ga_name} nói với vẻ mặt thất vọng.",
+        choice_a="Cảm thấy bất lực. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-10, ga_exp=-70, silver=-130, gold=-70,
+        next_steps=NextSteps("quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4")
+    ),
+
+    GuardianQuestLines(
+        id="continue_seal_attempt_fail",
+        title="Nỗ Lực Phong Ấn Thất Bại",
+        description="Bạn cố gắng tiếp tục phong ấn vực thẳm, nhưng năng lượng bóng tối bùng phát, khiến bạn và {guardian.ga_name} bị tổn thương nặng. {guardian.ga_name} ngã quỵ, đau đớn. 'Nó quá mạnh... chúng ta không thể...' {guardian.ga_name} thều thào.",
+        choice_a="Nhiệm vụ thất bại. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-15, ga_exp=-100, silver=-200, gold=-100, ga_health=-50, ga_mana=-50, ga_stamina=-50,
+        next_steps=NextSteps("quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4")
+    ),
+
+    GuardianQuestLines(
+        id="abyss_consumes_you",
+        title="Bị Vực Thẳm Nuốt Chửng",
+        description="Bạn chần chừ quá lâu khi cố gắng phong ấn vực thẳm. Năng lượng bóng tối bùng phát mạnh mẽ, nuốt chửng bạn và {guardian.ga_name} vào sâu trong vực thẳm. 'Không!!!' là tiếng hét cuối cùng của {guardian.ga_name}.",
+        choice_a="Mọi thứ chìm vào bóng tối vĩnh cửu. (Nhiệm vụ thất bại thảm hại)",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-50, ga_exp=-300, silver=-500, gold=-200, ga_health=-100, ga_mana=-100, ga_stamina=-100,
+        next_steps=NextSteps("quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4")
+    ),
+
+    GuardianQuestLines(
+        id="hunter_becomes_uncontrollable",
+        title="Kẻ Săn Đuổi Hoàn Toàn Vô Khống",
+        description="Bạn chần chừ quá lâu khi quyết định cách đối phó với 'Kẻ Săn Đuổi Ánh Sáng'. Nó trở nên hoàn toàn vô khống, năng lượng hủy diệt của nó lan ra khắp mọi nơi, không thể ngăn cản. 'Thế giới này đã bị hủy diệt, chủ nhân,' {guardian.ga_name} nói với vẻ mặt trống rỗng.",
+        choice_a="Đối mặt với sự hủy diệt toàn bộ. (Nhiệm vụ thất bại thảm hại)",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-50, ga_exp=-300, silver=-500, gold=-200, ga_health=-100, ga_mana=-100, ga_stamina=-100,
+        next_steps=NextSteps("quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4")
+    ),
+
+    GuardianQuestLines(
+        id="path_collapses_timeout",
+        title="Con Đường Sụp Đổ",
+        description="Bạn chần chừ khi đi theo con đường ẩn. Một tiếng rền vang lớn, con đường sụp đổ, chôn vùi bạn và {guardian.ga_name} dưới đống đổ nát. 'Không... không thể như vậy...' {guardian.ga_name} thì thào trước khi mọi thứ chìm vào im lặng.",
+        choice_a="Bị chôn vùi. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-15, ga_exp=-100, silver=-200, gold=-100, ga_health=-50, ga_mana=-50, ga_stamina=-50,
+        next_steps=NextSteps("quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4")
+    ),
+
+    GuardianQuestLines(
+        id="ritual_fail_hunter_unleashed",
+        title="Nghi Thức Thất Bại, Kẻ Săn Đuổi Thoát Khỏi",
+        description="Bạn chần chừ trong việc thực hiện nghi thức. 'Kẻ Săn Đuổi Ánh Sáng' cảm nhận được sự lưỡng lự của bạn và bùng nổ, thoát khỏi sự giam cầm. Năng lượng hủy diệt của nó quét sạch mọi thứ. 'Chúng ta đã thất bại, chủ nhân,' {guardian.ga_name} nói với giọng tuyệt vọng.",
+        choice_a="Đối mặt với sự hủy diệt. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-30, ga_exp=-200, silver=-400, gold=-150,
+        next_steps=NextSteps("quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4")
+    ),
+
+    GuardianQuestLines(
+        id="hunter_anger_escalates",
+        title="Sự Giận Dữ Của Kẻ Săn Đuổi Bùng Nổ",
+        description="Bạn chần chừ khi giao tiếp với 'Kẻ Săn Đuổi Ánh Sáng'. Sự giận dữ và nỗi đau của nó bùng nổ, biến thành một cơn thịnh nộ không thể kiểm soát, tấn công bạn và {guardian.ga_name} không ngừng. 'Nó đã không thể bị kiểm soát nữa!' {guardian.ga_name} hét lên.",
+        choice_a="Rút lui trong đau đớn. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-15, ga_exp=-80, silver=-150, gold=-75, ga_health=-30, ga_mana=-30, ga_stamina=-30,
+        next_steps=NextSteps("quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4")
+    ),
+
+    GuardianQuestLines(
+        id="crystal_corrupts_timeout",
+        title="Pha Lê Bị Ô Uế",
+        description="Bạn chần chừ quá lâu trước Viên Pha Lê Hồi Sinh. Năng lượng bóng tối của vực thẳm bắt đầu ăn mòn viên pha lê, khiến nó mất đi ánh sáng và trở nên đen kịt. 'Không! Viên pha lê đã bị ô uế!' {guardian.ga_name} thốt lên đầy kinh hãi.",
+        choice_a="Viên pha lê bị phá hủy. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-15, ga_exp=-100, silver=-200, gold=-100,
+        next_steps=NextSteps("quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4")
+    ),
+
+    GuardianQuestLines(
+        id="hunter_rampage_timeout",
+        title="Kẻ Săn Đuổi Tàn Phá",
+        description="Bạn chần chừ khi 'Kẻ Săn Đuổi Ánh Sáng' bị suy yếu. Nó lấy lại sức mạnh, bắt đầu tàn phá ngôi làng và những vùng đất xung quanh, mạnh mẽ hơn bao giờ hết. 'Chúng ta đã bỏ lỡ cơ hội, chủ nhân!' {guardian.ga_name} nói với giọng thất vọng.",
+        choice_a="Chứng kiến sự hủy diệt. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-20, ga_exp=-120, silver=-250, gold=-120,
+        next_steps=NextSteps("quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4")
+    ),
+
+    GuardianQuestLines(
+        id="spirits_fade_in_abyss",
+        title="Linh Hồn Tan Biến Hoàn Toàn",
+        description="Bạn chần chừ khi cố gắng giao tiếp hoặc thanh tẩy các linh hồn. Chúng dần dần tan biến hoàn toàn trong vực thẳm, không thể được cứu vớt. 'Chúng ta đã không thể giải thoát họ,' {guardian.ga_name} nói với vẻ buồn bã sâu sắc.",
+        choice_a="Cảm thấy hối tiếc. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-10, ga_exp=-50, silver=-100, gold=-50,
+        next_steps=NextSteps("quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4")
+    ),
+
+    GuardianQuestLines(
+        id="retreat_from_abyss_attempt_failed",
+        title="Rút Lui Trong Đau Đớn",
+        description="Bạn và {guardian.ga_name} phải rút lui khỏi vực thẳm sau một nỗ lực thất bại. Năng lượng đen tối vẫn bao trùm, và những linh hồn vẫn bị giam cầm. {guardian.ga_name} nhìn bạn với vẻ mặt mệt mỏi. 'Chúng ta cần một kế hoạch khác, chủ nhân, hoặc mọi thứ sẽ sụp đổ.'",
+        choice_a="Tìm một cách khác. (Nhiệm vụ thất bại)",
+        choice_b="", choice_c="", choice_timeout="",
+        dignity_point=-5, ga_exp=-30, silver=-60, gold=-30,
+        next_steps=NextSteps("quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4", "quest_failed_end_4")
+    ),
+
+    # Generic Endings
+    GuardianQuestLines(
+        id="quest_success_end_4",
+        title="Bình Minh Trên Làng Quên",
+        description="Ngôi làng đã được giải thoát khỏi bóng tối của vực thẳm. Ánh sáng trở lại, sưởi ấm những trái tim tuyệt vọng. Người dân reo hò trong niềm vui, và các linh hồn được giải thoát bay lượn trên bầu trời, như những vì sao lấp lánh. {guardian.ga_name} đứng cạnh bạn, ánh mắt nhìn về phía chân trời, nơi bình minh đang lên. 'Chúng ta đã mang lại hòa bình, chủ nhân. Đây là một chiến công vĩ đại. Tình bằng hữu của chúng ta đã được khắc sâu trong lịch sử của vùng đất này, mãi mãi là ánh sáng dẫn lối cho những kẻ lạc lối.'",
+        gold=1500, silver=5000, ga_exp=700, dignity_point=70, ga_health=150, ga_mana=150, ga_stamina=150,
+        choice_a="Cảm thấy tự hào và mãn nguyện.",
+        choice_b="", choice_c="", choice_timeout="",
+        next_steps=NextSteps("continue_adventure_4", "continue_adventure_4", "continue_adventure_4", "continue_adventure_4")
+    ),
+
+    GuardianQuestLines(
+        id="quest_failed_end_4",
+        title="Bóng Đêm Vĩnh Cửu",
+        description="Vực thẳm đã nuốt chửng ngôi làng, và bóng tối lan rộng khắp vùng đất. 'Kẻ Săn Đuổi Ánh Sáng' trở thành một cơn ác mộng kinh hoàng, vĩnh viễn ám ảnh thế giới. {guardian.ga_name} đứng lặng, ánh mắt vô hồn. 'Mọi thứ đã kết thúc, chủ nhân. Bóng tối đã chiến thắng. Ta xin lỗi vì đã không thể bảo vệ Ngài tốt hơn, và cũng xin lỗi vì chúng ta đã không thể cứu lấy những linh hồn vô tội đó.'",
+        dignity_point=-30, ga_exp=-200, silver=-400, gold=-150,
+        choice_a="Đau khổ và chấp nhận thất bại.",
+        choice_b="", choice_c="", choice_timeout="",
+        next_steps=NextSteps("continue_adventure_4", "continue_adventure_4", "continue_adventure_4", "continue_adventure_4")
+    ),
+
+    GuardianQuestLines(
+        id="continue_adventure_4",
+        title="Hành Trình Mới, Bài Học Mới",
+        description="Bạn và {guardian.ga_name} rời khỏi vùng đất hoang tàn, mang theo những ký ức về cuộc phiêu lưu vừa qua. Dù thành công hay thất bại, mỗi trải nghiệm đều khắc sâu một bài học. Những cuộc phiêu lưu mới đang chờ đợi, và tình bằng hữu của bạn và {guardian.ga_name} sẽ mãi mãi là nền tảng cho những thử thách tiếp theo.",
+        choice_a="",
+        choice_b="", choice_c="", choice_timeout="",
+        ga_exp=50, silver=100, gold=10,
+        next_steps=NextSteps("", "", "", "")
+    )
+]
 
 
-all_quests = [quest_ghost_of_forrest, quest_night_market, quest_the_ruin_call, quest_broken_oath, quest_ruin_whisper]
+all_quests = [quest_abyss, quest_ghost_of_forrest, quest_night_market, quest_the_ruin_call, quest_broken_oath, quest_ruin_whisper]

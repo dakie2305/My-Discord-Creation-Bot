@@ -201,7 +201,13 @@ class GaQuestView(discord.ui.View):
         elif total_hp < 0:
             text = f"{self.guardian_quest.guardian.ga_emoji} - {self.guardian_quest.guardian.ga_name} (Trọng Thương) thì:"
         embed.add_field(name=f"", value=f"{text}", inline=False)
-        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} **{self.total_ga_hp}** {EmojiCreation2.HP.value} **{self.total_ga_mana}** {EmojiCreation2.MP.value} **{self.total_ga_stamina}** {EmojiCreation2.STAMINA.value} **{self.total_ga_exp}** EXP", inline=False)
+        text = ""
+        text += self.format_stat(self.total_ga_hp, EmojiCreation2.HP.value) + " "
+        text += self.format_stat(self.total_ga_mana, EmojiCreation2.MP.value) + " "
+        text += self.format_stat(self.total_ga_stamina, EmojiCreation2.STAMINA.value) + " "
+        text += self.format_stat(self.total_ga_exp, "EXP")
+        
+        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} {text}", inline=False)
         embed.add_field(name=f"", value=f"Ngoài ra còn nhận được thưởng thêm: {additional_reward}", inline=False)
         await self.channel.send(embed=embed)
         return
@@ -303,7 +309,14 @@ class GaQuestView(discord.ui.View):
         ProfileMongoManager.update_profile_money(guild_id=self.user.guild.id, guild_name="", user_id=self.user.id, user_display_name="", user_name="", gold=amount)
         return reward_text
 
-    
+    def format_stat(self, value, emoji):
+        if value > 0:
+            return f"+**{value}** {emoji}"
+        elif value < 0:
+            return f"-**{abs(value)}** {emoji}"
+        else:
+            return f""
+
     def split_text_to_pairs(self, text: str):
         # Split sentences on punctuation + space
         sentence_endings = re.compile(r'(?<=[.!?])\s+')

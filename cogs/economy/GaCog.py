@@ -4,7 +4,7 @@ from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.EmojiEnum import EmojiCreation2
 import discord
 from discord.ext import commands
-from Handling.Economy.GA import GaQuestLineExample
+from Handling.Economy.GA import GaQuestLineExample, GaQuestLineExample2
 from Handling.Economy.GA.GaChallengeView import GaChallengeView
 from Handling.Economy.GA.GaQuestClass import GuardianAngelQuest
 from Handling.Economy.GA.GaQuestView import GaQuestView
@@ -33,6 +33,9 @@ async def setup(bot: commands.Bot):
 class GuardianAngelCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+        self.all_quests_combined = GaQuestLineExample2.all_quests_page_2 + GaQuestLineExample.all_quests  
+
+        
     
     ga_group = discord.app_commands.Group(name="ga", description="Các lệnh liên quan đến Guardian Angel!")
     #region ga sell slash
@@ -816,14 +819,15 @@ class GuardianAngelCog(commands.Cog):
             ProfileMongoManager.update_main_guardian_profile_time(guild_id=interaction.guild_id,user_id=interaction.user.id, data_type="last_quest", date_value=datetime.now())
         
         #Chọn một quest ngẫu nhiên
-        random_quest = random.choice(GaQuestLineExample.all_quests)
+        random_quest = random.choice(self.all_quests_combined)
+        if CustomFunctions.check_if_dev_mode():
+            random_quest = self.all_quests_combined[0]
+        
         random_quest[0].replace_guardian_name(user_profile.guardian.ga_name)
         title = random_quest[0].title
         description = random_quest[0].description
         # description = description.replace("{guardian.ga_name}", user_profile.guardian.ga_name)
         list_des = self.split_text_to_pairs(text=description)
-        
-        
         
         embed = discord.Embed(title=f"{EmojiCreation2.QUEST_ICON.value} {title} {EmojiCreation2.QUEST_ICON.value}", description=f"", color=discord.Color.blue())
         embed.add_field(name=f"", value=f"*{interaction.user.mention} đã cùng Hộ Vệ Thần {user_profile.guardian.ga_emoji} - **{user_profile.guardian.ga_name}** lên đường phiêu lưu.*", inline=False)
