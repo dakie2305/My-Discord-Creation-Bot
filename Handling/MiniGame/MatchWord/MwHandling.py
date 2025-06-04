@@ -47,7 +47,7 @@ class MwHandlingFunction():
         lan_label = "Tiếng Anh" if language == "en" else "Tiếng Việt"
         #Nếu là tiếng anh thì cứ tạo bình thường
         if language == "en":
-            data = MwClass.MatchWordInfo(channel_id=message.channel.id, channel_name=message.channel.name, guild_name=message.guild.name, current_word="hello", special_case=False)
+            data = MwClass.MatchWordInfo(channel_id=message.channel.id, channel_name=message.channel.name, guild_name=message.guild.name, current_word="hello", remaining_word= 1000, correct_start_word= "o", type="B", special_case=False)
             MwMongoManager.create_info(data=data, guild_id=message.guild.id, lang=language)
             embed = discord.Embed(title=f"{EmojiCreation1.CHECK.value} Nối Từ {lan_label}", description=f"",color=discord.Color.blue())
             embed.add_field(name=f"", value="▬▬▬▬▬▬ι═══════════>", inline=False)
