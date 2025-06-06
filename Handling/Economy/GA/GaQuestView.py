@@ -33,17 +33,17 @@ class GaQuestView(discord.ui.View):
         self.force_dead = force_dead
         self.timeout = timeout
         
-        if current_quest_lines.choice_a and current_quest_lines.choice_a.strip() != "":
+        if (current_quest_lines.choice_a and current_quest_lines.choice_a.strip() != "" and current_quest_lines.next_steps.choice_a and current_quest_lines.next_steps.choice_a.strip() != ""):
             self.choice_a_button = discord.ui.Button(label="A", style=discord.ButtonStyle.primary)
             self.choice_a_button.callback = self.choice_a_button_function
             self.add_item(self.choice_a_button)
             
-        if current_quest_lines.choice_b and current_quest_lines.choice_b.strip() != "":
+        if (current_quest_lines.choice_b and current_quest_lines.choice_b.strip() != "" and current_quest_lines.next_steps.choice_b and current_quest_lines.next_steps.choice_b.strip() != ""):
             self.choice_b_button = discord.ui.Button(label="B", style=discord.ButtonStyle.primary)
             self.choice_b_button.callback = self.choice_b_button_function
             self.add_item(self.choice_b_button)
         
-        if current_quest_lines.choice_c and current_quest_lines.choice_c.strip() != "":
+        if (current_quest_lines.choice_c and current_quest_lines.choice_c.strip() != "" and current_quest_lines.next_steps.choice_c and current_quest_lines.next_steps.choice_c.strip() != ""):
             self.choice_c_button = discord.ui.Button(label="C", style=discord.ButtonStyle.primary)
             self.choice_c_button.callback = self.choice_c_button_function
             self.add_item(self.choice_c_button)
@@ -124,14 +124,18 @@ class GaQuestView(discord.ui.View):
         flag_a = False
         flag_b = False
         flag_c = False
-        if next_quest_line.choice_a and next_quest_line.choice_a.strip() != "":
-            embed.add_field(name=f"", value=F"{EmojiCreation2.LETTER_A.value}: {next_quest_line.choice_a}", inline=False)
+        if (next_quest_line.choice_a and next_quest_line.choice_a.strip() != ""
+            and next_quest_line.next_steps.choice_a and next_quest_line.next_steps.choice_a.strip() != ""):
+            embed.add_field(name="", value=f"{EmojiCreation2.LETTER_A.value}: {next_quest_line.choice_a}", inline=False)
             flag_a = True
-        if next_quest_line.choice_b and next_quest_line.choice_b.strip() != "":
-            embed.add_field(name=f"", value=F"{EmojiCreation2.LETTER_B.value}: {next_quest_line.choice_b}", inline=False)
+
+        if (next_quest_line.choice_b and next_quest_line.choice_b.strip() != ""
+            and next_quest_line.next_steps.choice_b and next_quest_line.next_steps.choice_b.strip() != ""):
+            embed.add_field(name="", value=f"{EmojiCreation2.LETTER_B.value}: {next_quest_line.choice_b}", inline=False)
             flag_b = True
-        if next_quest_line.choice_c and next_quest_line.choice_c.strip() != "":
-            embed.add_field(name=f"", value=F"{EmojiCreation2.LETTER_C.value}: {next_quest_line.choice_c}", inline=False)
+        if (next_quest_line.choice_c and next_quest_line.choice_c.strip() != ""
+            and next_quest_line.next_steps.choice_c and next_quest_line.next_steps.choice_c.strip() != ""):
+            embed.add_field(name="", value=f"{EmojiCreation2.LETTER_C.value}: {next_quest_line.choice_c}", inline=False)
             flag_c = True
         if not (flag_a or flag_b or flag_c):
             #end
@@ -169,10 +173,6 @@ class GaQuestView(discord.ui.View):
         #Tính lại stats
         total_hp = self.guardian_quest.guardian.health - self.total_ga_hp
         if total_hp < 0 or self.force_injury or self.force_dead: total_hp = 0 #Nếu nhận flag thì set về 0
-        total_stamina = self.guardian_quest.guardian.stamina - self.total_ga_stamina
-        if total_stamina<0: total_stamina = 0
-        total_mana = self.guardian_quest.guardian.mana - self.total_ga_mana
-        if total_mana < 0: total_mana = 0
 
         is_dead = False
         if total_hp <= 0:
@@ -182,9 +182,10 @@ class GaQuestView(discord.ui.View):
                 actual_death_chance = UtilitiesFunctions.guardian_death_chance(level=self.guardian_quest.guardian.level)
                 is_dead = UtilitiesFunctions.get_chance(actual_death_chance)
 
-
+        
         if not CustomFunctions.check_if_dev_mode():
-            ProfileMongoManager.set_guardian_current_stats(guild_id=self.user.guild.id, user_id=self.user.id,stamina=total_stamina, health=total_hp, mana=total_mana, is_dead=is_dead)
+            ProfileMongoManager.update_guardian_stats(guild_id=self.user.guild.id, user_id=self.user.id,stamina=self.total_ga_stamina, health=self.total_ga_hp, mana=self.total_ga_mana)
+        ProfileMongoManager.update_main_guardian_level_progressing(guild_id=self.user.guild.id, user_id=self.user.id, bonus_exp=self.total_ga_exp)
         #Cập nhật nhân phẩm
         ProfileMongoManager.update_dignity_point(guild_id=self.user.guild.id, guild_name="", user_id=self.user.id, user_display_name="", user_name="", dignity_point=self.total_dignity)
         #Cập nhật tiền
