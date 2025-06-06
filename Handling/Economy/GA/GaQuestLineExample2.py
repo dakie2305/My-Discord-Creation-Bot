@@ -989,8 +989,8 @@ quest_red_promises = [
     GuardianQuestLines(
         id="ending_kingdom_in_chaos",
         title="Vương Quốc Hoang Tàn",
-        description="Khi bạn hoảng loạn rút lui, Viên Pha Lê Huyết Nguyệt bùng nổ, phá hủy mọi thứ xung quanh. Vương quốc bị nhấn chìm trong biển lửa và hỗn loạn. {guardian.ga_name} bị mắc kẹt trong đống đổ nát, không thể thoát ra. Bạn sống sót, nhưng vương quốc của bạn đã bị hủy diệt, và {guardian.ga_name} đã mất tích trong biển lửa đó. Bạn sống với nỗi đau của sự mất mát, và hình ảnh {guardian.ga_name} bị mắc kẹt mãi mãi ám ảnh bạn. Tình yêu của hai bạn đã tan vỡ cùng với vương quốc.",
-        choice_a="Bạn sống sót, nhưng vương quốc và {guardian.ga_name} chìm trong hoang tàn.",
+        description="Khi bạn hoảng loạn rút lui, Viên Pha Lê Huyết Nguyệt bùng nổ, phá hủy mọi thứ xung quanh. Vương quốc bị nhấn chìm trong biển lửa và hỗn loạn. {guardian.ga_name} bị mắc kẹt trong đống đổ nát, không thể thoát ra. Bạn sống sót, nhưng vương quốc của bạn đã bị hủy diệt, và {guardian.ga_name} đã mất tích trong biển lửa đó. Bạn sống với nỗi đau của sự mất mát, và hình ảnh {guardian.ga_name} bị mắc kẹt mãi mãi ám ảnh bạn. Tình yêu của hai bạn đã tan vỡ cùng với vương quốc. Bạn sống sót, nhưng vương quốc và {guardian.ga_name} chìm trong hoang tàn.",
+        choice_a="",
         choice_b="", choice_c="", choice_timeout="",
         next_steps=NextSteps("", "", "", ""),
         gold=0, silver=0, ga_exp=0, dignity_point=0, ga_health=0, ga_mana=0, ga_stamina=0
@@ -1000,11 +1000,11 @@ quest_red_promises = [
         id="ending_injured_and_failed",
         title="Thất Bại Đau Đớn",
         description="Bạn và {guardian.ga_name} bị thương nặng, không thể tiếp tục nhiệm vụ. Linh hồn của vị pháp sư vẫn còn đó, giận dữ và đầy thù hận, và lời nguyền vẫn tiếp tục hoành hành. Bạn và {guardian.ga_name} phải rút lui trong đau đớn, mang theo nỗi thất bại và sự hối tiếc. Vương quốc vẫn chìm trong bóng tối, và bạn biết rằng mình đã không thể cứu vãn nó. Mối tình của hai bạn đã bị tổn thương bởi nỗi đau và sự thất bại, và bạn phải sống với sự thật rằng mình đã không đủ mạnh mẽ.",
-        choice_a="Bạn và {guardian.ga_name} bị thương nặng, nhiệm vụ thất bại.",
+        choice_a="",
         choice_b="", choice_c="", choice_timeout="",
         next_steps=NextSteps("", "", "", ""),
         gold=0, silver=0, ga_exp=0, dignity_point=0, ga_health=0, ga_mana=0, ga_stamina=0
-    )
+    ),
 ]
 #region quest_forgetten_garden
 quest_forgetten_garden = [
@@ -1111,13 +1111,13 @@ quest_forgetten_garden = [
         title="Dòng Chảy Kết Nối",
         description="Bạn nhẹ nhàng chạm vào nàng tiên hoa. Một luồng sáng ấm áp truyền qua bạn, và bạn cảm nhận được nỗi cô đơn sâu thẳm của nàng, cùng với một tia hy vọng. {guardian.ga_name} nắm lấy tay bạn, năng lượng của cô ấy hòa quyện với bạn, tạo thành một luồng sáng mạnh mẽ hơn. 'Ngài... chúng ta có thể giúp nàng!'",
         choice_a="Cùng {guardian.ga_name} dùng tình cảm để xoa dịu nàng tiên.",
-        choice_b="Hỏi nàng tiên về cách hóa giải lời nguyền.",
-        choice_c="Rút tay lại, cảm thấy quá choáng ngợp.",
+        choice_b="Rút tay lại, cảm thấy quá choáng ngợp.",
+        choice_c="",
         choice_timeout="{guardian.ga_name} siết chặt tay bạn, 'Đừng sợ, Ngài! Chúng ta không đơn độc!'",
         next_steps=NextSteps(
             choice_a="soothe_fairy_with_affection",
-            choice_b="ask_fairy_about_curse",
-            choice_c="overwhelmed_retreat_outcome",
+            choice_b="overwhelmed_retreat_outcome",
+            choice_c="",
             timeout="guardian_comfort_timeout"
         )
     ),
@@ -1143,13 +1143,13 @@ quest_forgetten_garden = [
         title="Tiếng Gọi Từ Trái Tim",
         description="Bạn và {guardian.ga_name} cùng gọi tên nàng tiên hoa. Một luồng ánh sáng ấm áp bao trùm khu vườn, và nàng tiên hoa hiện ra rõ ràng hơn, ánh mắt không còn buồn bã nữa. {guardian.ga_name} mỉm cười rạng rỡ, 'Nàng đã nghe thấy chúng ta, Ngài! Nàng đang đến gần hơn rồi!'",
         choice_a="Tiếp cận nàng tiên hoa và bày tỏ sự quan tâm.",
-        choice_b="Hỏi nàng về lời nguyền cô đơn.",
-        choice_c="Cố gắng tìm kiếm một cổ vật giúp hóa giải lời nguyền.",
+        choice_b="Cố gắng tìm kiếm một cổ vật giúp hóa giải lời nguyền.",
+        choice_c="",
         choice_timeout="{guardian.ga_name} nắm lấy tay bạn, 'Chúng ta đã tạo ra một sự kết nối, Ngài!'",
         next_steps=NextSteps(
             choice_a="talk_to_fairy",
-            choice_b="ask_fairy_about_curse",
-            choice_c="search_for_artifact_for_curse",
+            choice_b="search_for_artifact_for_curse",
+            choice_c="",
             timeout="fairy_approaches_timeout"
         )
     ),
@@ -1541,9 +1541,9 @@ quest_forgetten_garden = [
         choice_b="", choice_c="", choice_timeout="",
         next_steps=NextSteps("", "", "", ""),
         gold=0, silver=0, ga_exp=0, dignity_point=0
-    )
+    ),
 ]
 
 
 
-all_quests_page_2 = [quest_forgetten_garden, quest_red_promises ,quest_romance_letter]
+all_quests_page_2 = [quest_red_promises, quest_forgetten_garden, quest_romance_letter]
