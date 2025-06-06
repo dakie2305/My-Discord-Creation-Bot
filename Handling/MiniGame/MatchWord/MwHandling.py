@@ -99,6 +99,7 @@ class MwHandlingFunction():
     
     async def handling_game(self, message: discord.Message):
         if message.author.bot: return
+        if not message.content: return
         if str.isspace(message.content): return
         mw_info, lan = await self.check_if_message_inside_game(source=message)
         if mw_info == None: return
