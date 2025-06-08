@@ -71,6 +71,10 @@ async def sync(ctx):
 @bot.tree.command(name = "say", description="Nói gì đó ẩn danh thông qua bot, có thể gắn hình ảnh và nhắn vào Channel khác")
 @app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
 async def say(interaction: discord.Interaction, thing_to_say : str, image: Optional[discord.Attachment] = None, chosen_channel: Optional[discord.TextChannel]= None):
+    black_list_id = [1194106864582004849]
+    if interaction.guild_id in black_list_id:
+        await interaction.response.send_message(content="Không thể gửi tin nhắn ẩn danh trong server", ephemeral=True)
+        return
     await interaction.response.send_message(content="Đã gửi tin nhắn ẩn danh thành công", ephemeral=True)
     #Lấy channel mà người dùng gọi ra
     current_channel_id = interaction.channel_id
