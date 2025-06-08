@@ -1,3 +1,4 @@
+import copy
 import re
 from CustomEnum.GuardianMemoryTag import GuardianMemoryTag
 from CustomEnum.SlashEnum import SlashCommand
@@ -819,7 +820,7 @@ class GuardianAngelCog(commands.Cog):
             ProfileMongoManager.update_main_guardian_profile_time(guild_id=interaction.guild_id,user_id=interaction.user.id, data_type="last_quest", date_value=datetime.now())
         
         #Chọn một quest ngẫu nhiên
-        random_quest = random.choice(self.all_quests_combined)
+        random_quest = random.choice(copy.deepcopy(self.all_quests_combined))
         if CustomFunctions.check_if_dev_mode():
             random_quest = self.all_quests_combined[0]
         
