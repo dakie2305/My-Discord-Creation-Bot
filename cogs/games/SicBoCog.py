@@ -666,7 +666,7 @@ class SicboCog(commands.Cog):
     
     #region Bài cào
     @sb_group.command(name="bai_cao", description="Tạo game bài cào để chơi cùng mọi người! Bạn sẽ làm nhà cái và chung tiền, hoặc ăn tiền nếu có!")
-    @discord.app_commands.checks.cooldown(1, 8)
+    @discord.app_commands.checks.cooldown(1, 45)
     @discord.app_commands.describe(so_tien="Chọn số tiền muốn cá cược.")
     @discord.app_commands.describe(loai_tien="Chọn loại tiền muốn cược.")
     @discord.app_commands.choices(loai_tien=[
