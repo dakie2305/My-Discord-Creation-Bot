@@ -53,7 +53,7 @@ class AIResponseHandling():
                 if CustomFunctions.is_inside_working_time() == False:
                     await message.channel.send(f"Tính năng AI của Bot chỉ hoạt động đến 12h đêm, vui lòng đợi đến 8h sáng hôm sau.")
                     return
-            elif message.guild.id == 1194106864582004849 and message.channel.id != 1264455905756446740: #Học viện 2ten/ channel #sân-chơi-creation-2
+            elif message.guild.id == 1194106864582004849 and message.channel.id != 1381630185723531264: #Học viện #sân-chơi-creation-2
                 return
             is_reply_message = False
         #Không trong trường hợp trên thì tắt
