@@ -20,7 +20,6 @@ class Snipe(commands.Cog):
     @discord.app_commands.command(name="snipe", description="Hiện lại message vừa mới bị xoá trong channel này!")
     async def snipe_slash(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=False)
-        await interaction.response.defer()
         called_channel = interaction.channel
         
         snipe_channel_info = DbMongoManager.find_snipe_channel_info_by_id(called_channel.id, interaction.guild.id)
