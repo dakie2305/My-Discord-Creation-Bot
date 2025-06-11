@@ -8,6 +8,9 @@ import CustomFunctions
 import random
 import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
 from CustomEnum.SlashEnum import SlashCommand 
+from Handling.MiniGame.GuessNumber import GnMongoManager
+from Handling.MiniGame.GuessNumber.GnConfirmHintView import GnConfirmHintView
+from Handling.MiniGame.GuessNumber.GuessNumberClass import GuessNumberInfo
 from Handling.MiniGame.MatchWord.MwConfirmHintView import MwConfirmHintView
 from Handling.MiniGame.SortWord import SwClass, SwHandling, SwMongoManager
 from Handling.MiniGame.MatchWord import MwClass, MwMongoManager
@@ -41,9 +44,14 @@ class HintWordMiniGame(commands.Cog):
             if check is not None:
                 return check, lan
         return None, None
+    
+    def check_if_message_inside_gn_game(self, guild_id: int = None, channel_id: int = None):
+        check = GnMongoManager.find_guess_number_info_by_id(guild_id=guild_id, channel_id= channel_id)
+        if check is not None:
+            return check
+        return None
 
-    #region Truth Dare
-    @discord.app_commands.command(name="hint", description="Gợi ý từ hợp lệ trong Đoán Từ, Nối Từ.")
+    @discord.app_commands.command(name="hint", description="Gợi ý từ hợp lệ trong Đoán Từ, Nối Từ, Đoán Số.")
     @discord.app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
     async def hint(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=False)
@@ -72,6 +80,15 @@ class HintWordMiniGame(commands.Cog):
             mess = await interaction.followup.send(embed=embed, view= view)
             view.message = mess
             return
+        info = self.check_if_message_inside_gn_game(guild_id=interaction.guild_id, channel_id=interaction.channel_id)
+        if info is not None:
+            #Đoán Số
+            view = GnConfirmHintView(user=interaction.user, info=info)
+            embed = self.get_hint_embed_guess_number(interaction=interaction)
+            mess = await interaction.followup.send(embed=embed, view= view)
+            view.message = mess
+            return
+        
         #Không có
         view = SelfDestructView(timeout=30)
         embed = discord.Embed(title="",description=f"{EmojiCreation1.CROSS.value} Chỉ dùng lệnh này trong kênh chơi Đoán Từ hoặc Nối Từ!",color=discord.Color.red())
@@ -86,12 +103,11 @@ class HintWordMiniGame(commands.Cog):
         else:
             await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
     
-    def get_hint_embed(self, interaction: discord.Interaction,lan: str, sw_info: SwClass.SortWordInfo = None, mw_info: MwClass.MatchWordInfo = None):
+    def get_hint_embed(self, interaction: discord.Interaction, lan: str, sw_info: SwClass.SortWordInfo = None, mw_info: MwClass.MatchWordInfo = None):
         if lan == 'en' or lan == 'eng':
             lan = "Tiếng Anh"
         elif lan == 'vn':
             lan = "Tiếng Việt"
-        
         title = "Đoán Từ"
         game_info = None
         if sw_info is not None:
@@ -104,5 +120,14 @@ class HintWordMiniGame(commands.Cog):
         unix_time = int(end_time.timestamp())
         embed = discord.Embed(title=f"{EmojiCreation1.QUESTION_MARK.value} Gợi Ý Từ Hợp Lệ {EmojiCreation1.QUESTION_MARK.value}", description=f"Trò Chơi {title} {lan}", color=0x03F8FC)
         embed.add_field(name=f"", value=f"{interaction.user.mention} bạn có muốn đổi 3 điểm để gợi ý từ tiếp theo không?", inline=False)
+        embed.add_field(name="______________", value= f"Thời gian còn lại: <t:{unix_time}:R>", inline=False)
+        return embed
+    
+    def get_hint_embed_guess_number(self, interaction: discord.Interaction):
+        start_time = datetime.now()
+        end_time = start_time + timedelta(seconds=30)  # 30 seconds from now
+        unix_time = int(end_time.timestamp())
+        embed = discord.Embed(title=f"{EmojiCreation1.QUESTION_MARK.value} Gợi Ý Đáp Án {EmojiCreation1.QUESTION_MARK.value}", description=f"Trò Chơi Đoán Số", color=0x03F8FC)
+        embed.add_field(name=f"", value=f"{interaction.user.mention} bạn có muốn đổi 10 điểm để nhận đáp án đúng không?", inline=False)
         embed.add_field(name="______________", value= f"Thời gian còn lại: <t:{unix_time}:R>", inline=False)
         return embed

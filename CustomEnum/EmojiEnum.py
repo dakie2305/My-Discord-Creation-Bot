@@ -280,4 +280,6 @@ class EmojiCreation1(Enum):
     EXCLAIM_MARK = "<a:exclaim:1378264904817184798>"
     CHECK = "<a:check:1378265379419193354>"
     CROSS = "<a:x_cross_red:1378265390110474362>"
+    HIGHER = "<a:higher:1382341981849649252>"
+    LOWER = "<a:lower:1382342001768267806>"
     TRUE_HEAVEN_LINK_MINI = "https://cdn.discordapp.com/emojis/1307360190353375336.webp?size=96"
