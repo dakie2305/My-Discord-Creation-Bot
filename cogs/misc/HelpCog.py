@@ -50,13 +50,16 @@ class Help(commands.Cog):
         count+=1
         embed.add_field(name=f"", value=f"- **Trang {count}**: Tổng hợp lệnh game Đoán Từ.", inline=False)
         count+=1
-        embed.add_field(name=f"", value=f"- **Trang {count}**: Thông tin thêm về game Đoán Từ, Nối Từ.", inline=False)
+        embed.add_field(name=f"", value=f"- **Trang {count}**: Tổng hợp lệnh game Đoán Số May Mắn.", inline=False)
+        count+=1
+        embed.add_field(name=f"", value=f"- **Trang {count}**: Thông tin thêm về game Đoán Từ, Đoán Số, Nối Từ.", inline=False)
         count+=1
         embed.add_field(name=f"", value=f"- **Trang {count}**: Tổng hợp lệnh lặt vặt.", inline=False)
         count+=1
         embed.add_field(name=f"", value=f"- **Trang {count}**: Những thông tin hữu ích về bot Creation 1", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
         list_embed.append(embed)
+        
         #Game nối từ
         embed = discord.Embed(title=f"Lệnh Game Nối Từ", description=f"Áp dụng cho mini game Nối Từ", color=0xddede7)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
@@ -76,20 +79,32 @@ class Help(commands.Cog):
         embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Trò này rất đơn giản, đó là bạn phải sắp xếp chữ cái của từ hiện tại thành một từ có nghĩa!", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Ví dụ: `olhel`  ->  `hello` ", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Bắt đầu hoặc kết thúc một game đoán từ trong channel hiện tại bằng lệnh {SlashCommand.START_SWORD_WORD.value}", inline=False)
-        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Reset channel đoán từ để bắt đầu lại từ đầu bằng lệnh {SlashCommand.RESTART_SWORD_WORD.value}", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Reset channel đoán từ để bắt đầu lại từ đầu bằng lệnh {SlashCommand.RESTART_SORT_WORD.value}", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Xem bảng xếp hạng bằng lệnh {SlashCommand.BXH.value}", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Sử dụng kỹ năng bằng lệnh {SlashCommand.SKILL_USE.value}", inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
+        list_embed.append(embed)
+        
+        #Game đoán số
+        embed = discord.Embed(title=f"Lệnh Game Đoán Số", description=f"Áp dụng cho mini game Đoán Số", color=0xddede7)
+        embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Trò này rất đơn giản, bạn chỉ cần nhắn lên số, và bot sẽ gợi ý đáp án cho bạn!", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Bot sẽ react {EmojiCreation1.HIGHER.value} nếu số của bạn thấp hơn đáp án", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Bot sẽ react {EmojiCreation1.LOWER.value} nếu số của bạn cao hơn đáp án", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Reset game và bắt đầu lại từ đầu bằng lệnh {SlashCommand.RESTART_GUESS_NUMBER.value}", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Xem bảng xếp hạng bằng lệnh {SlashCommand.BXH.value}", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Sử dụng kỹ năng bằng lệnh {SlashCommand.SKILL_USE.value}", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
         list_embed.append(embed)
         
         #thông tin thêm
-        embed = discord.Embed(title=f"Thông Tin Thêm", description=f"Áp dụng cho mini game Đoán Từ", color=0xddede7)
+        embed = discord.Embed(title=f"Thông Tin Thêm", description=f"Áp dụng cho mini game Đoán Từ, Nối Từ, Đoán Số", color=0xddede7)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Hãy cẩn thận, sai quá nhiều có thể sẽ bị trừ điểm!", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Từ khó quá, không biết kết quả? Sử dụng ngay lệnh {SlashCommand.HINT_WORD_MINIGAME.value} để đổi ba điểm và nhận được gợi ý chính xác!", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Có rất nhiều kỹ năng đặc biệt có thể xuất hiện ngẫu nhiên! Dùng kỹ năng bằng lệnh {SlashCommand.SKILL_USE.value}", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Riêng chủ server (owner) được quyền sử dụng lệnh {SlashCommand.SKILL_GIVE_WORD_MINIGAME.value} để ban phát kỹ năng đặc biệt!", inline=False)
-        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Cứ mỗi 500 lượt chơi là sẽ tự động restart lại từ đầu, hoặc cứ dùng lệnh {SlashCommand.RESTART_MATCH_WORD.value} hoặc {SlashCommand.RESTART_SWORD_WORD.value}!", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Cứ mỗi 500 lượt chơi là sẽ tự động restart lại từ đầu, hoặc cứ dùng lệnh {SlashCommand.RESTART_MATCH_WORD.value} hoặc {SlashCommand.RESTART_SORT_WORD.value}hoặc {SlashCommand.RESTART_GUESS_NUMBER.value}!", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Kênh không chơi khoảng một tháng sẽ tự động bị xóa!", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
         list_embed.append(embed)
