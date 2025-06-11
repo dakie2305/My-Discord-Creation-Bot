@@ -7,6 +7,10 @@ import CustomFunctions
 import random
 import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
 from CustomEnum.SlashEnum import SlashCommand 
+from Handling.MiniGame.GuessNumber import GnMongoManager, ListGuessNumberSkills
+from Handling.MiniGame.GuessNumber.GnGiveSkillView import GnGiveSkillView
+from Handling.MiniGame.GuessNumber.GnUseSkillView import GnUseSkillView
+from Handling.MiniGame.GuessNumber.GuessNumberClass import GuessNumberInfo
 from Handling.MiniGame.MatchWord.MwGiveSkillView import MwGiveSkillView
 from Handling.MiniGame.MatchWord.MwUseSkillView import MwUseSkillView
 from Handling.MiniGame.SortWord import SwClass, SwHandling, SwMongoManager
@@ -42,6 +46,11 @@ class SkillWordMiniGame(commands.Cog):
             if check is not None:
                 return check, lan
         return None, None
+    
+    def check_if_message_inside_gn_game(self, guild_id: int = None, channel_id: int = None):
+        check = GnMongoManager.find_guess_number_info_by_id(guild_id=guild_id, channel_id= channel_id)
+        if check is not None:
+            return check
 
     skill = discord.app_commands.Group(name="skill", description="Các lệnh liên quan đến Kỹ Năng đặc biệt trong Game Từ Vựng!")
     #region use skill
@@ -89,6 +98,20 @@ class SkillWordMiniGame(commands.Cog):
             else:
                 await interaction.followup.send(embed=embed)
             return
+        
+        info = self.check_if_message_inside_gn_game(guild_id=interaction.guild_id, channel_id=interaction.channel_id)
+        if info is not None:
+            #Đoán số
+            embed = self.get_list_skills_guess_number_embed(interaction=interaction, game_info=info)
+            profile = next((p for p in info.player_profiles if p.user_id == interaction.user.id), None)
+            if profile and profile.special_items:
+                view = GnUseSkillView(user=interaction.user, target=target, channel_id=interaction.channel_id, info=info, all_skills=profile.special_items, profile=profile)
+                mes = await interaction.followup.send(embed=embed, view= view)
+                view.message = mes
+            else:
+                await interaction.followup.send(embed=embed)
+            return
+        
         #Không có
         view = SelfDestructView(timeout=30)
         embed = discord.Embed(title="",description=f"{EmojiCreation1.CROSS.value} Chỉ dùng lệnh này trong kênh chơi Đoán Từ hoặc Nối Từ!",color=discord.Color.red())
@@ -147,8 +170,41 @@ class SkillWordMiniGame(commands.Cog):
         embed.add_field(name=f"", value="___________________", inline=False)
         return embed
     
+    def get_list_skills_guess_number_embed(self, interaction: discord.Interaction, game_info: GuessNumberInfo):
+        embed = discord.Embed(title=f"Danh sách kỹ năng.", description=f"Trò Chơi Đoán Số", color=0x03F8FC)
+        embed.add_field(name=f"", value=f"Player: {interaction.user.mention}", inline=False)
+        embed.add_field(name=f"", value="___________________", inline=False)
+        list_effect = []
+        for player_effect in game_info.player_effects:
+            if player_effect.user_id == interaction.user.id:
+                list_effect.append(player_effect.effect_name)
+
+        if game_info.player_profiles:
+            matched = False
+            game_info.player_profiles.sort(key=lambda x: x.point, reverse=True)
+            for profile in game_info.player_profiles:
+                if profile.user_id == interaction.user.id:
+                    matched = True
+                    if len(list_effect) > 0:
+                        comma_separated_string = ', '.join(list_effect)
+                        embed.add_field(name=f"", value= f"Hiệu ứng đặc biệt: **`{comma_separated_string}`**", inline=False)
+                        embed.add_field(name=f"________________", value= f"")
+                    if profile.special_items:
+                        for index_item, item in enumerate(profile.special_items):
+                            embed.add_field(name=f"Kỹ năng {index_item+1}", value= f"Tên kỹ năng: *{item.item_name}*\nRank: {item.level} \n\nMô tả kỹ năng: {item.item_description}", inline=False)  # Single-line field
+                            embed.add_field(name=f"________________", value= f"")
+                    else:
+                        embed.add_field(name="", value= "Bạn không có kỹ năng đặc biệt nào cả.", inline=False)
+                    break
+            if matched == False:
+                embed.add_field(name="", value= "Bạn hãy chơi trước đi đã.", inline=False)     
+        else:
+            embed.add_field(name=f"", value=f"*Chưa có dữ liệu về người chơi*", inline=False)       
+        embed.add_field(name=f"", value="___________________", inline=False)
+        return embed
+    
     #region give skill
-    @skill.command(name="give", description="Owner có thể cho kỹ năng cho người khác trong trò chơi Nối Từ, Đoán Từ!")
+    @skill.command(name="give", description="Owner có thể cho kỹ năng cho người khác trong trò chơi Nối Từ, Đoán Từ, Đoán Số!")
     @discord.app_commands.describe(target="Chọn người sẽ nhận kỹ năng")
     @discord.app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
     async def give_skill_slash_command(self, interaction: discord.Interaction, target: discord.Member):
@@ -213,9 +269,29 @@ class SkillWordMiniGame(commands.Cog):
             mess = await interaction.followup.send(embed=first, view=view)
             view.message = mess
             return
+        
+        info = self.check_if_message_inside_gn_game(guild_id=interaction.guild_id, channel_id=interaction.channel_id)
+        if info is not None:
+            #Đoán Số
+            list_embed = self.get_list_skill_embed_gn(user=interaction.user, target=target)
+            first = list_embed[0]
+            all_skills = []
+            for item in ListGuessNumberSkills.list_special_items_cap_thap:
+                all_skills.append(item)
+            for item in ListGuessNumberSkills.list_special_items_cap_cao:
+                all_skills.append(item)
+            for item in ListGuessNumberSkills.list_special_items_dang_cap:
+                all_skills.append(item)
+            for item in ListGuessNumberSkills.list_special_items_toi_thuong:
+                all_skills.append(item)
+            #Paginate view
+            view = GnGiveSkillView(user=interaction.user, target=target, channel_id=interaction.channel_id, list_embed=list_embed, all_skills= all_skills)
+            mess = await interaction.followup.send(embed=first, view=view)
+            view.message = mess
+            return
         #Không có
         view = SelfDestructView(timeout=30)
-        embed = discord.Embed(title="",description=f"{EmojiCreation1.CROSS.value} Chỉ dùng lệnh này trong kênh chơi Đoán Từ hoặc Nối Từ!",color=discord.Color.red())
+        embed = discord.Embed(title="",description=f"{EmojiCreation1.CROSS.value} Chỉ dùng lệnh này trong kênh chơi Đoán Từ, Đoán Số hoặc Nối Từ!",color=discord.Color.red())
         mess = await interaction.followup.send(embed=embed, view=view, ephemeral=False)
         view.message = mess
         return
@@ -292,6 +368,47 @@ class SkillWordMiniGame(commands.Cog):
         for i in range(0, total_skills, page_size):
             embed = discord.Embed(
                 title="Danh sách kỹ năng Đoán Từ",
+                description=f"{user.mention} hãy chọn kỹ năng để cho {target.mention}",
+                color=0x03F8FC
+            )
+            embed.add_field(name="", value="___________________", inline=False)
+            for j in range(i, min(i + page_size, total_skills)):
+                category, skill = all_skills[j]
+                embed.add_field(
+                    name=f"Kỹ năng `#{j- i + 1}`: **{skill.item_name}**",
+                    value=(
+                        f"ID: `{skill.item_id}`\n"
+                        f"Rank: **{skill.level}**\n"
+                        f"Mô tả kỹ năng: {skill.item_description}"
+                    ),
+                    inline=False
+                )
+                embed.add_field(name="________________", value="\u200b", inline=False)
+            page_index += 1
+            embed.set_footer(text=f"Trang {page_index}/{(total_skills + page_size - 1) // page_size}")
+            list_embed.append(embed)
+        return list_embed
+    
+    def get_list_skill_embed_gn(self, user: discord.Member, target: discord.Member):
+        list_embed = []
+        page_size = 5
+        all_skills = []
+
+        def add_skills_with_label(label, skill_list):
+            for skill in skill_list:
+                all_skills.append((label, skill))
+
+        add_skills_with_label("Cấp Thấp", ListGuessNumberSkills.list_special_items_cap_thap)
+        add_skills_with_label("Cấp Cao", ListGuessNumberSkills.list_special_items_cap_cao)
+        add_skills_with_label("Đẳng Cấp", ListGuessNumberSkills.list_special_items_dang_cap)
+        add_skills_with_label("Tối Thượng", ListGuessNumberSkills.list_special_items_toi_thuong)
+
+        total_skills = len(all_skills)
+        page_index = 0
+
+        for i in range(0, total_skills, page_size):
+            embed = discord.Embed(
+                title="Danh sách kỹ năng Đoán Số",
                 description=f"{user.mention} hãy chọn kỹ năng để cho {target.mention}",
                 color=0x03F8FC
             )

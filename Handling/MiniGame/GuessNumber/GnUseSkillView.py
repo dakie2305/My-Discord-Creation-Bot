@@ -1,19 +1,19 @@
 import random
 import discord
-from Handling.MiniGame.MatchWord import ListSkills, MwClass, MwMongoManager
-class MwUseSkillView(discord.ui.View):
-    def __init__(self, user: discord.Member, target: discord.Member, channel_id: int, lan: str, info: MwClass.MatchWordInfo, all_skills: list[MwClass.SpecialItem], profile: MwClass.PlayerProfile, english_words_dictionary, vietnamese_dict):
+
+from Handling.MiniGame.GuessNumber import GnMongoManager, ListGuessNumberSkills
+from Handling.MiniGame.GuessNumber.GuessNumberClass import GuessNumberInfo
+from Handling.MiniGame.MatchWord.MwClass import PlayerEffect, PlayerProfile, SpecialItem
+class GnUseSkillView(discord.ui.View):
+    def __init__(self, user: discord.Member, target: discord.Member, channel_id: int, info: GuessNumberInfo, all_skills: list[SpecialItem], profile: PlayerProfile):
         super().__init__(timeout=30)
         self.user = user
         self.target = target
-        self.lan = lan
         self.channel_id = channel_id
         self.profile = profile
         self.all_skills = all_skills
         self.info = info
         self.message: discord.Message = None
-        self.english_words_dictionary = english_words_dictionary
-        self.vietnamese_dict = vietnamese_dict
         
     async def on_timeout(self):
         #Xoá luôn message
@@ -30,10 +30,7 @@ class MwUseSkillView(discord.ui.View):
             user=self.user,
             target=self.target,
             channel_id=self.channel_id,
-            lan=self.lan,
             list_skills=self.all_skills,
-            english_words_dictionary=self.english_words_dictionary,
-            vietnamese_dict=self.vietnamese_dict,
             info=self.info,
             profile=self.profile,
             message=self.message
@@ -42,7 +39,7 @@ class MwUseSkillView(discord.ui.View):
 
 #region use
 class UseSkillInputModal(discord.ui.Modal):
-    def __init__(self, user: discord.Member, target: discord.Member, channel_id: str, lan: str, list_skills: list[MwClass.SpecialItem], info: MwClass.MatchWordInfo, profile: MwClass.PlayerProfile, english_words_dictionary, vietnamese_dict, message: discord.Message):
+    def __init__(self, user: discord.Member, target: discord.Member, channel_id: str, list_skills: list[SpecialItem], info: GuessNumberInfo, profile: PlayerProfile, message: discord.Message):
         super().__init__(title="Chọn kỹ năng")
         self.input_index_page_field = discord.ui.TextInput(
             label="Nhập số thứ tự kỹ năng bạn muốn dùng",
@@ -55,12 +52,9 @@ class UseSkillInputModal(discord.ui.Modal):
         self.user = user
         self.target = target
         self.channel_id = channel_id
-        self.lan = lan
         self.list_skills = list_skills
         self.info = info
         self.profile = profile
-        self.english_words_dictionary: dict = english_words_dictionary
-        self.vietnamese_dict: dict = vietnamese_dict
         self.message = message
 
     async def on_submit(self, interaction: discord.Interaction):
@@ -84,87 +78,23 @@ class UseSkillInputModal(discord.ui.Modal):
             #Logic xử lý dùng kỹ năng
             await self.process_special_item_functions(interaction=interaction, special_item=chosen_skill)
         except Exception as e:
-            print(f"Exception on use skill MW: {e}")
+            print(f"Exception on use skill Guess Number: {e}")
             await interaction.followup.send(f"Chỉ nhập số hợp lệ!", ephemeral=True)
             return
         
         return
     
-    async def process_special_item_functions(self, interaction: discord.Interaction, special_item: MwClass.SpecialItem):
+    async def process_special_item_functions(self, interaction: discord.Interaction, special_item: SpecialItem):
         #Nếu có self.target thì lập tức kiểm tra xem self.target có effect đặc biệt không
-        target_player_effect: MwClass.PlayerEffect = None
+        target_player_effect: PlayerEffect = None
         for effect in self.info.player_effects:
             if effect.user_id == self.target.id:
                 target_player_effect = effect
                 break
         flag_remove_skill = True
-        #Kỹ năng hint, gợi ý từ
-        if special_item.item_id == "ct_hint":
-            #Tìm từ hợp lệ, bắt đầu bằng chữ cái trong
-            suitable_word = None
-            if self.lan == 'eng' or self.lan == 'en':
-                for word in self.english_words_dictionary.keys():
-                    if len(word) > 1 and word.startswith(self.info.correct_start_word) and word not in self.info.used_words:
-                        suitable_word = word
-            elif self.lan == 'vn':
-                for word in self.vietnamese_dict.keys():
-                    if len(word) > 1 and word.startswith(self.info.correct_start_word) and word not in self.info.used_words:
-                        suitable_word = word
-            if suitable_word == None:
-                await interaction.followup.send(f"{interaction.user.mention} đã dùng kỹ năng **`{special_item.item_name}`**.\nRất tiếc là không có từ hợp lệ... lạ ta. <@315835396305059840>", ephemeral=False)
-                flag_remove_skill = False
-            else:
-                half_length = (len(suitable_word) + 2) // 2
-                suitable_word = suitable_word[:half_length] + "..."
-                #Gợi ý nửa từ
-                await interaction.followup.send(f"{interaction.user.mention} đã sử dụng kỹ năng **`{special_item.item_name}`**.\nGợi ý từ hợp lệ: **`{suitable_word}**`")
-        elif special_item.item_id == "cc_hint":
-            #Tìm từ hợp lệ, bắt đầu bằng chữ cái trong self.info
-            suitable_word = None
-            if self.lan == 'eng' or self.lan == 'en':
-                for word in self.english_words_dictionary.keys():
-                    if len(word) > 1 and word.startswith(self.info.correct_start_word) and word not in self.info.used_words:
-                        suitable_word = word
-                        break
-            elif self.lan == 'vn':
-                for word in self.vietnamese_dict.keys():
-                    if len(word) > 1 and word.startswith(self.info.correct_start_word) and word not in self.info.used_words:
-                        suitable_word = word
-                        break
-            if suitable_word == None:
-                await interaction.followup.send(f"{interaction.user.mention} đã dùng kỹ năng **`{special_item.item_name}`**.\nRất tiếc là không có từ hợp lệ... lạ ta. <@315835396305059840>", ephemeral=False)
-                flag_remove_skill = False
-            else:
-                await interaction.followup.send(f"{interaction.user.mention} đã sử dụng kỹ năng **`{special_item.item_name}`**.\nGợi ý từ hợp lệ: **`{suitable_word}**`")
-        
-        elif special_item.item_id =="ct_curr_player":
-            if target_player_effect!= None and target_player_effect.effect_id.endswith("protect"):
-                text_reply = f"{interaction.user.mention} đã dùng kỹ năng **`{special_item.item_name}`**, nhưng người chơi {self.target.mention} có hiệu ứng **`{target_player_effect.effect_name}`** nên không hề hấn gì! "
-                #Vô hiệu hoá
-                if target_player_effect.effect_id.startswith("cc") or target_player_effect.effect_id.startswith("dc"):
-                    #Phản lại kỹ năng
-                    MwMongoManager.update_current_player_id(channel_id=interaction.channel_id,guild_id=interaction.guild_id, language=self.lan, user_id=interaction.user.id)
-                    text_reply += f"{interaction.user.mention} mất quyền nối từ trong lượt chơi hiện tại"
-                    if target_player_effect.effect_id.startswith("dc"):
-                        #Cướp luôn kỹ năng
-                        MwMongoManager.update_player_special_item(user_id=self.target.id, user_name=self.target.name, user_display_name=self.target.display_name, point= 0, guild_id=interaction.guild_id, channel_id=interaction.channel_id,language=self.lan, special_item= special_item)
-                        text_reply += f" và đã bị **{self.target.display_name}** cướp mất kỹ năng **`{special_item.item_name}`**!"
-                await interaction.followup.send(text_reply)
-                #Xoá hiệu ứng khỏi target user
-                MwMongoManager.update_player_effects(remove_special_effect= True,channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id=self.target.id, user_name=self.target.name, effect_id= target_player_effect.effect_id, effect_name= target_player_effect.effect_name)
-            else:
-                #Chuyển current_player_id sang self.target là được
-                await interaction.followup.send(f"{interaction.user.mention} đã dùng kỹ năng **`{special_item.item_name}`**.\nNgười chơi {self.target.mention} sẽ mất quyền nối từ trong lượt chơi hiện tại.\n")
-                MwMongoManager.update_current_player_id(channel_id=interaction.channel_id,guild_id=interaction.guild_id, language=self.lan, user_id=self.target.id)
-
-        elif special_item.item_id =="ct_allow":
-            #Chuyển current_player_id sang số 1 là được
-            await interaction.followup.send(f"{interaction.user.mention} đã dùng kỹ năng **`{special_item.item_name}`**.\n")
-            MwMongoManager.update_current_player_id(channel_id=interaction.channel_id,guild_id=interaction.guild_id, language=self.lan, user_id=1)
-
         #Những kỹ năng có id tận cùng là minus_first hoặc minus_second
         #Đây là những kỹ năng trừ điểm của top 1 hoặc top 2
-        elif special_item.item_id.endswith("minus_first") or special_item.item_id.endswith("minus_second"):
+        if special_item.item_id.endswith("minus_first") or special_item.item_id.endswith("minus_second"):
             #Tìm top player để trừ điểm
             sort = sorted(self.info.player_profiles, key=lambda x: x.point, reverse=True)
             top_number = "1"
@@ -188,17 +118,17 @@ class UseSkillInputModal(discord.ui.Modal):
                 #Vô hiệu hoá
                 if target_player_effect.effect_id.startswith("cc") or target_player_effect.effect_id.startswith("dc"):
                     #Phản lại kỹ năng
-                    MwMongoManager.update_player_point_data_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id= interaction.user.id, user_name=interaction.user.name,user_display_name=interaction.user.display_name, point=-special_item.point)
+                    GnMongoManager.update_player_point_data_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id= interaction.user.id, user_name=interaction.user.name,user_display_name=interaction.user.display_name, point=-special_item.point)
                     text_reply += f"{interaction.user.mention} bị trừ {special_item.point} điểm!"
                     if target_player_effect.effect_id.startswith("dc"):
                         #Cướp luôn kỹ năng
-                        MwMongoManager.update_player_special_item(user_id=top_profile.user_id, user_name=top_profile.user_name, user_display_name=top_profile.user_display_name, point= 0, guild_id=interaction.guild_id, channel_id=interaction.channel_id,language=self.lan, special_item= special_item)
+                        GnMongoManager.update_player_special_item(user_id=top_profile.user_id, user_name=top_profile.user_name, user_display_name=top_profile.user_display_name, point= 0, guild_id=interaction.guild_id, channel_id=interaction.channel_id, special_item= special_item)
                         text_reply += f" và đã bị **<@{top_profile.user_id}>** cướp mất kỹ năng **`{special_item.item_name}`**!"
                 await interaction.followup.send(text_reply)
                 #Xoá hiệu ứng khỏi top profile
-                MwMongoManager.update_player_effects(remove_special_effect= True,channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id=top_profile.user_id, user_name=top_profile.user_name, effect_id= target_player_effect.effect_id, effect_name= target_player_effect.effect_name)
+                GnMongoManager.update_player_effects(remove_special_effect= True,channel_id=interaction.channel_id, guild_id=interaction.guild_id, user_id=top_profile.user_id, user_name=top_profile.user_name, effect_id= target_player_effect.effect_id, effect_name= target_player_effect.effect_name)
             else:
-                MwMongoManager.update_player_point_data_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id= top_profile.user_id, user_name=top_profile.user_name,user_display_name=top_profile.user_display_name, point=-special_item.point)
+                GnMongoManager.update_player_point_data_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id= top_profile.user_id, user_name=top_profile.user_name,user_display_name=top_profile.user_display_name, point=-special_item.point)
                 await interaction.followup.send(f"{interaction.user.mention} đã dùng kỹ năng **`{special_item.item_name}`** để trừ {special_item.point} điểm của <@{top_profile.user_id}>.\n")
 
         elif special_item.item_id.endswith("steal_skill") or special_item.item_id.endswith("del_skill"):
@@ -219,20 +149,20 @@ class UseSkillInputModal(discord.ui.Modal):
                 #Vô hiệu hoá
                 if target_player_effect.effect_id.startswith("cc") or target_player_effect.effect_id.startswith("dc"):
                     #Chỉ cướp kỹ năng
-                    MwMongoManager.update_player_special_item(user_id=self.target.id, user_name=self.target.name, user_display_name=self.target.display_name, point= 0, guild_id=interaction.guild_id, channel_id=interaction.channel_id,language=self.lan, special_item= special_item)
+                    GnMongoManager.update_player_special_item(user_id=self.target.id, user_name=self.target.name, user_display_name=self.target.display_name, point= 0, guild_id=interaction.guild_id, channel_id=interaction.channel_id, special_item= special_item)
                     text_reply += f" **{self.target.display_name}** đã cướp mất kỹ năng **`{special_item.item_name}`**!"
                 await interaction.followup.send(text_reply)
                 #Xoá hiệu ứng khỏi target user
-                MwMongoManager.update_player_effects(remove_special_effect= True,channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id=self.target.id, user_name=self.target.name, effect_id= target_player_effect.effect_id, effect_name= target_player_effect.effect_name)
+                GnMongoManager.update_player_effects(remove_special_effect= True,channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id=self.target.id, user_name=self.target.name, effect_id= target_player_effect.effect_id, effect_name= target_player_effect.effect_name)
             else:            
                 random_item = random.choice(selected_player.special_items)
                 action = "xoá"
                 if special_item.item_id.endswith("steal_skill"): 
                     action = "cướp"
                     #Thêm cái random item kia cho user
-                    MwMongoManager.update_player_special_item(user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, point= 0, guild_id=interaction.guild_id, channel_id=interaction.channel_id,language=self.lan, special_item= random_item)
+                    GnMongoManager.update_player_special_item(user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, point= 0, guild_id=interaction.guild_id, channel_id=interaction.channel_id, special_item= random_item)
                 #xoá random item kia ra khỏi inven của user target
-                MwMongoManager.update_player_special_item(remove_special_item=True,user_id=self.target.id, user_name=self.target.name, user_display_name=self.target.display_name, point= 0, guild_id=interaction.guild_id, channel_id=interaction.channel_id,language=self.lan, special_item= random_item)
+                GnMongoManager.update_player_special_item(remove_special_item=True,user_id=self.target.id, user_name=self.target.name, user_display_name=self.target.display_name, point= 0, guild_id=interaction.guild_id, channel_id=interaction.channel_id, special_item= random_item)
                 await interaction.followup.send(f"{interaction.user.mention} đã dùng kỹ năng **`{special_item.item_name}`** để {action} kỹ năng **`{random_item.item_name}`** của {self.target.mention}.\n")
 
         #Những kỹ năng có id chứa chữ "_random_skill_"
@@ -240,13 +170,13 @@ class UseSkillInputModal(discord.ui.Modal):
         elif special_item.item_id.endswith("random_skill_dc") or special_item.item_id.endswith("random_skill_cc"):
             random_skill = None
             if special_item.item_id.endswith("dc"):
-                random_skill = random.choice(ListSkills.list_special_items_dang_cap)
+                random_skill = random.choice(ListGuessNumberSkills.list_special_items_dang_cap)
             else:
-                random_skill = random.choice(ListSkills.list_special_items_cap_cao)
+                random_skill = random.choice(ListGuessNumberSkills.list_special_items_cap_cao)
             #Thêm cái random item kia cho user
-            MwMongoManager.update_player_special_item(user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, point= 0, guild_id=interaction.guild_id, channel_id=interaction.channel_id,language=self.lan, special_item= random_skill)
+            GnMongoManager.update_player_special_item(user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, point= 0, guild_id=interaction.guild_id, channel_id=interaction.channel_id, special_item= random_skill)
             #Skill này yêu cầu hy sinh điểm để đổi skill
-            MwMongoManager.update_player_point_data_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id= interaction.user.id, user_name=interaction.user.name,user_display_name=interaction.user.display_name, point=-special_item.point)
+            GnMongoManager.update_player_point_data_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id= interaction.user.id, user_name=interaction.user.name,user_display_name=interaction.user.display_name, point=-special_item.point)
             await interaction.followup.send(f"{interaction.user.mention} đã dùng kỹ năng **`{special_item.item_name}`** để hy sinh {special_item.point} điểm, và nhận được kỹ năng **`{random_skill.item_name}`**.\n")
 
         #Những kỹ năng có id tận cùng là _minus hoặc _add
@@ -262,20 +192,20 @@ class UseSkillInputModal(discord.ui.Modal):
                     #Vô hiệu hoá
                     if target_player_effect.effect_id.startswith("cc") or target_player_effect.effect_id.startswith("dc"):
                         #Phản lại kỹ năng
-                        MwMongoManager.update_player_point_data_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id= interaction.user.id, user_name=interaction.user.name,user_display_name=interaction.user.display_name, point=-special_item.point)
+                        GnMongoManager.update_player_point_data_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id= interaction.user.id, user_name=interaction.user.name,user_display_name=interaction.user.display_name, point=-special_item.point)
                         text_reply += f"{interaction.user.mention} bị trừ {special_item.point} điểm."
                         if target_player_effect.effect_id.startswith("dc"):
                             #Cướp luôn kỹ năng
-                            MwMongoManager.update_player_special_item(user_id=self.target.id, user_name=self.target.name, user_display_name=self.target.display_name, point= 0, guild_id=interaction.guild_id, channel_id=interaction.channel_id,language=self.lan, special_item= special_item)
+                            GnMongoManager.update_player_special_item(user_id=self.target.id, user_name=self.target.name, user_display_name=self.target.display_name, point= 0, guild_id=interaction.guild_id, channel_id=interaction.channel_id, special_item= special_item)
                             text_reply += f" và đã bị **{self.target.display_name}** cướp mất kỹ năng **`{special_item.item_name}`**!"
                     await interaction.followup.send(text_reply)
                     #Xoá hiệu ứng khỏi target user
-                    MwMongoManager.update_player_effects(remove_special_effect= True,channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id=self.target.id, user_name=self.target.name, effect_id= target_player_effect.effect_id, effect_name= target_player_effect.effect_name)
+                    GnMongoManager.update_player_effects(remove_special_effect= True,channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id=self.target.id, user_name=self.target.name, effect_id= target_player_effect.effect_id, effect_name= target_player_effect.effect_name)
                 else:
-                    MwMongoManager.update_player_point_data_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id= self.target.id, user_name=self.target.name,user_display_name=self.target.display_name, point=-special_item.point)
+                    GnMongoManager.update_player_point_data_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id= self.target.id, user_name=self.target.name,user_display_name=self.target.display_name, point=-special_item.point)
                     await interaction.followup.send(f"{interaction.user.mention} đã dùng kỹ năng **`{special_item.item_name}`** để trừ {special_item.point} điểm của {self.target.mention}.\n")
             else:
-                MwMongoManager.update_player_point_data_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id= interaction.user.id, user_name=interaction.user.name,user_display_name=interaction.user.display_name, point=special_item.point)
+                GnMongoManager.update_player_point_data_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id= interaction.user.id, user_name=interaction.user.name,user_display_name=interaction.user.display_name, point=special_item.point)
                 await interaction.followup.send(f"{interaction.user.mention} đã dùng kỹ năng **`{special_item.item_name}`** để cộng {special_item.point} điểm cho bản thân mình.\n")
 
         #Những kỹ năng có id tận cùng là _add_user
@@ -287,7 +217,7 @@ class UseSkillInputModal(discord.ui.Modal):
             elif self.target.id == interaction.user.id:
                 await interaction.followup.send(f"Ôi bạn ơi, kỹ năng **`{special_item.item_name}`** chỉ dành cho người khác chứ không phải dành cho bạn.\n")
                 return
-            MwMongoManager.update_player_point_data_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id= self.target.id, user_name=self.target.name,user_display_name=self.target.display_name, point=special_item.point)
+            GnMongoManager.update_player_point_data_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id= self.target.id, user_name=self.target.name,user_display_name=self.target.display_name, point=special_item.point)
             await interaction.followup.send(f"{interaction.user.mention} đã dùng kỹ năng **`{special_item.item_name}`** để cộng {special_item.point} điểm cho {self.target.mention}.\n")
 
         #Những kỹ năng có id tận cùng là steal_point
@@ -305,16 +235,16 @@ class UseSkillInputModal(discord.ui.Modal):
                     #Vô hiệu hoá
                     if target_player_effect.effect_id.startswith("cc") or target_player_effect.effect_id.startswith("dc"):
                         #Phản lại kỹ năng
-                        MwMongoManager.update_player_point_data_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id= interaction.user.id, user_name=interaction.user.name,user_display_name=interaction.user.display_name, point=-special_item.point)
-                        MwMongoManager.update_player_point_data_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id= self.target.id, user_name=self.target.name,user_display_name=self.target.display_name, point=special_item.point)
+                        GnMongoManager.update_player_point_data_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id= interaction.user.id, user_name=interaction.user.name,user_display_name=interaction.user.display_name, point=-special_item.point)
+                        GnMongoManager.update_player_point_data_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id= self.target.id, user_name=self.target.name,user_display_name=self.target.display_name, point=special_item.point)
                         text_reply += f"{interaction.user.mention} đã bị cướp mất {special_item.point} điểm!"
                         if target_player_effect.effect_id.startswith("dc"):
                             #Cướp luôn kỹ năng
-                            MwMongoManager.update_player_special_item(user_id=self.target.id, user_name=self.target.name, user_display_name=self.target.display_name, point= 0, guild_id=interaction.guild_id, channel_id=interaction.channel_id,language=self.lan, special_item= special_item)
+                            GnMongoManager.update_player_special_item(user_id=self.target.id, user_name=self.target.name, user_display_name=self.target.display_name, point= 0, guild_id=interaction.guild_id, channel_id=interaction.channel_id, special_item= special_item)
                             text_reply += f" và đã bị **{self.target.display_name}** cướp mất kỹ năng **`{special_item.item_name}`**!"
                     await interaction.followup.send(text_reply)
                     #Xoá hiệu ứng khỏi target user
-                    MwMongoManager.update_player_effects(remove_special_effect= True,channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id=self.target.id, user_name=self.target.name, effect_id= target_player_effect.effect_id, effect_name= target_player_effect.effect_name)
+                    GnMongoManager.update_player_effects(remove_special_effect= True,channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id=self.target.id, user_name=self.target.name, effect_id= target_player_effect.effect_id, effect_name= target_player_effect.effect_name)
                     return
             
             if special_item.item_id == "ct_steal_point":
@@ -323,19 +253,19 @@ class UseSkillInputModal(discord.ui.Modal):
                 if ran == 2:
                     await interaction.followup.send(f"{interaction.user.mention} định dùng kỹ năng **`{special_item.item_name}`** để cướp điểm {self.target.mention} nhưng đã thất bại!\n")
                     #xoá khỏi inven của player
-                    MwMongoManager.update_player_special_item(channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, point=0, special_item=special_item, remove_special_item=True)
+                    GnMongoManager.update_player_special_item(channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, point=0, special_item=special_item, remove_special_item=True)
                     return
             #cộng điểm player
-            MwMongoManager.update_player_point_data_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id= interaction.user.id, user_name=interaction.user.name,user_display_name=interaction.user.display_name, point=special_item.point)
+            GnMongoManager.update_player_point_data_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id= interaction.user.id, user_name=interaction.user.name,user_display_name=interaction.user.display_name, point=special_item.point)
             #trừ điểm đối thủ
-            MwMongoManager.update_player_point_data_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id= self.target.id, user_name=self.target.name,user_display_name=self.target.display_name, point=-special_item.point)
+            GnMongoManager.update_player_point_data_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id= self.target.id, user_name=self.target.name,user_display_name=self.target.display_name, point=-special_item.point)
             await interaction.followup.send(f"{interaction.user.mention} đã dùng kỹ năng **`{special_item.item_name}`** để cướp {special_item.point} điểm của {self.target.mention}.\n")
         
         #Những kỹ năng có id tận cùng là minus_all
         #Đây là những kỹ năng trừ điểm toàn bộ đối thủ
         elif special_item.item_id.endswith("minus_all"):
             await interaction.followup.send(f"{interaction.user.mention} đã dùng kỹ năng **`{special_item.item_name}`** để trừ {special_item.point} điểm cho toàn bộ đấu thủ!\n")
-            MwMongoManager.update_all_players_point(channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, point=-special_item.point, immune_user_id=interaction.user.id)
+            GnMongoManager.update_all_players_point(channel_id=interaction.channel_id, guild_id=interaction.guild_id,  point=-special_item.point, immune_user_id=interaction.user.id)
         
         #Những kỹ năng có id chứa chữ "_swap_"
         #Đây là những kỹ năng cộng điểm lên top
@@ -368,21 +298,21 @@ class UseSkillInputModal(discord.ui.Modal):
                 #Vô hiệu hoá
                 if target_player_effect.effect_id.startswith("cc") or target_player_effect.effect_id.startswith("dc"):
                     #Phản lại kỹ năng
-                    MwMongoManager.update_player_point_data_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id= interaction.user.id, user_name=interaction.user.name,user_display_name=interaction.user.display_name, point=-special_item.point)
+                    GnMongoManager.update_player_point_data_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id= interaction.user.id, user_name=interaction.user.name,user_display_name=interaction.user.display_name, point=-special_item.point)
                     text_reply += f"{interaction.user.mention} bị trừ {special_item.point} điểm!"
                     if target_player_effect.effect_id.startswith("dc"):
                         #Cướp luôn kỹ năng
-                        MwMongoManager.update_player_special_item(user_id=top_profile.user_id, user_name=top_profile.user_name, user_display_name=top_profile.user_display_name, point= 0, guild_id=interaction.guild_id, channel_id=interaction.channel_id,language=self.lan, special_item= special_item)
+                        GnMongoManager.update_player_special_item(user_id=top_profile.user_id, user_name=top_profile.user_name, user_display_name=top_profile.user_display_name, point= 0, guild_id=interaction.guild_id, channel_id=interaction.channel_id, special_item= special_item)
                         text_reply += f" và đã bị **<@{top_profile.user_id}>** cướp mất kỹ năng **`{special_item.item_name}`**!"
                 await interaction.followup.send(text_reply)
                 #Xoá hiệu ứng khỏi target user
-                MwMongoManager.update_player_effects(remove_special_effect= True,channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id=top_profile.user_id, user_name=top_profile.user_name, effect_id= target_player_effect.effect_id, effect_name= target_player_effect.effect_name)
+                GnMongoManager.update_player_effects(remove_special_effect= True,channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id=top_profile.user_id, user_name=top_profile.user_name, effect_id= target_player_effect.effect_id, effect_name= target_player_effect.effect_name)
             else:
                 #Lấy điểm của self.target ra và trừ điểm hiện tại của người chơi, đó sẽ là điểm cần cộng cho người chơi
                 calc_point = top_profile.point -curr_player.point
-                MwMongoManager.update_player_point_data_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id= interaction.user.id, user_name=interaction.user.name,user_display_name=interaction.user.display_name, point=calc_point)
+                GnMongoManager.update_player_point_data_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id= interaction.user.id, user_name=interaction.user.name,user_display_name=interaction.user.display_name, point=calc_point)
                 #User target bị trừ năm điểm
-                MwMongoManager.update_player_point_data_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id= top_profile.user_id, user_name=top_profile.user_name,user_display_name=top_profile.user_display_name, point=-special_item.point)
+                GnMongoManager.update_player_point_data_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id= top_profile.user_id, user_name=top_profile.user_name,user_display_name=top_profile.user_display_name, point=-special_item.point)
                 await interaction.followup.send(f"{interaction.user.mention} đã dùng kỹ năng **`{special_item.item_name}`** để thế vị trí của <@{top_profile.user_id}>, và đối phương đã bị trừ {special_item.point} điểm.\n")
         
         #Những kỹ năng có id chứa chữ "_protect"
@@ -396,22 +326,22 @@ class UseSkillInputModal(discord.ui.Modal):
                 if self.target.id == interaction.user.id:
                     await interaction.followup.send(f"Ôi bạn ơi, kỹ năng **`{special_item.item_name}`** chỉ dành cho người khác chứ không phải dành cho bạn.\n")
                     return
-                MwMongoManager.update_player_effects(channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id=self.target.id, user_name=self.target.name, effect_id= "ct_protect", effect_name= "Bảo Hộ")
+                GnMongoManager.update_player_effects(channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id=self.target.id, user_name=self.target.name, effect_id= "ct_protect", effect_name= "Bảo Hộ")
                 await interaction.followup.send(f"{interaction.user.mention} đã dùng kỹ năng **`{special_item.item_name}`** để bảo vệ player {self.target.mention}.\n")
             else:    
-                MwMongoManager.update_player_effects(channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id=interaction.user.id, user_name=interaction.user.name, effect_id= special_item.item_id, effect_name= special_item.item_name)
+                GnMongoManager.update_player_effects(channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id=interaction.user.id, user_name=interaction.user.name, effect_id= special_item.item_id, effect_name= special_item.item_name)
                 await interaction.followup.send(f"{interaction.user.mention} đã dùng kỹ năng **`{special_item.item_name}`** lên bản thân\n")
         
         #Đây là những kỹ năng bỏ khoá mõm player
         elif special_item.item_id == "ct_ban_remove":
             #Bỏ khoá mõm đối thủ
-            MwMongoManager.create_and_update_player_bans_word_matching_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id= self.target.id, user_name=self.target.name, ban_remaining=0)
+            GnMongoManager.create_and_update_player_bans_word_matching_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id= self.target.id, user_name=self.target.name, ban_remaining=0)
             await interaction.followup.send(f"{interaction.user.mention} đã dùng kỹ năng **`{special_item.item_name}`** để gỡ khoá cho {self.target.mention}.\n")
 
         #Đây là những kỹ năng bỏ khoá mõm toàn bộ
         elif special_item.item_id == "cc_ban_remove":
             #Bỏ khoá mõm toàn bộ
-            MwMongoManager.delete_player_bans(channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan)
+            GnMongoManager.delete_player_bans(channel_id=interaction.channel_id, guild_id=interaction.guild_id)
             await interaction.followup.send(f"{interaction.user.mention} đã dùng kỹ năng **`{special_item.item_name}`** để gỡ khoá cho toàn bộ mọi người trong kênh.\n")
 
         #Những kỹ năng có id chứa chữ "_ban"
@@ -428,28 +358,26 @@ class UseSkillInputModal(discord.ui.Modal):
                     #Vô hiệu hoá
                     if target_player_effect.effect_id.startswith("cc") or target_player_effect.effect_id.startswith("dc"):
                         #Phản lại kỹ năng
-                        MwMongoManager.create_and_update_player_bans_word_matching_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id= interaction.user.id, user_name=interaction.user.name, ban_remaining=special_item.point)
+                        GnMongoManager.create_and_update_player_bans_word_matching_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id= interaction.user.id, user_name=interaction.user.name, ban_remaining=special_item.point)
                         text_reply += f"{interaction.user.mention} đã bị khoá mõm trong {special_item.point} vòng chơi tiếp theo"
                         if target_player_effect.effect_id.startswith("dc"):
                             #Cướp luôn kỹ năng
-                            MwMongoManager.update_player_special_item(user_id=self.target.id, user_name=self.target.name, user_display_name=self.target.display_name, point= 0, guild_id=interaction.guild_id, channel_id=interaction.channel_id,language=self.lan, special_item= special_item)
+                            GnMongoManager.update_player_special_item(user_id=self.target.id, user_name=self.target.name, user_display_name=self.target.display_name, point= 0, guild_id=interaction.guild_id, channel_id=interaction.channel_id, special_item= special_item)
                             text_reply += f" và đã bị **{self.target.display_name}** cướp mất kỹ năng **`{special_item.item_name}`**!"
                     await interaction.followup.send(text_reply)
                     #Xoá hiệu ứng khỏi target user
-                    MwMongoManager.update_player_effects(remove_special_effect= True,channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id=self.target.id, user_name=self.target.name, effect_id= target_player_effect.effect_id, effect_name= target_player_effect.effect_name)
+                    GnMongoManager.update_player_effects(remove_special_effect= True,channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id=self.target.id, user_name=self.target.name, effect_id= target_player_effect.effect_id, effect_name= target_player_effect.effect_name)
             else:
                 #khoá mõm đối thủ
-                MwMongoManager.create_and_update_player_bans_word_matching_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id= self.target.id, user_name=self.target.name, ban_remaining=special_item.point)
-                await interaction.followup.send(f"{interaction.user.mention} đã dùng kỹ năng **`{special_item.item_name}`** để khoá mõm {self.target.mention} trong {special_item.point} lượt chơi tiếp theo.\n")
-        
-        
+                GnMongoManager.create_and_update_player_bans_word_matching_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id= self.target.id, user_name=self.target.name, ban_remaining=special_item.point)
+                await interaction.followup.send(f"{interaction.user.mention} đã dùng kỹ năng **`{special_item.item_name}`** để khoá mõm {self.target.mention} trong vài lượt chơi tiếp theo.\n")
         else:
             await interaction.followup.send(f"{interaction.user.mention}, Darkie vẫn chưa hoàn thành kỹ năng **`{special_item.item_name}`**.\nVui lòng đợi sau!")
             flag_remove_skill = False
         
         if flag_remove_skill:
             #xoá khỏi inven của player
-            MwMongoManager.update_player_special_item(channel_id=interaction.channel_id, guild_id=interaction.guild_id, language=self.lan, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, point=0, special_item=special_item, remove_special_item=True)
+            GnMongoManager.update_player_special_item(channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, point=0, special_item=special_item, remove_special_item=True)
         #Xoá luôn message
         try:
             await self.message.delete()

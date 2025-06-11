@@ -7,6 +7,8 @@ import CustomFunctions
 import random
 import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
 from CustomEnum.SlashEnum import SlashCommand 
+from Handling.MiniGame.GuessNumber import GnMongoManager
+from Handling.MiniGame.GuessNumber.GuessNumberClass import GuessNumberInfo
 from Handling.MiniGame.SortWord import SwClass, SwHandling, SwMongoManager
 from Handling.MiniGame.MatchWord import MwClass, MwMongoManager
 from Handling.MiniGame.SortWord.SwConfirmDeleteView import SwConfirmDeleteView
@@ -36,9 +38,14 @@ class LeaderboardWordMiniGame(commands.Cog):
             if check is not None:
                 return check, lan
         return None, None
+    
+    def check_if_message_inside_gn_game(self, guild_id: int = None, channel_id: int = None):
+        check = GnMongoManager.find_guess_number_info_by_id(guild_id=guild_id, channel_id= channel_id)
+        if check is not None:
+            return check
 
     #region Truth Dare
-    @discord.app_commands.command(name="bxh", description="Kiểm tra bảng xếp hạng Nối Từ/Đoán Từ trong kênh này.")
+    @discord.app_commands.command(name="bxh", description="Kiểm tra bảng xếp hạng Nối Từ/Đoán Từ/Đoán Số trong kênh này.")
     @discord.app_commands.describe(user="Chọn user cần muốn xem cụ thể xếp hạng")
     @discord.app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
     async def bxh(self, interaction: discord.Interaction, user: discord.Member = None):
@@ -64,6 +71,14 @@ class LeaderboardWordMiniGame(commands.Cog):
             embed = self.get_leaderboard_embed(interaction=interaction, lan= lan, sw_info=info, user_mention = user)
             await interaction.followup.send(embed=embed)
             return
+        
+        info = self.check_if_message_inside_gn_game(guild_id=interaction.guild_id, channel_id=interaction.channel_id)
+        if info is not None:
+            #Đoán từ
+            embed = self.get_leaderboard_guess_number_embed(interaction=interaction, game_info=info, user_mention = user)
+            await interaction.followup.send(embed=embed)
+            return
+        
         #Không có
         view = SelfDestructView(timeout=30)
         embed = discord.Embed(title="",description=f"{EmojiCreation1.CROSS.value} Chỉ dùng lệnh này trong kênh chơi Đoán Từ hoặc Nối Từ!",color=discord.Color.red())
@@ -114,10 +129,43 @@ class LeaderboardWordMiniGame(commands.Cog):
                         if profile.special_items:
                             embed.add_field(name=f"________________", value= f"")
                             for index_item, item in enumerate(profile.special_items):
-                                instruction = f"!sws {item.item_id}"
-                                if item.required_target:
-                                    instruction = f"!sws {item.item_id} <@315835396305059840>"
-                                embed.add_field(name=f"Kỹ năng {index_item+1}", value= f"Tên kỹ năng: *{item.item_name}*\n\nMô tả kỹ năng: {item.item_description}\n\nCách dùng:**/skills**", inline=False)
+                                embed.add_field(name=f"Kỹ năng {index_item+1}", value= f"Tên kỹ năng: *{item.item_name}*\n\nMô tả kỹ năng: {item.item_description}\n\nCách dùng: {SlashCommand.SKILL_USE.value}", inline=False)
+                                embed.add_field(name=f"________________", value= f"")
+                        matched = True
+                        break
+                if matched == False:
+                    embed.add_field(name=f"", value=f"*Chưa có dữ liệu về người chơi này*", inline=False)     
+        else:
+            embed.add_field(name=f"", value=f"*Chưa có dữ liệu về người chơi*", inline=False)       
+        embed.add_field(name=f"", value="___________________", inline=False)
+        return embed
+    
+    
+    def get_leaderboard_guess_number_embed(self, interaction: discord.Interaction, game_info: GuessNumberInfo, user_mention: discord.Member = None):
+        embed = discord.Embed(title=f"Xếp hạng các player theo điểm.", description=f"Trò Chơi Đoán Số", color=0x03F8FC)
+        embed.add_field(name=f"", value=f"Lượt chơi thứ: {game_info.current_round}", inline=False)
+        embed.add_field(name=f"", value="___________________", inline=False)
+        count = 0
+        if game_info.player_profiles:
+            game_info.player_profiles.sort(key=lambda x: x.point, reverse=True)
+            if user_mention == None:
+                for index, profile in enumerate(game_info.player_profiles):
+                    user = interaction.guild.get_member(profile.user_id)
+                    if user != None and (profile.point!= 0):
+                        embed.add_field(name=f"", value=f"**Hạng {index+1}.** {user.mention}. Tổng điểm: **{profile.point}**. Số lượng kỹ năng đặc biệt: **{len(profile.special_items)}**.", inline=False)
+                        count+=1
+                    if count >= 15: break
+            else:
+                matched = False
+                for index, profile in enumerate(game_info.player_profiles):
+                    if profile.user_id == user_mention.id:
+                        user = interaction.guild.get_member(profile.user_id)
+                        embed.add_field(name=f"", value=f"**Hạng {index+1}.** {user.mention}. Tổng điểm: **{profile.point}**. Số lượng kỹ năng đặc biệt: **{len(profile.special_items)}**.", inline=False)
+                        #Show kỹ năng luôn
+                        if profile.special_items:
+                            embed.add_field(name=f"________________", value= f"")
+                            for index_item, item in enumerate(profile.special_items):
+                                embed.add_field(name=f"Kỹ năng {index_item+1}", value= f"Tên kỹ năng: *{item.item_name}*\n\nMô tả kỹ năng: {item.item_description}\n\nCách dùng: {SlashCommand.SKILL_USE.value}", inline=False)
                                 embed.add_field(name=f"________________", value= f"")
                         matched = True
                         break
