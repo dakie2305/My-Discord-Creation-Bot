@@ -39,7 +39,7 @@ class AutoresponderHandling():
         dia_vi_help = ["tăng địa vị", "điểm địa vị", "địa vị là gì", "địa vị?"]
         
         
-        donate = ["donate"]
+        donate = ["donation"]
         donate_disable = ["!disable donation", "!disable donation text"]
         sb_help = ["sb help","cách chơi tài xỉu", "tài xỉu?", "tx help"]
         legend_weapon = ["thất truyền huyền khí"]
