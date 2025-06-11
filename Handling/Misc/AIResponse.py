@@ -17,6 +17,7 @@ class AIResponseHandling():
         self.bot = bot
         self.bot_name = "Creation 2" if bot.user.id == UserId.CREATION_2.value else "Creation 1"
         self.bot_to_bot_history = deque()
+        self.user_to_bot_history = deque()
 
     async def sub_function_ai_response(self, message: discord.Message, speakFlag: bool = True):
         if speakFlag == False: return
@@ -28,13 +29,23 @@ class AIResponseHandling():
         
         if message.author.id in [UserId.CREATION_1.value, UserId.CREATION_2.value] and message.author.id != self.bot.user.id:
             now = datetime.datetime.now()
-            # Clean up old timestamps
             self.bot_to_bot_history = deque(ts for ts in self.bot_to_bot_history if now - ts < datetime.timedelta(minutes=5))
-            
             self.bot_to_bot_history.append(now)
-
             if len(self.bot_to_bot_history) >= 5:
-                print(f"Too many bot-to-bot messages in 5 mins. Skipping.")
+                text = f"Creation 1 - 2 interacting with each other too many time in the last 5 mins. Skipping."
+                print(text)
+                await self.alert_creator(text)
+                return
+        
+        elif message.author.id != self.bot.user.id:
+            now = datetime.datetime.now()
+            self.bot_to_bot_history = deque(ts for ts in self.bot_to_bot_history if now - ts < datetime.timedelta(minutes=3))
+            self.bot_to_bot_history.append(now)
+            if len(self.bot_to_bot_history) >= 15:
+                text = f"User {message.author.name}, display name {message.author.display_name} interacting with bot {self.bot_name} over 15 times in the last 3 mins at guid {message.guild.name}."
+                print(text)
+                await message.channel.send(f"Vui lòng không spam chức năng A.I. của bot quá nhanh.")
+                await self.alert_creator(text)
                 return
 
         
@@ -120,4 +131,11 @@ class AIResponseHandling():
                 return
         except Exception as e:
             print(f"Username {message.author.name}, Display user name {message.author.display_name} replied {self.bot.user} but with error: {e}")
+        return
+    
+    
+    async def alert_creator(self, text: str):
+        user = await self.bot.fetch_user(UserId.DARKIE.value)
+        if user:
+            await user.send(text)
         return
