@@ -504,9 +504,9 @@ async def clear_up_data_task():
         all_gn_data = GnMongoManager.find_all_info_in_guild(guild_id=guild.id)
         count = 0
         if all_gn_data != None:
-            for sw_data in all_gn_data:
-                if datetime.now() > sw_data.last_played + timedelta(weeks=4):
-                    GnMongoManager.delete_data_info(channel_id=sw_data.channel_id, guild_id=guild.id)
+            for data in all_gn_data:
+                if datetime.now() > data.last_played + timedelta(weeks=4):
+                    GnMongoManager.delete_data_info(channel_id=data.channel_id, guild_id=guild.id)
                     count+=1
             
         print(f"clear_up_data_task started. Deleted {count} Guess Number data in guild {guild.name} for being inactive over 1 month")

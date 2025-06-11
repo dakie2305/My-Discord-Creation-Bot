@@ -31,7 +31,7 @@ class GuessNumberInfo:
             "correct_number": self.correct_number,
             "special_point": self.special_point,
             "current_round": self.current_round,
-            "last_played": self.last_played.isoformat() if self.last_played else None,
+            "last_played": self.last_played if self.last_played else None,
             "special_item": self.special_item.to_dict() if self.special_item else None,
             "player_profiles": [p.to_dict() for p in self.player_profiles],
             "player_effects": [e.to_dict() for e in self.player_effects],

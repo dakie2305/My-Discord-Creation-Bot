@@ -270,7 +270,7 @@ def reduce_player_penalty_after_round(channel_id: int, guild_id: int):
     if list_player_penalty != None and len(list_player_penalty) > 0:
         for player in list_player_penalty:
             player.penalty_point -= 1
-        new_list_remove_0 = [item for item in list_player_penalty if item.ban_remain > 0]    
+        new_list_remove_0 = [item for item in list_player_penalty if item.penalty_point > 0]    
         result = collection.update_one({"channel_id": channel_id}, {"$set": {"player_penalty": [player.to_dict() for player in new_list_remove_0],
                                                                             }})
         return result

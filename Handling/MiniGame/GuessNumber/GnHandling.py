@@ -10,6 +10,8 @@ import string
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 from Handling.Misc.SelfDestructView import SelfDestructView
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
+import re
+
 
 class GnHandlingFunction():
     def __init__ (self, message: discord.Message):
@@ -106,21 +108,25 @@ class GnHandlingFunction():
             if answer % d == 0:
                 hints.append(f"Số cần tìm chia hết cho `{d}`.")
                 break
+
         abs_answer = abs(answer)
         abs_answer_str = str(abs_answer)
-        hints.append(f"Số cần tìm có tận cùng là `{answer % 10}`.")
+
+        hints.append(f"Số cần tìm có tận cùng là `{abs_answer % 10}`.")
         hints.append(f"Số cần tìm là một số {'chẵn' if answer % 2 == 0 else 'lẻ'}.")
         hints.append(f"Số cần tìm là một số {'dương' if answer > 0 else 'âm'}.")
-        hints.append(f"Số cần tìm có `{len(str(answer))}` chữ số.")
+        hints.append(f"Số cần tìm có `{len(abs_answer_str)}` chữ số.")
         hints.append(f"Chữ số đầu tiên của số cần tìm là `{abs_answer_str[0]}`.")
-        hints.append(f"Tổng các chữ số của số cần tìm là `{sum(int(d) for d in str(answer))}`.")
+        hints.append(f"Tổng các chữ số của số cần tìm là `{sum(int(d) for d in abs_answer_str)}`.")
+
         if abs(guess - answer) <= 100:
             return f"Số bạn đoán gần đúng rồi, chỉ chênh lệch `{abs(guess - answer)}` đơn vị!"
-        hints.append(f"Chữ số đầu tiên của số cần tìm là `{str(answer)[0]}`.")
-        even_count = sum(1 for d in str(answer) if int(d) % 2 == 0)
+
+        even_count = sum(1 for d in abs_answer_str if int(d) % 2 == 0)
         hints.append(f"Số cần tìm có `{even_count}` chữ số chẵn.")
-        odd_count = sum(1 for d in str(answer) if int(d) % 2 != 0)
+        odd_count = sum(1 for d in abs_answer_str if int(d) % 2 != 0)
         hints.append(f"Số cần tìm có `{odd_count}` chữ số lẻ.")
+
         if len(abs_answer_str) >= 3:
             hints.append(f"Hai chữ số đầu của số cần tìm là `{abs_answer_str[:2]}`.")
         if len(abs_answer_str) >= 4:
@@ -129,9 +135,8 @@ class GnHandlingFunction():
             hints.append(f"Hai chữ số cuối của số cần tìm là `{abs_answer_str[-2:]}`.")
         if len(abs_answer_str) >= 3:
             hints.append(f"Ba chữ số cuối của số cần tìm là `{abs_answer_str[-3:]}`.")
+
         return random.choice(hints)
-
-
     
     async def handling_game(self, message: discord.Message):
         if message.author.bot: return
@@ -139,8 +144,8 @@ class GnHandlingFunction():
         if str.isspace(message.content): return
         gn_info = await self.check_if_message_inside_game(source=message)
         if gn_info == None: return
-        if message.content[0] in string.punctuation or message.content[0] == ":": return
-        if not message.content.isdigit(): return
+        if message.content[0] in string.punctuation and message.content[0] not in ['-', '+']: return
+        if not re.fullmatch(r"[+-]?\d+", message.content.strip()): return
         
         player_number = int(message.content)
         selected_ban = None
@@ -197,7 +202,7 @@ class GnHandlingFunction():
                     GnMongoManager.update_player_special_item(user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point= point, guild_id=message.guild.id, channel_id=message.channel.id, special_item= gn_info.special_item)
                     chuc_mung_item = f" và nhận được kỹ năng **{gn_info.special_item.item_name}**. Nhớ đừng quên sử dụng nó nhé"
                 #Trả lời đúng thì reset special_points và special_item lại từ đầu, cập nhật lại list player ban
-                await message.channel.send(f"{message.author.mention}, bạn đã đoán đúng số {gn_info.correct_number} và nhận được {point} điểm{chuc_mung_item}.\nSố tiếp theo nằm trong khoảng {gn_info.range_from} - {gn_info.range_to}.\nĐể kiểm tra điểm số của mình thì hãy dùng lệnh {SlashCommand.BXH.value}.")
+                await message.channel.send(f"{message.author.mention}, bạn đã đoán đúng số {gn_info.correct_number} và nhận được {point} điểm{chuc_mung_item}.\nSố tiếp theo nằm trong khoảng **`{gn_info.range_from}`** đến **`{gn_info.range_to}`**.\nĐể kiểm tra điểm số của mình thì hãy dùng lệnh {SlashCommand.BXH.value}.")
                 #Reset special point, special item, giảm ban remain của tất cả player
                 GnMongoManager.update_special_point_data_info(channel_id= message.channel.id, guild_id= message.guild.id, special_point= 0)
                 GnMongoManager.update_special_item_data_info(channel_id= message.channel.id, guild_id= message.guild.id, special_item= None)
