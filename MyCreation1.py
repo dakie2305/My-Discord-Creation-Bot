@@ -8,6 +8,7 @@ import google.generativeai as genai
 import DailyLogger
 from discord.ext import commands, tasks
 from discord import app_commands
+from Handling.MiniGame.GuessNumber import GnHandling, GnMongoManager
 from Handling.MiniGame.MatchWord import MwHandling, MwMongoManager
 import db.DbMongoManager as db
 from db.DbMongoManager import UserInfo
@@ -500,10 +501,20 @@ async def clear_up_data_task():
                     count+=1
             
         print(f"clear_up_data_task started. Deleted {count} SortWord data in guild {guild.name} for being inactive over 1 month")
+        all_gn_data = GnMongoManager.find_all_info_in_guild(guild_id=guild.id)
+        count = 0
+        if all_gn_data != None:
+            for sw_data in all_gn_data:
+                if datetime.now() > sw_data.last_played + timedelta(weeks=4):
+                    GnMongoManager.delete_data_info(channel_id=sw_data.channel_id, guild_id=guild.id)
+                    count+=1
+            
+        print(f"clear_up_data_task started. Deleted {count} Guess Number data in guild {guild.name} for being inactive over 1 month")
         #Drop quest collection nếu trống
         QuestMongoManager.drop_quest_collection_if_empty(guild_id=guild.id)
         MwMongoManager.drop_collections_if_empty(guild_id=guild.id)
         SwMongoManager.drop_collections_if_empty(guild_id=guild.id)
+        GnMongoManager.drop_collection_if_empty(guild_id=guild.id)
         #Kiểm tra snipe message cũ, xóa đi nếu cần
         all_snipe_channels = db.find_all_snipe_channel_info(guild_id=guild.id)
         count = 0
@@ -620,6 +631,13 @@ async def on_message(message: discord.Message):
     if mw_info != None:
         #Xử lý nối từ
         asyncio.create_task(match_word_game.handling_game(message=message))
+        speakFlag = False
+        
+    guess_number_game = GnHandling.GnHandlingFunction(message= message)
+    gn_info = await guess_number_game.check_if_message_inside_game(source=message)
+    if gn_info != None:
+        #Xử lý đoán số
+        asyncio.create_task(guess_number_game.handling_game(message=message))
         speakFlag = False
     
     guild_extra_info = db.find_guild_extra_info_by_id(guild_id=message.guild.id)
