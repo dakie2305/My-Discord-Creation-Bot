@@ -44,7 +44,7 @@ class LeaderboardWordMiniGame(commands.Cog):
         if check is not None:
             return check
 
-    #region Truth Dare
+    #region bxh
     @discord.app_commands.command(name="bxh", description="Kiểm tra bảng xếp hạng Nối Từ/Đoán Từ/Đoán Số trong kênh này.")
     @discord.app_commands.describe(user="Chọn user cần muốn xem cụ thể xếp hạng")
     @discord.app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
