@@ -212,7 +212,7 @@ class MwHandlingFunction():
             embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} **Lưu ý**: Đoán sai sẽ mất điểm ngay, nên hãy suy nghĩ cho kỹ trước khi trả lời!", inline=False)
             view = SelfDestructView(timeout=45)
             m = await message.channel.send(embed=embed, view=view)
-            view.message
+            view.message = m
         else:
             #Sổ xố xem trúng kỹ năng đặc biệt không
             so_xo = random.randint(3, 10)
