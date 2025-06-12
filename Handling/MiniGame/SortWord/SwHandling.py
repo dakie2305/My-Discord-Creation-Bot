@@ -9,6 +9,7 @@ from Handling.MiniGame.SortWord.SwClass import SortWordInfo
 import CustomFunctions
 import string
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
+from Handling.Misc.SelfDestructView import SelfDestructView
 
 class SwHandlingFunction():
     def __init__ (self, message: discord.Message):
@@ -174,7 +175,9 @@ class SwHandlingFunction():
             embed.add_field(name=f"", value="▬▬▬▬▬▬ι═══════════>", inline=False)
             embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Cơ hội chỉ đến một lần duy nhất, nếu ai đoán đúng sẽ nhận được **{special_point_english}** điểm!", inline=False)
             embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} **Lưu ý**: Đoán sai sẽ mất điểm ngay, nên hãy suy nghĩ cho kỹ trước khi trả lời!", inline=False)
-            await message.channel.send(embed=embed)
+            view = SelfDestructView(timeout=45)
+            m = await message.channel.send(embed=embed, view=view)
+            view.message
         else:
             #Sổ xố xem trúng kỹ năng đặc biệt không
             so_xo = random.randint(3, 10)
@@ -199,6 +202,8 @@ class SwHandlingFunction():
                 embed.add_field(name=f"", value=f"Tên kỹ năng: {item.item_name}", inline=False)
                 embed.add_field(name=f"", value=f"Mô tả kỹ năng: {item.item_description}", inline=False)
                 embed.add_field(name=f"", value=f"Cách dùng:\n{SlashCommand.SKILL_USE.value}", inline=False)
-                await message.channel.send(content=text_cong_skill, embed=embed)
+                view = SelfDestructView(timeout=45)
+                m = await message.channel.send(content=text_cong_skill, embed=embed, view=view)
+                view.message = m
                 return
                 

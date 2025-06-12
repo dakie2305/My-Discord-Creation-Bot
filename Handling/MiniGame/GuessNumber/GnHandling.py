@@ -78,10 +78,10 @@ class GnHandlingFunction():
         GnMongoManager.create_and_update_player_penalty(channel_id= message.channel.id, guild_id= message.guild.id, user_id=message.author.id, user_name=message.author.name)
         
         player_guess_number = int(message.content)
-        #Cứ dưới 5 round là sẽ có hint
+        #15 round đầu là sẽ có hint, về sau sẽ roll tỉ lệ
         flag_hint = False
-        chance = UtilitiesFunctions.get_chance(35)
-        if gn_info.current_round < 10 or chance:
+        chance = UtilitiesFunctions.get_chance(30)
+        if gn_info.current_round < 15 or chance:
             flag_hint = True
         
         if CustomFunctions.check_if_dev_mode():
@@ -209,7 +209,7 @@ class GnHandlingFunction():
                 GnMongoManager.remove_player_penalty_after_round(channel_id= message.channel.id, guild_id= message.guild.id)
                 GnMongoManager.reduce_player_bans_after_round(channel_id= message.channel.id, guild_id= message.guild.id)
         #Xổ số nếu chưa có special point
-        so_xo = random.randint(4, 10)
+        so_xo = UtilitiesFunctions.get_chance(10)
         #Nếu sổ xố rơi trúng số 5 thì coi như cộng point lên x ngẫu nhiên
         if so_xo == 10:
             x_value = random.randint(4, 10)
@@ -219,10 +219,12 @@ class GnHandlingFunction():
             embed.add_field(name=f"", value="▬▬▬▬▬▬ι═══════════>", inline=False)
             embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Cơ hội chỉ đến một lần duy nhất, nếu ai đoán đúng sẽ nhận được **{special_point_english}** điểm!", inline=False)
             embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} **Lưu ý**: Đoán sai sẽ mất điểm ngay, nên hãy suy nghĩ cho kỹ trước khi trả lời!", inline=False)
-            await message.channel.send(embed=embed)
+            view = SelfDestructView(timeout=15)
+            m = await message.channel.send(embed=embed, view=view)
+            view.message = m
         else:
             #Sổ xố xem trúng kỹ năng đặc biệt không
-            so_xo = random.randint(3, 10)
+            so_xo = UtilitiesFunctions.get_chance(10)
             if so_xo == 10:
                 text_cong_skill = f"\n**Cơ hội chỉ đến một lần duy nhất, nếu ai thắng nhận được kỹ năng đặc biệt bên dưới! Cơ hội duy nhất thôi!**\n"
                 percent = random.randint(0, 100)
@@ -243,6 +245,8 @@ class GnHandlingFunction():
                 embed = discord.Embed(title=f"Kỹ năng đặc biệt. Rank: {item.level}", description=f"", color=0x03F8FC)
                 embed.add_field(name=f"", value=f"Tên kỹ năng: {item.item_name}", inline=False)
                 embed.add_field(name=f"", value=f"Mô tả kỹ năng: {item.item_description}", inline=False)
-                await message.channel.send(content=text_cong_skill, embed=embed)
+                view = SelfDestructView(timeout=15)
+                m = await message.channel.send(content=text_cong_skill, embed=embed, view=view)
+                view.message = m
                 return
                 
