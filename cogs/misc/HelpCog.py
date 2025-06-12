@@ -91,9 +91,9 @@ class Help(commands.Cog):
         embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Trò này rất đơn giản, bạn chỉ cần nhắn lên số, và bot sẽ gợi ý đáp án cho bạn!", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Bot sẽ react {EmojiCreation1.HIGHER.value} nếu số của bạn thấp hơn đáp án", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Bot sẽ react {EmojiCreation1.LOWER.value} nếu số của bạn cao hơn đáp án", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Sau khoảng vài chục lượt chơi đầu thì lâu lâu bot mới gợi ý đáp án", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Reset game và bắt đầu lại từ đầu bằng lệnh {SlashCommand.RESTART_GUESS_NUMBER.value}", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Xem bảng xếp hạng bằng lệnh {SlashCommand.BXH.value}", inline=False)
-        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value} Sử dụng kỹ năng bằng lệnh {SlashCommand.SKILL_USE.value}", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
         list_embed.append(embed)
         
