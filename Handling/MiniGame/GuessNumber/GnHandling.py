@@ -80,7 +80,7 @@ class GnHandlingFunction():
         player_guess_number = int(message.content)
         #15 round đầu là sẽ có hint, về sau sẽ roll tỉ lệ
         flag_hint = False
-        chance = UtilitiesFunctions.get_chance(30)
+        chance = UtilitiesFunctions.get_chance(25)
         if gn_info.current_round < 15 or chance:
             flag_hint = True
         
@@ -209,9 +209,8 @@ class GnHandlingFunction():
                 GnMongoManager.remove_player_penalty_after_round(channel_id= message.channel.id, guild_id= message.guild.id)
                 GnMongoManager.reduce_player_bans_after_round(channel_id= message.channel.id, guild_id= message.guild.id)
         #Xổ số nếu chưa có special point
-        so_xo = UtilitiesFunctions.get_chance(10)
-        #Nếu sổ xố rơi trúng số 5 thì coi như cộng point lên x ngẫu nhiên
-        if so_xo == 10:
+        so_xo = UtilitiesFunctions.get_chance(15)
+        if so_xo:
             x_value = random.randint(4, 10)
             special_point_english = 1*x_value
             GnMongoManager.update_special_point_data_info(channel_id= message.channel.id, guild_id= message.guild.id,  special_point= special_point_english)
@@ -225,7 +224,7 @@ class GnHandlingFunction():
         else:
             #Sổ xố xem trúng kỹ năng đặc biệt không
             so_xo = UtilitiesFunctions.get_chance(10)
-            if so_xo == 10:
+            if so_xo:
                 text_cong_skill = f"\n**Cơ hội chỉ đến một lần duy nhất, nếu ai thắng nhận được kỹ năng đặc biệt bên dưới! Cơ hội duy nhất thôi!**\n"
                 percent = random.randint(0, 100)
                 item = None
