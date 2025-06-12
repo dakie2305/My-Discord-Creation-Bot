@@ -335,7 +335,7 @@ class UseSkillInputModal(discord.ui.Modal):
         #Đây là những kỹ năng bỏ khoá mõm player
         elif special_item.item_id == "ct_ban_remove":
             #Bỏ khoá mõm đối thủ
-            GnMongoManager.create_and_update_player_bans_word_matching_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id= self.target.id, user_name=self.target.name, ban_remaining=0)
+            GnMongoManager.create_and_update_player_bans_word_matching_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id= self.target.id, user_name=self.target.name, ban_remain=0)
             await interaction.followup.send(f"{interaction.user.mention} đã dùng kỹ năng **`{special_item.item_name}`** để gỡ khoá cho {self.target.mention}.\n")
 
         #Đây là những kỹ năng bỏ khoá mõm toàn bộ
@@ -358,7 +358,7 @@ class UseSkillInputModal(discord.ui.Modal):
                     #Vô hiệu hoá
                     if target_player_effect.effect_id.startswith("cc") or target_player_effect.effect_id.startswith("dc"):
                         #Phản lại kỹ năng
-                        GnMongoManager.create_and_update_player_bans_word_matching_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id= interaction.user.id, user_name=interaction.user.name, ban_remaining=special_item.point)
+                        GnMongoManager.create_and_update_player_bans_word_matching_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id= interaction.user.id, user_name=interaction.user.name, ban_remain=special_item.point)
                         text_reply += f"{interaction.user.mention} đã bị khoá mõm trong {special_item.point} vòng chơi tiếp theo"
                         if target_player_effect.effect_id.startswith("dc"):
                             #Cướp luôn kỹ năng
@@ -369,7 +369,7 @@ class UseSkillInputModal(discord.ui.Modal):
                     GnMongoManager.update_player_effects(remove_special_effect= True,channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id=self.target.id, user_name=self.target.name, effect_id= target_player_effect.effect_id, effect_name= target_player_effect.effect_name)
             else:
                 #khoá mõm đối thủ
-                GnMongoManager.create_and_update_player_bans_word_matching_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id= self.target.id, user_name=self.target.name, ban_remaining=special_item.point)
+                GnMongoManager.create_and_update_player_bans_word_matching_info(channel_id=interaction.channel_id, guild_id=interaction.guild_id,  user_id= self.target.id, user_name=self.target.name, ban_remain=special_item.point)
                 await interaction.followup.send(f"{interaction.user.mention} đã dùng kỹ năng **`{special_item.item_name}`** để khoá mõm {self.target.mention} trong vài lượt chơi tiếp theo.\n")
         else:
             await interaction.followup.send(f"{interaction.user.mention}, Darkie vẫn chưa hoàn thành kỹ năng **`{special_item.item_name}`**.\nVui lòng đợi sau!")
