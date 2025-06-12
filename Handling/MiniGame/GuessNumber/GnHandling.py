@@ -74,6 +74,8 @@ class GnHandlingFunction():
             point = 2
             await message.reply(f"{message.author.mention} đã bị trừ **{point}** vì trả lời sai quá nhiều lần!")
             GnMongoManager.update_player_point_data_info(channel_id= message.channel.id, guild_id= message.guild.id, user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point=-point)
+            #Cho phép trừ penalty để tiếp tục chơi
+            GnMongoManager.reduce_player_penalty_after_round(channel_id= message.channel.id, guild_id= message.guild.id)
             #Vẫn tiếp tục
         GnMongoManager.create_and_update_player_penalty(channel_id= message.channel.id, guild_id= message.guild.id, user_id=message.author.id, user_name=message.author.name)
         
