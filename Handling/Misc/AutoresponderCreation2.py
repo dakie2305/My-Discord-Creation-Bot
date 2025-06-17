@@ -211,7 +211,7 @@ class AutoresponderHandling():
             _mess = await message.channel.send(embed=embed, view=view)
             view.message= _mess
             
-        elif message.guild.id != 1194106864582004849 and CustomFunctions.contains_substring(message.content.lower(), donate):
+        elif message.guild.id != 1194106864582004849 and CustomFunctions.contains_substring(message.content.lower(), donate) and message.content.lower() != '!donation':
             check_exist = db.find_guild_extra_info_by_id(message.guild.id)
             if check_exist == None or check_exist.disable_donation_text_until == None or datetime.now() > check_exist.disable_donation_text_until:
                 flag = True
