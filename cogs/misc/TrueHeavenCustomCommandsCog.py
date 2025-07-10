@@ -1,10 +1,14 @@
 import discord
 from discord.ext import commands
 import asyncio
-from datetime import datetime
+from datetime import datetime, timedelta
 from CustomEnum.TrueHeavenEnum import TrueHeavenEnum
+from CustomEnum.UserEnum import UserId
+from Handling.Misc import DonatorMongoManager
+from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 import db.DbMongoManager as db
 from CustomEnum.EmojiEnum import EmojiCreation2, EmojiCreation1
+import re
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(TrueHeavenCustomCommands(bot=bot))
@@ -90,21 +94,33 @@ class TrueHeavenCustomCommands(commands.Cog):
     async def sd_th(self, ctx, user: discord.Member, *, text: str):
         message: discord.Message = ctx.message
         if message:
-            if message.author.id != 315835396305059840 or message.guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value:
+            if message.author.id != UserId.DARKIE:
                 return
             channel = message.channel
             await message.delete()
             today = datetime.now()
+            two_week = today + timedelta(weeks=2)
             unix_time = int(today.timestamp())
+            unix_time_two_weeks_later = int(two_week.timestamp())
             embed = discord.Embed(title=f"", description=f"**NHIỆT LIỆT VINH DANH {user.mention}**", color=0x69f5ee)
             embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
             embed.add_field(name=f"", value=f"<t:{unix_time}:F>", inline=False)
             embed.add_field(name=f"", value=f"- Darkie xin chân thành cảm ơn mạnh thường quân {user.mention} ({user.display_name}), username: {user.name} đã donate Darkie nhằm giúp ủng hộ phát triển server và cả bot! Một số tiền dù có ra sao thì cũng rất hoan nghênh!", inline=False)
             embed.add_field(name=f"", value=f"- Sự ủng hộ của bạn chính là niềm vui, và cũng là niềm động lực để Darkie tiếp tục phát triển thêm nhiều thứ hay ho cho bot lẫn server!", inline=False)
+            embed.add_field(name=f"", value=f"- Bạn đã nhận được role <@{TrueHeavenEnum.DONATOR.value}> cho đến ngày <t:{unix_time_two_weeks_later}:D>!", inline=False)
             embed.add_field(name=f"", value=f"- Số tiền nhận được:", inline=False)
             embed.add_field(name=f"", value=f"> 🔥** {text} VNĐ** 🔥", inline=False)
             embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
             await channel.send(embed=embed, content=user.mention)
+            donation_amount = UtilitiesFunctions.extract_number(text=text)
+            if donation_amount == None: donation_amount = 0
+            DonatorMongoManager.create_or_update_profile(user_id=user.id, user_name= user.name, user_display_name= user.display_name, donation_amount=donation_amount)
+            if message.guild.id == TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value:
+                #Give role
+                donator_role = message.guild.get_role(TrueHeavenEnum.DONATOR.value)
+                if donator_role:
+                    await user.add_roles(donator_role, reason="Donated to support Darkie.")
+            return
             
     #region sticky partner posting
     @commands.command()

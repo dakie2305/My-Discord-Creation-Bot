@@ -406,3 +406,16 @@ class UtilitiesFunctions():
                 money += int(worth_amount * level / 100)
 
         return money
+    
+    @staticmethod
+    def extract_number(text: str) -> int | None:
+        # Remove all spaces
+        text = text.replace(" ", "").strip()
+        # If it contains both . and , it's ambiguous — reject it
+        if '.' in text and ',' in text:
+            return None
+        # Normalize the separator to nothing (assume thousands separator)
+        cleaned = text.replace('.', '').replace(',', '')
+        if not cleaned.isdigit():
+            return None
+        return int(cleaned)
