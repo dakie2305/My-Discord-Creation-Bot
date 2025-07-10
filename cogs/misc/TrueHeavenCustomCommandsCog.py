@@ -94,7 +94,7 @@ class TrueHeavenCustomCommands(commands.Cog):
     async def sd_th(self, ctx, user: discord.Member, *, text: str):
         message: discord.Message = ctx.message
         if message:
-            if message.author.id != UserId.DARKIE:
+            if message.author.id != UserId.DARKIE.value:
                 return
             channel = message.channel
             await message.delete()
