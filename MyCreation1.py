@@ -10,6 +10,7 @@ from discord.ext import commands, tasks
 from discord import app_commands
 from Handling.MiniGame.GuessNumber import GnHandling, GnMongoManager
 from Handling.MiniGame.MatchWord import MwHandling, MwMongoManager
+from Handling.Misc import DonatorMongoManager
 import db.DbMongoManager as db
 from db.DbMongoManager import UserInfo
 import random
@@ -469,6 +470,30 @@ async def remove_old_conversation():
                 count+=1
     print(f"Found {count} old conversation in collection 'user_conversation_info_{bot_name}' and deleted them.")
 
+@tasks.loop(hours=6)
+async def check_true_heavens_role_expiracy():
+    count = 0
+    guild = bot.get_guild(TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value)
+    if not guild:
+        return
+    donator_role = guild.get_role(TrueHeavenEnum.DONATOR.value)
+    if not donator_role:
+        return
+    list_donator = DonatorMongoManager.find_all_donators()
+    if list_donator:
+        for donator in list_donator:
+            if donator.date_donate is None or not donator.is_given_role: continue
+            if donator.date_donate + timedelta(weeks=2) < datetime.now():
+                member = guild.get_member(donator.user_id)
+                if member and donator_role in member.roles:
+                    try:
+                        await member.remove_roles(donator_role, reason="Donator role expired after 2 weeks.")
+                        DonatorMongoManager.update_is_given_role(user_id=member.id, value=False)
+                        count += 1
+                        print(f"Removed Donator role from {member.display_name}, username: {member.name}")
+                    except Exception as e:
+                        print(f"Error removing role from {member.display_name}, username: {member.name}: {e}")
+    print(f"Donator role check completed. Removed role from {count} users.")
 
 @tasks.loop(hours=12)
 async def clear_up_data_task():
@@ -547,6 +572,7 @@ async def on_ready():
     check_jail_expiry.start()
     if CustomFunctions.check_if_dev_mode()==False:
         automatic_speak_randomly.start()
+        check_true_heavens_role_expiracy.start()
         activity = discord.Activity(type=discord.ActivityType.watching, 
                                 name="True Heavens",
                                 state = "Dùng lệnh /help để biết thêm thông tin",
@@ -570,6 +596,27 @@ async def on_member_update(before: discord.Member, after: discord.Member):
     channel = bot.get_channel(1259392446987632661)
     await CustomFunctions.thanking_for_boost(bot_name="creation 1", before=before, after=after, model=model, channel=channel)
     
+    # Check for Nitro Boost loss
+    if before.premium_since and after.premium_since is None:
+        # List role to remove
+        ROLE_IDS_TO_REMOVE_ON_BOOST_LOSS = [
+            TrueHeavenEnum.ROLE_CYAN.value,
+            TrueHeavenEnum.ROLE_BLUE.value,
+            TrueHeavenEnum.ROLE_GREEN.value,
+            TrueHeavenEnum.ROLE_PURPLE.value,
+            TrueHeavenEnum.ROLE_RED.value,
+            TrueHeavenEnum.ROLE_WHITE.value,
+            TrueHeavenEnum.ROLE_YELLOW.value,
+        ]
+        roles_to_remove = [after.guild.get_role(role_id) for role_id in ROLE_IDS_TO_REMOVE_ON_BOOST_LOSS]
+        roles_to_remove = [role for role in roles_to_remove if role in after.roles]  # Only remove if the user actually has the role
+        if roles_to_remove:
+            try:
+                await after.remove_roles(*roles_to_remove, reason="User stopped boosting the server.")
+                print(f"Removed boost-only roles from {after.display_name}")
+            except Exception as e:
+                print(f"Error removing roles from {after.name}: {e}")
+
     if before.timed_out_until != after.timed_out_until:
         channel = after.guild.get_channel(1257004337989943370) #Channel great hall
         if not channel: return
