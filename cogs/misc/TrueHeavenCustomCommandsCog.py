@@ -107,7 +107,7 @@ class TrueHeavenCustomCommands(commands.Cog):
             embed.add_field(name=f"", value=f"<t:{unix_time}:F>", inline=False)
             embed.add_field(name=f"", value=f"- Darkie xin chân thành cảm ơn mạnh thường quân {user.mention} ({user.display_name}), username: {user.name} đã donate Darkie nhằm giúp ủng hộ phát triển server và cả bot! Một số tiền dù có ra sao thì cũng rất hoan nghênh!", inline=False)
             embed.add_field(name=f"", value=f"- Sự ủng hộ của bạn chính là niềm vui, và cũng là niềm động lực để Darkie tiếp tục phát triển thêm nhiều thứ hay ho cho bot lẫn server!", inline=False)
-            embed.add_field(name=f"", value=f"- Bạn đã nhận được role <@{TrueHeavenEnum.DONATOR.value}> cho đến ngày <t:{unix_time_two_weeks_later}:D>!", inline=False)
+            embed.add_field(name=f"", value=f"- Bạn đã nhận được role <@&{TrueHeavenEnum.DONATOR.value}> cho đến ngày <t:{unix_time_two_weeks_later}:D>!", inline=False)
             embed.add_field(name=f"", value=f"- Số tiền nhận được:", inline=False)
             embed.add_field(name=f"", value=f"> 🔥** {text} VNĐ** 🔥", inline=False)
             embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)

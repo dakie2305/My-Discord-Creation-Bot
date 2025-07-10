@@ -32,31 +32,35 @@ def drop_profile_collection(guild_id: int):
 
 def create_or_update_profile(user_id: int, user_name: str, user_display_name: str, date_donate: datetime = datetime.now(), donation_amount: int = 0):
     collection = db_specific['donator']
+    existing_raw = collection.find_one({"user_id": Int64(user_id)})
 
-    collection.update_one(
-        {"user_id": Int64(user_id)},
-        {
-            "$set": {
-                "user_name": user_name,
-                "user_display_name": user_display_name,
-                "date_donate": date_donate,
-                "is_given_role": True,
-            },
-            "$setOnInsert": {
-                "total_time_donate": 0,
-                "total_amount_donate": 0
-            },
-            "$inc": {
-                "total_time_donate": 1,
-                "total_amount_donate": donation_amount
-            }
-        },
-        upsert=True
-    )
-
-    # Return the updated object (fetch latest from DB)
-    updated = collection.find_one({"user_id": Int64(user_id)})
-    return Donator.from_dict(updated)
+    if existing_raw is None:
+        # New donor profile
+        new_data = Donator(
+            user_id=user_id,
+            user_name=user_name,
+            user_display_name=user_display_name,
+            date_donate=date_donate,
+            total_time_donate=1,
+            total_amount_donate=donation_amount,
+            is_given_role=True
+        )
+        collection.insert_one(new_data.to_dict())
+        return new_data
+    else:
+        # Existing donor profile
+        existing_data = Donator.from_dict(existing_raw)
+        existing_data.user_name = user_name
+        existing_data.user_display_name = user_display_name
+        existing_data.date_donate = date_donate
+        existing_data.is_given_role = True
+        existing_data.total_time_donate += 1
+        existing_data.total_amount_donate += donation_amount
+        collection.update_one(
+            {"user_id": Int64(user_id)},
+            {"$set": existing_data.to_dict()}
+        )
+        return existing_data
 
 def update_is_given_role(user_id: int, value: bool = False):
     collection = db_specific['donator']
