@@ -188,6 +188,8 @@ class ProfileEconomy(commands.Cog):
                     cq = "Long Đại Thần"
                 elif role.id == TrueHeavenEnum.ULTIMATE_SUGAR_DADDY.value:
                     cq = "Bố Đường Tối Thượng"
+                elif role.id == TrueHeavenEnum.DONATOR.value:
+                    cq = "Mạnh Thường Quân Huyền Thoại"
         if data.is_authority:
             cq = "Chính Quyền Tối Cao"
 
