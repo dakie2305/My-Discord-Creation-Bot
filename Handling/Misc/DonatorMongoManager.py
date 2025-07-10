@@ -30,15 +30,6 @@ def drop_profile_collection(guild_id: int):
     if collection != None:
         collection.drop()
 
-def create_profile(user_id: int, user_name: str, user_display_name: str, date_donate: datetime= datetime.now(), total_time_donate: int = 1, total_amount_donate: int = 0):
-    collection = db_specific['donator']
-    existing_data = collection.find_one({"user_id": Int64(user_id)})
-    if existing_data:
-        return None
-    data = Donator(user_id=Int64(user_id), user_display_name=user_display_name, user_name=user_name, date_donate = date_donate, total_amount_donate=total_time_donate, total_amount_donate = total_amount_donate)
-    collection.insert_one(data.to_dict())
-    return data
-
 def create_or_update_profile(user_id: int, user_name: str, user_display_name: str, date_donate: datetime = datetime.now(), donation_amount: int = 0):
     collection = db_specific['donator']
 
