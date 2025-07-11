@@ -403,22 +403,21 @@ async def check_jail_expiry():
     jail_db = "jailed_user"
     #Lấy tất cả dữ liệu db jail user ra
     list_all_jailed_users = db.find_all_users(chosen_collection=jail_db)
-    guild = bot.get_guild(TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value)
     if list_all_jailed_users:
+        guild = bot.get_guild(TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value)
         for jail_user in list_all_jailed_users:
                 #Lấy thời hạn tù đày
                 jailed_time = (jail_user.jail_until)
-                if jailed_time > now:
-                    continue
+                if jailed_time > now: continue
                 user = guild.get_member(jail_user.user_id)
                 if user:
                     #Xoá role Đáy Xã Hội
                     jail_role = discord.utils.get(user.guild.roles, name="Đáy Xã Hội")
-                    if jail_role == None: return
+                    if jail_role == None: continue
                     await user.remove_roles(jail_role)
                     #Tìm xem user này đã có chưa, có thì xoá khỏi db jail_user
                     search_user = db.find_user_by_id(jail_user.user_id, jail_db)
-                    if search_user == None: return
+                    if search_user == None: continue
                         #Restore lại roles cũ của user
                     for role in search_user.roles:
                             get_role_from_server = discord.utils.get(user.guild.roles, id = role["role_id"])
@@ -439,7 +438,6 @@ async def check_jail_expiry():
                     channel = guild.get_channel(1257012036718563380)
                     if channel:
                             await channel.send(embed=embed)
-                    commands_logger.info(f"Bot {bot.user} automatically unjailed {user.display_name} for time is up")
                     print(f"Bot {bot.user} automatically unjailed {user.display_name} for time is up.")
 
 # Task: Nói chuyện tự động
