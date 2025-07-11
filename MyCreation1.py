@@ -18,7 +18,6 @@ import string
 import CustomButton
 from typing import Optional
 import asyncio
-import PIL
 from Handling.MiniGame.SortWord import SwHandling as SwHandling
 from Handling.Misc.Therapy import TherapyHandling
 from Handling.Misc.StickyMessage import StickyMessageHandling

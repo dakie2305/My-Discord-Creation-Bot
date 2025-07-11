@@ -214,7 +214,7 @@ class TrueHeavenCustomCommands(commands.Cog):
             if money_cost > 10000000: money_cost = 10000000
             money_type = "D"
         elif user_profile.gold > 100000:
-            money_cost = int(user_profile.gold * 50 / 100)
+            money_cost = int(user_profile.gold * 5 / 100)
             money_type = "G"
         else:
             flag_not_enough_money = True
