@@ -164,6 +164,11 @@ async def jail_user(channel: discord.TextChannel, jailer:discord.Member, user: d
         user_id=user.id,
         user_name=user.name,
         user_display_name=user.display_name,
+        jailer_id = jailer.id,
+        jailer_display_name= jailer.display_name,
+        jailer_user_name= jailer.name,
+        channel_id=channel.id,
+        channel_name=channel.name,
         reason= reason,
         jail_until= end_time,
         roles=stored_original_roles

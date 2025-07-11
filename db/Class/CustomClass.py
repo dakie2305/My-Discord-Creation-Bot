@@ -3,35 +3,49 @@ from datetime import datetime, timedelta
 from Handling.Economy.Quest.DungeonQuestChannelClass import DungeonQuestChannel
 #region User Info Database
 class UserInfo:
-    def __init__(self, user_id, user_name, user_display_name, roles, reason, jail_until=None):
+    def __init__(self, user_id, user_name, user_display_name, jailer_id=None, jailer_user_name=None, jailer_display_name=None, channel_id=None, channel_name=None, roles=None, reason=None, jail_until: datetime =None):
         self.user_id = user_id
         self.user_name = user_name
         self.user_display_name = user_display_name
-        self.roles = roles
+        self.jailer_id = jailer_id
+        self.jailer_user_name = jailer_user_name
+        self.jailer_display_name = jailer_display_name
+        self.channel_id = channel_id
+        self.channel_name = channel_name
+        self.roles = roles or []
         self.reason = reason
-        self.jail_until = jail_until
+        self.jail_until: datetime = jail_until
 
     def to_dict(self):
         return {
             "user_id": self.user_id,
             "user_name": self.user_name,
             "user_display_name": self.user_display_name,
+            "jailer_id": self.jailer_id,
+            "jailer_user_name": self.jailer_user_name,
+            "jailer_display_name": self.jailer_display_name,
+            "channel_id": self.channel_id,
+            "channel_name": self.channel_name,
             "roles": self.roles,
             "reason": self.reason,
-            "jail_until": self.jail_until.isoformat() if self.jail_until else None
+            "jail_until": self.jail_until
         }
 
     @staticmethod
-    def from_dict(data):
+    def from_dict(data: dict):
         return UserInfo(
-            user_id=data["user_id"],
-            user_name=data["user_name"],
-            user_display_name=data["user_display_name"],
-            roles=data["roles"],
-            reason = data["reason"],
-            jail_until=datetime.fromisoformat(data["jail_until"]) if data["jail_until"] else None
+            user_id=data.get("user_id"),
+            user_name=data.get("user_name"),
+            user_display_name=data.get("user_display_name"),
+            jailer_id=data.get("jailer_id"),
+            jailer_user_name=data.get("jailer_user_name"),
+            jailer_display_name=data.get("jailer_display_name"),
+            channel_id=data.get("channel_id"),
+            channel_name=data.get("channel_name"),
+            roles=data.get("roles", []),
+            reason=data.get("reason"),
+            jail_until=data.get("jail_until", None)
         )
-
 #region Guild Info
 
 class GuildExtraInfo:

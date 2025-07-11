@@ -13,15 +13,6 @@ from Handling.Economy.Quest.DungeonQuestChannelClass import DungeonQuestChannel
 #region User Info Database
 
 def create_user(user_info, chosen_collection):
-    """
-    Insert a new user into the collection.
-
-    Parameters:
-    - user_info (UserInfo): A UserInfo object representing the user data to insert.
-
-    Returns:
-    - result: The result of the insert operation.
-    """
     collection = db[chosen_collection]
     existing_user = collection.find_one({"user_id": user_info.user_id})
     if existing_user:
@@ -30,15 +21,6 @@ def create_user(user_info, chosen_collection):
     return result
   
 def find_user_by_id(user_id, chosen_collection):
-    """
-    Find a user by their user_id.
-
-    Parameters:
-    - user_id (int): The user_id of the user to find.
-
-    Returns:
-    - user_info (UserInfo): A UserInfo object if found, otherwise None.
-    """
     collection = db[chosen_collection]
     user_data = collection.find_one({"user_id": user_id})
     if user_data:
@@ -46,60 +28,21 @@ def find_user_by_id(user_id, chosen_collection):
     return None
 
 def find_all_users(chosen_collection):
-    """
-    Find all users in the collection.
-
-    Returns:
-    - users (list): A list of UserInfo objects.
-    """
     collection = db[chosen_collection]
     users_data = list(collection.find())
     return [UserInfo.from_dict(user_data) for user_data in users_data]
 
 
 def update_guild_extra_info(user_id, update_data, chosen_collection):
-    """
-    Update a user's information.
-
-    Parameters:
-    - user_id (int): The user_id of the user to update.
-    - update_data (dict): A dictionary of the fields to update.
-
-    Returns:
-    - result: The result of the update operation.
-    """
     collection = db[chosen_collection]
     result = collection.update_one({"user_id": user_id}, {"$set": update_data})
     return result
   
 def delete_user_by_id(user_id, chosen_collection):
-    """
-    Delete a user by their user_id.
-
-    Parameters:
-    - user_id (int): The user_id of the user to delete.
-
-    Returns:
-    - result: The result of the delete operation.
-    """
     collection = db[chosen_collection]
     result = collection.delete_one({"user_id": user_id})
     return result
 
-# Example user data
-user_info = UserInfo(
-    user_id=315835396305059840,
-    user_name="darkiex_xx",
-    user_display_name="Darkie",
-    reason= "Test",
-    jail_until= datetime.utcnow(),
-    roles=[
-        {
-            "role_id": 1256989385744846989,
-            "role_name": "Server Master"
-        }
-    ]
-)
 #endregion
 
 #region Guild Info

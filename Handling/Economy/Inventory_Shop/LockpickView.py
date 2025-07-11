@@ -71,7 +71,7 @@ class LockpickView(discord.ui.View):
                         user_id=actual_user.id,
                         user_name=actual_user.name,
                         user_display_name=actual_user.display_name,
-                        reason= f"Thành phần thực hiện phạm tội tại <#{message.channel.id}>",
+                        reason= f"Thành phần thực hiện phạm tội nguy hiểm tại <#{message.channel.id}>",
                         jail_until= end_time,
                         roles=stored_original_roles
                         )

@@ -1,10 +1,16 @@
 import discord
+from discord import Object
 from discord.ext import commands
 import asyncio
 from datetime import datetime, timedelta
+from CustomEnum import UserEnum
 from CustomEnum.TrueHeavenEnum import TrueHeavenEnum
 from CustomEnum.UserEnum import UserId
+import CustomFunctions
+from Handling.Economy.Profile import ProfileMongoManager
 from Handling.Misc import DonatorMongoManager
+from Handling.Misc.AppealJailView import AppealJailView
+from Handling.Misc.SelfDestructView import SelfDestructView
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 import db.DbMongoManager as db
 from CustomEnum.EmojiEnum import EmojiCreation2, EmojiCreation1
@@ -176,3 +182,54 @@ class TrueHeavenCustomCommands(commands.Cog):
                 data_updated = {"custom_parameter_1": mess.id, "custom_parameter_2": mess.channel.id}
                 db.update_guild_extra_info(guild_id=message.guild.id, update_data= data_updated)
             
+    
+    #region khang_tu
+    @discord.app_commands.guilds(Object(id=TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value))
+    @discord.app_commands.command(name="khang_tu", description="Bỏ tiền để nhờ luật sư kháng án tù!")
+    @discord.app_commands.describe(user="Chọn user để xem profile của người đó.")
+    async def show_profile(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=False)
+        #Không cho dùng bot nếu không phải user
+        if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+            view.message = mess
+            return
+        
+        user_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
+        if user_profile == None:
+            embed = discord.Embed(title=f"", description=f"Bắt buộc phải dùng lệnh `/profile` trước.", color=0xddede7)
+            embed.add_field(name=f"", value=f"Ngoài ra, bạn cần phải kiếm tiền mới đủ tiền kháng án tù!", inline=False)
+            view = SelfDestructView(timeout=30)
+            mess = await interaction.followup.send(embed=embed, view=view)
+            view.message = mess
+            return
+        
+        #Trừ 5% số tiền lớn nhất, tối thiểu 100000 gold
+        money_cost = 100000
+        money_type = "G"
+        flag_not_enough_money = False
+        if user_profile.darkium > 100:
+            money_cost = int(user_profile.darkium * 5 / 100)
+            money_type = "D"
+        elif user_profile.gold > 100000:
+            money_cost = int(user_profile.gold * 50 / 100)
+            money_type = "G"
+        else:
+            flag_not_enough_money = True
+        if money_type == EmojiCreation2.GOLD.value and money_cost < 100000:
+            flag_not_enough_money = True
+        if flag_not_enough_money:
+            embed = discord.Embed(title=f"", description=f"Không đủ tiền kháng án tù.", color=0xddede7)
+            embed.add_field(name=f"", value=f"Bạn cần phải có ít nhất 100.000 Gold để bắt đầu kháng án tù!", inline=False)
+            view = SelfDestructView(timeout=30)
+            mess = await interaction.followup.send(embed=embed, view=view)
+            view.message = mess
+            return
+        #Hiện view xác nhận
+        view = AppealJailView(user=interaction.user, guild_id=interaction.guild_id, money=money_cost, money_type=money_type)
+        embed = discord.Embed(title=f"Kháng Án Tù", description=f"", color=0xddede7)
+        embed.add_field(name=f"", value=f"Bạn có chấp nhận bỏ ra **{UtilitiesFunctions.shortened_currency(money_cost)}** {money_type} để bắt đầu kháng án tù?", inline=False)
+        mess = await interaction.followup.send(embed=embed, view=view)
+        view.message = mess

@@ -89,11 +89,17 @@ class AuthorityRiotPreventView(discord.ui.View):
                     jail_role = discord.utils.get(actual_user.guild.roles, name="Đáy Xã Hội")
                     if not jail_role:
                         jail_role = await actual_user.guild.create_role(name="Đáy Xã Hội")
+                    
                     user_info = UserInfo(
                         user_id=actual_user.id,
                         user_name=actual_user.name,
                         user_display_name=actual_user.display_name,
-                        reason= "Thành phần phản động",
+                        jailer_id=self.user.id,
+                        jailer_display_name=self.user.display_name,
+                        jailer_user_name= self.user.name,
+                        channel_id= interaction.channel_id,
+                        channel_name=interaction.channel.name,
+                        reason= "Thành phần phản động nguy hiểm, cần giam lập tức!",
                         jail_until= end_time,
                         roles=stored_original_roles
                         )
