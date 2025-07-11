@@ -233,3 +233,67 @@ class TrueHeavenCustomCommands(commands.Cog):
         embed.add_field(name=f"", value=f"Bạn có chấp nhận bỏ ra **{UtilitiesFunctions.shortened_currency(money_cost)}** {money_type} để bắt đầu kháng án tù?", inline=False)
         mess = await interaction.followup.send(embed=embed, view=view)
         view.message = mess
+
+    #region khang_tu prefix
+    @commands.command()
+    @discord.app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
+    async def khang_tu(self, ctx):
+        message: discord.Message = ctx.message
+        if not message or message.guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value:
+            return
+
+        user: discord.Member = ctx.author
+        guild_id: int = ctx.guild.id
+
+        if CustomFunctions.check_if_dev_mode() and user.id != UserEnum.UserId.DARKIE.value:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(
+                title="Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",
+                color=discord.Color.blue()
+            )
+            mess = await ctx.send(embed=embed, view=view)
+            view.message = mess
+            return
+
+        user_profile = ProfileMongoManager.find_profile_by_id(guild_id=guild_id, user_id=user.id)
+        if user_profile is None:
+            embed = discord.Embed(description="Bắt buộc phải dùng lệnh `/profile` trước.", color=0xddede7)
+            embed.add_field(name="", value="Ngoài ra, bạn cần phải kiếm tiền mới đủ tiền kháng án tù!", inline=False)
+            view = SelfDestructView(timeout=30)
+            mess = await ctx.send(embed=embed, view=view)
+            view.message = mess
+            return
+        # Tính tiền kháng án
+        money_cost = 100000
+        money_type = "G"
+        flag_not_enough_money = False
+
+        if user_profile.darkium > 100:
+            money_cost = int(user_profile.darkium * 5 / 100)
+            if money_cost > 10000000:
+                money_cost = 10000000
+            money_type = "D"
+        elif user_profile.gold > 100000:
+            money_cost = int(user_profile.gold * 5 / 100)
+            money_type = "G"
+        else:
+            flag_not_enough_money = True
+        if money_type == EmojiCreation2.GOLD.value and money_cost < 100000:
+            flag_not_enough_money = True
+        if flag_not_enough_money:
+            embed = discord.Embed(description="Không đủ tiền kháng án tù.", color=0xddede7)
+            embed.add_field(name="", value="Bạn cần phải có ít nhất 100.000 Gold để bắt đầu kháng án tù!", inline=False)
+            view = SelfDestructView(timeout=30)
+            mess = await ctx.send(embed=embed, view=view)
+            view.message = mess
+            return
+        # Gửi view xác nhận
+        view = AppealJailView(user=user, guild_id=guild_id, money=money_cost, money_type=money_type)
+        embed = discord.Embed(title="Kháng Án Tù", color=0xddede7)
+        embed.add_field(
+            name="",
+            value=f"Bạn có chấp nhận bỏ ra **{UtilitiesFunctions.shortened_currency(money_cost)}** {money_type} để bắt đầu kháng án tù?",
+            inline=False
+        )
+        mess = await ctx.send(embed=embed, view=view)
+        view.message = mess

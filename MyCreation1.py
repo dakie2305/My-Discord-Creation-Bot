@@ -201,6 +201,7 @@ async def jail_user(channel: discord.TextChannel, jailer:discord.Member, user: d
     embed.add_field(name="Sẽ được ân xoá sau khoảng thời gian:", value=f"{duration} {time_format}", inline=False)
     embed.add_field(name="Thời gian ra đại lao:", value=f"{mordern_date_time_format}", inline=True)
     embed.add_field(name="Ghi chú", value="Nếu quá thời hạn phạt tù mà chưa được ra tù thì hãy la làng lên nhé!", inline=False) 
+    embed.add_field(name="Kháng tù", value="Dùng lệnh `!khang_tu` để kháng án tù! Lệnh này sẽ tốn nhiều tiền!", inline=False) 
     embed.set_footer(text=f"Đã bị tống giam bởi: {jailer.name}")  # Footer text
 
     channel = bot.get_channel(1257012036718563380)
