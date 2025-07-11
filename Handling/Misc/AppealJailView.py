@@ -54,7 +54,41 @@ class AppealJailView(discord.ui.View):
         model = genai.GenerativeModel(model_name=CustomFunctions.AI_MODEL, safety_settings= CustomFunctions.safety_settings, system_instruction=system_instruction)
         today_str = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
 
-        prompt = f"Hãy chọn ngẫu nhiên một trong hai tính cách sau: nghiêm nghị chính trực hoặc gian manh xảo quyệt để đóng vai, sau đó, hãy vào vai một chấp hành viên tòa án tối cao, nhưng không được phép tiết lộ tính cách đã chọn. Hôm nay là ngày {today_str}, hãy xét xử một vụ án giam giữ tù tội nhân. Bị cáo có tên hiển thị là {search_user.user_display_name}, id <@{self.user.id}>, với username: {self.user.name} đang kháng án giam giữ do một chấp hành viên khác có tên hiển thị là {search_user.jailer_display_name}, username của chấp hành viên đó là {search_user.jailer_user_name}. Sự việc diễn ra ở một kênh tên là {search_user.channel_name}. Bị cáo đã bị bắt giam với lý do nguyên văn do chấp hành viên cung cấp: '{search_user.reason}'. Thời gian giam giữ ước tính đến thời gian như sau: {search_user.jail_until}. Lý do giam giữ và thời gian giam giữ là bằng chứng và cũng là yếu tố quan trọng trong việc xét xử.\nHãy dựa vào những thông tin trên, và đưa ra phán xét, lý do phù hợp với tính cách đã chọn nhất. Kết luận cuối cùng bắt buộc phải luôn là một trong ba kết luận: Vô Tội, Có Tội, Trắng Án.\nGiải thích: nếu lý do giam giữ tội nhân hoàn toàn xứng đáng, và chấp hành viên có lý do chính đáng thì xét Có Tội. Nếu chấp hành viên có dấu hiệu lạm quyền hoặc lý do không chính đáng, và thời giam giữ quá lâu vượt quá mức quy định thì xét Trắng Án để đảo ngược hình phạt. Nếu tội nhân chỉ phạm tội nhẹ, không đáng để giam giữ, và chấp hành viên cũng không vượt quá thẩm quyền với lý do chính đáng thì có thể xét Vô Tội. Lưu ý một điều, nếu tội nhân là cựu chấp hành viên bị giam giữ với lý do lạm quyền thì không cần nhân từ, hãy xét có tội, và . Ngoài trường hợp đó ra, hãy dựa vào tính cách đã chọn để đưa ra lý do ngắn gọn và phù hợp, đưa ra phán xét hợp lệ: Vô Tội hoặc Có Tội hoặc Trắng Án."
+        prompt = f"""
+        Bạn là một chấp hành viên của Toà Án Tối Cao trong thế giới giả tưởng. Ngày hôm nay là {today_str}.
+        ⚠️ Bắt buộc: Hãy **nhập vai hoàn toàn**, tuyệt đối **không được nhắc đến vai trò AI**, **không nói bạn là AI**, và **không phá vỡ nhân vật**. Luôn giữ văn phong của một chấp hành viên tòa án, nghiêm túc và chuyên nghiệp (hoặc xảo quyệt nếu chọn tính cách tương ứng).
+
+        Bạn phải bí mật chọn một trong hai tính cách:
+        1. **Nghiêm nghị chính trực**  
+        2. **Gian manh xảo quyệt**
+
+        Không tiết lộ hoặc gợi ý về tính cách đã chọn, dù là trực tiếp hay gián tiếp.
+
+        ---
+
+        ## Hồ sơ vụ án:
+
+        - **Bị cáo**: {search_user.user_display_name} (`<@{self.user.id}>`, username: `{self.user.name}`)
+        - **Người bắt giữ**: {search_user.jailer_display_name} (username: `{search_user.jailer_user_name}`)
+        - **Kênh xảy ra vụ việc**: {search_user.channel_name}
+        - **Lý do giam giữ**: "{search_user.reason}"
+        - **Thời hạn giam giữ**: {search_user.jail_until}
+
+        ---
+
+        ## Nhiệm vụ của bạn:
+        Dựa vào hồ sơ vụ án, hãy đưa ra một bản án hợp lý. **Luôn kết luận bằng một trong ba lựa chọn rõ ràng**:
+        - **Vô Tội**: Bị cáo phạm lỗi nhỏ, lý do bắt giữ không đủ nghiêm trọng.
+        - **Có Tội**: Lý do bắt giữ chính đáng và hợp pháp, phù hợp thời gian giam giữ.
+        - **Trắng Án**: Chấp hành viên bắt giữ có dấu hiệu lạm quyền hoặc hình phạt vượt quá mức, cần xoá bỏ phán quyết trước đó.
+
+        💡 Nếu bị cáo là **cựu chấp hành viên bị bắt vì lạm quyền**, mặc định là **Có Tội**.
+
+        Bạn phải giải thích bản án **bằng giọng điệu phù hợp với tính cách đã chọn**, ngắn gọn, nhưng đầy đủ lý do. Tránh lặp lại nội dung trên. **Không bình luận ngoài vai. Không nêu vai trò của bản thân hoặc hệ thống.**
+
+        Hãy bắt đầu phán xét.
+        """
+
         try:
             response = model.generate_content(f"{prompt}")
             bot_response = CustomFunctions.remove_creation_name_prefix(f"{response.text}")
@@ -77,11 +111,11 @@ class AppealJailView(discord.ui.View):
             if is_acquit:
                 actual_user = await interaction.guild.fetch_member(search_user.jailer_id)
                 if actual_user is None: return
-                self.jail_real(interaction=interaction, actual_user=actual_user, search_user=search_user)
-                self.unjail_real(interaction=interaction)
+                await self.jail_real(interaction=interaction, actual_user=actual_user, search_user=search_user)
+                await self.unjail_real(interaction=interaction)
             elif is_innocence:
                 #Thả
-                self.unjail_real(interaction=interaction)
+                await self.unjail_real(interaction=interaction)
                 return
         except Exception as e:
             print(f"There is exception in jail appeal for user {self.user.name}, displayname {self.user.display_name}: {e}")
