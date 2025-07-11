@@ -186,7 +186,6 @@ class TrueHeavenCustomCommands(commands.Cog):
     #region khang_tu
     @discord.app_commands.guilds(Object(id=TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value))
     @discord.app_commands.command(name="khang_tu", description="Bỏ tiền để nhờ luật sư kháng án tù!")
-    @discord.app_commands.describe(user="Chọn user để xem profile của người đó.")
     async def show_profile(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=False)
         #Không cho dùng bot nếu không phải user
@@ -212,6 +211,7 @@ class TrueHeavenCustomCommands(commands.Cog):
         flag_not_enough_money = False
         if user_profile.darkium > 100:
             money_cost = int(user_profile.darkium * 5 / 100)
+            if money_cost > 10000000: money_cost = 10000000
             money_type = "D"
         elif user_profile.gold > 100000:
             money_cost = int(user_profile.gold * 50 / 100)
