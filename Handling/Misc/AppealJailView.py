@@ -157,7 +157,10 @@ class AppealJailView(discord.ui.View):
         #Server True Heavens sẽ jail thật luôn
         if self.guild_id !=  TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value: return
         # Calculate the end time
-        end_time = search_user.jail_until
+        now = datetime.now()
+        #x3
+        original_duration = search_user.jail_until - now
+        end_time = now + original_duration * 3
         mordern_date_time_format = end_time.strftime(f"%d/%m/%Y %H:%M")
         # Save user's roles
         original_roles = [role for role in actual_user.roles if not role.is_default() and not role.is_premium_subscriber()]
