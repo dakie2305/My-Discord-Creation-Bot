@@ -186,7 +186,7 @@ class TrueHeavenCustomCommands(commands.Cog):
     #region khang_tu
     @discord.app_commands.guilds(Object(id=TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value))
     @discord.app_commands.command(name="khang_tu", description="Bỏ tiền để nhờ luật sư kháng án tù!")
-    async def show_profile(self, interaction: discord.Interaction):
+    async def khang_tu_slash_command(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=False)
         #Không cho dùng bot nếu không phải user
         if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
@@ -236,7 +236,7 @@ class TrueHeavenCustomCommands(commands.Cog):
 
     #region khang_tu prefix
     @commands.command()
-    @discord.app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
+    @commands.cooldown(rate=1, per=60.0, type=commands.BucketType.user)
     async def khang_tu(self, ctx):
         message: discord.Message = ctx.message
         if not message or message.guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value:
@@ -297,3 +297,16 @@ class TrueHeavenCustomCommands(commands.Cog):
         )
         mess = await ctx.send(embed=embed, view=view)
         view.message = mess
+        
+    @khang_tu.error
+    async def khang_tu_error(self, ctx: commands.Context, error: commands.CommandError):
+        if isinstance(error, commands.CommandOnCooldown):
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(
+                title="❗ Lỗi: Lệnh đang trong thời gian hồi",
+                description=f"Hãy thử lại sau {round(error.retry_after, 1)} giây nữa.",
+                color=discord.Color.red()
+            )
+            mess = await ctx.send(embed=embed, view=view)
+            view.message = mess
+
