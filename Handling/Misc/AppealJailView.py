@@ -14,7 +14,7 @@ from db.Class.CustomClass import UserInfo
 
 class AppealJailView(discord.ui.View):
     def __init__(self, user: discord.Member, guild_id: int, money: int = 0, money_type = "G"):
-        super().__init__(timeout=120)
+        super().__init__(timeout=15)
         self.message: discord.Message = None
         self.user = user
         self.guild_id = guild_id
@@ -86,7 +86,7 @@ class AppealJailView(discord.ui.View):
 
         Bạn phải giải thích bản án **bằng giọng điệu phù hợp với tính cách đã chọn**, ngắn gọn, nhưng đầy đủ lý do. Tránh lặp lại nội dung trên. **Không bình luận ngoài vai. Không nêu vai trò của bản thân hoặc hệ thống.**
 
-        Hãy bắt đầu phán xét.
+        Hãy bắt đầu phán xét và xưng hô giống với phiên tòa xét xử.
         """
 
         try:
