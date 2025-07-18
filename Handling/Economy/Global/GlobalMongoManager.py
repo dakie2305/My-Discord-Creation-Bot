@@ -38,6 +38,7 @@ def create_or_update_global_item(user_id: int, user_name: str, user_display_name
     collection = db_specific['global_inventory']
     existing_raw = collection.find_one({"user_id": user_id})
     item.item_worth_amount = 0 #Tránh lạm
+    item.item_worth_type = "C" #Tránh lạm
     if existing_raw is None:
         # New record
         item.quantity = min(max(amount, 0), 99)
