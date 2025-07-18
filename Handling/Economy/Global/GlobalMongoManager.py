@@ -23,6 +23,17 @@ def find_global_item_by_id(user_id: int):
         return GlobalItem.from_dict(data)
     return None
 
+def find_all_global_items() -> list[GlobalItem]:
+    collection = db_specific['global_inventory']
+    all_data = collection.find()
+    return [GlobalItem.from_dict(doc) for doc in all_data]
+
+def delete_global_item_by_user_id(user_id: int) -> bool:
+    collection = db_specific['global_inventory']
+    result = collection.delete_one({"user_id": user_id})
+    return result.deleted_count > 0
+
+
 def create_or_update_global_item(user_id: int, user_name: str, user_display_name: str, guild_id: int, guild_name: str, item: Item, amount: int):
     collection = db_specific['global_inventory']
     existing_raw = collection.find_one({"user_id": user_id})
@@ -48,6 +59,7 @@ def create_or_update_global_item(user_id: int, user_name: str, user_display_name
     existing_data.user_display_name = user_display_name
     existing_data.guild_id = guild_id
     existing_data.guild_name = guild_name
+    existing_data.date_updated = datetime.now()
 
     list_items = existing_data.list_items or []
     updated = False
@@ -92,6 +104,7 @@ def transfer_item_global(user_id: int, user_name: str, user_display_name: str, g
     if transfer_to_global == False:
         #transfer_to_global false thì sẽ chuyển item từ database global sang database của server bình thường
         ProfileMongoManager.update_list_items_profile(guild_id=guild_id, guild_name=guild_name, user_id=user_id, user_name=user_name, user_display_name=user_display_name,item=item, amount = item.quantity)
+        create_or_update_global_item(user_id=user_id, user_name=user_name, user_display_name=user_display_name, guild_id=guild_id, guild_name=guild_name, item=item, amount= - item.quantity)
     else:
         #transfer_to_global true thì sẽ chuyển item từ database của server bình thường sang database global
         ProfileMongoManager.update_list_items_profile(guild_id=guild_id, guild_name=guild_name, user_id=user_id, user_name=user_name, user_display_name=user_display_name,item=item, amount = - item.quantity)
