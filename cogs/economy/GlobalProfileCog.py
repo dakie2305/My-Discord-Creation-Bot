@@ -2,6 +2,8 @@ from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.EmojiEnum import EmojiCreation2
 import discord
 from discord.ext import commands
+from Handling.Economy.Global import GlobalMongoManager
+from Handling.Economy.Global.GlobalInventoryConfirmationView import GlobalInventoryConfirmationView
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 from datetime import datetime, timedelta
 import CustomFunctions
@@ -20,17 +22,17 @@ from CustomEnum.TrueHeavenEnum import TrueHeavenEnum
 
 
 async def setup(bot: commands.Bot):
-    await bot.add_cog(GlobalCog(bot=bot))
+    await bot.add_cog(GlobalProfileCog(bot=bot))
     print("Global Profile is ready!")
 
-class GlobalCog(commands.Cog):
+class GlobalProfileCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         
     
     global_group = discord.app_commands.Group(name="global", description="Các lệnh liên quan đến Global!")
     #region ga sell slash
-    @global_group.command(name="inventory", description="Chuyển giao vật phẩm từ kho đồ cá nhân sang kho đồ liên server!")
+    @global_group.command(name="inventory", description="Chuyển giao vật phẩm từ kho đồ cá nhân sang kho đồ liên thông!")
     @discord.app_commands.checks.cooldown(1, 30)
     async def global_inventory_slash_command(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=False)
@@ -42,13 +44,33 @@ class GlobalCog(commands.Cog):
             view.message = mess
             return
         
+        global_inventory = GlobalMongoManager.find_global_item_by_id(user_id=interaction.user.id)
         user_profile = ProfileMongoManager.find_profile_by_id(guild_id=interaction.guild_id, user_id=interaction.user.id)
         if user_profile == None:
             view = SelfDestructView(timeout=30)
             mess = await interaction.followup.send(content=f"Vui lòng dùng lệnh {SlashCommand.PROFILE.value} trước đã!", ephemeral=True, view=view)
             view.message = mess
             return
+        
+        if global_inventory == None or global_inventory.enable_until < datetime.now():
+            view = SelfDestructView(timeout=30)
+            mess = await interaction.followup.send(content=f"Bạn cần phải dùng Thẻ Liên Thông mua trong {SlashCommand.SHOP_GLOBAL.value} để kích hoạt chức năng Liên Thông!", ephemeral=True, view=view)
+            view.message = mess
+            return
+        
         #Xuất view chọn lấy đồ từ kho liên server hoặc chuyển đồ từ kho cá nhân sang kho liên server
+        embed = discord.Embed(title=f"Kho Đồ Liên Thông!", description="Kho Đồ Liên Thông là kho đồ tổng bộ, bạn có thể truy cập ở bất kỳ server nào! ",color=discord.Color.blue())
+        embed.add_field(name=f"", value="▬▬▬▬ι════════>", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Bạn có thể chuyển tối đa 10 vật phẩm từ kho đồ cá nhân vào Kho Đồ Liên Thông để sài ở server discord khác!", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} Chỉ mở khóa được tính năng này khi bạn đã mua và sử dụng Thẻ Liên Thông từ {SlashCommand.SHOP_GLOBAL.value}!", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} **Cá Nhân -> Liên Thông**: Chuyển vật phẩm từ kho đồ hiện tại vào Kho Đồ Liên Thông để sử dụng ở server khác!", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value} **Liên Thông -> Cá Nhân**: Chuyển vật phẩm từ Kho Đồ Liên Thông vào kho đồ ở server hiện tại!", inline=False)
+        footer_text = f"Để hiểu rõ cơ chế Liên Thông là gì thì hãy nhắn câu\n`global help`"
+        embed.set_footer(text=footer_text)
+        view = GlobalInventoryConfirmationView(user=interaction.user, user_profile=user_profile, guild_id=interaction.guild_id, global_inventory=global_inventory)
+        mess = await interaction.followup.send(embed=embed, view=view)
+        view.message = mess
+        return
         
     
     @global_inventory_slash_command.error
