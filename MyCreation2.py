@@ -1,4 +1,3 @@
-import PIL.Image
 import discord
 from datetime import datetime, timedelta
 import os
@@ -14,7 +13,6 @@ from db.DbMongoManager import UserInfo, GuildExtraInfo
 import random
 import CustomButton
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
-import PIL
 from Handling.Misc.AutoresponderCreation2 import AutoresponderHandling
 from Handling.Economy.Quest.QuestHandling import QuestHandling
 import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
@@ -585,6 +583,7 @@ init_extension = ["cogs.games.RockPaperScissorCog",
                   "cogs.economy.InventoryCog",
                   "cogs.economy.CoupleCog",
                   "cogs.economy.GaCog",
+                  "cogs.economy.GlobalProfileCog",
                   
                   "cogs.misc.HelpCog",
                   "cogs.misc.SnipeCog",

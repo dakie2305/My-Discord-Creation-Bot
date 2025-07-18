@@ -14,7 +14,6 @@ import re
 import aiohttp
 import io
 from gtts import gTTS
-import soundfile as sf
 
 load_dotenv()
 USER_NAME_MONGODB = os.getenv("USER_NAME_MONGODB", "")
