@@ -26,7 +26,7 @@ def find_global_item_by_id(user_id: int):
 def create_or_update_global_item(user_id: int, user_name: str, user_display_name: str, guild_id: int, guild_name: str, item: Item, amount: int):
     collection = db_specific['global_inventory']
     existing_raw = collection.find_one({"user_id": user_id})
-
+    item.item_worth_amount = 0 #Tránh lạm
     if existing_raw is None:
         # New record
         item.quantity = min(max(amount, 0), 99)
@@ -96,3 +96,23 @@ def transfer_item_global(user_id: int, user_name: str, user_display_name: str, g
         #transfer_to_global true thì sẽ chuyển item từ database của server bình thường sang database global
         ProfileMongoManager.update_list_items_profile(guild_id=guild_id, guild_name=guild_name, user_id=user_id, user_name=user_name, user_display_name=user_display_name,item=item, amount = - item.quantity)
         create_or_update_global_item(user_id=user_id, user_name=user_name, user_display_name=user_display_name, guild_id=guild_id, guild_name=guild_name, item=item, amount=item.quantity)
+        
+def update_enable_until(user_id: int, user_name: str, user_display_name: str, guild_id: int, guild_name: str):
+    collection = db_specific['global_inventory']
+    existing_raw = collection.find_one({"user_id": user_id})
+    future = datetime.now() + timedelta(weeks=2)
+    if existing_raw is None:
+        # New record
+        new_data = GlobalItem(
+            user_id=user_id,
+            user_name=user_name,
+            user_display_name=user_display_name,
+            guild_id=guild_id,
+            guild_name=guild_name,
+            list_items=[],
+            enable_until=future,
+        )
+        collection.insert_one(new_data.to_dict())
+    else:
+        collection.update_one({"user_id": user_id}, {"$set": {"enable_until": future,
+                                                                                        }})
