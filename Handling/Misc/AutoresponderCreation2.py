@@ -39,8 +39,6 @@ class AutoresponderHandling():
         dia_vi_help = ["tăng địa vị", "điểm địa vị", "địa vị là gì", "địa vị?"]
         
         
-        donate = ["donation"]
-        donate_disable = ["!disable donation", "!disable donation text"]
         sb_help = ["sb help","cách chơi tài xỉu", "tài xỉu?", "tx help"]
         legend_weapon = ["thất truyền huyền khí"]
         ga_help = ["ga help", "guardian help", "hộ vệ thần?", "guardian help"]
@@ -211,39 +209,6 @@ class AutoresponderHandling():
             _mess = await message.channel.send(embed=embed, view=view)
             view.message= _mess
             
-
-        elif message.guild.id != 1194106864582004849 and CustomFunctions.contains_substring(message.content.lower(), donate_disable):
-            flag = True
-            check_exist = db.find_guild_extra_info_by_id(message.guild.id)
-            if check_exist:
-                one_week_later = datetime.now() + timedelta(weeks=1)
-                check_exist.disable_donation_text_until = one_week_later
-                data_updated = {"disable_donation_text_until": check_exist.disable_donation_text_until}
-                db.update_guild_extra_info(guild_id=message.guild.id, update_data= data_updated)
-            else:
-                one_week_later = datetime.now() + timedelta(weeks=2)
-                data = GuildExtraInfo(guild_id=message.guild.id, guild_name= message.guild.name, allowed_ai_bot=True, disable_donation_text_until=one_week_later)
-                db.insert_guild_extra_info(data)
-            view = SelfDestructView(timeout=30)
-            _mess = await message.channel.send(content=f"Xin lỗi vì đã làm phiền. Bot sẽ không tự động gửi embed kêu gọi donate trong vòng hai tuần tới. Nếu muốn ủng hộ thì đừng quên dùng lệnh `!donation` nhé", view=view)
-            view.message= _mess
-        
-        elif message.guild.id != 1194106864582004849 and CustomFunctions.contains_substring(message.content.lower(), donate) and message.content.lower() != '!donation':
-            check_exist = db.find_guild_extra_info_by_id(message.guild.id)
-            if check_exist == None or check_exist.disable_donation_text_until == None or datetime.now() > check_exist.disable_donation_text_until:
-                flag = True
-                embed = discord.Embed(title=f"**Donate Darkie**", description=f"Xin lỗi vì đã làm phiền nhé! Tin nhắn này sẽ biến mất chỉ sau 1-2 phút thôi nhé!", color=0xc379e0)
-                embed.set_image(url="https://i.imgur.com/Zsoel4d.png")
-                embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
-                embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Nếu mọi người có chút lòng thành để ủng hộ và tạo động lực cho Darkie làm thêm chức năng mới, mini-game hoặc cải thiện bot, hoặc đẩy nhanh tiến độ dịch truyện, đăng truyện thì có thể donate một ít cafe nhé! Darkie **xin chân thành cảm ơn** rất rất nhiều!", inline=False)
-                embed.add_field(name="", value=f"> ACB: 9799317", inline=False)
-                embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
-                embed.set_footer(text=f"Cảm ơn chân thành vì đã đọc, nếu tin nhắn này làm phiền mọi người thì xin hãy dùng lệnh\n!disable donation text.", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")
-                view = SelfDestructView(timeout=15)
-                _mess = await message.channel.send(embed=embed, view=view)
-                view.message= _mess
-            
-
         return flag
     
     async def edit_embed_coin_flip(self, message: discord.Message, user: discord.Member):
