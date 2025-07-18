@@ -43,14 +43,14 @@ class SpecialInventoryGlobalView(discord.ui.View):
     @discord.ui.button(label="Kho Đồ Liên Thông", style=discord.ButtonStyle.blurple)
     async def global_inventory_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.defer(ephemeral=True)
-        unix_time = int(self.global_inventory.date_updated.timestamp())
+        unix_time = int(self.global_inventory.enable_until.timestamp())
         date_display = f"<t:{unix_time}:d>"
         embed_color = 0xffffff
         if isinstance(self.profile.profile_color, int) and 0x000000 <= self.profile.profile_color <= 0xFFFFFF:
             embed_color = self.profile.profile_color
         embed = discord.Embed(title="", description=f"**Kho Đồ Liên Thông của <@{self.profile.user_id}>**", color=embed_color)
         embed.add_field(name=f"Số lượng vật phẩm: {len(self.global_inventory.list_items)}", value=f"", inline=True)
-        embed.add_field(name=f"Chỉnh sửa lần cuối: {date_display}", value=f"", inline=True)
+        embed.add_field(name=f"Hết hạn truy cập vào: {date_display}", value=f"", inline=True)
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
         for item in self.global_inventory.list_items:
             embed.add_field(name=f"", value=f"{item.emoji} - {item.item_name} (x{item.quantity})", inline=True)
