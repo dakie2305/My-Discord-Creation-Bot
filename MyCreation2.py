@@ -8,6 +8,7 @@ import google.generativeai as genai
 import DailyLogger
 from discord.ext import commands, tasks
 from discord import app_commands
+from Handling.Economy.Global import GlobalMongoManager
 import db.DbMongoManager as db
 from db.DbMongoManager import UserInfo, GuildExtraInfo
 import random
@@ -292,6 +293,16 @@ async def clear_up_data_task():
         print(f"clear_up_data_task started. Deleted {count} snipe message in {guild.name}")
         #drop collection khi trống
         db.drop_snipe_channel_info_collection_if_empty(guild_id=guild.id)
+        
+        count = 0
+        all_global_inventories = GlobalMongoManager.find_all_global_items()
+        if all_global_inventories:
+            for global_inventory in all_global_inventories:
+                if global_inventory.date_updated + timedelta(weeks=24) < datetime.now():
+                    #Xóa
+                    GlobalMongoManager.delete_global_item_by_user_id(user_id=global_inventory.user_id)
+                    count+=1
+        print(f"clear_up_data_task started. Deleted {count} global inventory due to in-active")
 
 @tasks.loop(minutes = 13)
 async def dungeon_spawn_enemy_embed():
