@@ -1,4 +1,5 @@
 import discord
+from Handling.Economy.Global import GlobalMongoManager
 from Handling.Economy.Profile.GuardianMemoryView import GuardianMemoryView
 from Handling.Economy.Profile.ProfileClass import Profile
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
@@ -6,6 +7,7 @@ from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.EmojiEnum import EmojiCreation2
 from typing import List, Optional, Dict
 from Handling.Economy.Inventory_Shop.ItemClass import Item, list_gift_items
+from Handling.Economy.Profile.SpecialInventoryGlobalView import SpecialInventoryGlobalView
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 import Handling.Economy.GA.ListGAAndSkills as ListGAAndSkills
 from datetime import datetime, timedelta
@@ -20,9 +22,10 @@ class ProfileAdditionalView(discord.ui.View):
         self.profile_embed = profile_embed
         
         if profile.list_items != None and len(profile.list_items)>0:
-            self.profile_button = discord.ui.Button(label="Kho Đồ", style=discord.ButtonStyle.primary)
-            self.profile_button.callback = self.inventory_button_function
-            self.add_item(self.profile_button)
+            self.inventory_button = discord.ui.Button(label="Kho Đồ", style=discord.ButtonStyle.primary)
+            self.inventory_button.callback = self.inventory_button_function
+            self.add_item(self.inventory_button)
+            
         if profile.plant != None:
             self.gard_button = discord.ui.Button(label="Khu Vườn", style=discord.ButtonStyle.primary)
             self.gard_button.callback = self.garden_button_function
@@ -48,6 +51,10 @@ class ProfileAdditionalView(discord.ui.View):
         embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
         embed.set_footer(text=f"Đừng quên, bạn chỉ được giữ tối đa 20 vật phẩm, mỗi loại vật phẩm chỉ tối đa 99 cái thôi nhé!", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")
         view = BackToProfileView(profile=self.profile, profile_embed=self.profile_embed)
+        
+        global_inventory = GlobalMongoManager.find_global_item_by_id(user_id=interaction.user.id)
+        if global_inventory:
+            view = SpecialInventoryGlobalView(profile=self.profile, global_inventory=global_inventory, profile_embed=self.profile_embed)
         m = await self.message.edit(embed=embed, view = view)
         view.message = m
         await interaction.followup.send(f"Bạn đã chuyển sang chế độ Kho Đồ!", ephemeral=True)
@@ -171,74 +178,6 @@ class BackToProfileView(discord.ui.View):
             #Chuyển về embed cũ
             await self.message.edit(embed=self.profile_embed, view = None)
             return
-        await interaction.response.defer(ephemeral=True)
-        if self.profile.is_authority and ProfileMongoManager.is_in_debt(data = self.profile, copper_threshold=100000):
-            embed = discord.Embed(title=f"", description=f"Chính Quyền đã nợ nần quá nhiều và tự sụp đổ. Hãy dùng lệnh {SlashCommand.VOTE_AUTHORITY.value} để bầu Chính Quyền mới!", color=0xddede7)
-            self.profile.copper = -10000
-            self.profile.silver = 0
-            self.profile.gold = 0
-            self.profile.darkium = 0
-            ProfileMongoManager.update_profile_money_fast(guild_id= interaction.guild_id, data=self.profile)
-            ProfileMongoManager.remove_authority_from_server(guild_id=interaction.guild_id)
-            ProfileMongoManager.update_last_authority(guild_id=interaction.guild_id, user_id=self.profile.user_id)
-            await self.message.edit(embed=embed)
-            await interaction.followup.send(f"Bạn đã chuyển sang chế độ Profile!", ephemeral=True)
-            return
-        couple_info = CoupleMongoManager.find_couple_by_id(guild_id=interaction.guild_id, user_id=self.profile.user_id)
-        cq = ""
-        if self.profile.is_authority:
-            cq = "Chính Quyền Tối Cao"
-        embed_color = 0xffffff
-        if isinstance(self.profile.profile_color, int) and 0x000000 <= self.profile.profile_color <= 0xFFFFFF:
-            embed_color = self.profile.profile_color
-        embed = discord.Embed(title=cq, description=f"**Profile <@{self.profile.user_id}>**", color=embed_color)
-        if self.profile.protection_item != None:
-            embed.add_field(name=f"", value=f"Bảo Hộ Vật: [{self.profile.protection_item.emoji} - **{self.profile.protection_item.item_name}**]", inline=False)
-        if self.profile.attack_item != None:
-            embed.add_field(name=f"", value=f"Vũ Khí: [{self.profile.attack_item.emoji} - **{self.profile.attack_item.item_name}**]", inline=False)
-        embed.add_field(name=f"", value=f"Nhân phẩm: **{UtilitiesFunctions.get_nhan_pham(self.profile.dignity_point)}** ({self.profile.dignity_point})", inline=True)
-        embed.add_field(name=f"", value=f"Địa Vị: **{UtilitiesFunctions.get_dia_vi(self.profile)}**", inline=True)
-        embed.add_field(name=f"", value=f"Rank: **{self.profile.level}**", inline=False)
-        bar_progress = self.progress_bar(input_value= self.profile.level_progressing)
-        embed.add_field(name=f"", value=f"{bar_progress}\n", inline=False)
-        if couple_info!= None:
-            embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
-            embed.add_field(name=f"", value=f"Tình trạng cặp đôi: **{UtilitiesFunctions.get_text_on_love_rank(couple_info.love_rank)}** (**{couple_info.love_rank}**)", inline=False)
-            embed.add_field(name=f"", value=f"<@{couple_info.first_user_id}> -`{UtilitiesFunctions.get_heart_emoji_on_rank(couple_info.love_rank)}´- <@{couple_info.second_user_id}>", inline=False)
-            embed.add_field(name=f"", value=f"Điểm thân mật: **{couple_info.love_point}**", inline=False)
-            embed.add_field(name=f"", value=f"Tỉ lệ thăng hoa cảm xúc: **{int(couple_info.love_progressing/1000*100)}%**", inline=False)
-            date_created = couple_info.date_created
-            unix_time = int(date_created.timestamp())
-            embed.add_field(name=f"", value=f"Ngày đầu quen nhau: <t:{unix_time}:D>", inline=False)
-            if couple_info.date_married != None:
-                date_married = couple_info.date_married
-                unix_time_m = int(date_married.timestamp())
-                embed.add_field(name=f"", value=f"Ngày cưới nhau: <t:{unix_time_m}:D>", inline=False)
-        embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
-        embed.add_field(name=f"", value=f"**Tổng tài sản**:", inline=False)
-        show_darkium = f"{EmojiCreation2.DARKIUM.value}: **{UtilitiesFunctions.shortened_currency(self.profile.darkium)}**\n"
-        if self.profile.darkium == 0:
-            show_darkium = ""
-        embed.add_field(name=f"", value=f">>> {show_darkium}{EmojiCreation2.GOLD.value}: **{UtilitiesFunctions.shortened_currency(self.profile.gold)}**\n{EmojiCreation2.SILVER.value}: **{UtilitiesFunctions.shortened_currency(self.profile.silver)}**\n{EmojiCreation2.COPPER.value}: **{UtilitiesFunctions.shortened_currency(self.profile.copper)}**", inline=False)
-        #Quote
-        embed.add_field(name=f"", value="\n", inline=False)
-        embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
-        embed.add_field(name=f"", value=f"**Quote**: \"{self.profile.quote}\"", inline=False)
-        embed.set_footer(text=f"Profile của {self.profile.user_name}.", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")
-        await self.message.edit(embed=embed, view = None)
-        await interaction.followup.send(f"Bạn đã chuyển sang chế độ Profile!", ephemeral=True)
-        
-    
-    def progress_bar(self, input_value: int, total_progress: int = 1000, bar_length=15):
-        # Calculate the percentage of progress
-        percentage = (input_value / total_progress) * 100
-        # Determine the number of filled (█) characters
-        filled_length = int(bar_length * input_value // total_progress)
-        # Create the progress bar string
-        bar = '█' * filled_length + '░' * (bar_length - filled_length)
-        # Format the output with percentage
-        return f'{bar} **{int(percentage)}%**'
-
 
 class SpecialGuardianView(discord.ui.View):
     def __init__(self, profile: Profile, profile_embed: discord.Embed = None):
