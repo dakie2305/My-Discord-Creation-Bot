@@ -1,6 +1,7 @@
 import discord
 from CustomEnum.GuardianMemoryTag import GuardianMemoryTag
 from Handling.Economy.GA.GaDugeonView import GaDugeonView
+from Handling.Economy.Global import GlobalMongoManager
 from Handling.Economy.Profile.ProfileClass import Profile
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 from CustomEnum.EmojiEnum import EmojiCreation2
@@ -277,6 +278,10 @@ class InventoryUseView(discord.ui.View):
                 except Exception as e:
                     print(f"Failed to delete message in channel {interaction.channel.name} in guild {interaction.guild.name} after using GA summoning book.\n{e}")
             await self.handline_summoning_ga_book(interaction=interaction, level=self.user_profile.guardian.level if self.user_profile.guardian else 1)
+        
+        elif self.selected_item.item_id == "global_card":
+            GlobalMongoManager.update_enable_until(user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, guild_id=interaction.guild_id, guild_name=interaction.guild.name)
+            await channel.send(f'{interaction.user.mention} đã dùng [{self.selected_item.emoji} - **{self.selected_item.item_name}**] để mở khóa chức năng Liên Thông Đa Server! Thẻ sẽ hết hiệu lực sau hai tuần!')
         else:
             #Không xoá
             flag_delete_item = False

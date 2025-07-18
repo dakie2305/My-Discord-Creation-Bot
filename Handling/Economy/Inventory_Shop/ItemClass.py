@@ -451,6 +451,21 @@ list_support_items_p = [
         bonus_dignity = 0,
         rank_required = 20,
     ),
+        Item(
+        item_id = "global_card",
+        item_name = "Thẻ liên thông",
+        item_description = "Thẻ đặc biệt mở khóa chức năng liên thông đa server! Hiệu lực trong hai tuần sau khi sử dụng!",
+        item_type = "self_support",
+        quantity = 1,
+        emoji = EmojiCreation2.CARD_GLOBAL.value,
+        item_worth_amount = 100000,
+        item_worth_type= "D",
+        item_require_target = True,
+        is_self_usable = False,
+        bonus_exp = 0,
+        bonus_dignity = 0,
+        rank_required = 20,
+    ),
 ]
 list_support_items = copy.deepcopy(list_support_items_p)
 list_support_ga_items_p= [
