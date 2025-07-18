@@ -43,6 +43,7 @@ class AutoresponderHandling():
         legend_weapon = ["thất truyền huyền khí"]
         ga_help = ["ga help", "guardian help", "hộ vệ thần?", "guardian help"]
         gd_help = ["gd help", "dungeon help"]
+        global_help = ["global help", "global?"]
         gc_help = ["gc help", "challenge help", "ga challenge"]
 
         chosen_item: Item = None
@@ -169,6 +170,21 @@ class AutoresponderHandling():
             embed.add_field(name="", value=f"- Tài xỉu triple ({SlashCommand.SB_TRIPLE.value}) có tỷ lệ ăn 1:6, hoặc 1:8 nếu đoán số (tức đặt 1 {EmojiCreation2.GOLD.value} sẽ ăn 6 hoặc 8 {EmojiCreation2.GOLD.value}), và cách tính thắng thua như sau:", inline=False)
             embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} **Thắng**: nếu không đoán số, và cả ba xúc xắc ra giống nhau sẽ thắng. Nếu đoán trúng số nào sẽ ra giống nhau sẽ thắng x8 lần số tiền đặt cược.", inline=False)
             embed.add_field(name="", value="-------------------------------------", inline=False)
+            view = SelfDestructView(timeout=180)
+            _mess = await message.channel.send(embed=embed, view=view)
+            view.message= _mess
+            
+        elif CustomFunctions.contains_substring(message.content.lower(), global_help):
+            flag = True
+            embed = discord.Embed(title=f"", description=f"Giải thích và hướng dẫn chức năng **Liên Thông**", color=0xc379e0)
+            embed.add_field(name="", value="-------------------------------------", inline=False)
+            embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Kho Đồ Liên Thông tức là kho đồ chung, bạn có thể truy cập từ bất kỳ server nào! Khi đủ điều kiện liên thông thì bạn có thể bỏ tối đa **10** vật phẩm từ kho đồ cá nhân để đem sang server khác", inline=False)
+            embed.add_field(name="", value=f"- {EmojiCreation2.SHINY_POINT.value} Cần mua Thẻ Liên Thông trong lệnh {SlashCommand.SHOP_GLOBAL.value} để mở khóa chức năng Liên Thông trong vòng **hai tuần.**", inline=False)
+            embed.add_field(name="", value=f"- {EmojiCreation2.SHINY_POINT.value} Sau **6** tháng không sử dụng chức năng Liên Thông thì Kho Đồ Liên Thông sẽ bị xóa!", inline=False)
+            embed.add_field(name="", value=f"- {EmojiCreation2.SHINY_POINT.value} Để được phép bỏ vật phẩm vào Kho Đồ Liên Thông, cần phải đáp ứng điều kiện: server trên 1000 người, hoặc dùng lệnh trong server True Heavens!", inline=False)
+            embed.add_field(name="", value=f"- {EmojiCreation2.SHINY_POINT.value} Yêu cầu như thế là để tránh tình trạng đưa bot vào server cá nhân và lạm dụng chức năng Liên Thông!", inline=False)
+            embed.add_field(name="", value="-------------------------------------", inline=False)
+            embed.set_footer(text=f"{EmojiCreation2.SHINY_POINT.value} Lưu ý, vật phẩm đã liên thông sẽ mất tất cả giá trị bán ra, nên tốt nhất đừng mơ đến chuyện đem ra server khác bán!", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")
             view = SelfDestructView(timeout=180)
             _mess = await message.channel.send(embed=embed, view=view)
             view.message= _mess

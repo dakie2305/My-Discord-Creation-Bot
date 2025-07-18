@@ -187,6 +187,7 @@ class EmojiCreation2(Enum):
     
     CERT_CLOWNS = "<:certificate_1:1315707049958576229>"
     CERT_2 = "<:certificate_2:1315707058762416209>"
+    CARD_GLOBAL = "<a:card:1395806965036355615>"
     
     TATSUMAKI = "<a:tatsumaki:1320096007949648014>"
     FUBUKI = "<:fubuki:1320096012492083282>"

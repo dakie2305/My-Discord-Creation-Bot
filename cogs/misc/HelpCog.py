@@ -57,7 +57,6 @@ class Help(commands.Cog):
         embed.add_field(name=f"", value=f"- **Trang {count}**: Tổng hợp lệnh lặt vặt.", inline=False)
         count+=1
         embed.add_field(name=f"", value=f"- **Trang {count}**: Những thông tin hữu ích về bot Creation 1", inline=False)
-        embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
         list_embed.append(embed)
         
         #Game nối từ
@@ -150,6 +149,8 @@ class Help(commands.Cog):
         count+=1
         embed.add_field(name=f"", value=f"- **Trang {count}**: Tổng hợp thông tin về Shop và Kho Đồ.", inline=False)
         count+=1
+        embed.add_field(name=f"", value=f"- **Trang {count}**: Tổng hợp thông tin về Liên Thông Đa Server.", inline=False)
+        count+=1
         embed.add_field(name=f"", value=f"- **Trang {count}**: Tổng hợp thông tin về Thất Truyền Huyền Khí.", inline=False)
         count+=1
         embed.add_field(name=f"", value=f"- **Trang {count}**: Tổng hợp lệnh Chính Quyền.", inline=False)
@@ -160,14 +161,11 @@ class Help(commands.Cog):
         count+=1
         embed.add_field(name=f"", value=f"- **Trang {count}**: Tổng hợp thông tin chiến đấu Hộ Vệ Thần (Guardian Angel Battle)", inline=False)
         count+=1
-
         embed.add_field(name=f"", value=f"- **Trang {count}**: Tổng hợp thông tin Thách Đấu Hộ Vệ Thần (Guardian Angel Challenge)", inline=False)
         count+=1
-
         embed.add_field(name=f"", value=f"- **Trang {count}**: Tổng hợp thông tin về hệ thống Cặp Đôi.", inline=False)
         count+=1
         embed.add_field(name=f"", value=f"- **Trang {count}**: Những thông tin hữu ích về bot Creation 2", inline=False)
-        embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
         list_embed.append(embed)
         
         #Game cờ bạc
@@ -216,6 +214,19 @@ class Help(commands.Cog):
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value}`/inventory use`: chọn vật phẩm cần dùng sau khi mua từ shop!", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value}`/inventory sell`: bán các vật phẩm để kiếm tiền!", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value}`/gift`: để tặng quà cho người khác, giúp họ tăng kinh nghiệm và tăng nhân phẩm!", inline=False)
+        embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
+        list_embed.append(embed)
+        
+        #Global
+        embed = discord.Embed(title=f"Liên Thông Đa Server", description=f"Liên Thông Đa Server là chức năng cho phép bạn đồng bộ dữ liệu và dùng lệnh ở các server khác!", color=0xddede7)
+        embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation2.SHINY_POINT.value}Tưởng tượng đơn giản là bạn có thể mang vật phẩm, vũ khí hoặc Hộ Vệ Thần từ server mình giàu nhất sang server khác để khoe!", inline=False)
+        embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value}Kho Đồ Liên Thông tức là kho đồ chung, bạn có thể truy cập từ bất kỳ server nào! Khi đủ điều kiện liên thông thì bạn có thể bỏ tối đa **10** vật phẩm từ kho đồ cá nhân để đem sang server khác", inline=False)
+        embed.add_field(name="", value=f"- {EmojiCreation2.SHINY_POINT.value}Cần mua Thẻ Liên Thông trong lệnh {SlashCommand.SHOP_GLOBAL.value} để mở khóa chức năng Liên Thông trong vòng **hai tuần.**", inline=False)
+        embed.add_field(name="", value=f"- {EmojiCreation2.SHINY_POINT.value}Sau **6** tháng không sử dụng chức năng Liên Thông thì Kho Đồ Liên Thông sẽ bị xóa!", inline=False)
+        embed.add_field(name="", value=f"- {EmojiCreation2.SHINY_POINT.value}Để được phép bỏ vật phẩm vào Kho Đồ Liên Thông, cần phải đáp ứng điều kiện: server trên 1000 người, hoặc dùng lệnh trong server True Heavens!", inline=False)
+        embed.add_field(name="", value=f"- {EmojiCreation2.SHINY_POINT.value}Yêu cầu như thế là để tránh tình trạng đưa bot vào server cá nhân và lạm dụng chức năng Liên Thông!", inline=False)
+        embed.set_footer(text=f"{EmojiCreation2.SHINY_POINT.value} Lưu ý, vật phẩm đã liên thông sẽ mất tất cả giá trị bán ra, nên tốt nhất đừng mơ đến chuyện đem ra server khác bán!", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
         list_embed.append(embed)
         
