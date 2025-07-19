@@ -5,7 +5,6 @@ from CustomEnum.EmojiEnum import EmojiCreation2
 from dotenv import load_dotenv
 import CustomFunctions
 import google.generativeai as genai
-import DailyLogger
 from discord.ext import commands, tasks
 from discord import app_commands
 from Handling.Economy.Global import GlobalMongoManager
@@ -39,16 +38,12 @@ intents.presences = False
 API_KEY = os.getenv("GOOGLE_CLOUD_KEY_2")
 genai.configure(api_key=API_KEY)
 
-interaction_logger = DailyLogger.get_logger("Creation2_Interaction")
-commands_logger = DailyLogger.get_logger("Creation2_Commands")
-
 bot = commands.Bot(command_prefix="!", intents=intents)
 bot.remove_command('help')
 #region Bot Prefix Commands
 @bot.command()
 async def ping(ctx):
     await ctx.send(f"Online at {ctx.guild}")
-    commands_logger.info("Someone use ping!")
 
 @bot.command()
 @app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
@@ -115,7 +110,6 @@ async def random_ai_talk(interaction: discord.Interaction):
 async def automatic_speak_randomly():
     guilds = bot.guilds
     for guild in guilds:
-        print(guild)
         guild_extra_info = db.find_guild_extra_info_by_id(guild.id)
         if guild_extra_info != None and guild_extra_info.list_channels_ai_talk != None and len(guild_extra_info.list_channels_ai_talk)>0:
             random_channel_id = random.choice(guild_extra_info.list_channels_ai_talk)
@@ -402,7 +396,6 @@ client = discord.Client(intents=intents)
 @bot.event
 async def on_ready():
     print(f'We have logged in as {bot.user}')
-    interaction_logger.info(f"Successfully logged in as {bot.user}")
     
     if CustomFunctions.check_if_dev_mode()==False:
         automatic_speak_randomly.start()

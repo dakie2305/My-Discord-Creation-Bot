@@ -5,7 +5,6 @@ from dotenv import load_dotenv
 from CustomEnum.TrueHeavenEnum import TrueHeavenEnum
 import CustomFunctions
 import google.generativeai as genai
-import DailyLogger
 from discord.ext import commands, tasks
 from discord import app_commands
 from Handling.MiniGame.GuessNumber import GnHandling, GnMongoManager
@@ -35,9 +34,6 @@ intents.presences = False
 API_KEY = os.getenv("GOOGLE_CLOUD_KEY")
 genai.configure(api_key=API_KEY)
 
-interaction_logger = DailyLogger.get_logger("Creation1_Interaction")
-commands_logger = DailyLogger.get_logger("Creation1_Commands")
-
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 bot.remove_command('help')
@@ -45,7 +41,6 @@ bot.remove_command('help')
 @bot.command()
 async def ping(ctx):
     await ctx.send(f"Online at {ctx.guild}")
-    commands_logger.info("Someone use ping!")
 
 @bot.command()
 @app_commands.checks.cooldown(1, 5.0) #1 lần mỗi 5s
@@ -63,7 +58,6 @@ async def sync(ctx):
     if(ctx.author.id == CustomFunctions.user_darkie['user_id']):
         fmt = await ctx.bot.tree.sync(guild = ctx.guild)
         await ctx.send(f"Đồng bộ {len(fmt)} commands vào {ctx.guild}")
-        commands_logger.info(f"Synced commands for {ctx.guild}!")
     else:
         await ctx.send(f"Có phải là Darkie đâu mà dùng lệnh này?")
         
@@ -99,7 +93,6 @@ async def say(interaction: discord.Interaction, thing_to_say : str, image: Optio
     embed.set_footer(text= f"Anon: {first}{reversed_id}{second}")  # Single-line field
     # await interaction.followup.send(content= "Đã gửi tin nhắn ẩn danh thành công.", ephemeral= True)
     await current_channel.send(embed= embed)
-    commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} used /say to say: {thing_to_say}")
 #endregion
 
 #region jail command
@@ -208,7 +201,6 @@ async def jail_user(channel: discord.TextChannel, jailer:discord.Member, user: d
     if channel:
         await channel.send(content=f"{user.mention}",embed=embed)
     print(f"Username {jailer.name}, Display user name {jailer.display_name} jailed {user.display_name} for {duration} {time_format}. Reason: {reason}")
-    commands_logger.info(f"Username {jailer.name}, Display user name {jailer.display_name} jailed {user.display_name} for {duration} {time_format}. Reason: {reason}")
 
 #endregion
 
@@ -257,7 +249,6 @@ async def unjail(interaction: discord.Interaction, user : discord.Member, reason
     else:
         await interaction.followup.send(f"Người này không ở trong tù.", ephemeral=True)
     print(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} unjailed {user.display_name}. Reason: {reason}")
-    commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} unjailed {user.display_name}. Reason: {reason}")
 #endregion
 
 #region delete_message command
@@ -388,13 +379,11 @@ async def report(interaction: discord.Interaction, user : discord.Member, reason
             view = CustomButton.CustomReportButtonView() #Gắn nút report
             await channel.send(embed=embed, view= view)
             print(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} report user id: {user.id} with Username {user.name}.")
-            commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} report user id: {user.id} with Username {user.name}.")
         else:
             await interaction.followup.send(f"<@315835396305059840> Bot không tìm được channel để gửi báo cáo!")
     except Exception as e:
         #Tag bản thân
         await interaction.followup.send(f"<@315835396305059840> Bot gặp exception trong lúc thực hiện lệnh. Exception: {str(e)}. Vui lòng liên hệ Darkie!", ephemeral=True)
-        commands_logger.info(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} tried report user id {user.id} but got exception {str(e)}.")
 
 # Task: Check jail expiry
 @tasks.loop(seconds=30)
@@ -571,7 +560,6 @@ client = discord.Client(intents=intents)
 @bot.event
 async def on_ready():
     print(f'We have logged in as {bot.user}')
-    interaction_logger.info(f"Successfully logged in as {bot.user}")
     check_jail_expiry.start()
     if CustomFunctions.check_if_dev_mode()==False:
         automatic_speak_randomly.start()
