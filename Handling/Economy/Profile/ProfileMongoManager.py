@@ -966,6 +966,30 @@ def increase_count_guardian(guild_id: int, user_id: int, count_type: str, count_
     )
     return update_result
 
+def sync_with_global_guardian(user_id: int, guild_id: int, guardian: GuardianAngel):
+    collection = db_specific[f'profile_{guild_id}']
+    
+    existing_data = find_profile_by_id(guild_id=guild_id, user_id=user_id)
+    if existing_data is None:
+        return
+    
+    if existing_data.guardian is None:
+        existing_data.guardian = guardian
+    else:
+        guardian.health = existing_data.guardian.health
+        guardian.stamina = existing_data.guardian.stamina
+        guardian.mana = existing_data.guardian.mana
+        existing_data.guardian = guardian
+
+    collection.update_one(
+        {
+            "id": "profile",
+            "user_id": user_id
+        },
+        {"$set": existing_data.to_dict()}
+    )
+    return existing_data
+
 #region guardian memory
 
 def add_memory_guardian(guild_id: int, user_id: int, memory_description: str, channel_name: str = "Không rõ", tag: str = "general"):

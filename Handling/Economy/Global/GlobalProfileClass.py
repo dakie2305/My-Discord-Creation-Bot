@@ -6,25 +6,25 @@ from Handling.Economy.GA.GuardianAngelClass import GuardianAngel
 from Handling.Economy.Inventory_Shop.ItemClass import Item
 
 class GlobalProfile:
-    def __init__(self, user_id: str, user_name: str, user_display_name: str, guild_name: str, guild_id: int, date_created: datetime = datetime.now(), date_updated: datetime = datetime.now(), list_items : Optional[List['Item']] = None, guardian: GuardianAngel = None, enable_until: datetime = datetime.now()):
+    def __init__(self, user_id: str, user_name: str, user_display_name: str, guild_name: str, guild_id: int, date_created: datetime = None, date_updated: datetime = None, list_items : Optional[List['Item']] = None, guardian: GuardianAngel = None, enable_until: datetime = datetime.now()):
         self.user_id = user_id
         self.user_name = user_name
         self.user_display_name = user_display_name
         self.guild_name = guild_name
         self.guild_id = guild_id
-        self.date_created = date_created
-        self.date_updated = date_updated
+        self.date_created = date_created if date_created else datetime.now()
+        self.date_updated = date_updated if date_updated else datetime.now()
         self.enable_until = enable_until
         self.guardian = guardian
         
         self.list_items: List[Item] = list_items if list_items else []
-        
 
     def to_dict(self):
         return {
             "user_id": self.user_id,
             "user_name": self.user_name,
             "user_display_name": self.user_display_name,
+            "guild_id": self.guild_id,
             "guild_name": self.guild_name,
             "date_created": self.date_created,
             "date_updated": self.date_updated,

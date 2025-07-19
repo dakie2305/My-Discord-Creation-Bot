@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 from datetime import datetime, timedelta
+from Handling.Economy.GA.GuardianAngelClass import GuardianAngel
 from Handling.Economy.Global.GlobalProfileClass import GlobalProfile
 from Handling.Economy.Profile import ProfileMongoManager
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
@@ -16,7 +17,7 @@ db_specific = client["creation_global_database"]
 
 
 #region Global Item
-def find_global_item_by_id(user_id: int):
+def find_global_profile_by_id(user_id: int):
     collection = db_specific['global_inventory']
     data = collection.find_one({"user_id": user_id})
     if data:
@@ -82,11 +83,6 @@ def create_or_update_global_item(user_id: int, user_name: str, user_display_name
     if len(list_items) > 5:
         list_items = list_items[-5:]
 
-    # Delete if empty
-    if not list_items:
-        collection.delete_one({"user_id": user_id})
-        return None
-
     # Save back to DB
     existing_data.list_items = list_items
     collection.update_one(
@@ -130,3 +126,46 @@ def update_enable_until(user_id: int, user_name: str, user_display_name: str, gu
     else:
         collection.update_one({"user_id": user_id}, {"$set": {"enable_until": future,
                                                                                         }})
+
+#region Global Guardian
+def create_or_update_global_guardian(user_id: int, user_name: str, user_display_name: str, guild_id: int, guild_name: str, guardian: GuardianAngel):
+    collection = db_specific['global_inventory']
+    existing_raw = collection.find_one({"user_id": user_id})
+    if existing_raw is None:
+        # New record
+        new_data = GlobalProfile(
+            user_id=user_id,
+            user_name=user_name,
+            user_display_name=user_display_name,
+            guild_id=guild_id,
+            guild_name=guild_name,
+            list_items=[],
+            guardian=guardian,
+        )
+        collection.insert_one(new_data.to_dict())
+        return new_data
+
+    existing_data = GlobalProfile.from_dict(existing_raw)
+    # Update
+    existing_data.guardian = guardian
+    existing_data.date_updated = datetime.now()
+    
+    collection.update_one(
+        {"user_id": user_id},
+        {"$set": existing_data.to_dict()}
+    )
+    return existing_data
+
+def transfer_guardian_global(user_id: int, user_name: str, user_display_name: str, guild_id: int, guild_name: str, guardian: GuardianAngel, transfer_to_global: bool = False):
+    collection = db_specific['global_inventory']
+    existing_raw = collection.find_one({"user_id": user_id})
+    if not existing_raw: return
+    existing_data = GlobalProfile.from_dict(existing_raw)
+    if not existing_data: return
+    
+    if transfer_to_global == False:
+        #transfer_to_global false thì sẽ chuyển stats của database global sang database của server bình thường
+        ProfileMongoManager.sync_with_global_guardian(guild_id=guild_id, user_id=user_id, guardian=guardian)
+    else:
+        #transfer_to_global true thì sẽ chuyển stats của database của server bình thường sang database global
+        create_or_update_global_guardian(user_id=user_id, user_name=user_name, user_display_name=user_display_name, guild_id=guild_id, guild_name=guild_name, guardian = guardian)

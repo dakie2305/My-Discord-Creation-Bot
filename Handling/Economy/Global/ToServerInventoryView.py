@@ -37,7 +37,7 @@ class ToServerInventoryView(discord.ui.View):
         if self.selected_item == None: return
         await interaction.response.defer(ephemeral=False)
         #Kiểm tra xem item đó còn không
-        global_inventory = GlobalMongoManager.find_global_item_by_id(user_id=interaction.user.id)
+        global_inventory = GlobalMongoManager.find_global_profile_by_id(user_id=interaction.user.id)
         check_fail = True
         for player_item in global_inventory.list_items:
             if player_item.item_id == self.selected_item.item_id and player_item.quantity > 0:
