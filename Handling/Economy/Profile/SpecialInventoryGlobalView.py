@@ -1,5 +1,5 @@
 import discord
-from Handling.Economy.Global.GlobalInventoryClass import GlobalItem
+from Handling.Economy.Global.GlobalProfileClass import GlobalProfile
 from Handling.Economy.Profile.ProfileClass import Profile
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 from CustomEnum.SlashEnum import SlashCommand
@@ -12,7 +12,7 @@ import random
 
 
 class SpecialInventoryGlobalView(discord.ui.View):
-    def __init__(self, profile: Profile, global_inventory: GlobalItem, profile_embed: discord.Embed = None):
+    def __init__(self, profile: Profile, global_inventory: GlobalProfile, profile_embed: discord.Embed = None):
         super().__init__(timeout=30)
         self.message: discord.Message = None
         self.profile = profile

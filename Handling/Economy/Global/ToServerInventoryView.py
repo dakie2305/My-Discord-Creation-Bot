@@ -2,7 +2,7 @@ from typing import List
 import discord
 from CustomEnum.TrueHeavenEnum import TrueHeavenEnum
 from Handling.Economy.Global import GlobalMongoManager
-from Handling.Economy.Global.GlobalInventoryClass import GlobalItem
+from Handling.Economy.Global.GlobalProfileClass import GlobalProfile
 from Handling.Economy.Inventory_Shop.ItemClass import Item
 from Handling.Economy.Profile.ProfileClass import Profile
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
@@ -12,7 +12,7 @@ from Handling.Misc.SelfDestructView import SelfDestructView
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 
 class ToServerInventoryView(discord.ui.View):
-    def __init__(self, user: discord.Member, guild_id: int, global_inventory: GlobalItem = None):
+    def __init__(self, user: discord.Member, guild_id: int, global_inventory: GlobalProfile = None):
         super().__init__(timeout=30)
         self.message: discord.Message = None
         self.user = user

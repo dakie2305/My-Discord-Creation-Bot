@@ -1,7 +1,7 @@
 import discord
 from CustomEnum.TrueHeavenEnum import TrueHeavenEnum
 import CustomFunctions
-from Handling.Economy.Global.GlobalInventoryClass import GlobalItem
+from Handling.Economy.Global.GlobalProfileClass import GlobalProfile
 from Handling.Economy.Global.ToGlobalInventoryView import ToGlobalInventoryView
 from Handling.Economy.Global.ToServerInventoryView import ToServerInventoryView
 from Handling.Economy.Profile.ProfileClass import Profile
@@ -12,7 +12,7 @@ from Handling.Misc.SelfDestructView import SelfDestructView
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 
 class GlobalInventoryConfirmationView(discord.ui.View):
-    def __init__(self, user: discord.Member, user_profile: Profile, guild_id: int, global_inventory: GlobalItem = None):
+    def __init__(self, user: discord.Member, user_profile: Profile, guild_id: int, global_inventory: GlobalProfile = None):
         super().__init__(timeout=120)
         self.message: discord.Message = None
         self.user = user

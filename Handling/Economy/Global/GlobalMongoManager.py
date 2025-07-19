@@ -1,6 +1,6 @@
 from pymongo import MongoClient
 from datetime import datetime, timedelta
-from Handling.Economy.Global.GlobalInventoryClass import GlobalItem
+from Handling.Economy.Global.GlobalProfileClass import GlobalProfile
 from Handling.Economy.Profile import ProfileMongoManager
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 from Handling.Economy.Inventory_Shop.ItemClass import Item
@@ -20,13 +20,13 @@ def find_global_item_by_id(user_id: int):
     collection = db_specific['global_inventory']
     data = collection.find_one({"user_id": user_id})
     if data:
-        return GlobalItem.from_dict(data)
+        return GlobalProfile.from_dict(data)
     return None
 
-def find_all_global_items() -> list[GlobalItem]:
+def find_all_global_items() -> list[GlobalProfile]:
     collection = db_specific['global_inventory']
     all_data = collection.find()
-    return [GlobalItem.from_dict(doc) for doc in all_data]
+    return [GlobalProfile.from_dict(doc) for doc in all_data]
 
 def delete_global_item_by_user_id(user_id: int) -> bool:
     collection = db_specific['global_inventory']
@@ -43,7 +43,7 @@ def create_or_update_global_item(user_id: int, user_name: str, user_display_name
         # New record
         item.quantity = min(max(amount, 0), 99)
         if item.quantity <= 0: return None
-        new_data = GlobalItem(
+        new_data = GlobalProfile(
             user_id=user_id,
             user_name=user_name,
             user_display_name=user_display_name,
@@ -54,7 +54,7 @@ def create_or_update_global_item(user_id: int, user_name: str, user_display_name
         collection.insert_one(new_data.to_dict())
         return new_data
 
-    existing_data = GlobalItem.from_dict(existing_raw)
+    existing_data = GlobalProfile.from_dict(existing_raw)
     # Update
     existing_data.user_name = user_name
     existing_data.user_display_name = user_display_name
@@ -99,7 +99,7 @@ def transfer_item_global(user_id: int, user_name: str, user_display_name: str, g
     collection = db_specific['global_inventory']
     existing_raw = collection.find_one({"user_id": user_id})
     if not existing_raw: return
-    existing_data = GlobalItem.from_dict(existing_raw)
+    existing_data = GlobalProfile.from_dict(existing_raw)
     if not existing_data: return
     
     if transfer_to_global == False:
@@ -117,7 +117,7 @@ def update_enable_until(user_id: int, user_name: str, user_display_name: str, gu
     future = datetime.now() + timedelta(weeks=2)
     if existing_raw is None:
         # New record
-        new_data = GlobalItem(
+        new_data = GlobalProfile(
             user_id=user_id,
             user_name=user_name,
             user_display_name=user_display_name,

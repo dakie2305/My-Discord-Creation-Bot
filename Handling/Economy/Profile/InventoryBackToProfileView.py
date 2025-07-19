@@ -53,7 +53,7 @@ class ProfileAdditionalView(discord.ui.View):
         view = BackToProfileView(profile=self.profile, profile_embed=self.profile_embed)
         
         global_inventory = GlobalMongoManager.find_global_item_by_id(user_id=interaction.user.id)
-        if global_inventory:
+        if global_inventory != None and global_inventory.enable_until > datetime.now():
             view = SpecialInventoryGlobalView(profile=self.profile, global_inventory=global_inventory, profile_embed=self.profile_embed)
         m = await self.message.edit(embed=embed, view = view)
         view.message = m

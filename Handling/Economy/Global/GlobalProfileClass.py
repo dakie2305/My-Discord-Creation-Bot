@@ -2,10 +2,11 @@
 from datetime import datetime, timedelta
 from typing import List, Optional
 from CustomEnum.EmojiEnum import EmojiCreation2
+from Handling.Economy.GA.GuardianAngelClass import GuardianAngel
 from Handling.Economy.Inventory_Shop.ItemClass import Item
 
-class GlobalItem:
-    def __init__(self, user_id: str, user_name: str, user_display_name: str, guild_name: str, guild_id: int, date_created: datetime = datetime.now(), date_updated: datetime = datetime.now(), list_items : Optional[List['Item']] = None, enable_until: datetime = datetime.now()):
+class GlobalProfile:
+    def __init__(self, user_id: str, user_name: str, user_display_name: str, guild_name: str, guild_id: int, date_created: datetime = datetime.now(), date_updated: datetime = datetime.now(), list_items : Optional[List['Item']] = None, guardian: GuardianAngel = None, enable_until: datetime = datetime.now()):
         self.user_id = user_id
         self.user_name = user_name
         self.user_display_name = user_display_name
@@ -14,6 +15,7 @@ class GlobalItem:
         self.date_created = date_created
         self.date_updated = date_updated
         self.enable_until = enable_until
+        self.guardian = guardian
         
         self.list_items: List[Item] = list_items if list_items else []
         
@@ -27,13 +29,13 @@ class GlobalItem:
             "date_created": self.date_created,
             "date_updated": self.date_updated,
             "enable_until": self.enable_until,
-            
+            "guardian": self.guardian.to_dict() if self.guardian else None,
             "list_items": [data.to_dict() for data in self.list_items],
         }
 
     @staticmethod
-    def from_dict(data:dict) -> 'GlobalItem':
-        return GlobalItem(
+    def from_dict(data:dict) -> 'GlobalProfile':
+        return GlobalProfile(
                 user_id=data.get("user_id", None),
                 user_name=data.get("user_name", None),
                 user_display_name=data.get("user_display_name", None),
@@ -43,5 +45,6 @@ class GlobalItem:
                 date_updated=data.get("date_updated", datetime.now()),
                 enable_until=data.get("enable_until", datetime.now()),
                 
+                guardian = GuardianAngel.from_dict(data.get("guardian", None)) if data.get("guardian") else None,
                 list_items = [Item.from_dict(item) for item in data.get("list_items", [])],
             )
