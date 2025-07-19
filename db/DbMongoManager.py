@@ -279,6 +279,24 @@ def find_user_count_by_id(guild_id: int, user_id: int):
         return UserCount.from_dict(existing_data)
     return None
 
+def find_all_user_count_by_guild(guild_id: int):
+    db_specific = client['misc_database']
+    collection = db_specific[f'{guild_id}_user_count']
+    data = list(collection.find())
+    return [UserCount.from_dict(user) for user in data]
+
+def delete_user_count(guild_id: int, user_id: int):
+    collection = db_specific[f'{guild_id}_user_count']
+    result = collection.delete_one({"user_id": user_id})
+    return result
+
+def drop_user_count_info_collection_if_empty(guild_id: int):
+    db_specific = client['misc_database']
+    collection = db_specific[f'{guild_id}_user_count']
+    if collection is not None and collection.estimated_document_count() == 0:
+        collection.drop()
+        print(f"Collection '{guild_id}_user_count' dropped because it was empty.")
+
 def create_user_count(guild_id: int, data: UserCount):
     """
     Thêm mới lại thông tin count của user.

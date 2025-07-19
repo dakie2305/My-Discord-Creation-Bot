@@ -252,6 +252,16 @@ async def love_point_rank_reducing_task():
 
 @tasks.loop(hours=12)
 async def clear_up_data_task():
+    count = 0
+    all_global_inventories = GlobalMongoManager.find_all_global_items()
+    if all_global_inventories:
+        for global_inventory in all_global_inventories:
+            if global_inventory.date_updated + timedelta(weeks=24) < datetime.now():
+                #Xóa
+                GlobalMongoManager.delete_global_item_by_user_id(user_id=global_inventory.user_id)
+                count+=1
+    print(f"clear_up_data_task started. Deleted {count} global inventory due to in-active")
+
     guilds = bot.guilds
     for guild in guilds:
         #Kiểm tra quest cũ, xóa đi nếu cần
@@ -289,14 +299,16 @@ async def clear_up_data_task():
         db.drop_snipe_channel_info_collection_if_empty(guild_id=guild.id)
         
         count = 0
-        all_global_inventories = GlobalMongoManager.find_all_global_items()
-        if all_global_inventories:
-            for global_inventory in all_global_inventories:
-                if global_inventory.date_updated + timedelta(weeks=24) < datetime.now():
+        all_user_count = db.find_all_user_count_by_guild(guild_id=guild.id)
+        if all_user_count:
+            for user_count in all_user_count:
+                if user_count.last_interaction + timedelta(weeks=3) < datetime.now():
                     #Xóa
-                    GlobalMongoManager.delete_global_item_by_user_id(user_id=global_inventory.user_id)
+                    db.delete_user_count(guild_id=guild.id, user_id=user_count.user_id)
                     count+=1
-        print(f"clear_up_data_task started. Deleted {count} global inventory due to in-active")
+        print(f"clear_up_data_task started. Deleted {count} user count in {guild.name} due to in-active")
+        #drop collection khi trống
+        db.drop_user_count_info_collection_if_empty(guild_id=guild.id)
 
 @tasks.loop(minutes = 13)
 async def dungeon_spawn_enemy_embed():
