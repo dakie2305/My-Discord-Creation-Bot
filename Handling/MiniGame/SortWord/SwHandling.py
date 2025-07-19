@@ -51,7 +51,7 @@ class SwHandlingFunction():
     
     async def process_reset(self, message: discord.Message, sw_info: SortWordInfo, language: str):
         embed = discord.Embed(title=f"Xếp hạng các player theo điểm.", description=f"Game Đoán Từ", color=0x03F8FC)
-        embed.add_field(name=f"", value=f"Lượt chơi thứ: {sw_info.current_round}/1200", inline=False)
+        embed.add_field(name=f"", value=f"Lượt chơi thứ: {sw_info.current_round}/500", inline=False)
         embed.add_field(name=f"", value="___________________", inline=False)
         count = 0
         if sw_info.player_profiles:
@@ -71,7 +71,7 @@ class SwHandlingFunction():
         lan_label = "Tiếng Anh" if language == "en" else "Tiếng Việt"
         current_word = "hello" if language == "en" else "trai"
         unsorted = "olehl" if language == "en" else "rtia"
-        data = SortWordInfo(channel_id=self.message.channel, channel_name=message.channel.name, guild_name=message.guild.name, current_word=current_word, unsorted_word=unsorted, special_case=False)
+        data = SortWordInfo(channel_id=self.message.channel.id, channel_name=message.channel.name, guild_name=message.guild.name, current_word=current_word, unsorted_word=unsorted, special_case=False)
         SwMongoManager.create_info(data=data, guild_id=message.guild.id, lang=language)
         embed = discord.Embed(title=f"{EmojiCreation1.CHECK.value} Đoán Từ {lan_label}", description=f"",color=discord.Color.blue())
         embed.add_field(name=f"", value="▬▬▬▬▬▬ι═══════════>", inline=False)
