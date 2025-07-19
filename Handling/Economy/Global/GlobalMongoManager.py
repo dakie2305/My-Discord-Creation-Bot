@@ -131,6 +131,12 @@ def update_enable_until(user_id: int, user_name: str, user_display_name: str, gu
 def create_or_update_global_guardian(user_id: int, user_name: str, user_display_name: str, guild_id: int, guild_name: str, guardian: GuardianAngel):
     collection = db_specific['global_inventory']
     existing_raw = collection.find_one({"user_id": user_id})
+    guardian.worth_amount = 0 #Tránh lạm
+    guardian.worth_type = "C" #Tránh lạm
+    if guardian.list_skills:
+        for skill in guardian.list_skills:
+            skill.item_worth_type = "C"
+            skill.item_worth_amount = 0
     if existing_raw is None:
         # New record
         new_data = GlobalProfile(
