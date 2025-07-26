@@ -188,7 +188,7 @@ class LeaderboardEconomy(commands.Cog):
                     else:
                         embed.add_field(name=f"", value=f"**Hạng {index+1}**: <@{profile.user_id}> với **{short_text}** {emoji}", inline=False)
                     count+=1
-                    if count >= 20: break
+                    if count >= 15: break
             else:
                 embed.add_field(name=f"", value=f"Xếp hạng của {user.mention}", inline=True)
                 embed.add_field(name=f"", value=f"_____________", inline=False)
@@ -229,7 +229,7 @@ class LeaderboardEconomy(commands.Cog):
                     else:
                         embed.add_field(name=f"", value=f"**Hạng {index+1}**: <@{profile.user_id}> Rank **{profile.level}**", inline=False)
                     count+=1
-                    if count >= 20: break
+                    if count >= 15: break
             else:
                 embed.add_field(name=f"", value=f"Xếp hạng của {user.mention}", inline=True)
                 embed.add_field(name=f"", value=f"_____________", inline=False)
@@ -268,7 +268,7 @@ class LeaderboardEconomy(commands.Cog):
                     else:
                         embed.add_field(name=f"", value=f"**Hạng {index+1}**: <@{profile.user_id}> {text}", inline=False)
                     count+=1
-                    if count >= 20: break
+                    if count >= 15: break
             else:
                 embed.add_field(name=f"", value=f"Xếp hạng của {user.mention}", inline=True)
                 embed.add_field(name=f"", value=f"_____________", inline=False)
@@ -311,7 +311,7 @@ class LeaderboardEconomy(commands.Cog):
                     else:
                         embed.add_field(name=f"", value=f"**Hạng {index+1}**: {profile.guardian.ga_emoji} - {profile.guardian.ga_name}, cấp **{profile.guardian.level}** (<@{profile.user_id}>)", inline=False)
                     count+=1
-                    if count >= 20: break
+                    if count >= 15: break
             else:
                 embed.add_field(name=f"", value=f"Xếp hạng của {user.mention}", inline=True)
                 embed.add_field(name=f"", value=f"_____________", inline=False)
@@ -358,7 +358,7 @@ class LeaderboardEconomy(commands.Cog):
                     else:
                         embed.add_field(name=f"", value=f"**Hạng {index+1}**: {text}", inline=False)
                     count+=1
-                    if count >= 20: break
+                    if count >= 15: break
             else:
                 embed.add_field(name=f"", value=f"Xếp hạng của {user.mention}", inline=True)
                 embed.add_field(name=f"", value=f"_____________", inline=False)
@@ -408,7 +408,7 @@ class LeaderboardEconomy(commands.Cog):
                     else:
                         embed.add_field(name=f"", value=f"**Hạng {index+1}**: {text}", inline=False)
                     count+=1
-                    if count >= 20: break
+                    if count >= 15: break
             else:
                 embed.add_field(name=f"", value=f"Xếp hạng của {user.mention}", inline=True)
                 embed.add_field(name=f"", value=f"_____________", inline=False)
@@ -447,7 +447,7 @@ class LeaderboardEconomy(commands.Cog):
                     else:
                         embed.add_field(name=f"", value=f"**Hạng {index + 1}**: {text}", inline=False)
                     count += 1
-                    if count >= 20:
+                    if count >= 15:
                         break
             else:
                 embed.add_field(name=f"", value=f"Xếp hạng của {user.mention}", inline=True)
