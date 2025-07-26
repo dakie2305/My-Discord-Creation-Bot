@@ -178,8 +178,8 @@ class AutoresponderHandling():
             flag = True
             embed = discord.Embed(title=f"", description=f"Giải thích và hướng dẫn chức năng **Liên Thông**", color=0xc379e0)
             embed.add_field(name="", value="-------------------------------------", inline=False)
-            embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Kho Đồ Liên Thông tức là kho đồ chung, bạn có thể truy cập từ bất kỳ server nào! Khi đủ điều kiện liên thông thì bạn có thể bỏ vào tối đa **10** vật phẩm từ kho đồ cá nhân để đem sang server khác", inline=False)
-            embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Liên Thông Hộ Vệ Thần là chức năng cho phép bạn có thể đồng bộ dữ liệu Hộ Vệ Thần của bản thân ở bất kỳ server nào!", inline=False)
+            embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Kho Đồ Liên Thông ({SlashCommand.GLOBAL_INVENTORY.value}) tức là kho đồ chung, bạn có thể truy cập từ bất kỳ server nào! Khi đủ điều kiện liên thông thì bạn có thể bỏ vào tối đa **10** vật phẩm từ kho đồ cá nhân để đem sang server khác", inline=False)
+            embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Liên Thông Hộ Vệ Thần ({SlashCommand.GLOBAL_GA.value}) là chức năng cho phép bạn có thể đồng bộ dữ liệu Hộ Vệ Thần của bản thân ở bất kỳ server nào!", inline=False)
             embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Cần mua Thẻ Liên Thông trong lệnh {SlashCommand.SHOP_GLOBAL.value} để mở khóa chức năng Liên Thông trong vòng **hai tuần.**", inline=False)
             embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Sau **6** tháng không sử dụng chức năng Liên Thông thì dữ liệu Liên Thông sẽ bị xóa!", inline=False)
             embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Để được phép liên thông từ server -> global, cần phải đáp ứng điều kiện: server trên 1000 người, hoặc dùng lệnh trong server True Heavens!", inline=False)
