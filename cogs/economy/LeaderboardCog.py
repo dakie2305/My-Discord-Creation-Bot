@@ -2,6 +2,8 @@ from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.EmojiEnum import EmojiCreation2
 import discord
 from discord.ext import commands
+from Handling.Economy.Global import GlobalMongoManager
+from Handling.Misc import DonatorMongoManager
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 import CustomFunctions
 from Handling.Misc.SelfDestructView import SelfDestructView
@@ -38,15 +40,15 @@ class LeaderboardEconomy(commands.Cog):
     @discord.app_commands.choices(type=[
         Choice(name="Tổng toàn bộ tài sản", value="all"),
         Choice(name="Xếp hạng theo tổng số Gold", value="gold_only"),
-        Choice(name="Xếp hạng theo tổng số Silver", value="silver_only"),
-        Choice(name="Xếp hạng theo tổng số Copper", value="copper_only"),
         Choice(name="Xếp hạng theo rank", value="rank"),
         Choice(name="Xếp hạng Quest hoàn thành", value="quest"),
         Choice(name="Xếp hạng cấp bậc Hộ Vệ Thần", value="guardian"),
         Choice(name="Xếp hạng lực chiến Hộ Vệ Thần", value="guardian_power"),
+        Choice(name="Xếp hạng Hộ Vệ Thần Liên Server", value="guardian_power_global"),
+        Choice(name="Xếp hạng Mạnh Thường Quân Donator", value="donator"),
     ])
     @discord.app_commands.checks.cooldown(1, 10)
-    @discord.app_commands.command(name="leaderboard", description="Bảng xếp hạng tài chính trong server!")
+    @discord.app_commands.command(name="leaderboard", description="Bảng xếp hạng người dùng theo nhiều tiêu chí!")
     async def leaderboard_slash_command(self, interaction: discord.Interaction, type: str = None, user: discord.Member = None):
         await interaction.response.defer(ephemeral=False)
         
@@ -72,6 +74,8 @@ class LeaderboardEconomy(commands.Cog):
 
     
     async def embed_leaderboard_command(self, type: str, called_user: discord.Member, user: discord.Member = None):
+        if type == "guardian_power_global" or type == "donator":
+            return await self.embed_leaderboard_special(type=type, user=user)
         if user != None:
             user_profile = ProfileMongoManager.find_profile_by_id(guild_id=user.guild.id, user_id=user.id)
             if user_profile  == None:
@@ -82,17 +86,15 @@ class LeaderboardEconomy(commands.Cog):
         if list_profile_guild == None or len(list_profile_guild) == 0:
             embed = discord.Embed(title=f"", description=f"Cần phải có người dùng lệnh {SlashCommand.PROFILE.value} trước thì mới có dữ liệu để tạo bảng xếp hạng!", color=0x03F8FC)
             return embed
-        
-        
+        embed = discord.Embed(color=0x0ce7f2)
+        embed.add_field(name="", value="▬▬▬▬ι══════════>", inline=False)
         title = "Bảng Xếp Hạng"
         #region leaderboard all
         if type == "all":
             #Lọc theo tổng tài sản
             title = "Bảng Xếp Hạng Tổng Tài Sản"
             list_profile_guild.sort(key=lambda x: (x.copper + x.silver * 5000 + x.gold * 5000 * 5000 + x.darkium * 5000 * 5000 * 10000), reverse=True)
-            
-            embed = discord.Embed(title=f"", description=f"{title}", color=0x0ce7f2)
-            embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+            embed.description = title
             if user == None:
                 count = 1
                 for index, profile in enumerate(list_profile_guild):
@@ -164,8 +166,7 @@ class LeaderboardEconomy(commands.Cog):
                 list_profile_guild.sort(key=lambda x: x.gold, reverse=True)
             
             title = f"Bảng Xếp Hạng Tổng {emoji}"
-            embed = discord.Embed(title=f"", description=f"{title}", color=0x0ce7f2)
-            embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+            embed.description = title
             if user == None:
                 count = 1
                 for index, profile in enumerate(list_profile_guild):
@@ -213,9 +214,8 @@ class LeaderboardEconomy(commands.Cog):
         elif type == "rank":
             #Lọc theo rank
             title = "Bảng Xếp Hạng Rank"
+            embed.description = title
             list_profile_guild.sort(key=lambda x: x.level, reverse=True)
-            embed = discord.Embed(title=f"", description=f"{title}", color=0x0ce7f2)
-            embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
             if user == None:
                 count = 1
                 for index, profile in enumerate(list_profile_guild):
@@ -252,8 +252,7 @@ class LeaderboardEconomy(commands.Cog):
             #Lọc theo rank
             title = "Bảng Xếp Hạng Nhiệm Vụ Hoàn Thành"
             list_profile_guild.sort(key=lambda x: x.quest_finished, reverse=True)
-            embed = discord.Embed(title=f"", description=f"{title}", color=0x0ce7f2)
-            embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+            embed.description = title
             if user == None:
                 count = 1
                 for index, profile in enumerate(list_profile_guild):
@@ -297,8 +296,7 @@ class LeaderboardEconomy(commands.Cog):
                 key=lambda profile: profile.guardian.level, reverse=True
             )
             # list_profile_guild.sort(key=lambda x: x.guardian.level, reverse=True)
-            embed = discord.Embed(title=f"", description=f"{title}", color=0x0ce7f2)
-            embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+            embed.description = title
             if user == None:
                 count = 1
                 for index, profile in enumerate(list_profile_guild):
@@ -343,9 +341,7 @@ class LeaderboardEconomy(commands.Cog):
                 ),
                 reverse=True
             )
-
-            embed = discord.Embed(title=f"", description=f"{title}", color=0x0ce7f2)
-            embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+            embed.description = title
             if user == None:
                 count = 1
                 for index, profile in enumerate(list_profile_guild):
@@ -387,6 +383,91 @@ class LeaderboardEconomy(commands.Cog):
             embed = discord.Embed(title=f"", description=f"Loại bảng xếp hạng này vẫn chưa được code xong!", color=0x03F8FC)
             return embed
         
+    async def embed_leaderboard_special(self, type: str, user: discord.Member = None):
+        embed = discord.Embed(color=0x0ce7f2)
+        embed.add_field(name="", value="▬▬▬▬ι══════════>", inline=False)
+        #region Leaderboard global guardian
+        if type == "guardian_power_global":
+            #Lọc theo rank
+            title = "Bảng Xếp Hạng Hộ Vệ Thần Liên Server"
+            embed.description = title
+            if user == None:
+                list_profile = GlobalMongoManager.get_top_guardian_profiles()
+                count = 1
+                for index, profile in enumerate(list_profile):
+                    if profile == None or profile.user_id == None: continue
+                    if profile.guardian == None: continue
+                    total_stats = profile.guardian.max_stamina + profile.guardian.max_health + profile.guardian.max_mana + profile.guardian.attack_power + profile.guardian.stats_point * 5 + profile.guardian.max_skills
+                    text = f"{profile.guardian.ga_emoji} - {profile.guardian.ga_name} cấp {profile.guardian.level} (**{profile.user_name} - {profile.user_display_name}**) với lực chiến **{total_stats}**"
+                    if (index+1) == 1:
+                        embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.FIRST_CUP.value}**: {text}", inline=False)
+                    elif (index+1) == 2:
+                        embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.SECOND_CUP.value}**: {text}", inline=False)
+                    elif (index+1) == 3:
+                        embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.THIRD_CUP.value}**: {text}", inline=False)
+                    else:
+                        embed.add_field(name=f"", value=f"**Hạng {index+1}**: {text}", inline=False)
+                    count+=1
+                    if count >= 20: break
+            else:
+                embed.add_field(name=f"", value=f"Xếp hạng của {user.mention}", inline=True)
+                embed.add_field(name=f"", value=f"_____________", inline=False)
+                global_profile = GlobalMongoManager.get_guardian_rank_and_profile(user_id=user.id)
+                if not global_profile: 
+                    embed.add_field(name=f"", value=f"Không tìm thấy dữ liệu Hộ Vệ Thần Liên Thông Server của {user.mention}", inline=False)
+                else:
+                    rank, profile = global_profile
+                    total_stats = profile.guardian.max_stamina + profile.guardian.max_health + profile.guardian.max_mana + profile.guardian.attack_power + profile.guardian.stats_point * 5 + profile.guardian.max_skills
+                    text = f"{profile.guardian.ga_emoji} - {profile.guardian.ga_name} cấp {profile.guardian.level} (**{profile.user_name} - {profile.user_display_name}**) với lực chiến **{total_stats}**"
+                    if rank == 1:
+                        embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.FIRST_CUP.value}**: {text}", inline=False)
+                    elif rank == 2:
+                        embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.SECOND_CUP.value}**: {text}", inline=False)
+                    elif rank == 3:
+                        embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.THIRD_CUP.value}**: {text}", inline=False)
+                    else:
+                        embed.add_field(name=f"", value=f"**Hạng {rank}**: {text}", inline=False)
+            embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+        elif type == "donator":
+            title = "Bảng Xếp Hạng Mạnh Thường Quân Donator"
+            embed.description = title
+            if user is None:
+                list_donators = DonatorMongoManager.get_top_donators()
+                count = 1
+                for index, profile in enumerate(list_donators):
+                    if profile is None or profile.user_id is None:
+                        continue
+                    text = f"**{profile.user_name} - {profile.user_display_name}** đã ủng hộ tổng cộng **{profile.total_time_donate}** lần, tổng lên đến **{self.format_dot_separator(profile.total_amount_donate)} VND**"
+                    if (index + 1) == 1:
+                        embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.FIRST_CUP.value}**: {text}", inline=False)
+                    elif (index + 1) == 2:
+                        embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.SECOND_CUP.value}**: {text}", inline=False)
+                    elif (index + 1) == 3:
+                        embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.THIRD_CUP.value}**: {text}", inline=False)
+                    else:
+                        embed.add_field(name=f"", value=f"**Hạng {index + 1}**: {text}", inline=False)
+                    count += 1
+                    if count >= 20:
+                        break
+            else:
+                embed.add_field(name=f"", value=f"Xếp hạng của {user.mention}", inline=True)
+                embed.add_field(name=f"", value=f"_____________", inline=False)
+                result = DonatorMongoManager.get_donator_rank_and_profile(user_id=user.id)
+                if not result:
+                    embed.add_field(name=f"", value=f"Không tìm thấy dữ liệu donate của {user.mention}", inline=False)
+                else:
+                    rank, profile = result
+                    text = f"**{profile.user_name} - {profile.user_display_name}** đã ủng hộ tổng cộng **{profile.total_time_donate}** lần, tổng lên đến **{self.format_dot_separator(profile.total_amount_donate)} VND**"
+                    if rank == 1:
+                        embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.FIRST_CUP.value}**: {text}", inline=False)
+                    elif rank == 2:
+                        embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.SECOND_CUP.value}**: {text}", inline=False)
+                    elif rank == 3:
+                        embed.add_field(name=f"", value=f"**Hạng {EmojiCreation2.THIRD_CUP.value}**: {text}", inline=False)
+                    else:
+                        embed.add_field(name=f"", value=f"**Hạng {rank}**: {text}", inline=False)
+            embed.add_field(name=f"", value="▬▬▬▬ι══════════>", inline=False)
+        return embed
         
     def shortened_currency(self, number: int):
         if number >= 1000000000:
@@ -403,3 +484,6 @@ class LeaderboardEconomy(commands.Cog):
             return f"{int(number // 1000)}K{suffix}"  
         else:
             return str(int(number))
+
+    def format_dot_separator(self, number: int) -> str:
+        return f"{number:,}".replace(",", ".")
