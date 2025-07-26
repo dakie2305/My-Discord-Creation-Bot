@@ -24,7 +24,7 @@ def find_global_profile_by_id(user_id: int):
         return GlobalProfile.from_dict(data)
     return None
 
-def find_all_global_items() -> list[GlobalProfile]:
+def find_all_global_profiles() -> list[GlobalProfile]:
     collection = db_specific['global_inventory']
     all_data = collection.find()
     return [GlobalProfile.from_dict(doc) for doc in all_data]
@@ -128,6 +128,79 @@ def update_enable_until(user_id: int, user_name: str, user_display_name: str, gu
                                                                                         }})
 
 #region Global Guardian
+def get_top_guardian_profiles(limit: int = 12) -> list[GlobalProfile]:
+    collection = db_specific['global_inventory']
+    pipeline = [
+        {
+            "$match": {
+                "guardian": { "$ne": None }
+            }
+        },
+        {
+            "$addFields": {
+                "guardian_power_score": {
+                    "$add": [
+                        "$guardian.max_stamina",
+                        "$guardian.max_health",
+                        "$guardian.max_mana",
+                        "$guardian.attack_power",
+                        { "$multiply": ["$guardian.stats_point", 5] },
+                        "$guardian.max_skills"
+                    ]
+                }
+            }
+        },
+        {
+            "$sort": { "guardian_power_score": -1 }
+        },
+        {
+            "$limit": limit
+        }
+    ]
+    results = collection.aggregate(pipeline)
+    return [GlobalProfile.from_dict(doc) for doc in results]
+
+def get_guardian_rank_and_profile(user_id: int) -> tuple[int, GlobalProfile] | None:
+    collection = db_specific['global_inventory']
+    user_doc = collection.find_one({
+        "user_id": user_id,
+        "guardian": { "$ne": None }
+    })
+    if not user_doc:
+        return None
+    #Power score
+    g = user_doc['guardian']
+    user_score = (
+        g.get('max_stamina', 0) +
+        g.get('max_health', 0) +
+        g.get('max_mana', 0) +
+        g.get('attack_power', 0) +
+        g.get('stats_point', 0) * 5 +
+        g.get('max_skills', 0)
+    )
+    higher_score_count = collection.count_documents({
+        "guardian": { "$ne": None },
+        "$expr": {
+            "$gt": [
+                {
+                    "$add": [
+                        "$guardian.max_stamina",
+                        "$guardian.max_health",
+                        "$guardian.max_mana",
+                        "$guardian.attack_power",
+                        { "$multiply": ["$guardian.stats_point", 5] },
+                        "$guardian.max_skills"
+                    ]
+                },
+                user_score
+            ]
+        }
+    })
+    rank = higher_score_count + 1
+    profile = GlobalProfile.from_dict(user_doc)
+    return rank, profile
+
+
 def create_or_update_global_guardian(user_id: int, user_name: str, user_display_name: str, guild_id: int, guild_name: str, guardian: GuardianAngel):
     collection = db_specific['global_inventory']
     existing_raw = collection.find_one({"user_id": user_id})

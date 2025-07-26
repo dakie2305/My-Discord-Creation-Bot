@@ -253,7 +253,7 @@ async def love_point_rank_reducing_task():
 @tasks.loop(hours=12)
 async def clear_up_data_task():
     count = 0
-    all_global_inventories = GlobalMongoManager.find_all_global_items()
+    all_global_inventories = GlobalMongoManager.find_all_global_profiles()
     if all_global_inventories:
         for global_inventory in all_global_inventories:
             if global_inventory.date_updated + timedelta(weeks=24) < datetime.now():
