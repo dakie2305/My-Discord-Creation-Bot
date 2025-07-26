@@ -25,6 +25,72 @@ def find_all_donators():
     data = list(collection.find())
     return [Donator.from_dict(profile) for profile in data]
 
+def get_top_donators(limit=20):
+    collection = db_specific['donator']
+    pipeline = [
+        {
+            "$addFields": {
+                "donate_score": {
+                    "$add": ["$total_amount_donate", "$total_time_donate"]
+                }
+            }
+        },
+        {
+            "$sort": {"donate_score": -1}
+        },
+        {
+            "$limit": limit
+        }
+    ]
+    data = list(collection.aggregate(pipeline))
+    return [Donator.from_dict(profile) for profile in data]
+
+def get_donator_rank_and_profile(user_id: int):
+    collection = db_specific['donator']
+    pipeline = [
+        {
+            "$addFields": {
+                "donate_score": {
+                    "$add": ["$total_amount_donate", "$total_time_donate"]
+                }
+            }
+        },
+        {
+            "$sort": {"donate_score": -1}
+        },
+        {
+            "$group": {
+                "_id": None,
+                "docs": {"$push": "$$ROOT"}
+            }
+        },
+        {
+            "$unwind": {
+                "path": "$docs",
+                "includeArrayIndex": "rank"
+            }
+        },
+        {
+            "$match": {
+                "docs.user_id": Int64(user_id)
+            }
+        },
+        {
+            "$project": {
+                "rank": {"$add": ["$rank", 1]},
+                "docs": 1
+            }
+        }
+    ]
+
+    result = list(collection.aggregate(pipeline))
+    if not result:
+        return None
+    doc = result[0]
+    return doc['rank'], Donator.from_dict(doc['docs'])
+
+
+
 def drop_profile_collection(guild_id: int):
     collection = db_specific['donator']
     if collection != None:
