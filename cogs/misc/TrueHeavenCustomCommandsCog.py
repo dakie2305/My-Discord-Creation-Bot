@@ -13,7 +13,10 @@ from Handling.Misc.AppealJailView import AppealJailView
 from Handling.Misc.SelfDestructView import SelfDestructView
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 import db.DbMongoManager as db
+from db.Class.CustomClass import UserInfo
+import db.DbMongoManager as db
 from CustomEnum.EmojiEnum import EmojiCreation2, EmojiCreation1
+from discord.app_commands import Choice
 import re
 
 async def setup(bot: commands.Bot):
@@ -310,3 +313,144 @@ class TrueHeavenCustomCommands(commands.Cog):
             mess = await ctx.send(embed=embed, view=view)
             view.message = mess
 
+    #region jail
+    @discord.app_commands.guilds(Object(id=TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value))
+    @discord.app_commands.command(name="jail", description="Tống ai đó vào đại lao trong khoảng thời gian nhất định!")
+    @discord.app_commands.choices(time_format=[
+        Choice(name="Giây", value="second"),
+        Choice(name="Phút", value="minute"),
+        Choice(name="Giờ", value="hour"),
+        Choice(name="Ngày", value="day"),
+        Choice(name="Tuần", value="week"),
+        Choice(name="Tháng", value="month"),
+    ])
+    @discord.app_commands.describe(user= "Người cần tống giam", duration= "Thời gian tống giam (nhập số)", time_format = "Thời gian tống giam (second, minute, hour, day, week, month)", reason="Lý do tống giam")
+    async def jail_slash_command(self, interaction: discord.Interaction, user : discord.Member, duration: int, time_format : str, reason : str):
+        await interaction.response.defer(ephemeral=True)  # Defer the interaction early
+        req_roles = ['Cai Ngục', 'Supervisor', 'Server Master', 'Moderator', 'Ultimate Admins']
+        jail_db = "jailed_user"
+        has_required_role = any(role.name in req_roles for role in interaction.user.roles)
+        if not has_required_role:
+            await interaction.followup.send("Không đủ thẩm quyền để tống giam.")
+            return
+        
+        await interaction.followup.send(f"Bạn đã tống giam {user.mention} vào đại lao thành công!", ephemeral=True)
+        channel = interaction.channel
+        await self.jail_user(channel=channel, jailer=interaction.user, user=user, reason=reason, duration=duration, time_format=time_format, jail_db=jail_db)
+        return
+        
+    async def jail_user(self, channel: discord.TextChannel, jailer:discord.Member, user: discord.Member, reason: str, duration: int, time_format: str, jail_db = 'jailed_user'):
+        #Nếu là Bot thì lật ngược vị thế:
+        temp_author = jailer 
+        if user.bot:
+            user = user
+            user = temp_author
+        
+        # Calculate the end time
+        end_time = datetime.now() + CustomFunctions.get_timedelta(duration, time_format)
+        mordern_date_time_format = end_time.strftime(f"%d/%m/%Y %H:%M")
+
+        
+        #Tìm xem user này đã có chưa, chưa có thì insert
+        search_user = db.find_user_by_id(user.id, jail_db)
+        if search_user == None:
+            # Save user's roles
+            original_roles = [role for role in user.roles if not role.is_default() and not role.is_premium_subscriber()]
+            stored_original_roles = []
+            for role in original_roles:
+                old_role = {
+                                "role_id": role.id,
+                                "role_name": role.name
+                            }
+                stored_original_roles.append(old_role)
+            # Remove all roles and add jail role
+            jail_role = discord.utils.get(user.guild.roles, name="Đáy Xã Hội")
+            
+            user_info = UserInfo(
+                user_id=user.id,
+                user_name=user.name,
+                user_display_name=user.display_name,
+                jailer_id = jailer.id,
+                jailer_display_name= jailer.display_name,
+                jailer_user_name= jailer.name,
+                channel_id=channel.id,
+                channel_name=channel.name,
+                reason= reason,
+                jail_until= end_time,
+                roles=stored_original_roles
+            )
+            db.create_user(user_info= user_info, chosen_collection= jail_db)
+        else:
+            #Update lại jail_until và reason
+            db.update_user_jail_time(user_id=user.id, jail_until=end_time, reason=reason, jailer_id= jailer.id, jailer_display_name= jailer.display_name, jailer_user_name= jailer.name)
+        
+        try:
+            for ori_role in original_roles:
+                try:
+                    await user.remove_roles(ori_role)
+                except Exception:
+                    continue
+            await user.add_roles(jail_role)
+        except Exception as e:
+            print(e)
+
+        await channel.send(f"Kẻ tội độ {user.mention} đã bị {jailer.mention} bắt giữ và sẽ bị tống vào đại lao. Kẻ tội đồ này chỉ được thả ra xã hội sau {duration} {time_format}. Lý do tống giam: {reason}")
+        embed = discord.Embed(title="Đại Lao Thẳng Tiến", description=f"Kẻ tội đồ {user.mention} đã bị {jailer.mention} bắt giữ và tống vào đại lao!", color=0x00FF00)  # Green color
+        embed.add_field(name="Lý do bị tù đày:", value=reason, inline=False)  # Single-line field
+        embed.add_field(name="Sẽ được ân xoá sau khoảng thời gian:", value=f"{duration} {time_format}", inline=False)
+        embed.add_field(name="Thời gian ra đại lao:", value=f"{mordern_date_time_format}", inline=True)
+        embed.add_field(name="Ghi chú", value="Nếu quá thời hạn phạt tù mà chưa được ra tù thì hãy la làng lên nhé!", inline=False) 
+        embed.add_field(name="Kháng tù", value="Dùng lệnh `!khang_tu` để kháng án tù! Lệnh này sẽ tốn nhiều tiền!", inline=False) 
+        embed.set_footer(text=f"Đã bị tống giam bởi: {jailer.name}")  # Footer text
+
+        channel = self.bot.get_channel(1257012036718563380)
+        if channel:
+            await channel.send(content=f"{user.mention}",embed=embed)
+        print(f"Username {jailer.name}, Display user name {jailer.display_name} jailed {user.display_name} for {duration} {time_format}. Reason: {reason}")
+
+    #region unjail
+    @discord.app_commands.guilds(Object(id=TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value))
+    @discord.app_commands.command(name="unjail", description="Ân xá tội đồ ra khỏi đại lao ngay lập tức!")
+    @discord.app_commands.describe(user= "Người cần ân xá", reason = "Lý do tại sao ân xá")
+    async def unjail_slash_command(self, interaction: discord.Interaction, user : discord.Member, reason : str):
+        await interaction.response.defer()
+        req_roles = ['Cai Ngục', 'Supervisor', 'Server Master', 'Moderator', 'Ultimate Admins']
+        jail_db = "jailed_user"
+        has_required_role = any(role.name in req_roles for role in interaction.user.roles)
+        if not has_required_role:
+            await interaction.followup.send("Không đủ thẩm quyền để ân xá tội đồ.")
+            return
+        
+        #Xoá role Đáy Xã Hội
+        jail_role = discord.utils.get(user.guild.roles, name="Đáy Xã Hội")
+        if jail_role:
+            await user.remove_roles(jail_role)
+        
+        #Tìm xem user này đã có chưa, có thì xoá khỏi db jail_user
+        search_user = db.find_user_by_id(user.id, jail_db)
+        if search_user:
+            #Restore lại roles cũ của user
+            for role in search_user.roles:
+                get_role_from_server = discord.utils.get(user.guild.roles, id = role["role_id"])
+                if get_role_from_server:
+                    try:
+                        await user.add_roles(get_role_from_server)
+                    except Exception:
+                        continue
+            #Xoá row khỏi database
+            db.delete_user_by_id(user_id= user.id, chosen_collection= jail_db)
+            # Create embed object
+            mordern_date_time_format = datetime.now().strftime(f"%d/%m/%Y %H:%M")
+            embed = discord.Embed(title="Ân Xá Khỏi Đại Lao", description=f"Kẻ tội đồ {user.mention} đã được {interaction.user.mention} ân xoá khỏi đại lao!", color=0x00FF00)  # Green color
+            embed.add_field(name="Lý do được ân xá:", value=reason, inline=False)  # Single-line field
+            embed.add_field(name="Thời gian ra đại lao:", value=f"{mordern_date_time_format}", inline=True)
+            embed.add_field(name="Ghi chú", value="Nhớ đừng vi phạm để bị tống vài đại lao nữa nhé!", inline=False) 
+            embed.set_footer(text=f"Đã được ân xoá bởi: {interaction.user.name}")  # Footer text
+
+            await interaction.followup.send(f"Kẻ tội độ {user.mention} đã được {interaction.user.mention} ân xá đại lao. Mong thần dân đừng vi phạm để thành kẻ tội đồ nữa. Lý do ân xá: {reason}")
+            channel = self.bot.get_channel(1257012036718563380)
+            if channel:
+                await channel.send(embed=embed)
+        else:
+            await interaction.followup.send(f"Người này không ở trong tù.", ephemeral=True)
+        print(f"Username {interaction.user.name}, Display user name {interaction.user.display_name} unjailed {user.display_name}. Reason: {reason}")

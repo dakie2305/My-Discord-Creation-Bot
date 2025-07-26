@@ -19,6 +19,23 @@ def create_user(user_info, chosen_collection):
       return f"User with user_id {user_info.user_id} already exists."
     result = collection.insert_one(user_info.to_dict())
     return result
+
+def update_user_jail_time(user_id: int, jailer_id: int, jailer_user_name: str, jailer_display_name: str, reason: str, jail_until: datetime):
+    collection = db['jailed_user']
+    existing_user = collection.find_one({"user_id": user_id})
+    if existing_user:
+        collection.update_one(
+            {"user_id": user_id},
+            {
+                "$set": {
+                    "jailer_id": jailer_id,
+                    "jailer_user_name": jailer_user_name,
+                    "jailer_display_name": jailer_display_name,
+                    "reason": reason,
+                    "jail_until": jail_until
+                }
+            }
+        )
   
 def find_user_by_id(user_id, chosen_collection):
     collection = db[chosen_collection]
