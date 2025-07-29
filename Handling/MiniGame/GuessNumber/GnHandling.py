@@ -63,26 +63,10 @@ class GnHandlingFunction():
         if gn_info.special_item:
             GnMongoManager.update_special_item_data_info(channel_id= message.channel.id, guild_id= message.guild.id, special_item= None)
         
-        list_player_penalty = gn_info.player_penalty
-        selected_player = None
-        for player in list_player_penalty:
-            if player.user_id == message.author.id and player.penalty_point > 10:
-                selected_player = player
-                break
-        if selected_player is not None:
-            #Trừ điểm vì sai quá nhiều
-            point = 2
-            await message.reply(f"{message.author.mention} đã bị trừ **{point}** vì trả lời sai quá nhiều lần!")
-            GnMongoManager.update_player_point_data_info(channel_id= message.channel.id, guild_id= message.guild.id, user_id=message.author.id, user_name=message.author.name, user_display_name=message.author.display_name, point=-point)
-            #Cho phép trừ penalty để tiếp tục chơi
-            GnMongoManager.reduce_player_penalty_after_round(channel_id= message.channel.id, guild_id= message.guild.id)
-            #Vẫn tiếp tục
-        GnMongoManager.create_and_update_player_penalty(channel_id= message.channel.id, guild_id= message.guild.id, user_id=message.author.id, user_name=message.author.name)
-        
         player_guess_number = int(message.content)
         #15 round đầu là sẽ có hint, về sau sẽ roll tỉ lệ
         flag_hint = False
-        chance = UtilitiesFunctions.get_chance(25)
+        chance = UtilitiesFunctions.get_chance(35)
         if gn_info.current_round < 15 or chance:
             flag_hint = True
         

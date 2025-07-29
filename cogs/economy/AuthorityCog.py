@@ -474,7 +474,7 @@ class AuthorityEconomy(commands.Cog):
         #Kiểm tra xem có hàng cấm trong người không
         list_contraband = ["crime_evident", "fish_rod_5", "weed"]
         item = None
-        if target_profile.list_items!= None and len(target_profile.list_items)>1:
+        if target_profile.list_items!= None and len(target_profile.list_items)>0:
             for target_item in target_profile.list_items:
                 if target_item.item_id in list_contraband:
                     item = target_item
@@ -533,7 +533,7 @@ class AuthorityEconomy(commands.Cog):
         #Kiểm tra xem có hàng cấm trong người không
         list_contraband = ["crime_evident", "fish_rod_5", "weed"]
         item = None
-        if target_profile.list_items!= None and len(target_profile.list_items)>1:
+        if target_profile.list_items!= None and len(target_profile.list_items)>0:
             for target_item in target_profile.list_items:
                 if target_item.item_id in list_contraband:
                     item = target_item
