@@ -277,7 +277,7 @@ class InventoryUseView(discord.ui.View):
                     await self.message.delete()
                 except Exception as e:
                     print(f"Failed to delete message in channel {interaction.channel.name} in guild {interaction.guild.name} after using GA summoning book.\n{e}")
-            await self.handline_summoning_ga_book(interaction=interaction, level=self.user_profile.guardian.level if self.user_profile.guardian else 1)
+            await self.handling_summoning_ga_book(interaction=interaction, level=self.user_profile.guardian.level if self.user_profile.guardian else 1)
         
         elif self.selected_item.item_id == "global_card":
             GlobalMongoManager.update_enable_until(user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, guild_id=interaction.guild_id, guild_name=interaction.guild.name)
@@ -291,8 +291,8 @@ class InventoryUseView(discord.ui.View):
             ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, item=self.selected_item, amount= -1)
         return
     
-    
-    async def handline_summoning_ga_book(self, interaction: discord.Interaction, level: int):
+    #region summoning ga book
+    async def handling_summoning_ga_book(self, interaction: discord.Interaction, level: int):
         level = max(level, 110) # Cấp tối thiểu là 110
         guardian_chance = 100
         mysterious_stats = True
@@ -342,6 +342,15 @@ class InventoryUseView(discord.ui.View):
         return
     
     def get_top_1_ga_leaderboard(self, guild_id: int):
+        #Lấy top 1 global ra
+        top_1_global_dice = UtilitiesFunctions.get_chance(8)
+        if top_1_global_dice:
+            list_global_profiles = GlobalMongoManager.get_top_guardian_profiles(limit=2)
+            if list_global_profiles and len(list_global_profiles) > 0:
+                top_profile = list_global_profiles[0]
+                if top_profile != None and top_profile.guardian:
+                    top_profile.guardian.ga_name += f" ({top_profile.user_name})"
+                    return top_profile.guardian
         #Lấy top 1 ga leaderboard ra
         list_profile_guild = ProfileMongoManager.find_all_profiles(guild_id=guild_id)
         if list_profile_guild == None or len(list_profile_guild) == 0:
