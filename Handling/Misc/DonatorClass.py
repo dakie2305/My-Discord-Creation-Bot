@@ -5,7 +5,7 @@ class Donator:
         self.user_id = user_id
         self.user_name = user_name
         self.user_display_name = user_display_name
-        self.date_donate = date_donate
+        self.date_donate = date_donate if date_donate else datetime.now()
         self.total_time_donate = total_time_donate
         self.total_amount_donate = total_amount_donate
         self.is_given_role = is_given_role

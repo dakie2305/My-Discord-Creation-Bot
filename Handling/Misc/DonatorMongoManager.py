@@ -96,10 +96,13 @@ def drop_profile_collection(guild_id: int):
     if collection != None:
         collection.drop()
 
-def create_or_update_profile(user_id: int, user_name: str, user_display_name: str, date_donate: datetime = datetime.now(), donation_amount: int = 0):
+def create_or_update_profile(user_id: int, user_name: str, user_display_name: str, date_donate: datetime = None, donation_amount: int = 0):
     collection = db_specific['donator']
     existing_raw = collection.find_one({"user_id": Int64(user_id)})
 
+    if date_donate is None:
+        date_donate = datetime.now()
+        
     if existing_raw is None:
         # New donor profile
         new_data = Donator(
