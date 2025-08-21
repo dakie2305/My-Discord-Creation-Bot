@@ -292,7 +292,7 @@ class WorkEconomy(commands.Cog):
             embed.add_field(name=f"", value=f"{text}", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι═══════>", inline=False)
         #Thêm item cho player
-        ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, item=fishup_item, amount= 1)
+        ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, item=fishup_item, amount= fishup_item.quantity)
         #Trừ 1 cần câu
         ProfileMongoManager.update_list_items_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name, item=fish_rod, amount= -1)
         #Cập nhật fishing time
