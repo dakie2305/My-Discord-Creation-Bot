@@ -32,7 +32,6 @@ class GaQuestView(discord.ui.View):
         self.force_injury = force_injury
         self.force_dead = force_dead
         self.timeout = timeout
-        self.result_sent = False
         
         if (current_quest_lines.choice_a and current_quest_lines.choice_a.strip() != "" and current_quest_lines.next_steps.choice_a and current_quest_lines.next_steps.choice_a.strip() != ""):
             self.choice_a_button = discord.ui.Button(label="A", style=discord.ButtonStyle.primary)
@@ -95,6 +94,7 @@ class GaQuestView(discord.ui.View):
         if not next_quest_line:
             await self.message.edit(content="Câu chuyện kết thúc!", embed=None, view=None)
             print(f"User {self.user.name} at channel {self.guardian_quest.channel_name} cant find next quest line in {self.override_title}, choice {choice}, current line {self.current_quest_lines.title}")
+            self.guardian_quest.is_ended = True
             await self.send_result_embed()
             return
         
@@ -143,6 +143,7 @@ class GaQuestView(discord.ui.View):
             try:
                 await self.message.edit(embed=embed, view=None)  # Remove view
                 print(f"User {self.user.name} at channel {self.guardian_quest.channel_name} finished their GA quest")
+                self.guardian_quest.is_ended = True
                 await self.send_result_embed()
             except Exception as e:
                 print(f"Exception when trying to end quest line for user {self.user.name} at channel {self.guardian_quest.channel_name}: {e}")
@@ -162,13 +163,12 @@ class GaQuestView(discord.ui.View):
 
     #region end quest
     async def send_result_embed(self):
-        if self.result_sent:
+        if not self.guardian_quest.is_ended:
             return  # Chống spam
-        self.result_sent = True
-        
+        self.guardian_quest.is_ended = True
         #Nếu tiền dương thì buff mạnh
-        if self.total_gold > 0: self.total_gold * 5
-        if self.total_silver > 0: self.total_silver * 5
+        if self.total_gold > 0: self.total_gold *= 5
+        if self.total_silver > 0: self.total_silver *= 5
 
         #giới hạn exp
         if self.total_ga_exp < 50: self.total_ga_exp = 50

@@ -406,7 +406,9 @@ async def on_ready():
     print(f'We have logged in as {bot.user}')
     check_jail_expiry.start()
     if CustomFunctions.check_if_dev_mode()==False:
-        automatic_speak_randomly.start()
+        # Tạm tắt 
+        # automatic_speak_randomly.start()
+        
         check_true_heavens_role_expiracy.start()
         activity = discord.Activity(type=discord.ActivityType.watching, 
                                 name="True Heavens",

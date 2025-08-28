@@ -1,11 +1,12 @@
 from Handling.Economy.GA.GuardianAngelClass import GuardianAngel
 class GuardianAngelQuest:
-    def __init__(self, guardian: GuardianAngel, user_name: str, user_display_name: str, channel_name: str, quest_lines: list['GuardianQuestLines']):
+    def __init__(self, guardian: GuardianAngel, user_name: str, user_display_name: str, channel_name: str, quest_lines: list['GuardianQuestLines'], is_ended: bool = False):
         self.guardian = guardian
         self.user_name = user_name
         self.user_display_name = user_display_name
         self.channel_name = channel_name
         self.quest_lines = quest_lines
+        self.is_ended = is_ended
         
 
 class NextSteps:

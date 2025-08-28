@@ -410,7 +410,8 @@ async def on_ready():
     print(f'We have logged in as {bot.user}')
     
     if CustomFunctions.check_if_dev_mode()==False:
-        automatic_speak_randomly.start()
+        # Tạm tắt 
+        # automatic_speak_randomly.start()
         random_dropbox.start()
         random_quizz_embed.start()
         dungeon_spawn_enemy_embed.start()
