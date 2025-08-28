@@ -32,6 +32,7 @@ class GaQuestView(discord.ui.View):
         self.force_injury = force_injury
         self.force_dead = force_dead
         self.timeout = timeout
+        self.result_sent = False
         
         if (current_quest_lines.choice_a and current_quest_lines.choice_a.strip() != "" and current_quest_lines.next_steps.choice_a and current_quest_lines.next_steps.choice_a.strip() != ""):
             self.choice_a_button = discord.ui.Button(label="A", style=discord.ButtonStyle.primary)
@@ -161,6 +162,9 @@ class GaQuestView(discord.ui.View):
 
     #region end quest
     async def send_result_embed(self):
+        if self.result_sent:
+            return  # Chống spam
+        self.result_sent = True
         
         #Nếu tiền dương thì buff mạnh
         if self.total_gold > 0: self.total_gold * 5
