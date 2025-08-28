@@ -10,6 +10,7 @@ from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 from datetime import datetime, timedelta
 import random
 import CustomFunctions
+import copy
 from Handling.Economy.Inventory_Shop.ItemClass import Item, list_small_copper_fish,list_gold_fish, list_silver_fish, list_gift_items, list_trash, list_plant, list_legend_weapon_1, list_legend_weapon_2, list_support_ga_items, list_protection_items,list_attack_items,list_support_items
 
 class GaQuestView(discord.ui.View):
@@ -32,6 +33,7 @@ class GaQuestView(discord.ui.View):
         self.force_injury = force_injury
         self.force_dead = force_dead
         self.timeout = timeout
+        self.end_flag = False
         
         if (current_quest_lines.choice_a and current_quest_lines.choice_a.strip() != "" and current_quest_lines.next_steps.choice_a and current_quest_lines.next_steps.choice_a.strip() != ""):
             self.choice_a_button = discord.ui.Button(label="A", style=discord.ButtonStyle.primary)
@@ -79,23 +81,35 @@ class GaQuestView(discord.ui.View):
         if self.message and self.not_choose:
             self.not_choose = False
             await self.handle_choice("timeout")
+            
+    #region quest logic
+    async def _end_quest(self, reason: str = ""):
+        if self.guardian_quest.is_ended:
+            return  # Prevents multiple endings
         
+        self.guardian_quest.is_ended = True
+        print(f"User {self.user.name} at channel {self.guardian_quest.channel_name} ended their GA quest. Reason: {reason}")
+        
+        try:
+            await self.message.edit(view=None)
+        except Exception as e:
+            print(f"Exception when trying to remove view for user {self.user.name}: {e}")
+        
+        await self.send_result_embed()
+
     async def handle_choice(self, choice: str):
         # Get next quest line ID
         next_id = self.current_quest_lines.next_steps.get_next_id(choice)
         if not next_id:
             await self.message.edit(content="Không thể tìm thấy bước tiếp theo! Liên hệ Darkie ngay!", embed=None, view=None)
-            print(f"User {self.user.name} at channel {self.guardian_quest.channel_name} cant find next step id in quest {self.override_title}, choice {choice}, current line {self.current_quest_lines.title}")
-            await self.send_result_embed()
+            await self._end_quest(reason="No next ID found")
             return
 
         # Find the next GuardianQuestLines by ID
         next_quest_line = next((q for q in self.guardian_quest.quest_lines if q.id == next_id), None)
         if not next_quest_line:
             await self.message.edit(content="Câu chuyện kết thúc!", embed=None, view=None)
-            print(f"User {self.user.name} at channel {self.guardian_quest.channel_name} cant find next quest line in {self.override_title}, choice {choice}, current line {self.current_quest_lines.title}")
-            self.guardian_quest.is_ended = True
-            await self.send_result_embed()
+            await self._end_quest(reason="Next quest line not found")
             return
         
         next_quest_line.replace_guardian_name(guardian_name=self.guardian_quest.guardian.ga_name)
@@ -139,12 +153,10 @@ class GaQuestView(discord.ui.View):
             embed.add_field(name="", value=f"{EmojiCreation2.LETTER_C.value}: {next_quest_line.choice_c}", inline=False)
             flag_c = True
         if not (flag_a or flag_b or flag_c):
-            #end
+            # The quest has reached an end state with no further choices
             try:
                 await self.message.edit(embed=embed, view=None)  # Remove view
-                print(f"User {self.user.name} at channel {self.guardian_quest.channel_name} finished their GA quest")
-                self.guardian_quest.is_ended = True
-                await self.send_result_embed()
+                await self._end_quest(reason="No more choices")
             except Exception as e:
                 print(f"Exception when trying to end quest line for user {self.user.name} at channel {self.guardian_quest.channel_name}: {e}")
             return
@@ -154,8 +166,10 @@ class GaQuestView(discord.ui.View):
         embed.add_field(name=f"", value="_____", inline=False)
         embed.add_field(name=f"", value=f"Thời gian còn lại: <t:{unix_time}:R>", inline=False)
         # Create new view with the next step
-        new_view = GaQuestView(self.user, self.guardian_quest, next_quest_line, override_title=self.override_title, total_dignity=self.total_dignity, total_gold=self.total_gold, total_silver=self.total_silver, total_ga_exp=self.total_ga_exp, total_ga_hp=self.total_ga_hp, total_ga_mana=self.total_ga_mana, total_ga_stamina=self.total_ga_stamina, channel=self.channel, force_dead=self.force_dead, force_injury=self.force_injury, timeout=self.timeout)
+        copied_guardian_quest = copy.deepcopy(self.guardian_quest)
+        new_view = GaQuestView(self.user, copied_guardian_quest, next_quest_line, override_title=self.override_title, total_dignity=self.total_dignity, total_gold=self.total_gold, total_silver=self.total_silver, total_ga_exp=self.total_ga_exp, total_ga_hp=self.total_ga_hp, total_ga_mana=self.total_ga_mana, total_ga_stamina=self.total_ga_stamina, channel=self.channel, force_dead=self.force_dead, force_injury=self.force_injury, timeout=self.timeout)
         try:
+            self.end_flag = True
             mess = await self.message.edit(embed=embed,view=new_view)
             new_view.message = mess
         except Exception as e:
@@ -163,7 +177,7 @@ class GaQuestView(discord.ui.View):
 
     #region end quest
     async def send_result_embed(self):
-        if not self.guardian_quest.is_ended:
+        if self.guardian_quest.is_ended or self.end_flag:
             return  # Chống spam
         self.guardian_quest.is_ended = True
         #Nếu tiền dương thì buff mạnh
