@@ -33,7 +33,6 @@ class GaQuestView(discord.ui.View):
         self.force_injury = force_injury
         self.force_dead = force_dead
         self.timeout = timeout
-        self.end_flag = False
         
         if (current_quest_lines.choice_a and current_quest_lines.choice_a.strip() != "" and current_quest_lines.next_steps.choice_a and current_quest_lines.next_steps.choice_a.strip() != ""):
             self.choice_a_button = discord.ui.Button(label="A", style=discord.ButtonStyle.primary)
@@ -85,8 +84,7 @@ class GaQuestView(discord.ui.View):
     #region quest logic
     async def _end_quest(self, reason: str = ""):
         if self.guardian_quest.is_ended:
-            return  # Prevents multiple endings
-        
+            return
         self.guardian_quest.is_ended = True
         print(f"User {self.user.name} at channel {self.guardian_quest.channel_name} ended their GA quest. Reason: {reason}")
         
@@ -169,7 +167,6 @@ class GaQuestView(discord.ui.View):
         copied_guardian_quest = copy.deepcopy(self.guardian_quest)
         new_view = GaQuestView(self.user, copied_guardian_quest, next_quest_line, override_title=self.override_title, total_dignity=self.total_dignity, total_gold=self.total_gold, total_silver=self.total_silver, total_ga_exp=self.total_ga_exp, total_ga_hp=self.total_ga_hp, total_ga_mana=self.total_ga_mana, total_ga_stamina=self.total_ga_stamina, channel=self.channel, force_dead=self.force_dead, force_injury=self.force_injury, timeout=self.timeout)
         try:
-            self.end_flag = True
             mess = await self.message.edit(embed=embed,view=new_view)
             new_view.message = mess
         except Exception as e:
@@ -177,9 +174,6 @@ class GaQuestView(discord.ui.View):
 
     #region end quest
     async def send_result_embed(self):
-        if self.guardian_quest.is_ended or self.end_flag:
-            return  # Chống spam
-        self.guardian_quest.is_ended = True
         #Nếu tiền dương thì buff mạnh
         if self.total_gold > 0: self.total_gold *= 5
         if self.total_silver > 0: self.total_silver *= 5
