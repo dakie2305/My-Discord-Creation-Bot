@@ -9,7 +9,7 @@ from discord.ext import commands, tasks
 from discord import app_commands
 from Handling.MiniGame.GuessNumber import GnHandling, GnMongoManager
 from Handling.MiniGame.MatchWord import MwHandling, MwMongoManager
-from Handling.Misc import DonatorMongoManager
+from Handling.Misc import AntiSpamHandling, DonatorMongoManager
 import db.DbMongoManager as db
 from db.DbMongoManager import UserInfo
 import random
@@ -534,7 +534,7 @@ async def on_message(message: discord.Message):
         speakFlag = False
         #sticky message
         await StickyMessageHandling(bot=bot).handling_sticky_message(message=message)
-    
+    await anti_spam.handling_message(message)
     ai_handling_response = AIResponseHandling(bot=bot)
     await ai_handling_response.sub_function_ai_response(message=message, speakFlag=speakFlag)
     await bot.process_commands(message)
@@ -545,6 +545,7 @@ if CustomFunctions.check_if_dev_mode():
 english_words_dictionary = CustomFunctions.english_dict
 vietnamese_dict = CustomFunctions.vietnamese_dict
 message_tracker = CustomFunctions.MessageTracker()
+anti_spam = AntiSpamHandling.AntiSpam()  
 #Cog command
 init_extension = [
                   "cogs.games.WordMiniGameCog",
