@@ -113,13 +113,18 @@ class AppealJailView(discord.ui.View):
                 if actual_user is None: return
                 await self.jail_real(interaction=interaction, actual_user=actual_user, search_user=search_user)
                 await self.unjail_real(interaction=interaction)
+                try: await self.message.delete()
+                except Exception: return
             elif is_innocence:
                 #Thả
                 await self.unjail_real(interaction=interaction)
+                try: await self.message.delete()
+                except Exception: return
                 return
         except Exception as e:
             print(f"There is exception in jail appeal for user {self.user.name}, displayname {self.user.display_name}: {e}")
             return
+        
     def process_money(self):
         ProfileMongoManager.update_profile_money_by_type(guild_id=self.guild_id, guild_name="", user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, money=self.money, money_type=self.money_type)
         return
