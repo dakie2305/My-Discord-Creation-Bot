@@ -110,6 +110,7 @@ async def random_ai_talk(interaction: discord.Interaction):
 async def automatic_speak_randomly():
     guilds = bot.guilds
     for guild in guilds:
+        if guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value: continue
         guild_extra_info = db.find_guild_extra_info_by_id(guild.id)
         if guild_extra_info != None and guild_extra_info.list_channels_ai_talk != None and len(guild_extra_info.list_channels_ai_talk)>0:
             random_channel_id = random.choice(guild_extra_info.list_channels_ai_talk)
@@ -411,7 +412,7 @@ async def on_ready():
     
     if CustomFunctions.check_if_dev_mode()==False:
         # Tạm tắt 
-        # automatic_speak_randomly.start()
+        automatic_speak_randomly.start()
         random_dropbox.start()
         random_quizz_embed.start()
         dungeon_spawn_enemy_embed.start()
