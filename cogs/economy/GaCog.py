@@ -839,7 +839,7 @@ class GuardianAngelCog(commands.Cog):
         embed.add_field(name=f"", value=F"{EmojiCreation2.LETTER_A.value}: {random_quest[0].choice_a}", inline=False)
         embed.add_field(name=f"", value=F"{EmojiCreation2.LETTER_B.value}: {random_quest[0].choice_b}", inline=False)
         embed.add_field(name=f"", value=F"{EmojiCreation2.LETTER_C.value}: {random_quest[0].choice_c}", inline=False)
-        timeout = 45
+        timeout = 60
         start_time = datetime.now()
         end_time = start_time + timedelta(seconds=timeout)
         unix_time = int(end_time.timestamp())
