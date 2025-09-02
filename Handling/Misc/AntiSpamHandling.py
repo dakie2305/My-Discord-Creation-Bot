@@ -20,11 +20,8 @@ class AntiSpam:
         user_id = message.author.id
         now = datetime.now()
         user_deque = self.user_messages[message.guild.id][user_id]
-        print(f'message content: {message.content}')
-
         # Generate a simple hash for attachments (if any)
         attachments_hash = tuple(att.url for att in message.attachments) if message.attachments else None
-        print(f'attachments_hash: {attachments_hash}')
         # Ignore empty content AND no attachments
         if not message.content.strip() and not attachments_hash:
             return
