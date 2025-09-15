@@ -42,6 +42,25 @@ def drop_collections_if_empty(guild_id: int):
             collection.drop()
             print(f"Collection '{collection_name}' dropped because it was empty.")
 
+def get_all_match_word_guild_ids() -> List[int]:
+    """Return a list of guild IDs that have MatchWord collections (any language)."""
+    guild_ids: List[int] = []
+    for collection_name in db_specific.list_collection_names():
+        if collection_name.endswith("_mw_guild_") or "_mw_guild_" not in collection_name:
+            continue  # skip malformed names
+        try:
+            # name format: {lang}_mw_guild_{guild_id}
+            parts = collection_name.split("_mw_guild_")
+            if len(parts) != 2:
+                continue
+            guild_id = int(parts[1])
+            if guild_id not in guild_ids:
+                guild_ids.append(guild_id)
+        except ValueError:
+            continue
+    return guild_ids
+
+
 
 def create_info(lang: str, guild_id: int, data: MatchWordInfo):
     #Mỗi channel là một collection riêng, chia theo channel id

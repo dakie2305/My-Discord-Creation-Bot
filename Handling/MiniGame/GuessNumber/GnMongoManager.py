@@ -32,6 +32,23 @@ def find_all_info_in_guild(guild_id: int) -> List[GuessNumberInfo]:
         all_infos.extend(GuessNumberInfo.from_dict(doc) for doc in cursor)
     return all_infos
 
+def get_all_gn_guild_ids() -> List[int]:
+    """Return a list of guild IDs that have Guess Number collections."""
+    guild_ids: List[int] = []
+    for collection_name in db_specific.list_collection_names():
+        if collection_name.endswith("gn_guild_") or "gn_guild_" not in collection_name:
+            continue  # skip malformed names
+        try:
+            parts = collection_name.split("gn_guild_")
+            if len(parts) != 2:
+                continue
+            guild_id = int(parts[1])
+            if guild_id not in guild_ids:
+                guild_ids.append(guild_id)
+        except ValueError:
+            continue
+    return guild_ids
+
 def drop_collection_if_empty(guild_id: int):
     collection_name = f'gn_guild_{guild_id}'
     collection = db_specific[collection_name]

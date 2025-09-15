@@ -290,7 +290,24 @@ async def automatic_speak_randomly():
                 print(f"{bot.user} started talking on its own at {guild_extra_info.guild_name}, channel {actual_channel.name}.")
                 async with actual_channel.typing():
                     await actual_channel.send(f"{response.text}")
- 
+                    
+# Task: Nói chuyện tự động True Heavens Only
+@tasks.loop(hours=3, minutes= 30)
+async def automatic_speak_randomly_true_heaven():
+    guild = bot.get_guild(TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value)
+    if guild is None: return  # Bot not in that guild
+    guild_extra_info = db.find_guild_extra_info_by_id(guild.id)
+    if guild_extra_info != None and guild_extra_info.list_channels_ai_talk != None and len(guild_extra_info.list_channels_ai_talk)>0:
+        random_channel_id = random.choice(guild_extra_info.list_channels_ai_talk)
+        actual_channel = guild.get_channel(random_channel_id)
+        if actual_channel:
+            model = genai.GenerativeModel(CustomFunctions.AI_MODEL, CustomFunctions.safety_settings)
+            prompt = CustomFunctions.get_automatically_talk_prompt("Creation 1", guild, actual_channel)
+            response = model.generate_content(f"{prompt}")
+            print(f"{bot.user} started talking on its own at {guild_extra_info.guild_name}, channel {actual_channel.name}.")
+            async with actual_channel.typing():
+                await actual_channel.send(f"{response.text}")
+
 @tasks.loop(hours=12)
 async def remove_old_conversation():
     #Kiểm tra các collections user_conversation_info_creation xem
@@ -334,71 +351,84 @@ async def check_true_heavens_role_expiracy():
 
 @tasks.loop(hours=12)
 async def clear_up_data_task():
-    guilds = bot.guilds
-    for guild in guilds:
-        #Kiểm tra quest cũ, xóa đi nếu cần
-        all_quest_data = QuestMongoManager.find_all_profiles(guild_id=guild.id)
-        count = 0
-        if all_quest_data != None:
-            for quest in all_quest_data:
-                if datetime.now() > quest.reset_date: 
-                    QuestMongoManager.delete_quest(guild_id=guild.id, user_id=quest.user_id)
-                    count+=1
-        print(f"clear_up_data_task started. Deleted {count} quest data in guild {guild.name}")
-        all_mw_data = MwMongoManager.find_all_info_in_guild(guild_id=guild.id)
-        count = 0
-        if all_mw_data != None:
-            for lang, mw_data in all_mw_data:
-                if datetime.now() > mw_data.last_played + timedelta(weeks=4):
-                    MwMongoManager.delete_data_info(channel_id=mw_data.channel_id, guild_id=guild.id, lang=lang)
-                    count+=1
-        print(f"clear_up_data_task started. Deleted {count} MatchWord data in guild {guild.name} for being inactive over 1 month")
-        
-        all_sw_data = SwMongoManager.find_all_info_in_guild(guild_id=guild.id)
-        count = 0
-        if all_sw_data != None:
-            for lang, sw_data in all_sw_data:
-                if datetime.now() > sw_data.last_played + timedelta(weeks=4):
-                    SwMongoManager.delete_data_info(channel_id=sw_data.channel_id, guild_id=guild.id, lang=lang)
-                    count+=1
-            
-        print(f"clear_up_data_task started. Deleted {count} SortWord data in guild {guild.name} for being inactive over 1 month")
-        all_gn_data = GnMongoManager.find_all_info_in_guild(guild_id=guild.id)
-        count = 0
-        if all_gn_data != None:
-            for data in all_gn_data:
-                if datetime.now() > data.last_played + timedelta(weeks=4):
-                    GnMongoManager.delete_data_info(channel_id=data.channel_id, guild_id=guild.id)
-                    count+=1
-            
-        print(f"clear_up_data_task started. Deleted {count} Guess Number data in guild {guild.name} for being inactive over 1 month")
-        #Drop quest collection nếu trống
-        QuestMongoManager.drop_quest_collection_if_empty(guild_id=guild.id)
-        MwMongoManager.drop_collections_if_empty(guild_id=guild.id)
-        SwMongoManager.drop_collections_if_empty(guild_id=guild.id)
-        GnMongoManager.drop_collection_if_empty(guild_id=guild.id)
-        #Kiểm tra snipe message cũ, xóa đi nếu cần
-        all_snipe_channels = db.find_all_snipe_channel_info(guild_id=guild.id)
-        count = 0
-        if all_snipe_channels != None:
+    #Kiểm tra quest cũ, xóa đi nếu cần
+    all_quest_collection = QuestMongoManager.get_all_quest_guild_ids()
+    if all_quest_collection:
+        for guild_id in all_quest_collection:
+            all_quest_data = QuestMongoManager.find_all_quest_profiles(guild_id=guild_id)
             count = 0
-            for snipe_channel in all_snipe_channels:
-                if snipe_channel.snipe_messages != None and len(snipe_channel.snipe_messages) > 0:
-                    #Xóa bớt message
-                    snipe_messages = snipe_channel.snipe_messages
-                    filtered_messages = [
-                        msg for msg in snipe_messages 
-                        if datetime.now() <= msg.deleted_date + timedelta(weeks=2)
-                    ]
-                    count += len(snipe_messages) - len(filtered_messages)
-                    snipe_messages = filtered_messages
-                    db.replace_snipe_message_info(guild_id=guild.id, channel_id=snipe_channel.channel_id, snipe_messages=snipe_messages)
-                else:
-                    #Xóa channel
-                    db.delete_snipe_channel_info(guild_id=guild.id, channel_id=snipe_channel.channel_id)
-        print(f"clear_up_data_task started. Deleted {count} snipe message in {guild.name}")
-        #drop collection nếu trống
-        db.drop_snipe_channel_info_collection_if_empty(guild_id=guild.id)
+            if all_quest_data:
+                for quest in all_quest_data:
+                    if datetime.now() > quest.reset_date: 
+                        QuestMongoManager.delete_quest(guild_id=guild_id, user_id=quest.user_id)
+                        count+=1
+            QuestMongoManager.drop_quest_collection_if_empty(guild_id=guild_id)
+            print(f"clear_up_data_task started. Deleted {count} quest data in guild {guild_id}")
+    
+    all_mw_collections = MwMongoManager.get_all_match_word_guild_ids()
+    if all_mw_collections:
+        for guild_id in all_mw_collections:
+            all_mw_data = MwMongoManager.find_all_info_in_guild(guild_id=guild_id)
+            count = 0
+            if all_mw_data:
+                for lang, mw_data in all_mw_data:
+                    if datetime.now() > mw_data.last_played + timedelta(weeks=8):
+                        MwMongoManager.delete_data_info(channel_id=mw_data.channel_id, guild_id=guild_id, lang=lang)
+                        count+=1
+            MwMongoManager.drop_collections_if_empty(guild_id=guild_id)
+            print(f"clear_up_data_task started. Deleted {count} MatchWord data in guild {guild_id} for being inactive over 2 month")
+    
+    all_sw_collections = SwMongoManager.get_all_sort_word_guild_ids()
+    if all_sw_collections:
+        for guild_id in all_sw_collections:
+            all_sw_data = SwMongoManager.find_all_info_in_guild(guild_id=guild_id)
+            count = 0
+            if all_sw_data:
+                for lang, sw_data in all_sw_data:
+                    if datetime.now() > sw_data.last_played + timedelta(weeks=8):
+                        SwMongoManager.delete_data_info(channel_id=sw_data.channel_id, guild_id=guild_id, lang=lang)
+                        count+=1
+            SwMongoManager.drop_collections_if_empty(guild_id=guild_id)
+            print(f"clear_up_data_task started. Deleted {count} SortWord data in guild {guild_id} for being inactive over 2 month")
+    all_gn_collections = GnMongoManager.get_all_gn_guild_ids()
+    if all_gn_collections:
+        for guild_id in all_gn_collections:
+            all_gn_data = GnMongoManager.find_all_info_in_guild(guild_id=guild_id)
+            count = 0
+            if all_gn_data:
+                for data in all_gn_data:
+                    if datetime.now() > data.last_played + timedelta(weeks=8):
+                        GnMongoManager.delete_data_info(channel_id=data.channel_id, guild_id=guild_id)
+                        count+=1
+            GnMongoManager.drop_collection_if_empty(guild_id=guild_id)
+            print(f"clear_up_data_task started. Deleted {count} Guess Number data in guild {guild_id} for being inactive over 2 month")
+    
+    #Kiểm tra snipe message cũ, xóa đi nếu cần
+    list_guilds_id_snipe = db.get_all_snipe_guild_ids()
+    if list_guilds_id_snipe:
+        for guild_id in list_guilds_id_snipe:
+            all_snipe_channels = db.find_all_snipe_channel_info(guild_id=guild_id)
+            count = 0
+            if all_snipe_channels != None:
+                count = 0
+                for snipe_channel in all_snipe_channels:
+                    if snipe_channel.snipe_messages != None and len(snipe_channel.snipe_messages) > 0:
+                        #Xóa bớt message
+                        snipe_messages = snipe_channel.snipe_messages
+                        filtered_messages = [
+                            msg for msg in snipe_messages 
+                            if datetime.now() <= msg.deleted_date + timedelta(weeks=2)
+                        ]
+                        count += len(snipe_messages) - len(filtered_messages)
+                        snipe_messages = filtered_messages
+                        db.replace_snipe_message_info(guild_id=guild_id, channel_id=snipe_channel.channel_id, snipe_messages=snipe_messages)
+                    else:
+                        #Xóa channel
+                        db.delete_snipe_channel_info(guild_id=guild_id, channel_id=snipe_channel.channel_id)
+            print(f"clear_up_data_task started. Deleted {count} snipe message in {guild_id}")
+            #drop collection nếu trống
+            db.drop_snipe_channel_info_collection_if_empty(guild_id=guild_id)
+
 
 
 client = discord.Client(intents=intents)
@@ -408,7 +438,7 @@ async def on_ready():
     check_jail_expiry.start()
     if CustomFunctions.check_if_dev_mode()==False:
         # Tạm tắt 
-        automatic_speak_randomly.start()
+        automatic_speak_randomly_true_heaven.start()
         
         check_true_heavens_role_expiracy.start()
         activity = discord.Activity(type=discord.ActivityType.watching, 

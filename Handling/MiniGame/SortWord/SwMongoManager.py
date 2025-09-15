@@ -33,6 +33,24 @@ def find_all_info_in_guild(guild_id: int) -> List[Tuple[str, SortWordInfo]]:
             all_infos.extend((lang, SortWordInfo.from_dict(doc)) for doc in cursor)
     return all_infos
 
+def get_all_sort_word_guild_ids() -> List[int]:
+    """Return a list of guild IDs that have SortWord collections (any language)."""
+    guild_ids: List[int] = []
+    for collection_name in db_specific.list_collection_names():
+        if collection_name.endswith("_sw_guild_") or "_sw_guild_" not in collection_name:
+            continue  # skip malformed names
+        try:
+            # name format: {lang}_sw_guild_{guild_id}
+            parts = collection_name.split("_sw_guild_")
+            if len(parts) != 2:
+                continue
+            guild_id = int(parts[1])
+            if guild_id not in guild_ids:
+                guild_ids.append(guild_id)
+        except ValueError:
+            continue
+    return guild_ids
+
 def drop_collections_if_empty(guild_id: int):
     for lang in ['en', 'vn']:
         collection_name = f'{lang}_sw_guild_{guild_id}'

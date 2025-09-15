@@ -184,6 +184,21 @@ def find_all_snipe_channel_info(guild_id: int):
     data = list(collection.find())
     return [SnipeChannelInfo.from_dict(snipe_channel) for snipe_channel in data]
 
+def get_all_snipe_guild_ids() -> List[int]:
+    """Return a list of guild IDs that have Snipe Info collections."""
+    db_specific = client['guild_database']
+    guild_ids: List[int] = []
+    for collection_name in db_specific.list_collection_names():
+        if not collection_name.startswith("snipe_info_guild_"):
+            continue  # skip malformed names
+        try:
+            guild_id = int(collection_name.split("snipe_info_guild_")[1])
+            if guild_id not in guild_ids:
+                guild_ids.append(guild_id)
+        except ValueError:
+            continue
+    return guild_ids
+
 def create_snipe_channel_info(snipe_channel_info: SnipeChannelInfo, guild_id: int):
     db_specific = client['guild_database']
     collection = db_specific[f'snipe_info_guild_{guild_id}']
@@ -301,6 +316,23 @@ def find_all_user_count_by_guild(guild_id: int):
     collection = db_specific[f'{guild_id}_user_count']
     data = list(collection.find())
     return [UserCount.from_dict(user) for user in data]
+
+def get_all_user_count_guild_ids() -> List[int]:
+    """Return a list of guild IDs that have user_count collections."""
+    db_specific = client['misc_database']
+    guild_ids: List[int] = []
+    for collection_name in db_specific.list_collection_names():
+        if not collection_name.endswith("_user_count"):
+            continue  # skip unrelated collections
+        try:
+            guild_id_str = collection_name.replace("_user_count", "")
+            guild_id = int(guild_id_str)
+            if guild_id not in guild_ids:
+                guild_ids.append(guild_id)
+        except ValueError:
+            continue  # skip malformed collection names
+    return guild_ids
+
 
 def delete_user_count(guild_id: int, user_id: int):
     collection = db_specific[f'{guild_id}_user_count']

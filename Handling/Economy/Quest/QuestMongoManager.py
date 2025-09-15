@@ -33,10 +33,21 @@ def drop_quest_collection_if_empty(guild_id: int):
         collection.drop()
         print(f"Collection 'quest_{guild_id}' dropped because it was empty.")
 
-def find_all_profiles(guild_id: int):
+def find_all_quest_profiles(guild_id: int):
     collection = db_specific[f'quest_{guild_id}']
     data = list(collection.find())
     return [QuestProfile.from_dict(quest) for quest in data]
+
+def get_all_quest_guild_ids() -> List[int]:
+    guild_ids: List[int] = []
+    for collection_name in db_specific.list_collection_names():
+        if collection_name.startswith("quest_"):
+            try:
+                guild_id = int(collection_name.split("_", 1)[1])
+                guild_ids.append(guild_id)
+            except ValueError:
+                continue  # skip malformed collection names
+    return guild_ids
 
 def delete_quest(guild_id: int, user_id: int):
     collection = db_specific[f'quest_{guild_id}']
