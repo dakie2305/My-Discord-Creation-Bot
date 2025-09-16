@@ -116,6 +116,8 @@ class Help(commands.Cog):
         embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value}`/truth_dare`: Lệnh dùng để gửi tạo mới trò chơi Truth Or Dare.", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value}`/snipe`: Lệnh dùng để hiển thị lại 7 tin nhắn bị xoá gần nhất trong channel dùng lệnh. Chỉ dùng được nếu có bot Creation 2 trong server!", inline=False)
         embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value}`/therapy`: Lệnh dùng để thiết lập channel dùng để tâm sự cùng bot.", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value}`/remind create`: Lệnh dùng để tạo lời nhắc, bot sẽ nhắc bạn vào thời gian đã định.", inline=False)
+        embed.add_field(name=f"", value=f"{EmojiCreation1.SHINY_POINT.value}`/remind list`: Lệnh xem các lời nhắc đã tạo.", inline=False)
         embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
         list_embed.append(embed)
         
