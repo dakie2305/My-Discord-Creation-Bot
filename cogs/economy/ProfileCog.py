@@ -119,8 +119,11 @@ class ProfileEconomy(commands.Cog):
     async def quote(self, ctx, *, quote: str = None):
         message: discord.Message = ctx.message
         if message:
-            if quote == None:
-                quote = "None"
+            if not quote or quote.strip() == "":
+                await message.reply(
+                    content="👉 Dùng lệnh như sau: `!quote tôi bị khùng`"
+                )
+                return
             if len(quote.split()) > 50:
                 await message.reply(content="Độ dài quá ký tự cho phép")
                 return
