@@ -10,6 +10,8 @@ from discord import app_commands
 from Handling.MiniGame.GuessNumber import GnHandling, GnMongoManager
 from Handling.MiniGame.MatchWord import MwHandling, MwMongoManager
 from Handling.Misc import AntiSpamHandling, DonatorMongoManager
+from Handling.Misc.Remind import RemindMongoManager
+from Handling.Misc.Remind.RemindClass import Remind
 import db.DbMongoManager as db
 from db.DbMongoManager import UserInfo
 import random
@@ -428,8 +430,49 @@ async def clear_up_data_task():
             print(f"clear_up_data_task started. Deleted {count} snipe message in {guild_id}")
             #drop collection nếu trống
             db.drop_snipe_channel_info_collection_if_empty(guild_id=guild_id)
-
-
+    #Kiểm tra remind cũ và xóa
+    RemindMongoManager.delete_old_reminds()
+    print(f"clear_up_data_task started. Deleted old reminds data if any.")
+    
+    
+# Task: Check remind
+@tasks.loop(minutes=2)
+async def check_remind():
+    list_due_reminds = RemindMongoManager.find_due_reminds()
+    print(f"check_remind task started. Found {len(list_due_reminds) if list_due_reminds else 0} due reminds.")
+    if not list_due_reminds: return
+    #Lặp qua để gửi tin nhắn
+    for remind in list_due_reminds:
+        guild = bot.get_guild(remind.guild_id)
+        if not guild: 
+            await send_remind_to_user(remind=remind)
+            continue
+        channel = guild.get_channel(remind.channel_id)
+        if not channel:
+            await send_remind_to_user(remind=remind)
+            continue
+        try:
+            #Xoá lời nhắc này đi
+            RemindMongoManager.delete_remind_by_id(remind_id=remind.remind_id)
+            #Gửi tin nhắn kèm embed
+            await channel.send(f"<@{remind.user_id}> Lời nhắc của bạn: **{remind.message_content}**")
+            print(f"Sending remind to channel {remind.channel_name}, guild {remind.guild_name} of username {remind.user_name}, id {remind.user_id}, content:\n\"{remind.message_content}\"")
+        except Exception as e:
+            print(f"Error sending remind to channel {remind.channel_name}, guild {remind.guild_name} of username {remind.user_name}, id {remind.user_id}: {str(e)}")
+        
+async def send_remind_to_user(remind: Remind):
+    try:
+        user = await bot.fetch_user(remind.user_id)
+        if not user: 
+            RemindMongoManager.delete_remind_by_id(remind_id=remind.remind_id)
+            return
+        embed = discord.Embed(title=f"", description=f"**Lời nhắc của bạn**", color=discord.Color.blue())
+        embed.add_field(name=f"Nội Dung", value=f"{remind.message_content}",inline=False)
+        embed.add_field(name=f"Kênh", value=f"Kênh **{remind.channel_name}** của Server **{remind.guild_name}**",inline=False)
+        RemindMongoManager.delete_remind_by_id(remind_id=remind.remind_id)
+        await user.send(embed=embed)
+    except Exception as e:
+        print(f"Error sending remind to channel {remind.channel_name}, guild {remind.guild_name} of username {remind.user_name}, id {remind.user_id}: {str(e)}")
 
 client = discord.Client(intents=intents)
 @bot.event
@@ -452,6 +495,8 @@ async def on_ready():
     #Load extension
     for ext in init_extension:
         await bot.load_extension(ext)
+    
+    check_remind.start()
         
     
 
@@ -590,6 +635,7 @@ init_extension = [
                   "cogs.misc.HelpCog",
                   "cogs.misc.DonationCog",
                   "cogs.misc.DDCNCustomCommandsCog",
+                  "cogs.misc.RemindCog",
                   ]
 bot.tree.add_command(delete_message_context)
 bot.run(bot_token)
