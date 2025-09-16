@@ -134,7 +134,7 @@ async def automatic_speak_randomly_true_heaven():
         actual_channel = guild.get_channel(random_channel_id)
         if actual_channel:
             model = genai.GenerativeModel(CustomFunctions.AI_MODEL, CustomFunctions.safety_settings)
-            prompt = CustomFunctions.get_automatically_talk_prompt("Creation 1", guild, actual_channel)
+            prompt = CustomFunctions.get_automatically_talk_prompt("Creation 2", guild, actual_channel)
             response = model.generate_content(f"{prompt}")
             print(f"{bot.user} started talking on its own at {guild_extra_info.guild_name}, channel {actual_channel.name}.")
             async with actual_channel.typing():
