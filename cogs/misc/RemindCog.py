@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from discord.app_commands import Choice
 from Handling.Misc.Remind import RemindMongoManager
+from Handling.Misc.Remind.RemindCreateCustomView import RemindCreateCustom
 from Handling.Misc.Remind.RemindListView import RemindListView
 from Handling.Misc.SelfDestructView import SelfDestructView
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
@@ -71,7 +72,7 @@ class RemindCog(commands.Cog):
         Choice(name="Tuần", value="week"),
     ])
     @discord.app_commands.describe(time_format="Loại thời gian", time_number="Lượng thời gian", content="Nội dung lời nhắc")
-    async def remind_create_slash_command(self, interaction: discord.Interaction, time_number: int, time_format: str, content: str):
+    async def remind_create_custom_slash_command(self, interaction: discord.Interaction, time_number: int, time_format: str, content: str):
         await interaction.response.defer(ephemeral=False)
         #Không cho dùng bot nếu không phải user
         if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
@@ -111,8 +112,52 @@ class RemindCog(commands.Cog):
         await interaction.followup.send(content= f"{interaction.user.mention}",embed=embed, ephemeral=False)
         
     
-    @remind_create_slash_command.error
+    @remind_create_custom_slash_command.error
     async def remind_create_slash_command_error(self, interaction: discord.Interaction, error):
+        if isinstance(error, discord.app_commands.CommandOnCooldown):
+            # Send a cooldown message to the user, formatted nicely
+            await interaction.response.send_message(f"⏳ Lệnh đang cooldown, vui lòng thực hiện lại trong vòng {error.retry_after:.2f}s tới.", ephemeral=True)
+        else:
+            # Handle any other errors that might occur
+            await interaction.response.send_message("Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True)
+
+    #region remind ne
+    @remind_group.command(name="create_custom", description="Tạo các lời nhắc cho bản thân với thời gian tự nhập. Khi đến lúc, bot sẽ nhắc bạn ngay tại kênh này!")
+    @discord.app_commands.checks.cooldown(1, 45)
+    async def remind_create_custom_slash_command(self, interaction: discord.Interaction, content: str):
+        await interaction.response.defer(ephemeral=False)
+        #Không cho dùng bot nếu không phải user
+        if CustomFunctions.check_if_dev_mode() == True and interaction.user.id != UserEnum.UserId.DARKIE.value:
+            view = SelfDestructView(timeout=30)
+            embed = discord.Embed(title=f"Darkie đang nghiên cứu, cập nhật và sửa chữa bot! Vui lòng đợi nhé!",color=discord.Color.blue())
+            mess = await interaction.followup.send(embed=embed, view=view)
+            view.message = mess
+            return
+        #Mỗi user chỉ được phép có tối đa 5 lời nhắc trong bất kỳ server nào
+        #Trừ Darkie
+        if interaction.user.id != UserEnum.UserId.DARKIE.value:
+            count_remind = RemindMongoManager.count_reminds_by_user(user_id=interaction.user.id)
+            if count_remind >= 5:
+                view = SelfDestructView(timeout=30)
+                embed = discord.Embed(title=f"Bạn đã đạt giới hạn!", description="Mỗi người dùng chỉ được phép có tối đa **5** lời nhắc!", color=discord.Color.red())
+                mess = await interaction.followup.send(embed=embed, view=view)
+                view.message = mess
+                return
+        
+        embed = discord.Embed(title=f"Tạo lời nhắc!", description=f"", color=0xddede7)
+        embed.add_field(name=f"", value="▬▬▬▬ι═════════>", inline=False)
+        embed.add_field(name=f"", value=f"Nội dung nhắc:", inline=False)
+        embed.add_field(name=f"", value=f"- **{content}**", inline=False)
+        embed.add_field(name=f"", value=f"Ấn nút bên dưới để nhập thời gian nhắc.", inline=False)
+        embed.add_field(name=f"", value=f"Nhập ngày đúng dạng như ví dụ: 17/09/2025", inline=False)
+        embed.add_field(name=f"", value=f"Nhập giờ đúng dạng như ví dụ: 16:05", inline=False)
+        view = RemindCreateCustom(user=interaction.user, content=content)
+        mess = await interaction.followup.send(content= f"{interaction.user.mention}",embed=embed, view = view, ephemeral=False)
+        view.message = mess
+        
+    
+    @remind_create_custom_slash_command.error
+    async def remind_create_custom_slash_command_error(self, interaction: discord.Interaction, error):
         if isinstance(error, discord.app_commands.CommandOnCooldown):
             # Send a cooldown message to the user, formatted nicely
             await interaction.response.send_message(f"⏳ Lệnh đang cooldown, vui lòng thực hiện lại trong vòng {error.retry_after:.2f}s tới.", ephemeral=True)

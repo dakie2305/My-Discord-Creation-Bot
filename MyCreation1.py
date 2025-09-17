@@ -439,8 +439,8 @@ async def clear_up_data_task():
 @tasks.loop(minutes=2)
 async def check_remind():
     list_due_reminds = RemindMongoManager.find_due_reminds()
-    print(f"check_remind task started. Found {len(list_due_reminds) if list_due_reminds else 0} due reminds.")
     if not list_due_reminds: return
+    print(f"check_remind task started. Found {len(list_due_reminds) if list_due_reminds else 0} due reminds.")
     #Lặp qua để gửi tin nhắn
     for remind in list_due_reminds:
         guild = bot.get_guild(remind.guild_id)
