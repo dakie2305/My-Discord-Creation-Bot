@@ -157,7 +157,7 @@ async def remove_old_conversation():
     print(f"Found {count} old conversation in collection 'user_conversation_info_{bot_name}' and deleted them.")
 
     
-@tasks.loop(hours=1, minutes = 10)
+@tasks.loop(hours=2, minutes = 10)
 async def random_dropbox():
     guilds = bot.guilds
     for guild in guilds:
@@ -171,10 +171,11 @@ async def random_dropbox():
         if quest_channel == None:
             #Xoá channel_id lỗi
             list_channels_quests.remove(random_quest_channel_id)
+            if list_channels_quests == None or len(list_channels_quests) <= 0: continue
             data_updated = {"list_channels_quests": list_channels_quests}
             db.update_guild_extra_info(guild_id=guild.id, update_data= data_updated)
             #Chọn channel khác không bị lỗi
-            while quest_channel == None:
+            while quest_channel is None and list_channels_quests:
                 random_quest_channel_id = random.choice(list_channels_quests)
                 quest_channel = guild.get_channel(random_quest_channel_id)
         if quest_channel != None:
@@ -206,8 +207,9 @@ async def random_quizz_embed():
             list_channels_quests.remove(random_quest_channel_id)
             data_updated = {"list_channels_quests": list_channels_quests}
             db.update_guild_extra_info(guild_id=guild.id, update_data= data_updated)
+            if list_channels_quests == None or len(list_channels_quests) <= 0: continue
             #Chọn channel khác không bị lỗi
-            while quest_channel == None:
+            while quest_channel is None and list_channels_quests:
                 random_quest_channel_id = random.choice(list_channels_quests)
                 quest_channel = guild.get_channel(random_quest_channel_id)
         if quest_channel != None:
@@ -361,7 +363,7 @@ async def spawning_enemy_embed_in_dungeon(guild: discord.Guild, random_quest_cha
     quest_channel = guild.get_channel_or_thread(random_quest_channel_id.channel_id)
     if quest_channel == None:
         #Xoá channel_id lỗi
-        list_channels_dungeon.remove(random_quest_channel_id)
+        list_channels_dungeon = [c for c in list_channels_dungeon if c.channel_id != random_quest_channel_id.channel_id]
         db.update_guild_extra_info_list_channels_dungeon(guild_id=guild.id, list_channels_dungeon=list_channels_dungeon)
         return
     if quest_channel != None:
