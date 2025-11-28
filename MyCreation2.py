@@ -440,8 +440,8 @@ async def on_ready():
     if CustomFunctions.check_if_dev_mode()==False:
         # Tạm tắt 
         automatic_speak_randomly_true_heaven.start()
-        random_dropbox.start()
-        random_quizz_embed.start()
+        # random_dropbox.start()
+        # random_quizz_embed.start()
         dungeon_spawn_enemy_embed.start()
         activity = discord.Activity(type=discord.ActivityType.watching, 
                                 name="True Heavens",
