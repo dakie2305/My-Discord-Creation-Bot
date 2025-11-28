@@ -294,13 +294,16 @@ class AuthorityEconomy(commands.Cog):
         list_channels_quests = guild_info.list_channels_quests
         random_quest_channel_id = random.choice(list_channels_quests)
         quest_channel = interaction.guild.get_channel(random_quest_channel_id)
-        if quest_channel == None:
+        if quest_channel is None:
             #Xoá channel_id lỗi
             list_channels_quests.remove(random_quest_channel_id)
             data_updated = {"list_channels_quests": list_channels_quests}
             db.update_guild_extra_info(guild_id=interaction.guild.id, update_data= data_updated)
+            if list_channels_quests == None or len(list_channels_quests) <= 0:
+                await interaction.followup.send(content=f"Server chưa có channel dành cho thực hiện quest. Vui lòng dùng lệnh {SlashCommand.QUEST_CHANNELS.value} trước!", ephemeral=True)
+                return
             #Chọn channel khác không bị lỗi
-            while quest_channel == None:
+            while quest_channel is None and list_channels_quests:
                 random_quest_channel_id = random.choice(list_channels_quests)
                 quest_channel = interaction.guild.get_channel(random_quest_channel_id)
         if quest_channel != None:

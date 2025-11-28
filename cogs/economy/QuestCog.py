@@ -113,13 +113,16 @@ class QuestEconomy(commands.Cog):
         list_channels_quests = guild_extra_info.list_channels_quests
         random_quest_channel_id = random.choice(list_channels_quests)
         quest_channel = user.guild.get_channel(random_quest_channel_id)
-        if quest_channel == None:
+        if quest_channel is None:
             #Xoá channel_id lỗi
             list_channels_quests.remove(random_quest_channel_id)
             data_updated = {"list_channels_quests": list_channels_quests}
             DbMongoManager.update_guild_extra_info(guild_id=user.guild.id, update_data= data_updated)
-            #Chọn channel khác không bị lỗi
-            while quest_channel == None:
+            #Chọn lại channel khác
+            if list_channels_quests == None or len(list_channels_quests) <= 0:
+                embed = discord.Embed(title=f"Owner Server vui lòng dùng lệnh {SlashCommand.QUEST_CHANNELS.value} để thêm channel cho Hệ Thống Nhiệm Vụ chọn!",color=discord.Color.red())
+                return embed
+            while quest_channel is None and list_channels_quests:
                 random_quest_channel_id = random.choice(list_channels_quests)
                 quest_channel = user.guild.get_channel(random_quest_channel_id)
         if quest == None:
