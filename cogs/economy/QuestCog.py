@@ -110,7 +110,11 @@ class QuestEconomy(commands.Cog):
             QuestMongoManager.delete_quest(guild_id=user.guild.id, user_id=user.id)
             return new_embed
         
-        list_channels_quests = guild_extra_info.list_channels_quests
+        list_channels_quests = guild_extra_info.list_channels_quests.copy()
+        if not list_channels_quests:
+            embed = discord.Embed(title=f"Owner Server vui lòng dùng lệnh {SlashCommand.QUEST_CHANNELS.value} để thêm channel cho Hệ Thống Nhiệm Vụ chọn!",color=discord.Color.red())
+            return embed
+        quest_channel = None
         random_quest_channel_id = random.choice(list_channels_quests)
         quest_channel = user.guild.get_channel(random_quest_channel_id)
         if quest_channel is None:
@@ -122,9 +126,14 @@ class QuestEconomy(commands.Cog):
             if list_channels_quests == None or len(list_channels_quests) <= 0:
                 embed = discord.Embed(title=f"Owner Server vui lòng dùng lệnh {SlashCommand.QUEST_CHANNELS.value} để thêm channel cho Hệ Thống Nhiệm Vụ chọn!",color=discord.Color.red())
                 return embed
-            while quest_channel is None and list_channels_quests:
+            if quest_channel is None and list_channels_quests:
                 random_quest_channel_id = random.choice(list_channels_quests)
                 quest_channel = user.guild.get_channel(random_quest_channel_id)
+        
+        if quest_channel is None:
+                embed = discord.Embed(title=f"Owner Server vui lòng dùng lệnh {SlashCommand.QUEST_CHANNELS.value} để thêm channel cho Hệ Thống Nhiệm Vụ chọn!",color=discord.Color.red())
+                return embed
+        
         if quest == None:
             #Tạo random quest
             quest = QuestMongoManager.create_new_random_quest(guild_id=user.guild.id, guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name, channel_id=quest_channel.id, channel_name=quest_channel.name, data_profile=data)
