@@ -11,6 +11,7 @@ import google.generativeai as genai
 import PIL.Image
 import asyncio
 from collections import deque
+from google.api_core import exceptions
 
 class AIResponseHandling():
     def __init__(self, bot: commands.Bot):
@@ -129,6 +130,9 @@ class AIResponseHandling():
                 CustomFunctions.save_user_convo_data(message=message, bot_reponse= bot_response, bot_name= self.bot_name)
                 print(f"Username {message.author.name}, Display user name {message.author.display_name} replied {self.bot.user}")
                 return
+        except exceptions.ResourceExhausted as e:
+            # "Out of Quota" / Rate Limit error
+            await message.reply("Cảm ơn bạn đã đồng hành cùng bot suốt thời gian qua. Google đã không còn cho sử dụng AI miễn phí nữa, nên coi như tính năng A.I. thông minh của bot đến đây là kết thúc.\nMong một ngày bot trở về, và nếu không thì đành thôi vậy.")
         except Exception as e:
             print(f"Username {message.author.name}, Display user name {message.author.display_name} replied {self.bot.user} but with error: {e}")
         return
