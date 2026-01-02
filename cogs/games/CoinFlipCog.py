@@ -218,7 +218,7 @@ class CoinFlip(commands.Cog):
         if check_quest_message == True:
             view = SelfDestructView(60)
             quest_embed = discord.Embed(title=f"", description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!", color=0xc379e0)
-            ms = await message.channel.send(embed=quest_embed, content=f"{message.author.mention}", view=view)
+            ms = await message.channel.send(embed=quest_embed, content=f"{user.mention}", view=view)
             view.message = ms
         return
     
