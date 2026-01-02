@@ -1137,14 +1137,12 @@ class GaBattleView(discord.ui.View):
             elif skill.skill_id == "skill_explosion_spell":
                 #trừ hết mana + thể lực, dồn vào damage trong một cú
                 loss_health = int(self_player_info.player_ga.stamina + self_player_info.player_ga.mana)
-                if loss_health > opponent_alive_attack_info.player_ga.max_health: 
-                    loss_health = opponent_alive_attack_info.player_ga.max_health - 50
                 opponent_alive_attack_info.player_ga.health -= loss_health
                 #chiêu này tốn 100% mana và cả stamina của bản thân
                 self_player_info.player_ga.mana = 0
                 self_player_info.player_ga.stamina = 0
-                #Tự stun bản thân một round
-                self_player_info.stunned_round = 1
+                #Tự stun bản thân hai round
+                self_player_info.stunned_round = 3 #Vì cuối lượt bị trừ một
                 base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã tung chiêu {skill.emoji} - {skill.skill_name} cực mạnh, làm nổ tung mất {loss_health} máu của [{opponent_alive_attack_info.player_ga.ga_emoji} - {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist}!"
                 return base_text
             

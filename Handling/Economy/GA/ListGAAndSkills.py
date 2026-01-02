@@ -493,7 +493,7 @@ list_ga_skills_private = [
     GuardianAngelSkill(
         skill_id = "skill_explosion_spell",
         skill_name= "Bộc Liệt Ma Pháp",
-        skill_desc="Kỹ năng quen thuộc của Megumin, hy sinh tất cả mana và thể lực để dồn vào một chiêu Bộc Phá duy nhất với sức mạnh khủng khiếp!",
+        skill_desc="Kỹ năng quen thuộc của Megumin, hy sinh tất cả mana và thể lực để dồn vào một chiêu Bộc Phá duy nhất với sức mạnh khủng khiếp! Sẽ bị choáng hai lượt sau khi dùng!",
         skill_type= ["attack"],
         emoji= EmojiCreation2.EXPLOSION_SPELL_SKILL.value,
         attack_power= 100,
@@ -1152,29 +1152,33 @@ def get_random_ga_enemy_generic(level: int = 1, guardian_chance: int = 0, overri
         random_level_bonus = random.randint(4, 8)
     elif level >= 100 and level < 150:
         random_level_bonus = random.randint(5, 7)
+    elif level >= 150 and level < 175:
+        random_level_bonus = random.randint(6, 10)
+    elif level >= 175 and level < 200:
+        random_level_bonus = random.randint(7, 15)
     else:
-        random_level_bonus = random.randint(4, 20)
+        random_level_bonus = random.randint(7, 30)
     
     data.level = level + random_level_bonus
     if data.level <= 0: data.level = 1
-    percent_boost = 6
+    percent_boost = 7
     base = 20
     bonus_base = 30
     data.attack_power = base + bonus_base*int(percent_boost * data.level / 100) #tăng 5% mỗi level
     
-    percent_boost = 6
+    percent_boost = 5
     base = 100
     bonus_base = 100
     data.max_stamina = base + bonus_base*int(percent_boost * data.level / 100)
     data.stamina = data.max_stamina
     
-    percent_boost = 5
+    percent_boost = 7
     base = 100
     bonus_base = 110
     data.max_health = base + bonus_base*int(percent_boost * data.level / 100)
     data.health = data.max_health
     
-    percent_boost = 8
+    percent_boost = 7
     base = 50
     bonus_base = 105
     data.max_mana = base + bonus_base*int(percent_boost * data.level / 100)
@@ -1195,8 +1199,8 @@ def get_random_ga_enemy_generic(level: int = 1, guardian_chance: int = 0, overri
     if override_emoji != None:
       data.ga_emoji = override_emoji
     
-    #Nếu level của bản thân đã trên 50 thì mọi kẻ địch đều sẽ sở hữu ít nhất một skill
-    if level > 50:
+    #Nếu level của bản thân đã trên 30 thì mọi kẻ địch đều sẽ sở hữu ít nhất một skill
+    if level > 30:
         skill = get_random_skill(blacklist_ids=["summoning_skill"])
         if skill != None: data.list_skills.append(skill)
         #random xem có ra guardian không
@@ -1209,22 +1213,25 @@ def get_random_ga_enemy_generic(level: int = 1, guardian_chance: int = 0, overri
             skill = get_random_skill()
             if skill != None: data.list_skills.append(skill)
 
-    if data.level > 80:
-        #Quái trên 80 thì đương nhiên hưởng thêm skill nữa
+    if data.level > 50:
+        #Quái trên 50 thì đương nhiên hưởng thêm skill nữa
         skill = get_random_skill(blacklist_ids=["summoning_skill"])
+        if skill != None: data.list_skills.append(skill)
+    if data.level > 75:
         if skill != None: data.list_skills.append(skill)
     if data.level > 100:
-        #Quái trên 100 thì đương nhiên hưởng thêm skill nữa
-        skill = get_random_skill(blacklist_ids=["summoning_skill"])
-        if skill != None: data.list_skills.append(skill)
-    if data.level > 150:
-        #Quái trên 100 thì đương nhiên hưởng thêm skill nữa
-        skill = get_random_skill(blacklist_ids=["summoning_skill"])
         if skill != None: data.list_skills.append(skill)
         #roll tỉ lệ được chiên khiên
         shield_dice = UtilitiesFunctions.get_chance(20)
         if shield_dice:
           skill = get_random_skill(skill_id="shield_skill")
+          if skill != None: data.list_skills.append(skill)
+    if data.level > 150:
+        if skill != None: data.list_skills.append(skill)
+        #roll tỉ lệ skill_potion_destroyer
+        dice = UtilitiesFunctions.get_chance(10)
+        if dice:
+          skill = get_random_skill(skill_id="skill_potion_destroyer")
           if skill != None: data.list_skills.append(skill)
 
     if "Triệu Hồi" in data.ga_name:
