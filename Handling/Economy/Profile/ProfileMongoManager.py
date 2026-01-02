@@ -1013,7 +1013,7 @@ def add_memory_guardian(guild_id: int, user_id: int, memory_description: str, ch
                 "guardian.memories": {
                     "$each": [new_memory.to_dict()],
                     "$position": 0,
-                    "$slice": 500
+                    "$slice": 300
                 }
             }
         }

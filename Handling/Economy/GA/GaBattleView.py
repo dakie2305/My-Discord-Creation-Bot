@@ -1052,6 +1052,31 @@ class GaBattleView(discord.ui.View):
                     )
                 return base_text
             
+            non_evasion_skills = ["skill_black_fire", "skill_mass_damage", "skill_trade_stats", "skill_potion_destroyer", "skill_explosion_spell", "skill_mass_stun"]
+            #Mới: đối thủ được phép né phép thuật bằng stamina
+            #Tính tỉ lệ evasion cho đối thủ
+            opponent_evasion_chance = self.calculate_chance_by_stats(current_stat=opponent_alive_attack_info.player_ga.stamina, max_stat=opponent_alive_attack_info.player_ga.max_stamina, level=opponent_alive_attack_info.player_ga.level)
+
+            if opponent_evasion_chance > 85: opponent_evasion_chance = 85
+            evasion_dice = UtilitiesFunctions.get_chance(opponent_evasion_chance)
+            loss_amount = self.calculate_mana_loss_for_guardian(max_mana=opponent_alive_attack_info.player_ga.max_stamina, skill_mana_loss=skill.mana_loss + skill.attack_power, reference_mana=opponent_alive_attack_info.player_ga.stamina)
+            if evasion_dice and opponent_alive_attack_info.player_ga.stamina >= loss_amount and skill.skill_id not in non_evasion_skills: #Phải có đủ thể lực cần thiết, và skill không thuộc diện né được thì mới vào
+                #Tính lại trừ stamina
+                #Hiện tại: 10% stamina + tổng mana_loss và attack_power của skill. 
+                loss_amount = int(0.1 * opponent_alive_attack_info.player_ga.max_stamina) + skill.mana_loss + skill.attack_power
+                opponent_alive_attack_info.player_ga.stamina -= loss_amount
+                if opponent_alive_attack_info.player_ga.stamina <= 0: opponent_alive_attack_info.player_ga.stamina = 0
+                
+                #Trừ mana của người thi triển một chút
+                own_loss_mana = self.calculate_mana_loss_for_guardian(max_mana=self_player_info.player_ga.max_mana, skill_mana_loss=skill.mana_loss, reference_mana=self_player_info.player_ga.mana)
+                if own_loss_mana < 0:
+                    own_loss_mana *= (-1)
+                own_loss_mana = int(own_loss_mana*0.85) #giảm tý
+                self_player_info.player_ga.mana -= own_loss_mana
+                
+                base_text = f"- **[{self_player_info.player_ga.ga_emoji} - {self_player_info.player_ga.ga_name}]** {text_own_profile_exist} vận **{own_loss_mana}** mana để tung chiêu {skill.emoji} - {skill.skill_name} nhưng {opponent_alive_attack_info.player_ga.ga_name} đã né kịp, và chỉ mất **{loss_amount}** thể lực!"
+                return base_text
+            
             #Tuỳ skill mà tung kỹ năng, vì một số skill tấn công có cách tính khác
             if skill.skill_id == "skill_black_fire":
                 ap = self_player_info.player_ga.attack_power
