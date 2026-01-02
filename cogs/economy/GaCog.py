@@ -121,7 +121,7 @@ class GuardianAngelCog(commands.Cog):
             return
         
         if user_profile.guardian.last_meditation != None:
-            time_window = timedelta(minutes=30)
+            time_window = timedelta(minutes=20)
             check = UtilitiesFunctions.check_if_within_time_delta(input=user_profile.guardian.last_meditation, time_window=time_window)
             if check:
                 next_time = user_profile.guardian.last_meditation + time_window
@@ -253,7 +253,7 @@ class GuardianAngelCog(commands.Cog):
             return
         
         if user_profile.guardian.last_feed != None:
-            time_window = timedelta(minutes=30)
+            time_window = timedelta(minutes=20)
             check = UtilitiesFunctions.check_if_within_time_delta(input=user_profile.guardian.last_feed, time_window=time_window)
             if check:
                 next_time = user_profile.guardian.last_feed + time_window
@@ -441,7 +441,7 @@ class GuardianAngelCog(commands.Cog):
             return
         
         if user_profile.guardian.last_battle != None:
-            time_window = timedelta(minutes=30)
+            time_window = timedelta(minutes=20)
             check = UtilitiesFunctions.check_if_within_time_delta(input=user_profile.guardian.last_battle, time_window=time_window)
             if check:
                 next_time = user_profile.guardian.last_battle + time_window
