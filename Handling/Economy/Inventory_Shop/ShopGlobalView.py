@@ -181,7 +181,7 @@ class TextShopInputModal(discord.ui.Modal):
                     maintenance_money = int(cost_money * 10000 * 0.1)
                     maintenance_emoji = EmojiCreation2.GOLD.value
                     if maintenance_money <= 0: maintenance_money = 1
-                    if maintenance_money > 10000: maintenance_money = 10000
+                    if maintenance_money > 20000: maintenance_money = 20000
                     ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, gold=-maintenance_money)
             elif item.item_worth_type == "G":
                 #mặc định 5% giá trị của item

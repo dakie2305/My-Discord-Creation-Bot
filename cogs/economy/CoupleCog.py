@@ -251,7 +251,7 @@ class CoupleCog(commands.Cog):
             return
         
         if couple.last_love_action != None:
-            time_window = timedelta(minutes=30)
+            time_window = timedelta(minutes=20)
             check = UtilitiesFunctions.check_if_within_time_delta(input=couple.last_love_action, time_window=time_window)
             if check:
                 #Lấy thời gian cũ để cộng vào 1h xem chừng nào mới làm tiếp

@@ -106,10 +106,10 @@ class WorkEconomy(commands.Cog):
             user_profile = ProfileMongoManager.create_profile(guild_id=user.guild.id, guild_name=user.guild.name, user_id=user.id, user_name=user.name, user_display_name=user.display_name)
         
         if user_profile != None and user_profile.last_work != None:
-            time_window = timedelta(minutes=30)
+            time_window = timedelta(minutes=10)
             check = self.check_if_within_time_delta(input=user_profile.last_work, time_window=time_window)
             if check:
-                #Lấy thời gian cũ để cộng vào 1h30 xem chừng nào mới làm việc được tiếp
+                #Lấy thời gian cũ để cộng vào xem chừng nào mới làm việc được tiếp
                 work_next_time = user_profile.last_work + time_window
                 unix_time = int(work_next_time.timestamp())
                 embed = discord.Embed(title=f"", description=f"🚫 Bạn đã làm việc rồi. Vui lòng thực hiện lại lệnh {SlashCommand.WORK.value} vào lúc <t:{unix_time}:t> !", color=0xc379e0)
@@ -231,7 +231,7 @@ class WorkEconomy(commands.Cog):
             user_profile = ProfileMongoManager.create_profile(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name=interaction.user.name, user_display_name=interaction.user.display_name)
         
         if user_profile != None and user_profile.last_fishing != None:
-            time_window = timedelta(minutes=30)
+            time_window = timedelta(minutes=15)
             check = self.check_if_within_time_delta(input=user_profile.last_fishing, time_window=time_window)
             if check:
                 #Lấy thời gian cũ để cộng vào xem chừng nào mới làm được tiếp

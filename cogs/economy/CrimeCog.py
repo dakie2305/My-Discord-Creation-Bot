@@ -147,7 +147,7 @@ class CrimeEconomy(commands.Cog):
             return
         
         elif user_profile != None and user_profile.last_crime != None:
-            time_window = timedelta(minutes=30)
+            time_window = timedelta(minutes=20)
             check = self.check_if_within_time_delta(input=user_profile.last_crime, time_window=time_window)
             if check:
                 #Lấy thời gian cũ để cộng vào xem chừng nào mới crime được tiếp
