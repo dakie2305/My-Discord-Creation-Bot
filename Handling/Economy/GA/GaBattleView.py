@@ -278,7 +278,7 @@ class GaBattleView(discord.ui.View):
     #region battle event
     async def commence_battle(self):
         if len(self.upper_attack_class) == 0 or len(self.lower_attack_class) == 0: return
-        await asyncio.sleep(3)
+        await asyncio.sleep(4)
         #upper attack sẽ đánh trước
         flag_end_battle = False
         full_text = ""
@@ -781,10 +781,9 @@ class GaBattleView(discord.ui.View):
                     mana_potion = item
         
         #Kiểm tra xem có stun không, có thì skip lượt
-        if self_player_info.stunned_round != None:
+        if self_player_info.stunned_round != 0:
             self_player_info.stunned_round -= 1
-            if self_player_info.stunned_round <= 0:
-                self_player_info.stunned_round = None
+            if self_player_info.stunned_round >= 0:
                 base_text = f"- **[{self_player_info.player_ga.ga_emoji} - {self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã quá choáng váng không thể làm được gì!"
                 return base_text
         
@@ -1100,7 +1099,7 @@ class GaBattleView(discord.ui.View):
                 #tăng stunned_round của kẻ địch
                 loss_health = int(skill.attack_power + (self_player_info.player_ga.attack_power*skill.buff_attack_percent/100))
                 opponent_alive_attack_info.player_ga.health -= loss_health
-                opponent_alive_attack_info.stunned_round = 1
+                opponent_alive_attack_info.stunned_round += 1
                 #trừ mana của người dùng theo tỉ lệ skill
                 # loss_own_mana = int(self_player_info.player_ga.max_mana * skill.mana_loss/100) - skill.mana_loss #Không hẳn là trừ quá nhiều, vì thường magic sẽ mạnh hơn, nên buff một tý cho chắc. Để balance sau
                 loss_own_mana = self.calculate_mana_loss_for_guardian(max_mana=self_player_info.player_ga.max_mana, skill_mana_loss=skill.mana_loss, reference_mana=self_player_info.player_ga.mana)
@@ -1146,10 +1145,10 @@ class GaBattleView(discord.ui.View):
                 #tăng stunned_round của tất cả kẻ địch
                 if opponent_alive_attack_info in self.upper_attack_class:
                     for e in self.upper_attack_class:
-                        e.stunned_round = 1
+                        e.stunned_round += 1
                 else:
                     for e in self.lower_attack_class:
-                        e.stunned_round = 1
+                        e.stunned_round += 1
                 #trừ mana của người dùng theo tỉ lệ skill
                 loss_own_mana = self.calculate_mana_loss_for_guardian(max_mana=self_player_info.player_ga.max_mana, skill_mana_loss=skill.mana_loss, reference_mana=self_player_info.player_ga.mana)
                 if loss_own_mana <= 10: loss_own_mana = 20
@@ -1167,7 +1166,7 @@ class GaBattleView(discord.ui.View):
                 self_player_info.player_ga.mana = 0
                 self_player_info.player_ga.stamina = 0
                 #Tự stun bản thân hai round
-                self_player_info.stunned_round = 3 #Vì cuối lượt bị trừ một
+                self_player_info.stunned_round += 2
                 base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã tung chiêu {skill.emoji} - {skill.skill_name} cực mạnh, làm nổ tung mất {loss_health} máu của [{opponent_alive_attack_info.player_ga.ga_emoji} - {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist}!"
                 return base_text
             
@@ -1660,7 +1659,7 @@ class GaBattleView(discord.ui.View):
             #Random 10% tăng stun
             stun_chance = UtilitiesFunctions.get_chance(15)
             if stun_chance:
-                self_player_info.stunned_round = 1
+                self_player_info.stunned_round += 1
                 base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã đánh mất **{loss_health}** Máu của [{opponent_alive_attack_info.player_ga.ga_emoji} - {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist} nhưng bị phản đòn ngược lại và bị choáng!"
             return base_text
         return base_text
