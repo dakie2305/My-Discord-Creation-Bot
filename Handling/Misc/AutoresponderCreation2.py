@@ -182,7 +182,7 @@ class AutoresponderHandling():
             embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Liên Thông Hộ Vệ Thần ({SlashCommand.GLOBAL_GA.value}) là chức năng cho phép bạn có thể đồng bộ dữ liệu Hộ Vệ Thần của bản thân ở bất kỳ server nào!", inline=False)
             embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Cần mua Thẻ Liên Thông trong lệnh {SlashCommand.SHOP_GLOBAL.value} để mở khóa chức năng Liên Thông trong vòng **hai tuần.**", inline=False)
             embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Sau **6** tháng không sử dụng chức năng Liên Thông thì dữ liệu Liên Thông sẽ bị xóa!", inline=False)
-            embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Để được phép liên thông từ server -> global, cần phải đáp ứng điều kiện: server trên 1000 người, hoặc dùng lệnh trong server True Heavens!", inline=False)
+            embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Để được phép liên thông từ server -> global, cần phải đáp ứng điều kiện: server trên 1500 người, hoặc dùng lệnh trong server True Heavens!", inline=False)
             embed.add_field(name="", value=f"{EmojiCreation2.SHINY_POINT.value} Yêu cầu như thế là để tránh tình trạng đưa bot vào server cá nhân và lạm dụng chức năng Liên Thông!", inline=False)
             embed.add_field(name="", value="-------------------------------------", inline=False)
             embed.set_footer(text=f"Lưu ý, vật phẩm và Hộ Vệ Thần đã liên thông sẽ mất tất cả giá trị bán ra, nên tốt nhất đừng mơ đến chuyện đem ra server khác bán!", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")

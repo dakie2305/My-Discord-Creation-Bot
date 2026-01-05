@@ -49,7 +49,7 @@ class ProfileAdditionalView(discord.ui.View):
         embed.set_footer(text=f"Đừng quên, bạn chỉ được giữ tối đa 20 vật phẩm, mỗi loại vật phẩm chỉ tối đa 99 cái thôi nhé!", icon_url=f"{EmojiCreation2.TRUE_HEAVEN_LINK_MINI.value}")
         view = BackToProfileView(profile=self.profile, profile_embed=self.profile_embed)
         
-        global_inventory = GlobalMongoManager.find_global_profile_by_id(user_id=interaction.user.id)
+        global_inventory = GlobalMongoManager.find_global_profile_by_id(user_id=self.profile.user_id)
         if global_inventory != None and global_inventory.enable_until > datetime.now():
             view = SpecialInventoryGlobalView(profile=self.profile, global_inventory=global_inventory, profile_embed=self.profile_embed)
         m = await self.message.edit(embed=embed, view = view)
