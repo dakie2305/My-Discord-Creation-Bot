@@ -592,7 +592,7 @@ list_ga_passive_skills_private = [
     GuardianAngelSkill(
         skill_id = "skill_critical_strike",
         skill_name= "Ngưỡng Máu Tử",
-        skill_desc="Khi Hộ Vệ Thần còn máu dưới 30% thì các đòn tấn công tiếp theo sẽ tăng sát thương, chỉ kích hoạt một lần!",
+        skill_desc="Khi Hộ Vệ Thần còn máu dưới 30% thì sẽ hóa rồ để tăng sức mạnh tấn công và hồi lại chút thể lực, chỉ kích hoạt một lần trong một trận chiến!",
         skill_type= ["passive"],
         emoji= EmojiCreation2.CRITICAL_DAMAGE.value,
         attack_power= 15,
@@ -1218,21 +1218,27 @@ def get_random_ga_enemy_generic(level: int = 1, guardian_chance: int = 0, overri
         skill = get_random_skill(blacklist_ids=["summoning_skill"])
         if skill != None: data.list_skills.append(skill)
     if data.level > 75:
+        skill = get_random_skill()
         if skill != None: data.list_skills.append(skill)
     if data.level > 100:
+        skill = get_random_skill()
         if skill != None: data.list_skills.append(skill)
-        #roll tỉ lệ được chiên khiên
+        #roll tỉ lệ được khiên
         shield_dice = UtilitiesFunctions.get_chance(20)
         if shield_dice:
           skill = get_random_skill(skill_id="shield_skill")
           if skill != None: data.list_skills.append(skill)
     if data.level > 150:
+        skill = get_random_skill()
         if skill != None: data.list_skills.append(skill)
         #roll tỉ lệ skill_potion_destroyer
         dice = UtilitiesFunctions.get_chance(10)
         if dice:
           skill = get_random_skill(skill_id="skill_potion_destroyer")
           if skill != None: data.list_skills.append(skill)
+    #Test
+    skill = get_random_skill("summoning_skill")
+    data.list_skills.append(skill)
 
     if "Triệu Hồi" in data.ga_name:
         skill = get_random_skill("summoning_skill")
