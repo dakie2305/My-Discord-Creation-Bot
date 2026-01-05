@@ -1148,12 +1148,17 @@ class GaBattleView(discord.ui.View):
                 return base_text
             
             elif skill.skill_id == "skill_explosion_spell":
-                #trừ hết mana + thể lực, dồn vào damage trong một cú
-                loss_health = int(self_player_info.player_ga.stamina + self_player_info.player_ga.mana)
+                #trừ % mana + thể lực, dồn vào damage trong một cú
+                mana_part = int(self_player_info.player_ga.mana * 0.8)
+                stamina_part = int(self_player_info.player_ga.stamina * 0.3)
+                loss_health = mana_part + stamina_part
                 opponent_alive_attack_info.player_ga.health -= loss_health
-                #chiêu này tốn 100% mana và cả stamina của bản thân
-                self_player_info.player_ga.mana = 0
-                self_player_info.player_ga.stamina = 0
+                #chiêu này tốn % mana và cả stamina của bản thân
+                self_player_info.player_ga.mana -= mana_part
+                self_player_info.player_ga.stamina -= stamina_part
+                # Clamp to zero
+                if self_player_info.player_ga.mana < 0: self_player_info.player_ga.mana = 0
+                if self_player_info.player_ga.stamina < 0: self_player_info.player_ga.stamina = 0
                 #Tự stun bản thân hai round
                 self_player_info.stunned_round += 2
                 base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã tung chiêu {skill.emoji} - {skill.skill_name} cực mạnh, làm nổ tung mất {loss_health} máu của [{opponent_alive_attack_info.player_ga.ga_emoji} - {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist}!"
@@ -1371,7 +1376,7 @@ class GaBattleView(discord.ui.View):
                 except Exception as e:
                     print(f"Exception when remove brain washed ga from team, {e}")
                 opponent_alive_attack_info.brain_washed_round = 4
-                print(f"{opponent_alive_attack_info.player_ga.ga_name} has been brain washed for 4 rounds!")
+                # print(f"{opponent_alive_attack_info.player_ga.ga_name} has been brain washed for 4 rounds!")
                 #Trừ % mana của bản thân chiếu theo skill
                 own_loss_mana = int(self_player_info.player_ga.max_mana * skill.mana_loss / 100)
                 self_player_info.player_ga.mana -= own_loss_mana
@@ -1712,7 +1717,6 @@ class GaBattleView(discord.ui.View):
                     print(f"  [{j}] uid={it.ga_attack_uid} obj={it}")
                 print("[REMOVE] ===== END (OK) =====")
                 return removed
-
         print("[REMOVE] !!! NOT FOUND !!!")
         print("[REMOVE] ===== END (NONE) =====")
         return None
@@ -1728,7 +1732,6 @@ class GaBattleView(discord.ui.View):
         print("[ADD] List BEFORE:")
         for i, item in enumerate(lst):
             print(f"  [{i}] uid={item.ga_attack_uid} obj={item}")
-
         for i, item in enumerate(lst):
             print(
                 f"[ADD] Compare item[{i}].uid == target.uid ? "
@@ -1738,7 +1741,6 @@ class GaBattleView(discord.ui.View):
                 print("[ADD] !!! ALREADY EXISTS — NOT ADDING !!!")
                 print("[ADD] ===== END (EXISTS) =====")
                 return item
-
         lst.append(target)
         print("[ADD] >>> ADDED:", target)
         print("[ADD] List AFTER:")

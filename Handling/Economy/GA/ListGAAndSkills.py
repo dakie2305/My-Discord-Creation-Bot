@@ -493,7 +493,7 @@ list_ga_skills_private = [
     GuardianAngelSkill(
         skill_id = "skill_explosion_spell",
         skill_name= "Bộc Liệt Ma Pháp",
-        skill_desc="Kỹ năng quen thuộc của Megumin, hy sinh tất cả mana và thể lực để dồn vào một chiêu Bộc Phá duy nhất với sức mạnh khủng khiếp! Sẽ bị choáng hai lượt sau khi dùng!",
+        skill_desc="Kỹ năng quen thuộc của Megumin, hy sinh phần lớn mana và một phần thể lực để dồn vào một chiêu Bộc Phá duy nhất với sức mạnh khủng khiếp! Sẽ bị choáng hai lượt sau khi dùng!",
         skill_type= ["attack"],
         emoji= EmojiCreation2.EXPLOSION_SPELL_SKILL.value,
         attack_power= 100,
@@ -1172,7 +1172,7 @@ def get_random_ga_enemy_generic(level: int = 1, guardian_chance: int = 0, overri
     data.max_stamina = base + bonus_base*int(percent_boost * data.level / 100)
     data.stamina = data.max_stamina
     
-    percent_boost = 7
+    percent_boost = 3
     base = 100
     bonus_base = 110
     data.max_health = base + bonus_base*int(percent_boost * data.level / 100)
