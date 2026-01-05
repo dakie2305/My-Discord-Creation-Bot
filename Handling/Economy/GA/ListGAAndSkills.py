@@ -1237,8 +1237,8 @@ def get_random_ga_enemy_generic(level: int = 1, guardian_chance: int = 0, overri
           skill = get_random_skill(skill_id="skill_potion_destroyer")
           if skill != None: data.list_skills.append(skill)
     #Test
-    skill = get_random_skill("summoning_skill")
-    data.list_skills.append(skill)
+    # skill = get_random_skill("summoning_skill")
+    # data.list_skills.append(skill)
 
     if "Triệu Hồi" in data.ga_name:
         skill = get_random_skill("summoning_skill")
