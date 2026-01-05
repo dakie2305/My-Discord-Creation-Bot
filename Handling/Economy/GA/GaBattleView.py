@@ -1,4 +1,3 @@
-
 import discord
 from CustomEnum.GuardianMemoryTag import GuardianMemoryTag
 from Handling.Economy.Profile.ProfileClass import Profile
@@ -97,6 +96,11 @@ class GaBattleView(discord.ui.View):
                 second_player_class = GuardianAngelAttackClass(player_ga=enemy_ga_2)
                 self.lower_attack_class.append(second_player_class)
         
+        #Đảm bảo đúng side
+        for ga in self.upper_attack_class:
+            ga.is_upper_side = True
+        for ga in self.lower_attack_class:
+            ga.is_upper_side = False
             
     async def on_timeout(self):
         #Delete
@@ -210,7 +214,7 @@ class GaBattleView(discord.ui.View):
         new_player_profile.guardian.mana = new_player_profile.guardian.max_mana
         new_player_profile.guardian.stamina = new_player_profile.guardian.max_stamina
         
-        data = GuardianAngelAttackClass(player_profile=new_player_profile, player_ga=new_player_profile.guardian, starting_at_round=self.round)
+        data = GuardianAngelAttackClass(player_profile=new_player_profile, player_ga=new_player_profile.guardian, starting_at_round=self.round, is_upper_side=False)
         self.lower_attack_class.append(data)
         self.joined_player_id.append(interaction.user.id)
         ProfileMongoManager.update_main_guardian_profile_time(guild_id=interaction.guild_id,user_id=interaction.user.id, data_type="last_joined_battle", date_value=datetime.now())
@@ -322,7 +326,6 @@ class GaBattleView(discord.ui.View):
         
         if not self.is_empty_or_whitespace(full_text):
             self.round_number_text_report.update({self.round: full_text.strip()})
-        
         #Cập nhật embed chiến đấu
         embed = discord.Embed(title=f"", description=self.embed_title, color=0x0ce7f2)
         for self_player_info in self.upper_attack_class:
@@ -888,7 +891,7 @@ class GaBattleView(discord.ui.View):
             evasion_dice = UtilitiesFunctions.get_chance(opponent_evasion_chance)
             if evasion_dice and opponent_alive_attack_info.player_ga.stamina >= loss_amount: #Phải có đủ thể lực cần thiết mới né được
                 #Chỉ trừ stamina của lower, tỉ lệ thấp hơn, tầm 50% của info.player_ga.attack_power
-                loss_amount = int(self_player_info.player_ga.attack_power * 0.3)
+                loss_amount = int(self_player_info.player_ga.attack_power * 0.4)
                 opponent_alive_attack_info.player_ga.stamina -= loss_amount
                 if opponent_alive_attack_info.player_ga.stamina <= 0: opponent_alive_attack_info.player_ga.stamina = 0
                 base_text = f"- **[{self_player_info.player_ga.ga_emoji} - {self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã lao đến đánh {opponent_alive_attack_info.player_ga.ga_name} {text_target_profile_exist} nhưng mục tiêu đã kịp né tránh, và chỉ mất **{loss_amount}** thể lực!"
@@ -947,34 +950,20 @@ class GaBattleView(discord.ui.View):
                         break
         
         #Trừ -1 tẩy não khi hết lượt
-        if self_player_info.brain_washed_round != None: 
+        if self_player_info.brain_washed_round > 0:
             self_player_info.brain_washed_round -= 1
             #Khi còn 0 thì đổi phe
             if self_player_info.brain_washed_round <= 0:
-                self_player_info.brain_washed_round = None
+                self_player_info.brain_washed_round = 0
                 try:
-                    if self_player_info in self.upper_attack_class:
-                        self.upper_attack_class.remove(self_player_info)
-                        self.lower_attack_class.append(self_player_info)
+                    if self_player_info.is_upper_side == False:
+                        self.remove_ga_by_player_ga(lst=self.upper_attack_class, target=self_player_info)
+                        self.add_ga_by_player_ga(lst=self.lower_attack_class, target=self_player_info)
                     else:
-                        self.lower_attack_class.remove(self_player_info)
-                        self.upper_attack_class.append(self_player_info)
+                        self.remove_ga_by_player_ga(lst=self.lower_attack_class, target=self_player_info)
+                        self.add_ga_by_player_ga(lst=self.upper_attack_class, target=self_player_info)
                 except Exception as e:
                     print(f"Exception when remove brain washed ga from team, {e}")
-        if opponent_alive_attack_info.brain_washed_round != None:
-            #Khi còn 0 thì đổi phe
-            opponent_alive_attack_info.brain_washed_round -= 1
-            if opponent_alive_attack_info.brain_washed_round <= 0:
-                opponent_alive_attack_info.brain_washed_round = None
-                try:
-                    if opponent_alive_attack_info in self.upper_attack_class:
-                        self.upper_attack_class.remove(opponent_alive_attack_info)
-                        self.lower_attack_class.append(opponent_alive_attack_info)
-                    else:
-                        self.lower_attack_class.remove(opponent_alive_attack_info)
-                        self.upper_attack_class.append(opponent_alive_attack_info)
-                except Exception as ex:
-                    print(f"Exception when remove brain washed ga from team, {ex}")
         
         base_text+= additional_loss_stats_text
         #Đảm bảo stats không âm
@@ -1061,8 +1050,8 @@ class GaBattleView(discord.ui.View):
             loss_amount = self.calculate_mana_loss_for_guardian(max_mana=opponent_alive_attack_info.player_ga.max_stamina, skill_mana_loss=skill.mana_loss + skill.attack_power, reference_mana=opponent_alive_attack_info.player_ga.stamina)
             if evasion_dice and opponent_alive_attack_info.player_ga.stamina >= loss_amount and skill.skill_id not in non_evasion_skills: #Phải có đủ thể lực cần thiết, và skill không thuộc diện né được thì mới vào
                 #Tính lại trừ stamina
-                #Hiện tại: 10% stamina + tổng mana_loss và attack_power của skill. 
-                loss_amount = int(0.1 * opponent_alive_attack_info.player_ga.max_stamina) + skill.mana_loss + skill.attack_power
+                #Hiện tại: 20% stamina + tổng mana_loss và attack_power của skill. 
+                loss_amount = int(0.2 * opponent_alive_attack_info.player_ga.max_stamina) + skill.mana_loss + skill.attack_power
                 opponent_alive_attack_info.player_ga.stamina -= loss_amount
                 if opponent_alive_attack_info.player_ga.stamina <= 0: opponent_alive_attack_info.player_ga.stamina = 0
                 
@@ -1371,16 +1360,18 @@ class GaBattleView(discord.ui.View):
                                 tag=GuardianMemoryTag.BATTLE.value
                             )
                         return base_text
-                    if opponent_alive_attack_info in self.lower_attack_class:
-                        self.lower_attack_class.remove(opponent_alive_attack_info)
-                        self.upper_attack_class.append(opponent_alive_attack_info)
-                    elif opponent_alive_attack_info in self.upper_attack_class:
-                        self.upper_attack_class.remove(opponent_alive_attack_info)
-                        self.lower_attack_class.append(opponent_alive_attack_info)
+                    #Không tẩy não người đã bị tẩy não
+                    if opponent_alive_attack_info.brain_washed_round == 0:
+                        if opponent_alive_attack_info.is_upper_side == False:
+                            self.remove_ga_by_player_ga(lst=self.lower_attack_class, target=opponent_alive_attack_info)
+                            self.add_ga_by_player_ga(lst=self.upper_attack_class, target=opponent_alive_attack_info)
+                        else:
+                            self.remove_ga_by_player_ga(lst=self.upper_attack_class, target=opponent_alive_attack_info)
+                            self.add_ga_by_player_ga(lst=self.lower_attack_class, target=opponent_alive_attack_info)
                 except Exception as e:
                     print(f"Exception when remove brain washed ga from team, {e}")
                 opponent_alive_attack_info.brain_washed_round = 4
-                
+                print(f"{opponent_alive_attack_info.player_ga.ga_name} has been brain washed for 4 rounds!")
                 #Trừ % mana của bản thân chiếu theo skill
                 own_loss_mana = int(self_player_info.player_ga.max_mana * skill.mana_loss / 100)
                 self_player_info.player_ga.mana -= own_loss_mana
@@ -1632,8 +1623,11 @@ class GaBattleView(discord.ui.View):
             skill = self.get_random_skill(list_skills=self_player_info.player_ga.list_skills, skill_id="skill_critical_strike")
             if skill != None:
                 #Dùng skill này sẽ lập tức tăng 40% sức tấn công cho user
-                self_player_info.player_ga.attack_power += int(self_player_info.player_ga.attack_power * 0.4)
+                self_player_info.player_ga.attack_power += int(self_player_info.player_ga.attack_power * 0.3)
                 self_player_info.is_used_skill_critical_strike = True
+                #Tăng lại 20% stamina bản thân
+                additional_stamina = int(self_player_info.player_ga.max_stamina * 0.2)
+                self_player_info.player_ga.stamina += additional_stamina
                 base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã dùng chiêu {skill.emoji} - {skill.skill_name} và hoá rồ để tăng sức mạnh tấn công của bản thân!"
                 return base_text
     
@@ -1645,6 +1639,8 @@ class GaBattleView(discord.ui.View):
             is_upper = True
         current_mana_percent = int(self_player_info.player_ga.mana/self_player_info.player_ga.max_mana*100)
         current_mana_percent_opponent = int(opponent_alive_attack_info.player_ga.mana/opponent_alive_attack_info.player_ga.max_mana*100)
+        current_health_percent = int(self_player_info.player_ga.health/self_player_info.player_ga.max_health*100)
+        current_health_percent_opponent = int(opponent_alive_attack_info.player_ga.health/opponent_alive_attack_info.player_ga.max_health*100)
         skill = self.get_random_skill(list_skills=opponent_alive_attack_info.player_ga.list_skills, skill_id="skill_spike_arnour")
         if skill != None and current_mana_percent_opponent >= skill.percent_min_mana_req:
             #Nếu kẻ địch có kỹ năng này thì self player sẽ bị dính chưởng
@@ -1662,7 +1658,18 @@ class GaBattleView(discord.ui.View):
                 self_player_info.stunned_round += 1
                 base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã đánh mất **{loss_health}** Máu của [{opponent_alive_attack_info.player_ga.ga_emoji} - {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist} nhưng bị phản đòn ngược lại và bị choáng!"
             return base_text
-        return base_text
+        
+        #Nếu máu đối thủ thấp thì cũng kích hoạt chiêu ngưỡng máu tử luôn
+        skill = self.get_random_skill(list_skills=opponent_alive_attack_info.player_ga.list_skills, skill_id="skill_critical_strike")
+        if skill != None and current_health_percent_opponent <= 30 and opponent_alive_attack_info.is_used_skill_critical_strike == False:
+            #Dùng skill này sẽ lập tức tăng 30% sức tấn công cho đối thủ
+            opponent_alive_attack_info.player_ga.attack_power += int(opponent_alive_attack_info.player_ga.attack_power * 0.3)
+            opponent_alive_attack_info.is_used_skill_critical_strike = True
+            #Tăng lại 20% stamina bản thân
+            additional_stamina = int(opponent_alive_attack_info.player_ga.max_stamina * 0.2)
+            opponent_alive_attack_info.player_ga.stamina += additional_stamina
+            base_text =  f"- **[{self_player_info.player_ga.ga_name}]** {text_own_profile_exist} đã đánh trúng [{opponent_alive_attack_info.player_ga.ga_emoji} - {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist} và khiến đối thủ hóa rồ để tăng sức mạnh tấn công!"
+            return base_text
     
     
     def calculate_mana_loss_for_guardian(self, max_mana: int, skill_mana_loss: int, reference_mana: int = 100) -> int:
@@ -1680,3 +1687,62 @@ class GaBattleView(discord.ui.View):
         elif max_mana >= 500:
             skill_mana_loss = int(skill_mana_loss * 1.3)
         return max(skill_mana_loss, min(int(effective_mana_loss), skill_mana_loss * 2))
+    
+    def remove_ga_by_player_ga(
+        self,
+        lst: List['GuardianAngelAttackClass'],
+        target: GuardianAngelAttackClass
+    ) -> GuardianAngelAttackClass | None:
+        print("\n[REMOVE] ===== START =====")
+        print("[REMOVE] Target UID:", target.ga_attack_uid)
+        print("[REMOVE] List BEFORE:")
+        for i, item in enumerate(lst):
+            print(f"  [{i}] uid={item.ga_attack_uid} obj={item}")
+
+        for i, item in enumerate(lst):
+            print(
+                f"[REMOVE] Compare item[{i}].uid == target.uid ? "
+                f"{item.ga_attack_uid == target.ga_attack_uid}"
+            )
+            if item.ga_attack_uid == target.ga_attack_uid:
+                removed = lst.pop(i)
+                print("[REMOVE] >>> REMOVED:", removed)
+                print("[REMOVE] List AFTER:")
+                for j, it in enumerate(lst):
+                    print(f"  [{j}] uid={it.ga_attack_uid} obj={it}")
+                print("[REMOVE] ===== END (OK) =====")
+                return removed
+
+        print("[REMOVE] !!! NOT FOUND !!!")
+        print("[REMOVE] ===== END (NONE) =====")
+        return None
+
+
+    def add_ga_by_player_ga(
+        self,
+        lst: List['GuardianAngelAttackClass'],
+        target: GuardianAngelAttackClass
+    ) -> GuardianAngelAttackClass:
+        print("\n[ADD] ===== START =====")
+        print("[ADD] Target UID:", target.ga_attack_uid)
+        print("[ADD] List BEFORE:")
+        for i, item in enumerate(lst):
+            print(f"  [{i}] uid={item.ga_attack_uid} obj={item}")
+
+        for i, item in enumerate(lst):
+            print(
+                f"[ADD] Compare item[{i}].uid == target.uid ? "
+                f"{item.ga_attack_uid == target.ga_attack_uid}"
+            )
+            if item.ga_attack_uid == target.ga_attack_uid:
+                print("[ADD] !!! ALREADY EXISTS — NOT ADDING !!!")
+                print("[ADD] ===== END (EXISTS) =====")
+                return item
+
+        lst.append(target)
+        print("[ADD] >>> ADDED:", target)
+        print("[ADD] List AFTER:")
+        for j, it in enumerate(lst):
+            print(f"  [{j}] uid={it.ga_attack_uid} obj={it}")
+        print("[ADD] ===== END (ADDED) =====")
+        return target
