@@ -48,6 +48,10 @@ class GaBattleView(discord.ui.View):
         self.upper_attack_class: List['GuardianAngelAttackClass'] = []
         self.lower_attack_class: List['GuardianAngelAttackClass'] = []
         
+        #Dùng làm danh sách tạm thời cho thao túng list
+        self.upper_temp_list: List['GuardianAngelAttackClass'] = []
+        self.lower_temp_list: List['GuardianAngelAttackClass'] = []
+        
         self.round_number_text_report = {}
         self.round = 1
         self.embed_title = embed_title
@@ -282,6 +286,8 @@ class GaBattleView(discord.ui.View):
     #region battle event
     async def commence_battle(self):
         if len(self.upper_attack_class) == 0 or len(self.lower_attack_class) == 0: return
+        #Cập nhập lại danh sách team sau khi cả hai đều đánh xong.
+        self.apply_pending_team_changes()
         await asyncio.sleep(4)
         #upper attack sẽ đánh trước
         flag_end_battle = False
@@ -957,11 +963,11 @@ class GaBattleView(discord.ui.View):
                 self_player_info.brain_washed_round = 0
                 try:
                     if self_player_info.is_upper_side == False:
-                        self.remove_ga_by_player_ga(lst=self.upper_attack_class, target=self_player_info)
-                        self.add_ga_by_player_ga(lst=self.lower_attack_class, target=self_player_info)
+                        self.remove_ga_by_player_ga(lst=self.upper_temp_list, target=self_player_info)
+                        self.add_ga_by_player_ga(lst=self.lower_temp_list, target=self_player_info)
                     else:
-                        self.remove_ga_by_player_ga(lst=self.lower_attack_class, target=self_player_info)
-                        self.add_ga_by_player_ga(lst=self.upper_attack_class, target=self_player_info)
+                        self.remove_ga_by_player_ga(lst=self.lower_temp_list, target=self_player_info)
+                        self.add_ga_by_player_ga(lst=self.upper_temp_list, target=self_player_info)
                 except Exception as e:
                     print(f"Exception when remove brain washed ga from team, {e}")
         
@@ -1368,14 +1374,15 @@ class GaBattleView(discord.ui.View):
                     #Không tẩy não người đã bị tẩy não
                     if opponent_alive_attack_info.brain_washed_round == 0:
                         if opponent_alive_attack_info.is_upper_side == False:
-                            self.remove_ga_by_player_ga(lst=self.lower_attack_class, target=opponent_alive_attack_info)
-                            self.add_ga_by_player_ga(lst=self.upper_attack_class, target=opponent_alive_attack_info)
+                            self.remove_ga_by_player_ga(lst=self.lower_temp_list, target=opponent_alive_attack_info)
+                            self.add_ga_by_player_ga(lst=self.upper_temp_list, target=opponent_alive_attack_info)
                         else:
-                            self.remove_ga_by_player_ga(lst=self.upper_attack_class, target=opponent_alive_attack_info)
-                            self.add_ga_by_player_ga(lst=self.lower_attack_class, target=opponent_alive_attack_info)
+                            self.remove_ga_by_player_ga(lst=self.lower_temp_list, target=opponent_alive_attack_info)
+                            self.add_ga_by_player_ga(lst=self.upper_temp_list, target=opponent_alive_attack_info)
                 except Exception as e:
                     print(f"Exception when remove brain washed ga from team, {e}")
                 opponent_alive_attack_info.brain_washed_round = 4
+                opponent_alive_attack_info.stunned_round = 1
                 # print(f"{opponent_alive_attack_info.player_ga.ga_name} has been brain washed for 4 rounds!")
                 #Trừ % mana của bản thân chiếu theo skill
                 own_loss_mana = int(self_player_info.player_ga.max_mana * skill.mana_loss / 100)
@@ -1698,27 +1705,10 @@ class GaBattleView(discord.ui.View):
         lst: List['GuardianAngelAttackClass'],
         target: GuardianAngelAttackClass
     ) -> GuardianAngelAttackClass | None:
-        print("\n[REMOVE] ===== START =====")
-        print("[REMOVE] Target UID:", target.ga_attack_uid)
-        print("[REMOVE] List BEFORE:")
         for i, item in enumerate(lst):
-            print(f"  [{i}] uid={item.ga_attack_uid} obj={item}")
-
-        for i, item in enumerate(lst):
-            print(
-                f"[REMOVE] Compare item[{i}].uid == target.uid ? "
-                f"{item.ga_attack_uid == target.ga_attack_uid}"
-            )
             if item.ga_attack_uid == target.ga_attack_uid:
                 removed = lst.pop(i)
-                print("[REMOVE] >>> REMOVED:", removed)
-                print("[REMOVE] List AFTER:")
-                for j, it in enumerate(lst):
-                    print(f"  [{j}] uid={it.ga_attack_uid} obj={it}")
-                print("[REMOVE] ===== END (OK) =====")
                 return removed
-        print("[REMOVE] !!! NOT FOUND !!!")
-        print("[REMOVE] ===== END (NONE) =====")
         return None
 
 
@@ -1727,24 +1717,21 @@ class GaBattleView(discord.ui.View):
         lst: List['GuardianAngelAttackClass'],
         target: GuardianAngelAttackClass
     ) -> GuardianAngelAttackClass:
-        print("\n[ADD] ===== START =====")
-        print("[ADD] Target UID:", target.ga_attack_uid)
-        print("[ADD] List BEFORE:")
         for i, item in enumerate(lst):
-            print(f"  [{i}] uid={item.ga_attack_uid} obj={item}")
-        for i, item in enumerate(lst):
-            print(
-                f"[ADD] Compare item[{i}].uid == target.uid ? "
-                f"{item.ga_attack_uid == target.ga_attack_uid}"
-            )
             if item.ga_attack_uid == target.ga_attack_uid:
-                print("[ADD] !!! ALREADY EXISTS — NOT ADDING !!!")
-                print("[ADD] ===== END (EXISTS) =====")
                 return item
         lst.append(target)
-        print("[ADD] >>> ADDED:", target)
-        print("[ADD] List AFTER:")
-        for j, it in enumerate(lst):
-            print(f"  [{j}] uid={it.ga_attack_uid} obj={it}")
-        print("[ADD] ===== END (ADDED) =====")
         return target
+
+    def apply_pending_team_changes(self):
+        for ga in self.upper_temp_list:
+            self.remove_ga_by_player_ga(self.lower_attack_class, ga)
+            self.add_ga_by_player_ga(self.upper_attack_class, ga)
+
+        for ga in self.lower_temp_list:
+            self.remove_ga_by_player_ga(self.upper_attack_class, ga)
+            self.add_ga_by_player_ga(self.lower_attack_class, ga)
+
+        self.upper_temp_list.clear()
+        self.lower_temp_list.clear()
+

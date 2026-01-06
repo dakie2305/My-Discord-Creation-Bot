@@ -1172,7 +1172,7 @@ def get_random_ga_enemy_generic(level: int = 1, guardian_chance: int = 0, overri
     data.max_stamina = base + bonus_base*int(percent_boost * data.level / 100)
     data.stamina = data.max_stamina
     
-    percent_boost = 3
+    percent_boost = 6
     base = 100
     bonus_base = 110
     data.max_health = base + bonus_base*int(percent_boost * data.level / 100)
