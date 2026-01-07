@@ -116,12 +116,16 @@ class BankEconomy(commands.Cog):
         if conversion_rate == None:
             ConversionRateMongoManager.create_update_conversion_rate(guild_id=user.guild.id, rate=1)
             conversion_rate = ConversionRateMongoManager.find_conversion_rate_by_id(guild_id=user.guild.id)
-        elif conversion_rate != None and conversion_rate.last_reset != None and conversion_rate.last_reset.date() != datetime.now().date():
-            #Random tỷ lệ rate
-            allowed_values = [0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4]
-            new_rate = random.choice(allowed_values)
-            ConversionRateMongoManager.create_update_conversion_rate(guild_id=user.guild.id, rate=new_rate)
-            conversion_rate = ConversionRateMongoManager.find_conversion_rate_by_id(guild_id=user.guild.id)
+        else:
+            update_conversion_rate = False
+            if conversion_rate.last_reset != None and conversion_rate.last_reset.date() != datetime.now().date(): update_conversion_rate = True
+            if conversion_rate.last_reset == None: update_conversion_rate = True
+            if update_conversion_rate:
+                #Random tỷ lệ rate
+                allowed_values = [0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4]
+                new_rate = random.choice(allowed_values)
+                ConversionRateMongoManager.create_update_conversion_rate(guild_id=user.guild.id, rate=new_rate)
+                conversion_rate = ConversionRateMongoManager.find_conversion_rate_by_id(guild_id=user.guild.id)
         
         
         embed = discord.Embed(title=f"**Ngân Hàng Chính Quyền Tối Cao**", description=f"{authority_user.mention} hiện đang là Chính Quyền", color=0xddede7)
