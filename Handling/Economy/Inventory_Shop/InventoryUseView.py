@@ -297,7 +297,7 @@ class InventoryUseView(discord.ui.View):
         guardian_chance = 100
         mysterious_stats = True
         bonus_percent = 15
-        double_enemy_chance = 25
+        double_enemy_chance = 20
         double_enemy_dice = UtilitiesFunctions.get_chance(double_enemy_chance)
         top_1_leaderboard_dice = UtilitiesFunctions.get_chance(8)
         is_top_1_server = False
@@ -307,7 +307,11 @@ class InventoryUseView(discord.ui.View):
             print(f"Top 1 GA leaderboard: {enemy.ga_name} - {enemy.level} at guild {interaction.guild.name}")
             if enemy is None:
                 enemy = ListGAAndSkills.get_random_ga_enemy_generic(level=level, guardian_chance=guardian_chance)
-            else: is_top_1_server = True
+            else: 
+                is_top_1_server = True
+                #Thêm kỹ năng của đại đế
+                emperor_skill = ListGAAndSkills.get_random_skill(skill_id='emperor_stare_skill', allow_hidden=True)
+                enemy.list_skills.append(emperor_skill)
             enemy.health = enemy.max_health
             enemy.mana = enemy.max_mana
             enemy.stamina = enemy.max_stamina

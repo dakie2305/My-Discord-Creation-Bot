@@ -60,4 +60,5 @@ class SlashCommand(Enum):
     
     GLOBAL_INVENTORY = "</global inventory:1395841269606912252>"
     GLOBAL_GA = "</global ga:1395841269606912252>"
+    LEADERBOARD = "</leaderboard:1379512980265369644>"
     

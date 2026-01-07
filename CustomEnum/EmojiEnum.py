@@ -241,6 +241,7 @@ class EmojiCreation2(Enum):
     SUMMON_SACRIFICE = "<:summon_sacrifice_skill:1376374742172565655>"
     SHIELD_SKILL = "<a:shield_skill:1375882285156401263>"
     VITALITY_DRAIN = "<a:vitality_drain:1376374755237822547>"
+    EMPEROR_SKILL = "<:emperor_stare_skill:1458467800199729213>"
     
     
     HP = "<:HP:1320777603358920724>"

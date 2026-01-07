@@ -1010,6 +1010,7 @@ class GaBattleView(discord.ui.View):
             return random.choice(legit_skills)
         return None
 
+    #region execute_attack_skill
     def execute_attack_skill(self, self_player_info: GuardianAngelAttackClass, opponent_alive_attack_info: GuardianAngelAttackClass, skill: GuardianAngelSkill, text_target_profile_exist: str, text_own_profile_exist: str):
         base_text = None
         mem_chance = UtilitiesFunctions.get_chance(20)
@@ -1021,6 +1022,36 @@ class GaBattleView(discord.ui.View):
             first_chance = UtilitiesFunctions.get_chance(use_magic_int)
             second_chance = UtilitiesFunctions.get_chance(use_magic_int)
             if first_chance == False or second_chance == False: return None #Nếu cả 2 lần không trúng thì không dùng skill
+            
+            if skill.skill_id == "emperor_stare_skill":
+                #chiêu này có 45% tỉ lệ ra đòn nếu phe đối thủ trên 2, dưới 2 thì 15% ra đòn
+                #không áp dụng với kẻ địch cũng có chiêu y hệt
+                check_same_skill = False
+                for s in opponent_alive_attack_info.player_ga.list_skills:
+                    if s.skill_id == "emperor_stare_skill":
+                        check_same_skill = True
+                        break
+                if check_same_skill: return None
+                chance = 15
+                if self_player_info.is_upper_side and len(self.lower_attack_class) >= 2:
+                    chance = 45
+                elif not self_player_info.is_upper_side and len(self.upper_attack_class) >= 2:
+                    chance = 45
+                dice = UtilitiesFunctions.get_chance(chance)
+                if not dice: return None
+                #Xóa hoàn toàn đối thủ khỏi trận đấu
+                try:
+                    if opponent_alive_attack_info in self.upper_attack_class:
+                        self.upper_attack_class.remove(opponent_alive_attack_info)
+                    if opponent_alive_attack_info in self.lower_attack_class:
+                        self.lower_attack_class.remove(opponent_alive_attack_info)
+                except Exception as e:
+                    print(f"Exception when ga run away from team due to emperor_stare_skill, {e}")
+                #Lưu lại stats lúc đó
+                if CustomFunctions.check_if_dev_mode() == False and opponent_alive_attack_info.player_profile != None:
+                    ProfileMongoManager.set_guardian_current_stats(guild_id=self.guild_id, user_id=self_player_info.player_profile.user_id,stamina=opponent_alive_attack_info.player_ga.stamina, health=opponent_alive_attack_info.player_ga.health, mana=opponent_alive_attack_info.player_ga.mana)
+                base_text =  f"- **[{self_player_info.player_ga.ga_name}]** đã thể hiện {skill.emoji} -{skill.skill_name} khiến cho kẻ địch [{opponent_alive_attack_info.player_ga.ga_emoji} - {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist} khiếp sợ và bỏ trốn khỏi trận chiến!"
+                return base_text
             
             #Xem đối thủ có khiên không, có khiên thì coi như self player tấn công thất bại
             shield = self.get_random_skill(list_skills=opponent_alive_attack_info.player_ga.list_skills, skill_id="shield_skill")

@@ -159,7 +159,7 @@ class GuardianAngel:
 
 
 class GuardianAngelSkill:
-    def __init__(self, skill_id: str, skill_name: str, skill_desc: str, skill_type: List[str], emoji: str, attack_power: int = 10, defense_power: int = 10, buff_attack_percent = 1, buff_defense_percent = 1, min_level_required: int = 1, item_worth_amount: int = 100, item_worth_type: str = "G", percent_min_stamina_req: int = 1, percent_min_health_req: int = 1, percent_min_mana_req: int = 1, stamina_loss: int = 0, health_loss: int = 0, mana_loss: int = 0):
+    def __init__(self, skill_id: str, skill_name: str, skill_desc: str, skill_type: List[str], emoji: str, attack_power: int = 10, defense_power: int = 10, buff_attack_percent = 1, buff_defense_percent = 1, min_level_required: int = 1, item_worth_amount: int = 100, item_worth_type: str = "G", percent_min_stamina_req: int = 1, percent_min_health_req: int = 1, percent_min_mana_req: int = 1, stamina_loss: int = 0, health_loss: int = 0, mana_loss: int = 0, hidden_skill = False):
         self.skill_id = skill_id
         self.skill_name = skill_name
         self.skill_desc = skill_desc
@@ -178,6 +178,7 @@ class GuardianAngelSkill:
         self.stamina_loss = stamina_loss
         self.health_loss = health_loss
         self.mana_loss = mana_loss
+        self.hidden_skill = hidden_skill
 
     def to_dict(self):
         return {
@@ -198,7 +199,7 @@ class GuardianAngelSkill:
             "stamina_loss": self.stamina_loss,
             "health_loss": self.health_loss,
             "mana_loss": self.mana_loss,
-            
+            "hidden_skill": self.hidden_skill,
             "skill_type": [data for data in self.skill_type],
         }
 
@@ -222,7 +223,7 @@ class GuardianAngelSkill:
             stamina_loss=data.get("stamina_loss", 0),
             health_loss=data.get("health_loss", 0),
             mana_loss=data.get("mana_loss", 0),
-            
+            hidden_skill=data.get("hidden_skill", False),
             skill_type = [data for data in data.get("skill_type", [])],
         )
 

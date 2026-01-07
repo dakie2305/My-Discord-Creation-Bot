@@ -569,6 +569,22 @@ list_ga_attack_skills_2_private = [
         buff_attack_percent=5,
         min_level_required=1,
     ),
+    GuardianAngelSkill(
+        skill_id = "emperor_stare_skill",
+        skill_name= "Uy Thế Đại Đế",
+        skill_desc="Sức mạnh của Đại Hoàng Đế thực thụ, một sự tồn tại vượt xa các Hộ Vệ Thần Khác! Một liếc là một kẻ bỏ chạy! Kỹ năng đặc biệt chỉ dành riêng cho Hộ Vệ Thần top 1 bảng xếp hạng liên thông!",
+        skill_type= ["attack"],
+        emoji= EmojiCreation2.EMPEROR_SKILL.value,
+        attack_power= 1,
+        item_worth_amount= 25000,
+        item_worth_type= "D",
+        percent_min_mana_req= 10,
+        mana_loss= 20,
+        buff_defense_percent=0,
+        buff_attack_percent=1,
+        min_level_required=1,
+        hidden_skill=True,
+    ),
 ]
 list_ga_attack_skills_2 = copy.deepcopy(list_ga_attack_skills_2_private)
 
@@ -1059,19 +1075,30 @@ def get_list_back_ground_on_ga_id(ga_id: str):
       ]
     return background_urls
 
-def get_random_skill(skill_id: str = None, blacklist_ids: List[str]= None):
+def get_random_skill(skill_id: str = None, blacklist_ids: List[str]= None, allow_hidden = False):
   if blacklist_ids is None:
     blacklist_ids = []
+  valid_skill_list = copy.deepcopy(all_skill_lists)
+  
+  # Lọc lại
+  valid_skill_list = [
+        [
+            skill for skill in skill_list
+            if skill.skill_id not in blacklist_ids
+            and (allow_hidden or not skill.hidden_skill)
+        ]
+        for skill_list in valid_skill_list
+  ]
 
   #Nếu có skill name thì ưu tiên tìm xem có skill name không
   if skill_id != None:
-    for skill_list in all_skill_lists:
+    for skill_list in valid_skill_list:
       for skill in skill_list:
         if skill.skill_id == skill_id and skill.skill_id not in blacklist_ids:
           return skill
   else:
     #Nếu không thì random bình thường
-    random_skill_list = random.choice(all_skill_lists)
+    random_skill_list = random.choice(valid_skill_list)
     random_skill = random.choice(random_skill_list)
     if random_skill.skill_id not in blacklist_ids: return random_skill
   return None

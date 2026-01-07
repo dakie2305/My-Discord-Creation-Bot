@@ -1,4 +1,5 @@
 import discord
+from Handling.Economy.Global import GlobalMongoManager
 from Handling.Economy.Profile.ProfileClass import Profile
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 from CustomEnum.SlashEnum import SlashCommand
@@ -125,10 +126,12 @@ class TextShopInputModal(discord.ui.Modal):
                 return
             item = self.current_list_item[skill_id]
 
-            #Kiểm tra phải kỹ năng huyền thoại không
-            legend_check = False
-            if "legend_" in item.skill_id:
-                legend_check = True
+            #Kiểm tra phải kỹ năng đại đế không
+            if item.skill_id == 'emperor_stare_skill':
+                top_1_ga = self.get_top_1_ga_leaderboard()
+                if top_1_ga == None or top_1_ga.user_id != interaction.user.id:
+                    await interaction.followup.send(f"Một Hộ Vệ Thần hạ đẳng, thấp kém không xứng đáng sở hữu [{item.emoji}- **{item.skill_name}**].\nChỉ Hộ Vệ Thần Top 1 liên thông server trong lệnh {SlashCommand.LEADERBOARD.value} mới được phép sở hữu", ephemeral=True)
+                    return
                 
             #Kiểm tra xem trong list skill có skill này chưa
             if profile_user.guardian.list_skills != None and len(profile_user.guardian.list_skills) > 0:
@@ -171,16 +174,12 @@ class TextShopInputModal(discord.ui.Modal):
                 ProfileMongoManager.update_profile_money(guild_id=interaction.guild_id, guild_name=interaction.guild.name, user_id=interaction.user.id, user_name= interaction.user.name, user_display_name= interaction.user.display_name, darkium=-cost_money)
                 if profile_user.is_authority != True:
                     ProfileMongoManager.update_money_authority(guild_id=interaction.guild_id, darkium=money_for_authority)
-            if "legend_" in item.skill_id:
-                item.item_worth_amount = item.item_worth_amount/2
             ProfileMongoManager.update_list_skills_guardian(guild_id=interaction.guild_id, user_id=interaction.user.id, skill=item)
             authority_text = f"Trong giao dịch này, Chính Quyền đã nhận được **{money_for_authority}** {self.get_emoji_money_from_type(item.item_worth_type)} để làm tiền thuế!"
             if profile_user.is_authority == True:
                 authority_text = ""
             await interaction.followup.send(f"{interaction.user.mention} đã chọn mua kỹ năng [{item.emoji}- **{item.skill_name}**] với giá {cost_money} {self.get_emoji_money_from_type(item.item_worth_type)}! {authority_text}", ephemeral=False)
             ProfileMongoManager.update_level_progressing(guild_id=interaction.guild_id, user_id=interaction.user.id)
-            if legend_check:
-                if self.message != None: await self.message.delete()
         except ValueError:
             await interaction.followup.send(f"Chỉ nhập số hợp lệ!", ephemeral=True)
             return
@@ -193,3 +192,11 @@ class TextShopInputModal(discord.ui.Modal):
         if type == "S": return EmojiCreation2.SILVER.value
         if type == "G": return EmojiCreation2.GOLD.value
         if type == "D": return EmojiCreation2.DARKIUM.value
+    
+    def get_top_1_ga_leaderboard(self):
+        list_global_profiles = GlobalMongoManager.get_top_guardian_profiles(limit=2)
+        if list_global_profiles and len(list_global_profiles) > 0:
+            top_profile = list_global_profiles[0]
+            if top_profile != None and top_profile.guardian:
+                return top_profile
+        return None
