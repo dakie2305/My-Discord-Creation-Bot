@@ -1049,7 +1049,8 @@ class GaBattleView(discord.ui.View):
                     print(f"Exception when ga run away from team due to emperor_stare_skill, {e}")
                 #Lưu lại stats lúc đó
                 if CustomFunctions.check_if_dev_mode() == False and opponent_alive_attack_info.player_profile != None:
-                    ProfileMongoManager.set_guardian_current_stats(guild_id=self.guild_id, user_id=self_player_info.player_profile.user_id,stamina=opponent_alive_attack_info.player_ga.stamina, health=opponent_alive_attack_info.player_ga.health, mana=opponent_alive_attack_info.player_ga.mana)
+                    if not self.is_players_versus_players and self.is_challenge:
+                        ProfileMongoManager.set_guardian_current_stats(guild_id=self.guild_id, user_id=self_player_info.player_profile.user_id,stamina=opponent_alive_attack_info.player_ga.stamina, health=opponent_alive_attack_info.player_ga.health, mana=opponent_alive_attack_info.player_ga.mana)
                 base_text =  f"- **[{self_player_info.player_ga.ga_name}]** đã thể hiện {skill.emoji} -{skill.skill_name} khiến cho kẻ địch [{opponent_alive_attack_info.player_ga.ga_emoji} - {opponent_alive_attack_info.player_ga.ga_name}] {text_target_profile_exist} khiếp sợ và bỏ trốn khỏi trận chiến!"
                 return base_text
             
