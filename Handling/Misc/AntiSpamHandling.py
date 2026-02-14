@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 
 class AntiSpam:
     def __init__(self):
-        # {guild_id: {user_id: deque[(timestamp, channel_id, content, attachments_hash)]}}
         self.user_messages = defaultdict(lambda: defaultdict(deque))
         self.spam_time_window = timedelta(minutes=1)
         self.spam_message_count = 4
@@ -52,9 +51,13 @@ class AntiSpam:
 
         # ---- Attachment spam check ----
         if attachments_hash:
-            same_attachment_messages = [m for m in user_deque if m[3] == attachments_hash]
-            attach_channels = {m[1] for m in same_attachment_messages}
-            if len(same_attachment_messages) >= self.spam_message_count and len(attach_channels) >= self.spam_channel_count:
+            attachment_messages = [m for m in user_deque if m[3] is not None]
+            attach_channels = {m[1] for m in attachment_messages}
+
+            if (
+                len(attachment_messages) >= self.spam_message_count
+                and len(attach_channels) >= self.spam_channel_count
+            ):
                 try:
                     await message.guild.ban(
                         message.author,
