@@ -490,7 +490,6 @@ async def on_ready():
     check_jail_expiry.start()
     if CustomFunctions.check_if_dev_mode()==False:
         # Tạm tắt 
-        automatic_speak_randomly_true_heaven.start()
         check_true_heavens_role_expiracy.start()
         activity = discord.Activity(type=discord.ActivityType.watching, 
                                 name="True Heavens",
@@ -503,9 +502,10 @@ async def on_ready():
     #Load extension
     for ext in init_extension:
         await bot.load_extension(ext)
-    
     check_remind.start()
-        
+    if CustomFunctions.check_if_dev_mode()==False:
+        # Tạm tắt 
+        automatic_speak_randomly_true_heaven.start()    
     
 
 @bot.event

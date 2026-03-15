@@ -448,7 +448,6 @@ async def on_ready():
     
     if CustomFunctions.check_if_dev_mode()==False:
         # Tạm tắt 
-        automatic_speak_randomly_true_heaven.start()
         # random_dropbox.start()
         # random_quizz_embed.start()
         dungeon_spawn_enemy_embed.start()
@@ -469,7 +468,8 @@ async def on_ready():
     #Load extension
     for ext in init_extension:
         await bot.load_extension(ext)
-    
+    if CustomFunctions.check_if_dev_mode()==False:
+        automatic_speak_randomly_true_heaven.start()
 
 @bot.event
 async def on_message(message: discord.Message):
