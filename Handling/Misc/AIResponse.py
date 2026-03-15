@@ -7,18 +7,18 @@ from CustomEnum.UserEnum import UserId
 import db.DbMongoManager as db
 import CustomFunctions
 import os
-import google.generativeai as genai
-import PIL.Image
 import asyncio
 from collections import deque
 from google.api_core import exceptions
+from groq import Groq
 
 class AIResponseHandling():
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: commands.Bot, key: str):
         self.bot = bot
         self.bot_name = "Creation 2" if bot.user.id == UserId.CREATION_2.value else "Creation 1"
         self.bot_to_bot_history = deque()
         self.user_to_bot_history = deque()
+        self.groq_client = Groq(api_key=key)
 
     async def sub_function_ai_response(self, message: discord.Message, speakFlag: bool = True):
         if speakFlag == False: return
@@ -84,30 +84,27 @@ class AIResponseHandling():
         #pass hết, cho phép bot trả lời
         try:
             async with message.channel.typing():
-                await asyncio.sleep(4)  # Delay
+                await asyncio.sleep(5)  # Delay
                 system_instruction = ""
                 if self.bot_name == "Creation 1":
                     system_instruction = f"{CustomFunctions.initial_instruction} {CustomFunctions.background_creation_1} {CustomFunctions.shared_background}"
                 else:
                     system_instruction = f"{CustomFunctions.initial_instruction} {CustomFunctions.background_creation_2} {CustomFunctions.shared_background}"
-                model = genai.GenerativeModel(model_name=CustomFunctions.AI_MODEL, safety_settings= CustomFunctions.safety_settings, system_instruction=system_instruction)
+                # model = genai.GenerativeModel(model_name=CustomFunctions.AI_MODEL, safety_settings= CustomFunctions.safety_settings, system_instruction=system_instruction)
+                
                 prompt = await CustomFunctions.get_proper_prompt(message, self.bot_name, referenced_message)
                 print(f"Prompt generated from {self.bot.user}:\n {prompt}")
-                file_image_path = None
-                if len(message.attachments)>0:
-                    #Lấy ảnh đầu tiên thôi
-                    for att in message.attachments:
-                        if 'image' in att.content_type:
-                            file_image_path = await CustomFunctions.download_image_file_from_url(url=att.url, content_type=att.content_type,filename= att.filename)
-                            break
-                if file_image_path!= None:
-                    response = model.generate_content([f"{prompt}", PIL.Image.open(file_image_path)])
-                    #Xoá file
-                    os.remove(file_image_path)
-                else:
-                    response = model.generate_content(f"{prompt}")
-                bot_response = CustomFunctions.remove_creation_name_prefix(f"{response.text}")
-
+                # response = model.generate_content(f"{prompt}")
+                
+                # Groq Chat Completion Call
+                completion = self.groq_client.chat.completions.create(
+                    model=CustomFunctions.AI_MODEL,
+                    messages=[
+                        {"role": "system", "content": system_instruction},
+                        {"role": "user", "content": prompt}
+                    ],
+                )
+                bot_response = CustomFunctions.remove_creation_name_prefix(f"{completion.choices[0].message.content}")
                 #Kiểm tra xem bot reponse có nhiều emoji không, nếu nhiều quá thì remove emoji
                 if CustomFunctions.count_emojis_in_text(bot_response) > 4:
                     bot_response = CustomFunctions.remove_emojis_from_text(bot_response)

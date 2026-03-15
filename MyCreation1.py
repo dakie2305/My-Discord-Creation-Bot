@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 from CustomEnum.TrueHeavenEnum import TrueHeavenEnum
 import CustomFunctions
-import google.generativeai as genai
+# import google.generativeai as genai
 from discord.ext import commands, tasks
 from discord import app_commands
 from Handling.MiniGame.GuessNumber import GnHandling, GnMongoManager
@@ -29,12 +29,15 @@ from CustomEnum.EmojiEnum import EmojiCreation2, EmojiCreation1
 from Handling.Misc.UnbanView import UnbanView
 from Handling.Misc.RemoveTimeoutView import RemoveTimeoutView
 from Handling.Misc.AIResponse import AIResponseHandling
+from groq import Groq
 
 load_dotenv()
 intents = discord.Intents.all()
 intents.presences = False
 API_KEY = os.getenv("GOOGLE_CLOUD_KEY")
-genai.configure(api_key=API_KEY)
+GROQ_API_KEY = os.getenv("GROQ_KEY")
+# genai.configure(api_key=API_KEY)
+groq_client = Groq(api_key=GROQ_API_KEY)
 
 
 bot = commands.Bot(command_prefix="!", intents=intents)
@@ -276,22 +279,22 @@ async def check_jail_expiry():
                     print(f"Bot {bot.user} automatically unjailed {user.display_name} for time is up.")
 
 # Task: Nói chuyện tự động
-@tasks.loop(hours=3, minutes= 30)
-async def automatic_speak_randomly():
-    guilds = bot.guilds
-    for guild in guilds:
-        if guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value: continue
-        guild_extra_info = db.find_guild_extra_info_by_id(guild.id)
-        if guild_extra_info != None and guild_extra_info.list_channels_ai_talk != None and len(guild_extra_info.list_channels_ai_talk)>0:
-            random_channel_id = random.choice(guild_extra_info.list_channels_ai_talk)
-            actual_channel = guild.get_channel(random_channel_id)
-            if actual_channel:
-                model = genai.GenerativeModel(CustomFunctions.AI_MODEL, CustomFunctions.safety_settings)
-                prompt = CustomFunctions.get_automatically_talk_prompt("Creation 1", guild, actual_channel)
-                response = model.generate_content(f"{prompt}")
-                print(f"{bot.user} started talking on its own at {guild_extra_info.guild_name}, channel {actual_channel.name}.")
-                async with actual_channel.typing():
-                    await actual_channel.send(f"{response.text}")
+# @tasks.loop(hours=3, minutes= 30)
+# async def automatic_speak_randomly():
+#     guilds = bot.guilds
+#     for guild in guilds:
+#         if guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value: continue
+#         guild_extra_info = db.find_guild_extra_info_by_id(guild.id)
+#         if guild_extra_info != None and guild_extra_info.list_channels_ai_talk != None and len(guild_extra_info.list_channels_ai_talk)>0:
+#             random_channel_id = random.choice(guild_extra_info.list_channels_ai_talk)
+#             actual_channel = guild.get_channel(random_channel_id)
+#             if actual_channel:
+#                 model = genai.GenerativeModel(CustomFunctions.AI_MODEL, CustomFunctions.safety_settings)
+#                 prompt = CustomFunctions.get_automatically_talk_prompt("Creation 1", guild, actual_channel)
+#                 response = model.generate_content(f"{prompt}")
+#                 print(f"{bot.user} started talking on its own at {guild_extra_info.guild_name}, channel {actual_channel.name}.")
+#                 async with actual_channel.typing():
+#                     await actual_channel.send(f"{response.text}")
                     
 # Task: Nói chuyện tự động True Heavens Only
 @tasks.loop(hours=3, minutes= 30)
@@ -303,12 +306,18 @@ async def automatic_speak_randomly_true_heaven():
         random_channel_id = random.choice(guild_extra_info.list_channels_ai_talk)
         actual_channel = guild.get_channel(random_channel_id)
         if actual_channel:
-            model = genai.GenerativeModel(CustomFunctions.AI_MODEL, CustomFunctions.safety_settings)
             prompt = CustomFunctions.get_automatically_talk_prompt("Creation 1", guild, actual_channel)
-            response = model.generate_content(f"{prompt}")
+            completion = groq_client.chat.completions.create(
+                    model=CustomFunctions.AI_MODEL,
+                    messages=[
+                        {"role": "user", "content": prompt}
+                    ],
+                )
+            bot_response = CustomFunctions.remove_creation_name_prefix(f"{completion.choices[0].message.content}")
+            # response = model.generate_content(f"{prompt}")
             print(f"{bot.user} started talking on its own at {guild_extra_info.guild_name}, channel {actual_channel.name}.")
             async with actual_channel.typing():
-                await actual_channel.send(f"{response.text}")
+                await actual_channel.send(f"{bot_response}")
 
 @tasks.loop(hours=12)
 async def remove_old_conversation():
@@ -482,7 +491,6 @@ async def on_ready():
     if CustomFunctions.check_if_dev_mode()==False:
         # Tạm tắt 
         automatic_speak_randomly_true_heaven.start()
-        
         check_true_heavens_role_expiracy.start()
         activity = discord.Activity(type=discord.ActivityType.watching, 
                                 name="True Heavens",
@@ -505,9 +513,9 @@ async def on_member_update(before: discord.Member, after: discord.Member):
     #Tạm thời không cần chạy trong server khác
     if before.guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value: return
     
-    model = genai.GenerativeModel(CustomFunctions.AI_MODEL, CustomFunctions.safety_settings)
-    channel = bot.get_channel(1259392446987632661)
-    await CustomFunctions.thanking_for_boost(bot_name="creation 1", before=before, after=after, model=model, channel=channel)
+    # model = genai.GenerativeModel(CustomFunctions.AI_MODEL, CustomFunctions.safety_settings)
+    # channel = bot.get_channel(1259392446987632661)
+    # await CustomFunctions.thanking_for_boost(bot_name="creation 1", before=before, after=after, model=model, channel=channel)
     
     # Check for Nitro Boost loss
     if before.premium_since and after.premium_since is None:
@@ -601,17 +609,17 @@ async def on_message(message: discord.Message):
         speakFlag = False
     
     guild_extra_info = db.find_guild_extra_info_by_id(guild_id=message.guild.id)
-    if guild_extra_info != None and message.channel.id == guild_extra_info.therapy_channel and message.author.bot == False:
-        #Xử lý therapy
-        model = genai.GenerativeModel(CustomFunctions.AI_MODEL, CustomFunctions.safety_settings)
-        asyncio.create_task(TherapyHandling(bot=bot, model=model).handling_therapy_ai(message=message))
-        speakFlag = False
+    # if guild_extra_info != None and message.channel.id == guild_extra_info.therapy_channel and message.author.bot == False:
+    #     #Xử lý therapy
+    #     model = genai.GenerativeModel(CustomFunctions.AI_MODEL, CustomFunctions.safety_settings)
+    #     asyncio.create_task(TherapyHandling(bot=bot, model=model).handling_therapy_ai(message=message))
+    #     speakFlag = False
     if guild_extra_info != None and guild_extra_info.custom_parameter_2 != None and message.channel.id == guild_extra_info.custom_parameter_2: #Hiện tại chỉ có true heaven có
         speakFlag = False
         #sticky message
         await StickyMessageHandling(bot=bot).handling_sticky_message(message=message)
     await anti_spam.handling_message(message)
-    ai_handling_response = AIResponseHandling(bot=bot)
+    ai_handling_response = AIResponseHandling(bot=bot, key = GROQ_API_KEY)
     await ai_handling_response.sub_function_ai_response(message=message, speakFlag=speakFlag)
     await bot.process_commands(message)
 

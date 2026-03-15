@@ -4,7 +4,7 @@ import os
 from CustomEnum.EmojiEnum import EmojiCreation2
 from dotenv import load_dotenv
 import CustomFunctions
-import google.generativeai as genai
+# import google.generativeai as genai
 from discord.ext import commands, tasks
 from discord import app_commands
 from Handling.Economy.Global import GlobalMongoManager
@@ -31,12 +31,15 @@ from Handling.Economy.GA.GaDugeonView import GaDugeonView
 from Handling.Economy.Quest.DungeonQuestChannelClass import DungeonQuestChannel
 from CustomEnum.TrueHeavenEnum import TrueHeavenEnum
 from Handling.Misc.AIResponse import AIResponseHandling
+from groq import Groq
 
 load_dotenv()
 intents = discord.Intents.all()
 intents.presences = False
 API_KEY = os.getenv("GOOGLE_CLOUD_KEY_2")
-genai.configure(api_key=API_KEY)
+# genai.configure(api_key=API_KEY)
+GROQ_API_KEY = os.getenv("GROQ_KEY_2")
+groq_client = Groq(api_key=GROQ_API_KEY)
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 bot.remove_command('help')
@@ -106,22 +109,22 @@ async def random_ai_talk(interaction: discord.Interaction):
         await interaction.followup.send(f"Đã tạo Guild Extra Info. Bot lâu lâu sẽ nói chuyện trong channel này.", ephemeral= True)
 
 # Task: Nói chuyện tự động
-@tasks.loop(hours=3)
-async def automatic_speak_randomly():
-    guilds = bot.guilds
-    for guild in guilds:
-        if guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value: continue
-        guild_extra_info = db.find_guild_extra_info_by_id(guild.id)
-        if guild_extra_info != None and guild_extra_info.list_channels_ai_talk != None and len(guild_extra_info.list_channels_ai_talk)>0:
-            random_channel_id = random.choice(guild_extra_info.list_channels_ai_talk)
-            actual_channel = guild.get_channel(random_channel_id)
-            if actual_channel:
-                model = genai.GenerativeModel(CustomFunctions.AI_MODEL, CustomFunctions.safety_settings)
-                prompt = CustomFunctions.get_automatically_talk_prompt("Creation 2", guild, actual_channel)
-                response = model.generate_content(f"{prompt}")
-                print(f"{bot.user} started talking on its own at {guild_extra_info.guild_name}, channel {actual_channel.name}.")
-                async with actual_channel.typing():
-                    await actual_channel.send(f"{response.text}")
+# @tasks.loop(hours=3)
+# async def automatic_speak_randomly():
+#     guilds = bot.guilds
+#     for guild in guilds:
+#         if guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value: continue
+#         guild_extra_info = db.find_guild_extra_info_by_id(guild.id)
+#         if guild_extra_info != None and guild_extra_info.list_channels_ai_talk != None and len(guild_extra_info.list_channels_ai_talk)>0:
+#             random_channel_id = random.choice(guild_extra_info.list_channels_ai_talk)
+#             actual_channel = guild.get_channel(random_channel_id)
+#             if actual_channel:
+#                 # model = genai.GenerativeModel(CustomFunctions.AI_MODEL, CustomFunctions.safety_settings)
+#                 prompt = CustomFunctions.get_automatically_talk_prompt("Creation 2", guild, actual_channel)
+#                 response = model.generate_content(f"{prompt}")
+#                 print(f"{bot.user} started talking on its own at {guild_extra_info.guild_name}, channel {actual_channel.name}.")
+#                 async with actual_channel.typing():
+#                     await actual_channel.send(f"{response.text}")
                     
 # Task: Nói chuyện tự động True Heavens Only
 @tasks.loop(hours=3, minutes= 30)
@@ -133,12 +136,18 @@ async def automatic_speak_randomly_true_heaven():
         random_channel_id = random.choice(guild_extra_info.list_channels_ai_talk)
         actual_channel = guild.get_channel(random_channel_id)
         if actual_channel:
-            model = genai.GenerativeModel(CustomFunctions.AI_MODEL, CustomFunctions.safety_settings)
             prompt = CustomFunctions.get_automatically_talk_prompt("Creation 2", guild, actual_channel)
-            response = model.generate_content(f"{prompt}")
+            completion = groq_client.chat.completions.create(
+                    model=CustomFunctions.AI_MODEL,
+                    messages=[
+                        {"role": "user", "content": prompt}
+                    ],
+                )
+            bot_response = CustomFunctions.remove_creation_name_prefix(f"{completion.choices[0].message.content}")
+            # response = model.generate_content(f"{prompt}")
             print(f"{bot.user} started talking on its own at {guild_extra_info.guild_name}, channel {actual_channel.name}.")
             async with actual_channel.typing():
-                await actual_channel.send(f"{response.text}")
+                await actual_channel.send(f"{bot_response}")
 
 @tasks.loop(hours=24)
 async def remove_old_conversation():
@@ -471,7 +480,7 @@ async def on_message(message: discord.Message):
     if await auto_rep.handling_auto_responder(message=message):
         speakFlag = False
     
-    ai_handling_response = AIResponseHandling(bot=bot)
+    ai_handling_response = AIResponseHandling(bot=bot, key = GROQ_API_KEY)
     await ai_handling_response.sub_function_ai_response(message=message, speakFlag=speakFlag)
     # await sub_function_ai_response(message=message, speakFlag=speakFlag)
     
@@ -577,9 +586,9 @@ async def on_member_update(before: discord.Member, after: discord.Member):
     #Tạm thời không cần chạy trong server khác
     if before.guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value: return
     
-    model = genai.GenerativeModel(CustomFunctions.AI_MODEL, CustomFunctions.safety_settings)
-    channel = bot.get_channel(1259392446987632661)
-    await CustomFunctions.thanking_for_boost(bot_name="creation 2", before=before, after=after, model=model, channel=channel)
+    # model = genai.GenerativeModel(CustomFunctions.AI_MODEL, CustomFunctions.safety_settings)
+    # channel = bot.get_channel(1259392446987632661)
+    # await CustomFunctions.thanking_for_boost(bot_name="creation 2", before=before, after=after, model=model, channel=channel)
     
     
     # Get roles trước và sau khi update
