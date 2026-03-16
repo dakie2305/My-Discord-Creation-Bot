@@ -306,18 +306,21 @@ async def automatic_speak_randomly_true_heaven():
         random_channel_id = random.choice(guild_extra_info.list_channels_ai_talk)
         actual_channel = guild.get_channel(random_channel_id)
         if actual_channel:
-            prompt = CustomFunctions.get_automatically_talk_prompt("Creation 1", guild, actual_channel)
-            completion = groq_client.chat.completions.create(
-                    model=CustomFunctions.AI_MODEL,
-                    messages=[
-                        {"role": "user", "content": prompt}
-                    ],
-                )
-            bot_response = CustomFunctions.remove_creation_name_prefix(f"{completion.choices[0].message.content}")
-            # response = model.generate_content(f"{prompt}")
-            print(f"{bot.user} started talking on its own at {guild_extra_info.guild_name}, channel {actual_channel.name}.")
-            async with actual_channel.typing():
-                await actual_channel.send(f"{bot_response}")
+            try:
+                prompt = CustomFunctions.get_automatically_talk_prompt("Creation 1", guild, actual_channel)
+                completion = groq_client.chat.completions.create(
+                        model=CustomFunctions.AI_MODEL,
+                        messages=[
+                            {"role": "user", "content": prompt}
+                        ],
+                    )
+                bot_response = CustomFunctions.remove_creation_name_prefix(f"{completion.choices[0].message.content}")
+                # response = model.generate_content(f"{prompt}")
+                print(f"{bot.user} started talking on its own at {guild_extra_info.guild_name}, channel {actual_channel.name}.")
+                async with actual_channel.typing():
+                    await actual_channel.send(f"{bot_response}")
+            except Exception as e:
+                print(f"Error in automatic_speak_randomly_true_heaven: {e}")
 
 @tasks.loop(hours=12)
 async def remove_old_conversation():
