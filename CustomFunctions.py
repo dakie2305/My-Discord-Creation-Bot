@@ -18,7 +18,7 @@ from gtts import gTTS
 load_dotenv()
 USER_NAME_MONGODB = os.getenv("USER_NAME_MONGODB", "")
 PASSWORD_MONGODB = os.getenv("PASSWORD_MONGODB", "")
-AI_MODEL = 'moonshotai/kimi-k2-instruct-0905'
+AI_MODEL = 'moonshotai/kimi-k2-instruct'
 # AI_MODEL = 'qwen/qwen3-32b'
 
 def get_random_response(filename):
