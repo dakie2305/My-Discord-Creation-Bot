@@ -108,7 +108,8 @@ class AIResponseHandling():
                 #Kiểm tra xem bot reponse có nhiều emoji không, nếu nhiều quá thì remove emoji
                 if CustomFunctions.count_emojis_in_text(bot_response) > 4:
                     bot_response = CustomFunctions.remove_emojis_from_text(bot_response)
-                
+                # Remove @everyone
+                bot_response = bot_response.replace("@everyone", "")
                 #Nếu có chữ record thì tạo file và gửi ghi âm
                 if 'record' in message.content.lower():
                     await CustomFunctions.bot_sending_sound(bot_name='Creation_2', bot_reponse=bot_response, message=message)
