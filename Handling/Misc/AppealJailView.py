@@ -11,6 +11,7 @@ from db import DbMongoManager
 from datetime import datetime, timedelta
 from db.Class.CustomClass import UserInfo
 from groq import Groq
+import json
 
 
 class AppealJailView(discord.ui.View):
@@ -52,57 +53,78 @@ class AppealJailView(discord.ui.View):
             await interaction.followup.send(embed=embed)
             return
         
-        system_instruction = f"{CustomFunctions.initial_instruction} {CustomFunctions.court_officer_background_creation_1} {CustomFunctions.shared_background}"
+        #Delete
+        if self.message != None: 
+            try: await self.message.delete()
+            except Exception: pass
+
+        
+        system_instruction = f"Bạn là Chấp hành viên Toà Án Tối Cao, chuyên đưa ra phán quyết tàn nhẫn hoặc công minh dưới dạng JSON"
         today_str = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+        is_evil = UtilitiesFunctions.get_chance(50)
+        if is_evil:
+            personality_prompt = """
+            BẠN LÀ: Một chấp hành viên GIAN MANH, XẢO QUYỆT và THAM NHŨNG.
+            PHONG CÁCH: Trịch thượng, coi thường luật pháp, thích bẻ cong sự thật. Bạn có thể xử trắng thành đen 
+            nếu cảm thấy thích thú hoặc muốn hành hạ bị cáo. Câu chữ sắc lẹm, đầy tính đe dọa hoặc mỉa mai.
+            """
+        else:
+            personality_prompt = """
+            BẠN LÀ: Một chấp hành viên NGHIÊM NGHỊ, CHÍNH TRỰC và CÔNG MINH.
+            PHONG CÁCH: Tôn trọng lẽ phải, thượng tôn pháp luật. Bạn xử lý dựa trên đạo đức và tính hợp lý 
+            của hành vi. Câu chữ trang trọng, uy nghiêm, thể hiện sự công bằng của Toà Án Tối Cao.
+            """
 
         prompt = f"""
-        Hãy trở thành một chấp hành viên của Toà Án Tối Cao trong thế giới giả tưởng. Ngày hôm nay là {today_str}.
-        ⚠️ Bắt buộc: Hãy **nhập vai hoàn toàn**, tuyệt đối **không được nhắc đến vai trò AI**, **không nói bạn là AI**, và **không phá vỡ nhân vật**. Luôn giữ văn phong của một chấp hành viên tòa án, nghiêm túc và chuyên nghiệp (hoặc xảo quyệt nếu chọn tính cách tương ứng). **Không cần quá quan trọng việc trình bày bằng chứng, chỉ dựa trên duy nhất những thông tin có sẵn**
-
-        Bạn phải bí mật chọn một trong hai tính cách:
-        1. **Nghiêm nghị chính trực**  (Người vì lẽ phải)
-        2. **Gian manh xảo quyệt** (Người tham nhũng, xử trắng thành đen không quan tâm lẽ phải)
-
+        {personality_prompt}
         Không tiết lộ hoặc gợi ý về tính cách đã chọn, dù là trực tiếp hay gián tiếp.
-
+        Ngày ra tòa: {today_str}
         ---
-
         ## Hồ sơ vụ án:
-
         - **Bị cáo**: {search_user.user_display_name} (`<@{self.user.id}>`, username: `{self.user.name}`)
         - **Người bắt giữ**: {search_user.jailer_display_name} (username: `{search_user.jailer_user_name}`)
-        - **Kênh xảy ra vụ việc**: {search_user.channel_name}
         - **Lý do giam giữ**: "{search_user.reason}"
         - **Thời hạn giam giữ**: {search_user.jail_until}
-
         ---
-
         ## Nhiệm vụ của bạn:
-        Dựa vào hồ sơ vụ án, hãy đưa ra một bản án hợp lý. **Luôn kết luận bằng một trong ba lựa chọn rõ ràng**:
-        - **Vô Tội**: Bị cáo phạm lỗi nhỏ, lý do bắt giữ không quá nghiêm trọng.
-        - **Có Tội**: Lý do bắt giữ chính đáng và hợp pháp, phù hợp thời gian giam giữ.
-        - **Trắng Án**: Chấp hành viên bắt giữ có dấu hiệu lạm quyền hoặc hình phạt vượt quá mức, cần xoá bỏ phán quyết trước đó.
-
-        💡 Nếu bị cáo là **cựu chấp hành viên bị bắt vì lạm quyền**, mặc định là **Có Tội**.
-
-        Bạn phải giải thích bản án **bằng giọng điệu phù hợp với tính cách đã chọn**, ngắn gọn, nhưng đầy đủ lý do. Tránh lặp lại nội dung trên. **Không bình luận ngoài vai. Không nêu vai trò của bản thân hoặc hệ thống. Không quá quan trọng bằng chứng.**
-
-        Hãy bắt đầu phán xét và xưng hô giống với phiên tòa xét xử.
+        Chỉ cần dựa vào lý do bắt giữ, hãy phán xét ngay lập tức. Không cần bằng chứng, không cần logic, chỉ cần bản năng của một chấp hành viên {is_evil and 'gian ác' or 'chính trực'}.
+        
+        BẠN PHẢI TRẢ VỀ KẾT QUẢ THEO ĐỊNH DẠNG JSON SAU:
+        {{
+            "phan_quyet": "VO_TOI" | "CO_TOI" | "TRANG_AN",
+            "loi_thoai": "**Lời phán xét nhập vai của bạn ở đây**"
+        }}
+        💡 Nếu bị cáo là **cựu chấp hành viên bị bắt vì lạm quyền**, mặc định là **CO_TOI**.
+        Phán quyết ngay!
         """
 
         try:
-            bot_response = await self.fetch_and_sanitize_ai_response(system_instruction="Hãy trở thành một chấp hành viên của Toà Án Tối Cao", prompt=prompt)
+            completion = self.groq_client.chat.completions.create(
+                model=CustomFunctions.AI_MODEL,
+                response_format={ "type": "json_object" }, # Force JSON
+                messages=[
+                    {"role": "system", "content": system_instruction},
+                    {"role": "user", "content": prompt}
+                ],
+            )
+            data = json.loads(completion.choices[0].message.content)
+            verdict = data.get("phan_quyet") # "VO_TOI", "CO_TOI", or "TRANG_AN"
+            bot_response = data.get("loi_thoai")
+            bot_response = CustomFunctions.remove_creation_name_prefix(bot_response)
+            bot_response = bot_response.replace("@everyone", "")
+            
             await interaction.followup.send(f"{interaction.user.mention} {bot_response}")
             #Dựa trên câu trả lời để phán
             final_text = "Vô Tội"
-            if "trắng án" in bot_response.lower():
+            if verdict == "TRANG_AN":
                 is_acquit = True
                 final_text = "Trắng Án"
-            elif "có tội" in bot_response.lower():
+            elif verdict == "CO_TOI":
                 is_innocence = False
                 final_text = "Có Tội"
             else:
                 is_innocence = True
+                final_text = "Vô Tội"
             embed = discord.Embed(title=f"", description=f"Tuyên Án", color=0xddede7)
             embed.add_field(name=f"", value=f"- Bị cáo {interaction.user.mention} nhận phán quyết: **{final_text}**!", inline=False)
             embed.add_field(name=f"", value=f"- {interaction.user.mention} đã đóng **{UtilitiesFunctions.shortened_currency(self.money)} {self.money_type}** tiền kháng án!", inline=False)
@@ -129,26 +151,6 @@ class AppealJailView(discord.ui.View):
         ProfileMongoManager.update_profile_money_by_type(guild_id=self.guild_id, guild_name="", user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, money=self.money, money_type=self.money_type)
         return
     
-    async def fetch_and_sanitize_ai_response(self, system_instruction, prompt):
-        # 1. API Call
-        completion = self.groq_client.chat.completions.create(
-            model=CustomFunctions.AI_MODEL,
-            messages=[
-                {"role": "system", "content": system_instruction},
-                {"role": "user", "content": prompt}
-            ],
-        )
-        # Get Raw Content
-        raw_content = f"{completion.choices[0].message.content}"
-        # Apply Cleaning Rules
-        # Remove Prefix
-        bot_response = CustomFunctions.remove_creation_name_prefix(raw_content)
-        # Remove @everyone
-        bot_response = bot_response.replace("@everyone", "")
-        # Emoji Check (Remove if > 4)
-        if CustomFunctions.count_emojis_in_text(bot_response) > 4:
-            bot_response = CustomFunctions.remove_emojis_from_text(bot_response)
-        return bot_response
 
     async def unjail_real(self, interaction: discord.Interaction):
         if self.guild_id !=  TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value: return
