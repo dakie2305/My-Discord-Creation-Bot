@@ -91,7 +91,7 @@ class AppealJailView(discord.ui.View):
         """
 
         try:
-            bot_response = self.fetch_and_sanitize_ai_response(system_instruction="Hãy trở thành một chấp hành viên của Toà Án Tối Cao", prompt=prompt)
+            bot_response = await self.fetch_and_sanitize_ai_response(system_instruction="Hãy trở thành một chấp hành viên của Toà Án Tối Cao", prompt=prompt)
             await interaction.followup.send(f"{interaction.user.mention} {bot_response}")
             #Dựa trên câu trả lời để phán
             final_text = "Vô Tội"

@@ -144,7 +144,7 @@ class AIResponseHandling():
             #Lấy prompt
             prompt = await CustomFunctions.get_therapy_prompt(message=message, extra_message=ref_message)
             print(prompt)
-            bot_response = self.fetch_and_sanitize_ai_response(system_instruction="", prompt=prompt)
+            bot_response = await self.fetch_and_sanitize_ai_response(system_instruction="", prompt=prompt)
             await message.channel.send(f"{message.author.mention} {bot_response}")
         return
     
