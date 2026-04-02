@@ -72,6 +72,8 @@ class AutoresponderHandling():
             flag = True
         
         elif message.content and message.content[0] == "=" and message.content != "=":
+            next_char = message.content[1]
+            if next_char in [')', ']', '>', '}', '=']: return
             flag = True
             options = [item.strip() for item in message.content[1:].split(",") if item.strip()]
             if len(options) >1:
