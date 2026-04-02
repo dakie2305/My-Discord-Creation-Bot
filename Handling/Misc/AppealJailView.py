@@ -1,3 +1,4 @@
+import os
 import discord
 from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.EmojiEnum import EmojiCreation2, EmojiCreation1
@@ -8,8 +9,8 @@ from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 from Handling.Economy.Profile import ProfileMongoManager
 from db import DbMongoManager
 from datetime import datetime, timedelta
-import google.generativeai as genai
 from db.Class.CustomClass import UserInfo
+from groq import Groq
 
 
 class AppealJailView(discord.ui.View):
@@ -24,6 +25,7 @@ class AppealJailView(discord.ui.View):
         self.accept_button = discord.ui.Button(label="🚨 Chấp Nhận", style=discord.ButtonStyle.green)
         self.accept_button.callback = self.accept_button_callback
         self.add_item(self.accept_button)
+        self.groq_client = Groq(api_key=os.getenv("GROQ_KEY"))
     
     
     async def on_timeout(self):
@@ -51,11 +53,10 @@ class AppealJailView(discord.ui.View):
             return
         
         system_instruction = f"{CustomFunctions.initial_instruction} {CustomFunctions.court_officer_background_creation_1} {CustomFunctions.shared_background}"
-        model = genai.GenerativeModel(model_name=CustomFunctions.AI_MODEL, safety_settings= CustomFunctions.safety_settings, system_instruction=system_instruction)
         today_str = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
 
         prompt = f"""
-        Bạn là một chấp hành viên của Toà Án Tối Cao trong thế giới giả tưởng. Ngày hôm nay là {today_str}.
+        Hãy trở thành một chấp hành viên của Toà Án Tối Cao trong thế giới giả tưởng. Ngày hôm nay là {today_str}.
         ⚠️ Bắt buộc: Hãy **nhập vai hoàn toàn**, tuyệt đối **không được nhắc đến vai trò AI**, **không nói bạn là AI**, và **không phá vỡ nhân vật**. Luôn giữ văn phong của một chấp hành viên tòa án, nghiêm túc và chuyên nghiệp (hoặc xảo quyệt nếu chọn tính cách tương ứng). **Không cần quá quan trọng việc trình bày bằng chứng, chỉ dựa trên duy nhất những thông tin có sẵn**
 
         Bạn phải bí mật chọn một trong hai tính cách:
@@ -90,8 +91,7 @@ class AppealJailView(discord.ui.View):
         """
 
         try:
-            response = model.generate_content(f"{prompt}")
-            bot_response = CustomFunctions.remove_creation_name_prefix(f"{response.text}")
+            bot_response = self.fetch_and_sanitize_ai_response(system_instruction="Hãy trở thành một chấp hành viên của Toà Án Tối Cao", prompt=prompt)
             await interaction.followup.send(f"{interaction.user.mention} {bot_response}")
             #Dựa trên câu trả lời để phán
             final_text = "Vô Tội"
@@ -128,6 +128,27 @@ class AppealJailView(discord.ui.View):
     def process_money(self):
         ProfileMongoManager.update_profile_money_by_type(guild_id=self.guild_id, guild_name="", user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, money=self.money, money_type=self.money_type)
         return
+    
+    async def fetch_and_sanitize_ai_response(self, system_instruction, prompt):
+        # 1. API Call
+        completion = self.groq_client.chat.completions.create(
+            model=CustomFunctions.AI_MODEL,
+            messages=[
+                {"role": "system", "content": system_instruction},
+                {"role": "user", "content": prompt}
+            ],
+        )
+        # Get Raw Content
+        raw_content = f"{completion.choices[0].message.content}"
+        # Apply Cleaning Rules
+        # Remove Prefix
+        bot_response = CustomFunctions.remove_creation_name_prefix(raw_content)
+        # Remove @everyone
+        bot_response = bot_response.replace("@everyone", "")
+        # Emoji Check (Remove if > 4)
+        if CustomFunctions.count_emojis_in_text(bot_response) > 4:
+            bot_response = CustomFunctions.remove_emojis_from_text(bot_response)
+        return bot_response
 
     async def unjail_real(self, interaction: discord.Interaction):
         if self.guild_id !=  TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value: return

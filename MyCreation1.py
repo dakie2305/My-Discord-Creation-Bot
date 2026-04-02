@@ -20,7 +20,6 @@ import CustomButton
 from typing import Optional
 import asyncio
 from Handling.MiniGame.SortWord import SwHandling as SwHandling
-from Handling.Misc.Therapy import TherapyHandling
 from Handling.Misc.StickyMessage import StickyMessageHandling
 from discord.app_commands import Choice
 import Handling.Economy.Quest.QuestMongoManager as QuestMongoManager
@@ -612,11 +611,11 @@ async def on_message(message: discord.Message):
         speakFlag = False
     
     guild_extra_info = db.find_guild_extra_info_by_id(guild_id=message.guild.id)
-    # if guild_extra_info != None and message.channel.id == guild_extra_info.therapy_channel and message.author.bot == False:
-    #     #Xử lý therapy
-    #     model = genai.GenerativeModel(CustomFunctions.AI_MODEL, CustomFunctions.safety_settings)
-    #     asyncio.create_task(TherapyHandling(bot=bot, model=model).handling_therapy_ai(message=message))
-    #     speakFlag = False
+    if guild_extra_info != None and message.channel.id == guild_extra_info.therapy_channel and message.author.bot == False:
+        #Xử lý therapy
+        ai_handling_response = AIResponseHandling(bot=bot, key = GROQ_API_KEY)
+        await ai_handling_response.handling_therapy_ai(message=message)
+        speakFlag = False
     if guild_extra_info != None and guild_extra_info.custom_parameter_2 != None and message.channel.id == guild_extra_info.custom_parameter_2: #Hiện tại chỉ có true heaven có
         speakFlag = False
         #sticky message

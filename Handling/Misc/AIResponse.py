@@ -97,19 +97,7 @@ class AIResponseHandling():
                 # response = model.generate_content(f"{prompt}")
                 
                 # Groq Chat Completion Call
-                completion = self.groq_client.chat.completions.create(
-                    model=CustomFunctions.AI_MODEL,
-                    messages=[
-                        {"role": "system", "content": system_instruction},
-                        {"role": "user", "content": prompt}
-                    ],
-                )
-                bot_response = CustomFunctions.remove_creation_name_prefix(f"{completion.choices[0].message.content}")
-                #Kiểm tra xem bot reponse có nhiều emoji không, nếu nhiều quá thì remove emoji
-                if CustomFunctions.count_emojis_in_text(bot_response) > 4:
-                    bot_response = CustomFunctions.remove_emojis_from_text(bot_response)
-                # Remove @everyone
-                bot_response = bot_response.replace("@everyone", "")
+                bot_response = await self.fetch_and_sanitize_ai_response(system_instruction, prompt)
                 #Nếu có chữ record thì tạo file và gửi ghi âm
                 if 'record' in message.content.lower():
                     await CustomFunctions.bot_sending_sound(bot_name='Creation_2', bot_reponse=bot_response, message=message)
@@ -134,6 +122,55 @@ class AIResponseHandling():
         except Exception as e:
             print(f"Username {message.author.name}, Display user name {message.author.display_name} replied {self.bot.user} but with error: {e}")
         return
+    
+    
+    async def handling_therapy_ai(self, message: discord.Message):
+        bots_creation1_name = ["creation 1", "creation số 1", "creation no 1", "creation no. 1"]
+        if not (message.reference and message.reference.resolved and message.reference.resolved.author == self.bot.user) and not any(name in message.content.lower() for name in bots_creation1_name):
+            return
+        if message.guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value and message.guild.id != 1194106864582004849: #Chỉ True Heaven, học viện 2ten mới không bị dính
+            if CustomFunctions.is_inside_working_time() == False:
+                await message.channel.send(f"Tính năng AI của Bot chỉ hoạt động đến 12h đêm, vui lòng đợi đến 8h sáng hôm sau.")
+                return
+        flag, mess = await CustomFunctions.check_message_nsfw(message, self.bot)
+        if flag != 0:
+            await message.reply(mess)
+            return
+        ref_message: discord.Message = None
+        async with message.channel.typing():
+            if message.reference is not None and message.reference.resolved is not None:
+                if message.reference.resolved.author == self.bot.user or CustomFunctions.contains_substring(message.content.lower(), bots_creation1_name):
+                    ref_message = await message.channel.fetch_message(message.reference.message_id)
+            #Lấy prompt
+            prompt = await CustomFunctions.get_therapy_prompt(message=message, extra_message=ref_message)
+            print(prompt)
+            bot_response = self.fetch_and_sanitize_ai_response(system_instruction="", prompt=prompt)
+            await message.channel.send(f"{message.author.mention} {bot_response}")
+        return
+    
+    async def fetch_and_sanitize_ai_response(self, system_instruction, prompt):
+        """
+        Calls the Groq API and applies all cleaning rules (prefixes, emojis, @everyone).
+        """
+        # 1. API Call
+        completion = self.groq_client.chat.completions.create(
+            model=CustomFunctions.AI_MODEL,
+            messages=[
+                {"role": "system", "content": system_instruction},
+                {"role": "user", "content": prompt}
+            ],
+        )
+        # Get Raw Content
+        raw_content = f"{completion.choices[0].message.content}"
+        # Apply Cleaning Rules
+        # Remove Prefix
+        bot_response = CustomFunctions.remove_creation_name_prefix(raw_content)
+        # Remove @everyone
+        bot_response = bot_response.replace("@everyone", "")
+        # Emoji Check (Remove if > 4)
+        if CustomFunctions.count_emojis_in_text(bot_response) > 4:
+            bot_response = CustomFunctions.remove_emojis_from_text(bot_response)
+        return bot_response
     
     
     async def alert_creator(self, text: str):
