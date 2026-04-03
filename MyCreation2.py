@@ -146,6 +146,7 @@ async def automatic_speak_randomly_true_heaven():
                     )
                 bot_response = CustomFunctions.remove_creation_name_prefix(f"{completion.choices[0].message.content}")
                 # response = model.generate_content(f"{prompt}")
+                bot_response = bot_response.replace("@everyone", "")
                 print(f"{bot.user} started talking on its own at {guild_extra_info.guild_name}, channel {actual_channel.name}.")
                 async with actual_channel.typing():
                     await actual_channel.send(f"{bot_response}")
