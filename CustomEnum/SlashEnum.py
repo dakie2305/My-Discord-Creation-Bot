@@ -1,4 +1,6 @@
 from enum import Enum
+
+
 class SlashCommand(Enum):
     PROFILE = "</profile:1379512980164710525>"
     VOTE_AUTHORITY = "</authority vote:1379512980265369640>"
@@ -23,13 +25,13 @@ class SlashCommand(Enum):
     SB_TRIPLE = "</sb triple:1379512980164710524>"
     SB_SLOT_MACHINE = "</sb slot_machine:1379512980164710524>"
     SB_BAI_CAO = "</sb bai_cao:1379512980164710524>"
-    
+
     SHOP_GLOBAL = "</shop global:1379512980265369645>"
     GIFT = "</gift:1379512980265369646>"
-    
+
     COUPLE_INTIMATE = "</couple intimate:1379512980265369648>"
     COUPLE_FIGHT = "</couple fight:1379512980265369648>"
-    
+
     INVENTORY_USE = "</inventory use:1379512980265369647>"
     GA_SELL = "</ga sell:1379513748531712201>"
     SHOP_GUARDIAN = "</shop guardian:1379512980265369645>"
@@ -40,11 +42,8 @@ class SlashCommand(Enum):
     GA_BATTLE = "</ga battle:1379513748531712201>"
     GA_CHALLENGE = "</ga challenge:1379513748531712201>"
     GA_QUEST = "</ga quest:1379513748531712201>"
-    
 
     QUEST_DUNGEON = "</quests dungeon_channels:1379512980265369642>"
-
-
 
     SKILL_USE = "</skill use:1378739143106105497>"
     BXH = "</bxh:1378739143106105498>"
@@ -57,8 +56,8 @@ class SlashCommand(Enum):
     HINT_WORD_MINIGAME = "</hint:1378739143106105496>"
     SKILL_USE_WORD_MINIGAME = "</skill use:1378739143106105497>"
     SKILL_GIVE_WORD_MINIGAME = "</skill give:1378739143106105497>"
-    
+
     GLOBAL_INVENTORY = "</global inventory:1395841269606912252>"
     GLOBAL_GA = "</global ga:1395841269606912252>"
     LEADERBOARD = "</leaderboard:1379512980265369644>"
-    
+    DUA_NGUA = "</dua_ngua:1395841269606912252>"
