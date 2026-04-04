@@ -52,7 +52,7 @@ class DuaNgua(commands.Cog):
         ]
 
     # region Dua Ngua
-    @discord.app_commands.checks.cooldown(1, 7)
+    @discord.app_commands.checks.cooldown(1, 30)
     @discord.app_commands.command(
         name="dua_ngua",
         description="Làm nhà cái tổ chức thi đua ngựa! Không giàu thì đừng cá cược nhé!",
@@ -157,10 +157,13 @@ class DuaNgua(commands.Cog):
             color=0x03F8FC,
         )
         horses_pool = self.generate_random_horses()
+        track_length = 60
+        obstacles = [20, 45]
+
         for horse in horses_pool:
             embed.add_field(
                 name=f"{horse['id']}. {horse['name']}",
-                value=f"[{horse['emoji']}......─...............─.........🚩]",
+                value=f"{UtilitiesFunctions.get_track_string(horse_emoji=horse['emoji'], position=0, track_length=track_length, obstacles=obstacles)}",
                 inline=False,
             )
         embed.set_footer(
@@ -177,6 +180,8 @@ class DuaNgua(commands.Cog):
             is_betting=is_betting,
             mult=mult,
             timeout=timeout,
+            track_length=track_length,
+            obstacles=obstacles,
         )
         mess = await interaction.followup.send(embed=embed, view=view)
         view.message = mess
@@ -202,3 +207,17 @@ class DuaNgua(commands.Cog):
                     }
                 )
         return horses
+
+    @dua_ngua_slash_command.error
+    async def dua_ngua_slash_command_error(
+        self, interaction: discord.Interaction, error
+    ):
+        if isinstance(error, discord.app_commands.CommandOnCooldown):
+            await interaction.response.send_message(
+                f"⏳ Lệnh đang cooldown, vui lòng thực hiện lại trong vòng {error.retry_after:.2f}s tới.",
+                ephemeral=True,
+            )
+        else:
+            await interaction.response.send_message(
+                "Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True
+            )
