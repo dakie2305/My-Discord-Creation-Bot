@@ -186,6 +186,23 @@ class DuaNgua(commands.Cog):
         mess = await interaction.followup.send(embed=embed, view=view)
         view.message = mess
 
+        check_quest_message = QuestMongoManager.increase_quest_objective_count(
+            guild_id=interaction.guild_id,
+            user_id=interaction.user.id,
+            quest_type="dua_ngua_count",
+        )
+        if check_quest_message:
+            view = SelfDestructView(60)
+            quest_embed = discord.Embed(
+                title="",
+                description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!",
+                color=0xC379E0,
+            )
+            ms = await interaction.channel.send(
+                embed=quest_embed, content=f"{interaction.user.mention}", view=view
+            )
+            view.message = ms
+
     def generate_random_horses(self, count=8):
         """Generates a list of unique horse objects for the race."""
         horses = []
