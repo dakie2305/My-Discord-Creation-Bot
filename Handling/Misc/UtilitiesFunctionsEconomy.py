@@ -448,11 +448,18 @@ class UtilitiesFunctions:
         return int(cleaned)
 
     @staticmethod
-    def get_track_string(horse_emoji, position, track_length, obstacles):
+    def get_track_string(
+        horse_emoji, position, track_length, obstacles, is_winning=False
+    ):
         track_list = ["."] * track_length
         for obs in obstacles:
             if obs < track_length:
                 track_list[obs] = "─"
-        p = min(int(position), track_length - 1)
-        track_list[p] = horse_emoji
-        return f"[{''.join(track_list)}|🚩]"
+
+        if is_winning:
+            return f"[{''.join(track_list)}.....|{horse_emoji}]"
+        else:
+            # Old logic: Place horse at its current position p
+            p = min(int(position), track_length - 1)
+            track_list[p] = horse_emoji
+            return f"[{''.join(track_list)}|🚩]"

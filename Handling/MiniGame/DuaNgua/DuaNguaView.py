@@ -239,7 +239,16 @@ class DuaNguaView(discord.ui.View):
                 track_length=self.track_length,
                 obstacles=self.obstacles,
             )
-            status = f"{EmojiCreation2.FIRST_CUP.value}" if h_id == winner_id else "❌"
+            status = "❌"
+            if h_id == winner_id:
+                status = f"{EmojiCreation2.FIRST_CUP.value}"
+                track_str = UtilitiesFunctions.get_track_string(
+                    horse_emoji=horse["emoji"],
+                    position=pos,
+                    track_length=self.track_length,
+                    obstacles=self.obstacles,
+                    is_winning=True,
+                )
             standings_embed.add_field(
                 name=f"{status} {h_id}. {horse['name']}", value=track_str, inline=False
             )
