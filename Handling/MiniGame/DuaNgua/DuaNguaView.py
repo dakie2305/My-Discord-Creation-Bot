@@ -36,6 +36,8 @@ class DuaNguaView(discord.ui.View):
         is_betting=False,
         mult: int = 2,
         timeout: int = 30,
+        track_length: int = 60,
+        obstacles: List[int] = None,
     ):
         super().__init__(timeout=timeout)
         self.message: discord.Message = None
@@ -50,8 +52,8 @@ class DuaNguaView(discord.ui.View):
         self.player_list: List[PlayerBetInfo] = []
         self.horse_positions: Dict[int, int] = {h["id"]: 0 for h in horses_pool}
         self.comments = ["Đang chờ người tham gia..."]
-        self.track_length = 40
-        self.obstacles = [10, 25]
+        self.track_length = track_length
+        self.obstacles = obstacles
         if self.is_betting:
             betting_button = discord.ui.Button(
                 label="Tham Gia Đặt Cược 🐎", style=discord.ButtonStyle.primary
@@ -119,20 +121,6 @@ class DuaNguaView(discord.ui.View):
             ephemeral=True,
         )
 
-    def get_track_string(self, horse_id, position):
-        horse = next(h for h in self.horses_pool if h["id"] == horse_id)
-        emoji = horse["emoji"]
-
-        track_list = ["."] * self.track_length
-        for obs in self.obstacles:
-            if obs < self.track_length:
-                track_list[obs] = "─"
-
-        p = min(int(position), self.track_length - 1)
-        track_list[p] = emoji
-
-        return f"[{''.join(track_list)}🚩]"
-
     async def on_timeout(self):
         if self.message:
             self.clear_items()
@@ -163,8 +151,7 @@ class DuaNguaView(discord.ui.View):
             for horse in self.horses_pool:
                 h_id = horse["id"]
                 # Normal move
-                move = random.randint(3, 6)
-
+                move = random.randint(4, 9)
                 # Check obstacles
                 current_pos = self.horse_positions[h_id]
                 for obs in self.obstacles:
@@ -185,9 +172,8 @@ class DuaNguaView(discord.ui.View):
 
             # Find leader
             leader_id = max(self.horse_positions, key=self.horse_positions.get)
-            leader_name = next(
-                h["name"] for h in self.horses_pool if h["id"] == leader_id
-            )
+            leader_horse = next(h for h in self.horses_pool if h["id"] == leader_id)
+            leader_name = f"{leader_horse['name']} số {leader_horse['id']}"
 
             # Generate commentary
             new_comment = random.choice(commentary_pool).format(name=leader_name)
@@ -208,7 +194,12 @@ class DuaNguaView(discord.ui.View):
             for horse in self.horses_pool:
                 h_id = horse["id"]
                 pos = int(self.horse_positions[h_id])
-                track_str = self.get_track_string(h_id, pos)
+                track_str = UtilitiesFunctions.get_track_string(
+                    horse_emoji=horse["emoji"],
+                    position=pos,
+                    track_length=self.track_length,
+                    obstacles=self.obstacles,
+                )
                 embed.add_field(
                     name=f"{h_id}. {horse['name']}",
                     value=track_str,
@@ -228,6 +219,11 @@ class DuaNguaView(discord.ui.View):
         losers_list = []
         total_house_payout = 0
 
+        # Rank horses by final positions
+        ranked_horse_ids = sorted(
+            self.horse_positions, key=self.horse_positions.get, reverse=True
+        )
+
         # 1. Update the ORIGINAL message with final horse standings
         standings_embed = discord.Embed(
             title="Kết Quả Cuộc Đua - Đã Kết Thúc",
@@ -237,8 +233,22 @@ class DuaNguaView(discord.ui.View):
         for horse in self.horses_pool:
             h_id = horse["id"]
             pos = int(self.horse_positions[h_id])
-            track_str = self.get_track_string(h_id, pos)
-            status = f"{EmojiCreation2.FIRST_CUP.value}" if h_id == winner_id else "❌"
+            track_str = UtilitiesFunctions.get_track_string(
+                horse_emoji=horse["emoji"],
+                position=pos,
+                track_length=self.track_length,
+                obstacles=self.obstacles,
+            )
+            status = "❌"
+            if h_id == winner_id:
+                status = f"{EmojiCreation2.FIRST_CUP.value}"
+                track_str = UtilitiesFunctions.get_track_string(
+                    horse_emoji=horse["emoji"],
+                    position=pos,
+                    track_length=self.track_length,
+                    obstacles=self.obstacles,
+                    is_winning=True,
+                )
             standings_embed.add_field(
                 name=f"{status} {h_id}. {horse['name']}", value=track_str, inline=False
             )
@@ -324,7 +334,7 @@ class DuaNguaView(discord.ui.View):
         # Trừ % số tiền từ game nếu có bet
         text_tax = ""
         if self.is_betting:
-            tax_money = int(total_house_win * 5 / 100)
+            tax_money = int(total_house_win * 10 / 100)
             if tax_money <= 0:
                 tax_money = 1
             if self.loai_tien == "C":

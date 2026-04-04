@@ -52,7 +52,7 @@ class DuaNgua(commands.Cog):
         ]
 
     # region Dua Ngua
-    @discord.app_commands.checks.cooldown(1, 7)
+    @discord.app_commands.checks.cooldown(1, 30)
     @discord.app_commands.command(
         name="dua_ngua",
         description="Làm nhà cái tổ chức thi đua ngựa! Không giàu thì đừng cá cược nhé!",
@@ -157,10 +157,13 @@ class DuaNgua(commands.Cog):
             color=0x03F8FC,
         )
         horses_pool = self.generate_random_horses()
+        track_length = 60
+        obstacles = [20, 45]
+
         for horse in horses_pool:
             embed.add_field(
                 name=f"{horse['id']}. {horse['name']}",
-                value=f"[{horse['emoji']}......─...............─.........🚩]",
+                value=f"{UtilitiesFunctions.get_track_string(horse_emoji=horse['emoji'], position=0, track_length=track_length, obstacles=obstacles)}",
                 inline=False,
             )
         embed.set_footer(
@@ -177,9 +180,28 @@ class DuaNgua(commands.Cog):
             is_betting=is_betting,
             mult=mult,
             timeout=timeout,
+            track_length=track_length,
+            obstacles=obstacles,
         )
         mess = await interaction.followup.send(embed=embed, view=view)
         view.message = mess
+
+        check_quest_message = QuestMongoManager.increase_quest_objective_count(
+            guild_id=interaction.guild_id,
+            user_id=interaction.user.id,
+            quest_type="dua_ngua_count",
+        )
+        if check_quest_message:
+            view = SelfDestructView(60)
+            quest_embed = discord.Embed(
+                title="",
+                description=f"Bạn đã hoàn thành nhiệm vụ của mình và được nhận thưởng! Hãy dùng lại lệnh {SlashCommand.QUEST.value} để kiểm tra quest mới nha!",
+                color=0xC379E0,
+            )
+            ms = await interaction.channel.send(
+                embed=quest_embed, content=f"{interaction.user.mention}", view=view
+            )
+            view.message = ms
 
     def generate_random_horses(self, count=8):
         """Generates a list of unique horse objects for the race."""
@@ -202,3 +224,17 @@ class DuaNgua(commands.Cog):
                     }
                 )
         return horses
+
+    @dua_ngua_slash_command.error
+    async def dua_ngua_slash_command_error(
+        self, interaction: discord.Interaction, error
+    ):
+        if isinstance(error, discord.app_commands.CommandOnCooldown):
+            await interaction.response.send_message(
+                f"⏳ Lệnh đang cooldown, vui lòng thực hiện lại trong vòng {error.retry_after:.2f}s tới.",
+                ephemeral=True,
+            )
+        else:
+            await interaction.response.send_message(
+                "Có lỗi khá bự đã xảy ra. Lập tức liên hệ Darkie ngay.", ephemeral=True
+            )

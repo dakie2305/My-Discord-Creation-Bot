@@ -1,5 +1,4 @@
-
-from CustomEnum.SlashEnum import SlashCommand 
+from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.EmojiEnum import EmojiCreation2
 from Handling.Economy.Profile.ProfileClass import Profile
 import random
@@ -7,27 +6,31 @@ from datetime import datetime, timedelta, time
 import os
 import CustomFunctions as CustomFunctions
 
-class UtilitiesFunctions():
+
+class UtilitiesFunctions:
     USER_NAME_MONGODB = CustomFunctions.USER_NAME_MONGODB
     PASSWORD_MONGODB = CustomFunctions.PASSWORD_MONGODB
-    
+
     @staticmethod
     def shortened_currency(number: int):
         if number >= 1000000000:
             suffix = int(number % 1000000000 // 1000000)
-            if suffix == 0: suffix = "" 
+            if suffix == 0:
+                suffix = ""
             return f"{int(number // 1000000000)}B{suffix}"
         elif number >= 1000000:
             suffix = int(number % 1000000 // 1000)
-            if suffix == 0: suffix = "" 
+            if suffix == 0:
+                suffix = ""
             return f"{int(number // 1000000)}M{suffix}"
         elif number >= 10000:
             suffix = int(number % 1000 // 100)
-            if suffix == 0: suffix = ""
-            return f"{int(number // 1000)}K{suffix}"  
+            if suffix == 0:
+                suffix = ""
+            return f"{int(number // 1000)}K{suffix}"
         else:
             return str(int(number))
-    
+
     @staticmethod
     def get_nhan_pham(number: int):
         text = "Người Thường"
@@ -48,41 +51,46 @@ class UtilitiesFunctions():
         else:
             text = "Gian Thương Tà Đạo"
         return text
-    
+
     @staticmethod
     def get_dia_vi(data: Profile):
         text = "Hạ Đẳng"
-        total_wealth = data.copper + data.silver *5000 + data.gold * 5000 * 5000 + data.darkium * 5000 * 5000 * 10000
+        total_wealth = (
+            data.copper
+            + data.silver * 5000
+            + data.gold * 5000 * 5000
+            + data.darkium * 5000 * 5000 * 10000
+        )
         if total_wealth > 200025026000:
-            text= "Đỉnh Cấp Xã Hội"
+            text = "Đỉnh Cấp Xã Hội"
         elif total_wealth > 160250260000:
-            text= "Giới Tinh Anh"
+            text = "Giới Tinh Anh"
         elif total_wealth > 101025026000:
-            text= "Phú Hào"
+            text = "Phú Hào"
         elif total_wealth > 61025026000:
-            text= "Giàu Nứt Vách"
+            text = "Giàu Nứt Vách"
         elif total_wealth > 41025026000:
-            text= "Nhất Quan"
+            text = "Nhất Quan"
         elif total_wealth > 21025026000:
-            text= "Quý Tộc"
+            text = "Quý Tộc"
         elif total_wealth > 11025026000:
-            text= "Thượng Đẳng"
+            text = "Thượng Đẳng"
         elif total_wealth > 8525026000:
-            text= "Thượng Lưu"
+            text = "Thượng Lưu"
         elif total_wealth > 2205026000:
-            text= "Thượng Lưu"
+            text = "Thượng Lưu"
         elif total_wealth > 75026000:
-            text= "Trung Lưu"
+            text = "Trung Lưu"
         elif total_wealth > 20000000:
-            text= "Hạ Lưu"
+            text = "Hạ Lưu"
         else:
             text = "Hạ Đẳng"
         if total_wealth > -60000 and total_wealth < 0:
-            text= "Đáy Xã Hội"
+            text = "Đáy Xã Hội"
         elif total_wealth > -80000 and total_wealth <= -60000:
-            text= "Rác Rưởi Tột Cùng"
+            text = "Rác Rưởi Tột Cùng"
         return text
-    
+
     @staticmethod
     def get_emoji_from_card_type(card_type: str):
         card_mapping = {
@@ -141,20 +149,22 @@ class UtilitiesFunctions():
         }
         # Return the mapped value or a default value
         return card_mapping.get(card_type, EmojiCreation2.CARD_2_C.value)
-    
+
     @staticmethod
     def get_chance(chance: int):
         rand_num = random.randint(0, 100)
         return rand_num <= chance
 
-    
     @staticmethod
-    def get_emoji_from_loai_tien(loai_tien:str):
-        if loai_tien == "D": return EmojiCreation2.DARKIUM.value
-        if loai_tien == "G": return EmojiCreation2.GOLD.value
-        if loai_tien == "S": return EmojiCreation2.SILVER.value
+    def get_emoji_from_loai_tien(loai_tien: str):
+        if loai_tien == "D":
+            return EmojiCreation2.DARKIUM.value
+        if loai_tien == "G":
+            return EmojiCreation2.GOLD.value
+        if loai_tien == "S":
+            return EmojiCreation2.SILVER.value
         return EmojiCreation2.COPPER.value
-    
+
     @staticmethod
     def check_if_within_time_delta(input: datetime, time_window: timedelta):
         now = datetime.now()
@@ -162,7 +172,7 @@ class UtilitiesFunctions():
             return True
         else:
             return False
-    
+
     @staticmethod
     def is_within_time_range(from_time: time = time(2, 0), to_time: time = time(5, 0)):
         now = datetime.now().time()
@@ -171,7 +181,7 @@ class UtilitiesFunctions():
             return from_time <= now <= to_time
         # Handle time range that crosses midnight
         return from_time <= now or now <= to_time
-    
+
     @staticmethod
     def get_cap_do_quest(input: int):
         text = "Dễ"
@@ -184,140 +194,142 @@ class UtilitiesFunctions():
         elif input == 4:
             text = "Huyền Thoại"
         return text
-    
+
     @staticmethod
     def get_heart_emoji_on_rank(rank: int):
         text = "💘"
         if rank >= 20:
-            text= "❤️‍🔥"
+            text = "❤️‍🔥"
         elif rank == 19:
-            text= "💝"
+            text = "💝"
         elif rank == 18:
-            text= "💓"
+            text = "💓"
         elif rank == 17:
-            text= "💗"
+            text = "💗"
         elif rank == 16:
-            text= "💞"
+            text = "💞"
         elif rank == 15:
-            text= "💕"
+            text = "💕"
         elif rank == 14:
-            text= "💖"
+            text = "💖"
         elif rank == 13:
-            text= "❣️"
+            text = "❣️"
         elif rank == 12:
-            text= "❤️"
+            text = "❤️"
         elif rank == 11:
-            text= "🩷"
+            text = "🩷"
         elif rank == 10:
-            text= "🧡"
+            text = "🧡"
         elif rank == 9:
-            text= "💛"
+            text = "💛"
         elif rank == 8:
-            text= "💚"
+            text = "💚"
         elif rank == 7:
-            text= "🩵"
+            text = "🩵"
         elif rank == 6:
-            text= "💙"
+            text = "💙"
         elif rank == 5:
-            text= "💜"
+            text = "💜"
         elif rank == 4:
-            text= "🤍"
+            text = "🤍"
         elif rank == 3:
-            text= "🩶"
+            text = "🩶"
         elif rank == 2:
-            text= "🖤"
+            text = "🖤"
         elif rank == 1:
-            text= "💘"
+            text = "💘"
         return text
-    
+
     @staticmethod
     def get_text_on_love_rank(rank: int):
         text = "Mới Quen"
         if rank >= 20:
-            text= "Bạn Đời Vĩnh Cửu"
+            text = "Bạn Đời Vĩnh Cửu"
         elif rank >= 19:
-            text= "Đôi Tri Kỉ"
+            text = "Đôi Tri Kỉ"
         elif rank >= 16:
-            text= "Đôi Uyên Ương"
+            text = "Đôi Uyên Ương"
         elif rank >= 12:
-            text= "Tri Kỷ Tâm Giao"
+            text = "Tri Kỷ Tâm Giao"
         elif rank >= 10:
-            text= "Nửa Kia Hoàn Hảo"
+            text = "Nửa Kia Hoàn Hảo"
         elif rank >= 10:
-            text= "Tâm Đầu Ý Hợp"
+            text = "Tâm Đầu Ý Hợp"
         elif rank >= 8:
-            text= "Nhạc Sĩ Mộng Mơ Và Nàng Thơ"
+            text = "Nhạc Sĩ Mộng Mơ Và Nàng Thơ"
         elif rank >= 6:
-            text= "Người Yêu"
+            text = "Người Yêu"
         elif rank >= 4:
-            text= "Người Tình"
+            text = "Người Tình"
         elif rank >= 2:
-            text= "Tình Chớm Nở"
+            text = "Tình Chớm Nở"
         return text
-    
+
     @staticmethod
-    def progress_bar_plant(start_time: datetime, end_time: datetime, bar_length: int = 15) -> str:
+    def progress_bar_plant(
+        start_time: datetime, end_time: datetime, bar_length: int = 15
+    ) -> str:
         now = datetime.now()
-        
+
         if start_time > end_time:
             bar = "█" * bar_length
             return f"{bar} 100%"
-        
+
         if datetime.now() > end_time:
             bar = "█" * bar_length
             return f"{bar} 100%"
-        
+
         total_duration = (end_time - start_time).total_seconds()
         elapsed_time = (now - start_time).total_seconds()
-        
+
         # Ensure progress is within bounds (0 to 100%)
         progress_percentage = max(0, min(100, (elapsed_time / total_duration) * 100))
-        
+
         # Calculate the number of "filled" blocks in the bar
         filled_length = int(bar_length * (progress_percentage / 100))
         empty_length = bar_length - filled_length
-        
+
         # Create the bar
         bar = "█" * filled_length + "░" * empty_length
         return f"{bar} {progress_percentage:.0f}%"
-    
+
     @staticmethod
     def get_text_on_guardian_level(level: int):
         text = "Tân Binh"
         if level >= 120:
-            text= "Thượng Cổ Đại Thần"
+            text = "Thượng Cổ Đại Thần"
         elif level >= 100:
-            text= "Vệ Chiến Thần"
+            text = "Vệ Chiến Thần"
         elif level >= 95:
-            text= "Thiên Tử"
+            text = "Thiên Tử"
         elif level >= 90:
-            text= "Tử Thần"
+            text = "Tử Thần"
         elif level >= 80:
-            text= "Bất Diệt Chiến Đế"
+            text = "Bất Diệt Chiến Đế"
         elif level >= 80:
-            text= "Đại Chiến Tôn"
+            text = "Đại Chiến Tôn"
         elif level >= 70:
-            text= "Chúa Tể"
+            text = "Chúa Tể"
         elif level >= 60:
-            text= "Đại Hộ Vệ"
+            text = "Đại Hộ Vệ"
         elif level >= 50:
-            text= "Lãnh Quản Chiến Khí"
+            text = "Lãnh Quản Chiến Khí"
         elif level >= 40:
-            text= "Thống Lãnh"
+            text = "Thống Lãnh"
         elif level >= 30:
-            text= "Tư Lệnh"
+            text = "Tư Lệnh"
         elif level >= 25:
-            text= "Tướng Quân"
+            text = "Tướng Quân"
         elif level >= 20:
-            text= "Chỉ Huy"
+            text = "Chỉ Huy"
         elif level >= 15:
-            text= "Tinh Anh"
+            text = "Tinh Anh"
         elif level >= 10:
-            text= "Dị Nhân"
+            text = "Dị Nhân"
         elif level >= 5:
-            text= "Đấu Sĩ"
+            text = "Đấu Sĩ"
         return text
-    
+
     @staticmethod
     def progress_bar(input_value: int, total_progress: int = 1000, bar_length=15):
         # Calculate the percentage of progress
@@ -325,21 +337,28 @@ class UtilitiesFunctions():
         # Determine the number of filled (█) characters
         filled_length = int(bar_length * input_value // total_progress)
         # Create the progress bar string
-        bar = '█' * filled_length + '░' * (bar_length - filled_length)
+        bar = "█" * filled_length + "░" * (bar_length - filled_length)
         # Format the output with percentage
-        return f'{bar} **{int(percentage)}%**'
+        return f"{bar} **{int(percentage)}%**"
 
     @staticmethod
     def replace_with_question_marks(number):
         # Convert the number to a string to determine its length
         length = len(str(number))
         # Return the string of '?' repeated for the length of the number
-        return '?' * length
+        return "?" * length
 
     @staticmethod
-    def progress_bar_stat(input_value: int, max_value: int, emoji: str, bar_length=15, mysterious_stats = False):
+    def progress_bar_stat(
+        input_value: int,
+        max_value: int,
+        emoji: str,
+        bar_length=15,
+        mysterious_stats=False,
+    ):
         # Clamp values to ensure safety
-        if input_value > max_value: input_value = max_value
+        if input_value > max_value:
+            input_value = max_value
         input_value = max(0, input_value)
         max_value = max(1, max_value)  # Prevent divide by zero
         # Calculate the percentage of progress
@@ -347,12 +366,12 @@ class UtilitiesFunctions():
         # Determine the number of filled (█) characters
         filled_length = int(bar_length * input_value // max_value)
         # Create the progress bar string
-        bar = '█' * filled_length + '░' * (bar_length - filled_length)
+        bar = "█" * filled_length + "░" * (bar_length - filled_length)
         # Format the output with percentage
         if mysterious_stats:
-            return f'{emoji}: {bar} ({(UtilitiesFunctions.replace_with_question_marks(input_value))}/{UtilitiesFunctions.replace_with_question_marks(max_value)})'
+            return f"{emoji}: {bar} ({(UtilitiesFunctions.replace_with_question_marks(input_value))}/{UtilitiesFunctions.replace_with_question_marks(max_value)})"
         else:
-            return f'{emoji}: {bar} ({input_value}/{max_value})'
+            return f"{emoji}: {bar} ({input_value}/{max_value})"
 
     @staticmethod
     def guardian_death_chance(level: int):
@@ -368,9 +387,17 @@ class UtilitiesFunctions():
             return 15
         else:  # level >= 99
             return 17
-    
+
     @staticmethod
-    def calculate_guardian_sell_money(worth_amount: int, level: int, is_dead: bool = False, attack_power: int = 0, max_health: int = 0, max_mana: int = 0, max_stamina: int = 0) -> int:
+    def calculate_guardian_sell_money(
+        worth_amount: int,
+        level: int,
+        is_dead: bool = False,
+        attack_power: int = 0,
+        max_health: int = 0,
+        max_mana: int = 0,
+        max_stamina: int = 0,
+    ) -> int:
         if level < 65:
             multiplier = 0.30
         elif level < 80:
@@ -406,16 +433,33 @@ class UtilitiesFunctions():
                 money += int(worth_amount * level / 100)
 
         return money
-    
+
     @staticmethod
     def extract_number(text: str) -> int | None:
         # Remove all spaces
         text = text.replace(" ", "").strip()
         # If it contains both . and , it's ambiguous — reject it
-        if '.' in text and ',' in text:
+        if "." in text and "," in text:
             return None
         # Normalize the separator to nothing (assume thousands separator)
-        cleaned = text.replace('.', '').replace(',', '')
+        cleaned = text.replace(".", "").replace(",", "")
         if not cleaned.isdigit():
             return None
         return int(cleaned)
+
+    @staticmethod
+    def get_track_string(
+        horse_emoji, position, track_length, obstacles, is_winning=False
+    ):
+        track_list = ["."] * track_length
+        for obs in obstacles:
+            if obs < track_length:
+                track_list[obs] = "─"
+
+        if is_winning:
+            return f"[{''.join(track_list)}.....|{horse_emoji}]"
+        else:
+            # Old logic: Place horse at its current position p
+            p = min(int(position), track_length - 1)
+            track_list[p] = horse_emoji
+            return f"[{''.join(track_list)}|🚩]"
