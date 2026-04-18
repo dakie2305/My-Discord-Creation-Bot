@@ -3,13 +3,14 @@ from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
 from CustomEnum.TrueHeavenEnum import TrueHeavenEnum
+from CustomEnum.UserEnum import UserId
 import CustomFunctions
 # import google.generativeai as genai
 from discord.ext import commands, tasks
 from discord import app_commands
 from Handling.MiniGame.GuessNumber import GnHandling, GnMongoManager
 from Handling.MiniGame.MatchWord import MwHandling, MwMongoManager
-from Handling.Misc import AntiSpamHandling, DonatorMongoManager
+from Handling.Misc import AntiSpamHandling, DonatorMongoManager, SyncDiscordMongoManager
 from Handling.Misc.Remind import RemindMongoManager
 from Handling.Misc.Remind.RemindClass import Remind
 import db.DbMongoManager as db
@@ -443,8 +444,10 @@ async def clear_up_data_task():
             #drop collection nếu trống
             db.drop_snipe_channel_info_collection_if_empty(guild_id=guild_id)
     #Kiểm tra remind cũ và xóa
-    RemindMongoManager.delete_old_reminds()
+    RemindMongoManager.delete_old_reminds()    
     print(f"clear_up_data_task started. Deleted old reminds data if any.")
+    count =  SyncDiscordMongoManager.cleanup_old_messages()
+    print(f"clear_up_data_task started. Deleted {count} old synced messages in SyncDiscord collection.")
     
     
 # Task: Check remind
@@ -587,8 +590,26 @@ async def on_member_ban(guild: discord.Guild, user: discord.Member):
 
 @bot.event
 async def on_message(message: discord.Message):
-    if message.author == bot.user:
-        return
+    sync_discord_chat = False
+    if (not message.author.bot) or (message.author.id in (bot.user.id, UserId.CREATION_2.value)):
+        if message.channel.id == TrueHeavenEnum.SYNC_ASURA_CHANNEL.value:
+            sync_discord_chat = True
+    
+    if sync_discord_chat:   
+        SyncDiscordMongoManager.insert_message(
+            message_id=message.id,
+            channel_id=message.channel.id,
+            guild_id=message.guild.id,
+            author_id=message.author.id,
+            author_username=message.author.name,
+            author_display_name=message.author.display_name,
+            author_image=message.author.avatar,
+            content=message.content,
+            created_at=message.created_at,
+            is_bot=message.author.bot
+        )    
+    
+    if message.author == bot.user: return
     speakFlag= True
     sort_word_game = SwHandling.SwHandlingFunction(message= message)
     sw_info, lan = await sort_word_game.check_if_message_inside_game(source=message)
