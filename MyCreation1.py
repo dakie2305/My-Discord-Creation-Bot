@@ -594,7 +594,8 @@ async def on_message(message: discord.Message):
     if (not message.author.bot) or (message.author.id in (bot.user.id, UserId.CREATION_2.value)):
         if message.channel.id == TrueHeavenEnum.SYNC_ASURA_CHANNEL.value:
             sync_discord_chat = True
-    
+    if not message.content and not message.attachments:
+        sync_discord_chat = False
     if sync_discord_chat:   
         SyncDiscordMongoManager.insert_message(
             message_id=message.id,
@@ -603,9 +604,16 @@ async def on_message(message: discord.Message):
             author_id=message.author.id,
             author_username=message.author.name,
             author_display_name=message.author.display_name,
-            author_image=message.author.avatar,
+            author_image = message.author.display_avatar.url,
             content=message.content,
             created_at=message.created_at,
+            attachments = [
+                {
+                    "url": attachment.url,
+                    "content_type": attachment.content_type or "unknown"
+                }
+                for attachment in message.attachments
+            ],
             is_bot=message.author.bot
         )    
     
