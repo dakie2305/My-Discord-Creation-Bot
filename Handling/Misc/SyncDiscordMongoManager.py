@@ -5,6 +5,7 @@ from Handling.Misc.DonatorClass import Donator
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 from bson.int64 import Int64
 from datetime import datetime, timedelta
+import requests
 
 # Connect to the MongoDB server
 if UtilitiesFunctions.USER_NAME_MONGODB != "" and UtilitiesFunctions.USER_NAME_MONGODB != None and UtilitiesFunctions.PASSWORD_MONGODB != "" and UtilitiesFunctions.PASSWORD_MONGODB != None:
@@ -36,7 +37,7 @@ def insert_message(
     is_bot: bool = False,
     source: str = "discord"
 ):
-    collection.insert_one({
+    result = collection.insert_one({
         "message_id": Int64(message_id),
         "channel_id": Int64(channel_id),
         "guild_id": Int64(guild_id),
@@ -57,6 +58,25 @@ def insert_message(
         "is_bot": is_bot,
         "source": source,
     })
+    if result.inserted_id:
+        notify_laravel_broadcast(str(result.inserted_id))
+        
+def notify_laravel_broadcast(mongo_id: str):
+    targets = [
+        "http://127.0.0.1:8000/discord/message-sync",
+        "https://asura.com.vn/discord/message-sync"
+    ]
+    payload = {"id": mongo_id}
+    for url in targets:
+        try:
+            response = requests.post(url, json=payload, timeout=3) 
+            if response.status_code == 200:
+                print(f"[{url}] Successfully signaled: {mongo_id}")
+            else:
+                print(f"[{url}] Error {response.status_code}: {response.text}")
+                
+        except Exception as e:
+            print(f"[{url}] Failed to connect: {e}")
     
 def get_messages(channel_id: int, page: int = 0, limit: int = 20):
     data = list(
