@@ -63,8 +63,7 @@ def insert_message(
         
 def notify_laravel_broadcast(mongo_id: str):
     targets = [
-        "http://127.0.0.1:8000/discord/message-sync",
-        "https://asura.com.vn/discord/message-sync"
+        "https://asura.com.vn/api/discord/message-sync"
     ]
     payload = {"id": mongo_id}
     for url in targets:
