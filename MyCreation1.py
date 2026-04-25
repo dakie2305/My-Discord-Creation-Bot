@@ -601,6 +601,7 @@ async def on_message(message: discord.Message):
             message_id=message.id,
             channel_id=message.channel.id,
             guild_id=message.guild.id,
+            message=message,
             author_id=message.author.id,
             author_username=message.author.name,
             author_display_name=message.author.display_name,

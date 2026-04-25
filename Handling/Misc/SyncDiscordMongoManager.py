@@ -1,4 +1,5 @@
 from typing import Optional, List
+import discord
 from pymongo import MongoClient
 from datetime import datetime, timedelta
 from Handling.Misc.DonatorClass import Donator
@@ -6,6 +7,7 @@ from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 from bson.int64 import Int64
 from datetime import datetime, timedelta
 import requests
+import re
 
 # Connect to the MongoDB server
 if UtilitiesFunctions.USER_NAME_MONGODB != "" and UtilitiesFunctions.USER_NAME_MONGODB != None and UtilitiesFunctions.PASSWORD_MONGODB != "" and UtilitiesFunctions.PASSWORD_MONGODB != None:
@@ -20,6 +22,7 @@ def insert_message(
     message_id: int,
     channel_id: int,
     guild_id: int,
+    message: discord.Message,
 
     author_id: int,
     author_username: str,
@@ -37,6 +40,7 @@ def insert_message(
     is_bot: bool = False,
     source: str = "discord"
 ):
+    clean_content = resolve_mentions(content, message)
     result = collection.insert_one({
         "message_id": Int64(message_id),
         "channel_id": Int64(channel_id),
@@ -47,7 +51,7 @@ def insert_message(
         "author_display_name": author_display_name,
         "author_image": author_image,
 
-        "content": content,
+        "content": clean_content,
 
         "created_at": created_at,
         "edited_at": edited_at,
@@ -60,7 +64,34 @@ def insert_message(
     })
     if result.inserted_id:
         notify_laravel_broadcast(str(result.inserted_id))
-        
+
+def resolve_mentions(content: str, message: discord.Message):
+    if not message:
+        return content
+    def replace(match):
+        mention = match.group(0)
+        #USER
+        if mention.startswith("<@"):
+            user_id = int(match.group(1))
+            user = next((u for u in message.mentions if u.id == user_id), None)
+            if not user and message.guild:
+                user = message.guild.get_member(user_id)
+            return f"@{user.display_name}" if user else ""
+        #CHANNEL
+        elif mention.startswith("<#"):
+            channel_id = int(match.group(1))
+            channel = next((c for c in message.channel_mentions if c.id == channel_id), None)
+            if not channel and message.guild:
+                channel = message.guild.get_channel(channel_id)
+            return f"#{channel.name}" if channel else ""
+        elif mention.startswith("<@&"):
+            role_id = int(match.group(1))
+            role = message.guild.get_role(role_id) if message.guild else None
+            return f"@{role.name}" if role else ""
+        return mention
+    return re.sub(r"<(@!?\d+|@&\d+|#\d+)>", replace, content)
+
+
 def notify_laravel_broadcast(mongo_id: str):
     targets = [
         "https://asura.com.vn/api/discord/message-sync"
