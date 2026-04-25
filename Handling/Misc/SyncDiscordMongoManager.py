@@ -69,26 +69,29 @@ def resolve_mentions(content: str, message: discord.Message):
     if not message:
         return content
     def replace(match):
-        mention = match.group(0)
-        #USER
-        if mention.startswith("<@"):
-            user_id = int(match.group(1))
+        raw = match.group(1)  # e.g. @123, @!123, @&123, #123
+        # USER
+        if raw.startswith("@") and not raw.startswith("@&"):
+            user_id = int(raw.replace("@", "").replace("!", ""))
             user = next((u for u in message.mentions if u.id == user_id), None)
             if not user and message.guild:
                 user = message.guild.get_member(user_id)
-            return f"@{user.display_name}" if user else ""
-        #CHANNEL
-        elif mention.startswith("<#"):
-            channel_id = int(match.group(1))
+            return f"@{user.display_name}" if user else match.group(0)
+
+        # CHANNEL
+        if raw.startswith("#"):
+            channel_id = int(raw[1:])
             channel = next((c for c in message.channel_mentions if c.id == channel_id), None)
             if not channel and message.guild:
                 channel = message.guild.get_channel(channel_id)
-            return f"#{channel.name}" if channel else ""
-        elif mention.startswith("<@&"):
-            role_id = int(match.group(1))
+            return f"#{channel.name}" if channel else match.group(0)
+
+        # ROLE
+        if raw.startswith("@&"):
+            role_id = int(raw[2:])
             role = message.guild.get_role(role_id) if message.guild else None
-            return f"@{role.name}" if role else ""
-        return mention
+            return f"@{role.name}" if role else match.group(0)
+        return match.group(0)
     return re.sub(r"<(@!?\d+|@&\d+|#\d+)>", replace, content)
 
 
