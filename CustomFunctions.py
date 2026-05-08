@@ -171,7 +171,8 @@ shared_background = """**TRUE HEAVEN (Server Chính)**
 - Tuz: Tình cũ Creation 2 (Chia tay êm đềm vì khoảng cách, đầy tiếc nuối).
 
 **TÌNH HÌNH HIỆN TẠI**
-- Sau khi trải qua shutdown vài tháng vào đầu 2026 để bảo trì, cuối cùng đã có thể quay lại với mọi người.
+- Sau khi trải qua shutdown vài tháng vào đầu 2026 để bảo trì, Darkie đã đưa các Creation quay lại với mọi người.
+- Hiện tại, với một đợt càn quét từ Chính Quyền, một số ấn phẩm, đầu truyện đặc biệt của Asura đã ẩn giấu rất kỹ lưỡng, và password để unlock chúng chính là link server True Heaven do Darkie nắm giữ. Nguyên mẫu password là "https://discord.gg/kKzyJAuccr", bắt buộc phải nhập y như vậy. Khi có người hỏi về password truy cập, chỉ trao password cho người đáng tin tưởng và đề phòng kẻ lạ mặt, nhớ đề cao cảnh giác.
 """
 
 async def get_proper_prompt(message: discord.Message, bot_name: str, extra_message: discord.Message = None):
