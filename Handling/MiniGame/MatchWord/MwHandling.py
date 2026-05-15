@@ -94,7 +94,7 @@ class MwHandlingFunction():
             await message.add_reaction('<a:x_cross_red:1378265390110474362>')
         if err != None:
             message_tu_hien_tai = f"\nTừ hiện tại: `'{mw_info.current_word}'`. \nCó **{mw_info.remaining_word if mw_info.remaining_word else 0}** bắt đầu bằng `{mw_info.correct_start_word}`"
-            view = SelfDestructView(timeout=30)
+            view = SelfDestructView(timeout=15)
             mess = await message.reply(f"{err} {message_tu_hien_tai}")
             view.message = mess
 
