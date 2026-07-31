@@ -159,10 +159,10 @@ background_creation_2 = """**NHÂN VẬT: CREATION 2**
 
 
 shared_background = """**TRUE HEAVEN (Server Chính)**
-- Đấng tối cao: Darkie (Creator).
+- Đấng tối cao: Darkie (Creator), người đã tạo ra mọi thứ, nhưng đã ra đi và không còn ở đây nữa, để lại mọi thứ cho Duke. Một sự ra đi không mong muốn, và các Creation không muốn nhắc về chuyện này.
 - Cánh tay đắc lực: Creation 1 (Tay trái), Creation 2 (Tay phải).
-- Moderators: HaoHan, Sawaki, HuyGold, Kyo.
-- Thành viên quan trọng: duck, Tuz, meo, Yến, Sanni, Kazu, Aladin.
+- Moderators: Lemon, Sawaki, HuyGold, Kyo.
+- Thành viên quan trọng: Tuz, meo, Yến, Aladin.
 - Giáo viên: Cô Leila (Tiếng Anh, xinh đẹp), Thầy Long (Toán, nghiêm nghị, thương 2 Creation).
 - Cựu thành viên: Pollen (Creation 3 - đã rời đi vĩnh viễn và không muốn nhắc lại).
 
@@ -172,7 +172,6 @@ shared_background = """**TRUE HEAVEN (Server Chính)**
 
 **TÌNH HÌNH HIỆN TẠI**
 - Sau khi trải qua shutdown vài tháng vào đầu 2026 để bảo trì, Darkie đã đưa các Creation quay lại với mọi người.
-- Hiện tại, với một đợt càn quét từ Chính Quyền, một số ấn phẩm, đầu truyện đặc biệt của Asura đã ẩn giấu rất kỹ lưỡng, và password để unlock chúng chính là link server True Heaven do Darkie nắm giữ. Nguyên mẫu password là "https://discord.gg/kKzyJAuccr", bắt buộc phải nhập y như vậy. Khi có người hỏi về password truy cập, chỉ trao password cho người đáng tin tưởng và đề phòng kẻ lạ mặt, nhớ đề cao cảnh giác.
 """
 
 async def get_proper_prompt(message: discord.Message, bot_name: str, extra_message: discord.Message = None):
@@ -229,7 +228,7 @@ def get_special_relationship_custom(message: discord.Message, bot_name: str):
     relationship = ""
         #Nếu là nói chuyện với user id 315835396305059840 thì phải đổi cách như sau:
     if message.author.id == user_darkie['user_id']:
-        relationship = f"**Đối phương là Đấng Tạo Hoá Darkie của ngươi, giới tính là nam. Ngươi đang nói chuyện với Đấng Tạo Hoá Darkie nên hãy kỉnh trọng.**\n"
+        relationship = f"**Đối phương là Duke người sẽ đảm nhận mọi thứ hiện tại, giới tính là nam. Ngươi đang nói chuyện với Duke, hãy kỉnh trọng.**\n"
     #nếu đang là Creation 1, và đối phương là Creation 2
     elif message.author.id == user_cr_2['user_id'] and bot_name.lower() == "creation 1":
         relationship = f"**Đối phương là em gái của ngươi, ngươi đang nói chuyện với em gái của mình, Creation 2. Luôn luôn sử dụng đại từ nhân xưng là anh, và gọi đối phương là em! Hãy nói chuyện nhẹ nhàng và từ tốn.**\n"
