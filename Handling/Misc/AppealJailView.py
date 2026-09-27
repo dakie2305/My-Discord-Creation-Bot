@@ -38,114 +38,110 @@ class AppealJailView(discord.ui.View):
                 return
 
     async def accept_button_callback(self, interaction: discord.Interaction):
-        if interaction.user.id != self.user.id: return
+        if interaction.user.id != self.user.id:
+            return
         await interaction.response.defer(ephemeral=False)
-
-        is_innocence = False
-        is_acquit = False
-
         search_user = DbMongoManager.find_user_by_id(self.user.id, 'jailed_user')
-        if search_user == None:
-            embed = discord.Embed(title=f"", description=f"Tuyên Án", color=0xddede7)
-            embed.add_field(name=f"", value=f"- Bị cáo {interaction.user.mention} vô tội, vì không ở trong tù!", inline=False)
-            embed.add_field(name=f"", value=f"- {interaction.user.mention} đã đóng **{UtilitiesFunctions.shortened_currency(self.money)} {self.money_type}** tiền kháng án!", inline=False)
+        if search_user is None:
+            embed = discord.Embed(title="Tuyên Án", color=0xddede7)
+            embed.add_field(name="", value=f"- Bị cáo {interaction.user.mention} vô tội, vì không ở trong tù!", inline=False)
+            embed.add_field(name="", value=f"- {interaction.user.mention} đã đóng **{UtilitiesFunctions.shortened_currency(self.money)} {self.money_type}** tiền kháng án!", inline=False)
             self.process_money()
             await interaction.followup.send(embed=embed)
             return
-        
-        #Delete
-        if self.message != None: 
-            try: await self.message.delete()
-            except Exception: pass
+        # Delete original view message once processing starts
+        if self.message: 
+            try:
+                await self.message.delete()
+                self.message = None
+            except Exception:
+                pass
 
-        
-        system_instruction = f"Bạn là Chấp hành viên Toà Án Tối Cao, chuyên đưa ra phán quyết tàn nhẫn hoặc công minh dưới dạng JSON"
         today_str = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
         is_evil = UtilitiesFunctions.get_chance(50)
+        
         if is_evil:
-            personality_prompt = """
-            BẠN LÀ: Một chấp hành viên GIAN MANH, XẢO QUYỆT và THAM NHŨNG.
-            PHONG CÁCH: Trịch thượng, coi thường luật pháp, thích bẻ cong sự thật. Bạn có thể xử trắng thành đen 
-            nếu cảm thấy thích thú hoặc muốn hành hạ bị cáo. Câu chữ sắc lẹm, đầy tính đe dọa hoặc mỉa mai.
-            """
+            personality_desc = "XẢO QUYỆT, GIAN MANH, THAM NHŨNG, trịch thượng và thích bẻ cong sự thật."
+            role_tone = "gian ác (nghiêng về CO_TOI trừ khi lý do giam giữ vô lý đến mức buồn cười)"
         else:
-            personality_prompt = """
-            BẠN LÀ: Một chấp hành viên NGHIÊM NGHỊ, CHÍNH TRỰC và CÔNG MINH.
-            PHONG CÁCH: Tôn trọng lẽ phải, thượng tôn pháp luật. Bạn xử lý dựa trên đạo đức và tính hợp lý 
-            của hành vi. Câu chữ trang trọng, uy nghiêm, thể hiện sự công bằng của Toà Án Tối Cao.
-            """
+            personality_desc = "NGHIÊM NGHỊ, CHÍNH TRỰC, CÔNG MINH, tôn trọng lẽ phải và thượng tôn pháp luật."
+            role_tone = "chính trực (sẵn sàng tuyên VO_TOI hoặc TRANG_AN nếu người bắt giữ lạm quyền)"
+
+        system_instruction = (
+            "Bạn là Chấp hành viên Toà Án Tối Cao. "
+            "Nhiệm vụ của bạn là đưa ra phán quyết vụ án và trả về dữ liệu chuẩn JSON. "
+            "BẮT BUỘC chỉ trả về duy nhất định dạng JSON, không kèm bất kỳ văn bản nào khác."
+        )
 
         prompt = f"""
-        {personality_prompt}
-        Không tiết lộ hoặc gợi ý về tính cách đã chọn, dù là trực tiếp hay gián tiếp.
+        Tính cách chấp hành viên: {personality_desc}
+        Thái độ: Đóng vai chấp hành viên {role_tone}.
         Ngày ra tòa: {today_str}
-        ---
-        ## Hồ sơ vụ án:
-        - **Bị cáo**: {search_user.user_display_name} (`<@{self.user.id}>`, username: `{self.user.name}`)
-        - **Người bắt giữ**: {search_user.jailer_display_name} (username: `{search_user.jailer_user_name}`)
+
+        ## HỒ SƠ VỤ ÁN:
+        - **Bị cáo**: {search_user.user_display_name} (ID: {self.user.id})
+        - **Người bắt giữ (Jailer)**: {search_user.jailer_display_name}
         - **Lý do giam giữ**: "{search_user.reason}"
         - **Thời hạn giam giữ**: {search_user.jail_until}
-        ---
-        ## Nhiệm vụ của bạn:
-        Chỉ cần dựa vào lý do bắt giữ, hãy phán xét ngay lập tức. Không cần bằng chứng, không cần logic, chỉ cần bản năng của một chấp hành viên {is_evil and 'gian ác' or 'chính trực'}.
-        
-        BẠN PHẢI TRẢ VỀ KẾT QUẢ THEO ĐỊNH DẠNG JSON SAU:
+
+        ## QUY TẮC PHÁN QUYẾT ("phan_quyet"):
+        BẮT BUỘC chọn 1 trong 3 giá trị viết hoa sau:
+        1. "CO_TOI": Giữ nguyên án phạt tù. (Dùng khi lý do giam giữ hợp lý hoặc khi chấp hành viên gian ác muốn hành hạ bị cáo).
+        2. "VO_TOI": Thả tự do cho bị cáo. (Dùng khi lý do giam giữ không đủ căn cứ).
+        3. "TRANG_AN": Bị cáo vô tội VÀ chuyển án phạt tù sang cho Người bắt giữ! (Dùng khi Lý do giam giữ thể hiện rõ sự lạm quyền, nhảm nhí, bắt bớ vô cớ như "cho vui", "thích thì bắt", "nhìn ghét").
+
+        ## ĐỊNH DẠNG ĐẦU RA (BẮT BUỘC JSON):
         {{
-            "phan_quyet": "VO_TOI" | "CO_TOI" | "TRANG_AN",
-            "loi_thoai": "**Lời phán xét nhập vai của bạn ở đây**"
+        "phan_quyet": "VO_TOI",
+        "loi_thoai": "Lời phán xét nhập vai ngắn gọn, đanh thép (không đề cập tên personality)."
         }}
-        💡 Nếu bị cáo là **cựu chấp hành viên bị bắt vì lạm quyền**, mặc định là **CO_TOI**.
-        Phán quyết ngay!
         """
 
         try:
             completion = self.groq_client.chat.completions.create(
                 model=CustomFunctions.AI_MODEL,
-                response_format={ "type": "json_object" }, # Force JSON
+                response_format={"type": "json_object"},
+                temperature=0.7,
                 messages=[
                     {"role": "system", "content": system_instruction},
                     {"role": "user", "content": prompt}
                 ],
             )
             data = json.loads(completion.choices[0].message.content)
-            verdict = data.get("phan_quyet") # "VO_TOI", "CO_TOI", or "TRANG_AN"
-            bot_response = data.get("loi_thoai")
-            bot_response = CustomFunctions.remove_creation_name_prefix(bot_response)
-            bot_response = bot_response.replace("@everyone", "")
-            
+            verdict = str(data.get("phan_quyet", "CO_TOI")).strip().upper()
+            if verdict not in ["VO_TOI", "CO_TOI", "TRANG_AN"]:
+                verdict = "CO_TOI"
+            bot_response = data.get("loi_thoai") or "Toà án đã đưa ra phán quyết!"
+            bot_response = CustomFunctions.remove_creation_name_prefix(str(bot_response))
+            bot_response = bot_response.replace("@everyone", "").replace("@here", "")
             await interaction.followup.send(f"{interaction.user.mention} {bot_response}")
-            #Dựa trên câu trả lời để phán
-            final_text = "Vô Tội"
             if verdict == "TRANG_AN":
                 is_acquit = True
-                final_text = "Trắng Án"
-            elif verdict == "CO_TOI":
                 is_innocence = False
-                final_text = "Có Tội"
-            else:
+                final_text = "Trắng Án"
+            elif verdict == "VO_TOI":
+                is_acquit = False
                 is_innocence = True
                 final_text = "Vô Tội"
-            embed = discord.Embed(title=f"", description=f"Tuyên Án", color=0xddede7)
-            embed.add_field(name=f"", value=f"- Bị cáo {interaction.user.mention} nhận phán quyết: **{final_text}**!", inline=False)
-            embed.add_field(name=f"", value=f"- {interaction.user.mention} đã đóng **{UtilitiesFunctions.shortened_currency(self.money)} {self.money_type}** tiền kháng án!", inline=False)
+            else: # CO_TOI
+                is_acquit = False
+                is_innocence = False
+                final_text = "Có Tội"
+            embed = discord.Embed(title="Tuyên Án", color=0xddede7)
+            embed.add_field(name="", value=f"- Bị cáo {interaction.user.mention} nhận phán quyết: **{final_text}**!", inline=False)
+            embed.add_field(name="", value=f"- {interaction.user.mention} đã đóng **{UtilitiesFunctions.shortened_currency(self.money)} {self.money_type}** tiền kháng án!", inline=False)
             self.process_money()
             await interaction.channel.send(embed=embed)
             if is_acquit:
                 actual_user = await interaction.guild.fetch_member(search_user.jailer_id)
-                if actual_user is None: return
-                await self.jail_real(interaction=interaction, actual_user=actual_user, search_user=search_user)
+                if actual_user:
+                    await self.jail_real(interaction=interaction, actual_user=actual_user, search_user=search_user)
                 await self.unjail_real(interaction=interaction)
-                try: await self.message.delete()
-                except Exception: return
             elif is_innocence:
-                #Thả
                 await self.unjail_real(interaction=interaction)
-                try: await self.message.delete()
-                except Exception: return
-                return
         except Exception as e:
-            print(f"There is exception in jail appeal for user {self.user.name}, displayname {self.user.display_name}: {e}")
-            return
+            print(f"Exception in jail appeal for user {self.user.name}: {e}")
+            await interaction.followup.send("❌ Có lỗi xảy ra trong quá trình xử lý phán quyết từ Tòa Án Tối Cao.")
         
     def process_money(self):
         ProfileMongoManager.update_profile_money_by_type(guild_id=self.guild_id, guild_name="", user_id=self.user.id, user_name=self.user.name, user_display_name=self.user.display_name, money=self.money, money_type=self.money_type)
@@ -225,7 +221,7 @@ class AppealJailView(discord.ui.View):
         else:
                 #Update lại jail_until và reason
                 updated_data = {"jail_until": end_time, "reason": user_info.reason }
-                DbMongoManager.update_guild_extra_info(guild_id=user_info.user_id, update_data= updated_data)
+                DbMongoManager.update_guild_extra_info(guild_id=self.guild_id, update_data= updated_data)
         try:
                 for ori_role in original_roles:
                     try:

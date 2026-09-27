@@ -239,7 +239,7 @@ class TrueHeavenCustomCommands(commands.Cog):
 
     #region khang_tu prefix
     @commands.command()
-    @commands.cooldown(rate=1, per=60.0, type=commands.BucketType.user)
+    @commands.cooldown(rate=1, per=120.0, type=commands.BucketType.user)
     async def khang_tu(self, ctx):
         message: discord.Message = ctx.message
         if not message or message.guild.id != TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value:
