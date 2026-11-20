@@ -12,6 +12,7 @@ from CustomEnum.SlashEnum import SlashCommand
 from CustomEnum.EmojiEnum import EmojiCreation2
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 import CustomEnum.UserEnum as UserEnum
+from CustomEnum.UserEnum import UserId
 import CustomFunctions
 
 async def setup(bot: commands.Bot):
@@ -178,7 +179,7 @@ class RockPaperScissors(commands.Cog):
         if user_mention == None:
             for index, profile in enumerate(list_player_profile):
                 #Skip qua hai con bot vì điểm rất ảo
-                if profile.user_id == 1257713292445618239 or profile.user_id == 1257305865124581416: continue
+                if profile.user_id == UserId.CREATION_2.value or profile.user_id == UserId.CREATION_1.value: continue
                 user = interaction.guild.get_member(profile.user_id)
                 if user != None and (profile.win_point!= 0):
                     embed.add_field(name=f"", value=f"**Hạng {count}.** {user.mention}: Thắng: **{profile.win_point}**. Thua: **{profile.lose_point}**. Hoà: **{profile.draw_point}**. Huyền Thoại: **{profile.legendary_point}**. Sỉ Nhục: **{profile.humiliated_point}**.", inline=False)

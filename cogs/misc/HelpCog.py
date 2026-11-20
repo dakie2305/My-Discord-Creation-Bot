@@ -5,6 +5,7 @@ from discord.ext import commands
 import CustomFunctions
 from Handling.Misc.SelfDestructView import SelfDestructView
 from Handling.Misc.HelpPageView import HelpPageView
+from CustomEnum.UserEnum import UserId
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Help(bot=bot))
@@ -14,7 +15,7 @@ class Help(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.list_all_embed: list[discord.Embed] = []
-        if bot.user.id == 1257305865124581416: # cr 1
+        if bot.user.id == UserId.CREATION_1.value: # cr 1
             self.list_all_embed = self.get_list_help_creation_1()
         else: #cr 2
             self.list_all_embed = self.get_list_help_creation_2()

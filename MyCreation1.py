@@ -656,7 +656,8 @@ async def on_message(message: discord.Message):
     await ai_handling_response.sub_function_ai_response(message=message, speakFlag=speakFlag)
     await bot.process_commands(message)
 
-bot_token = os.getenv("BOT_TOKENN")
+#Old bot token is invalid now
+bot_token = os.getenv("BOT_TOKEN_NO1_DEV")
 if CustomFunctions.check_if_dev_mode():
     bot_token = os.getenv("BOT_TOKEN_NO1_DEV")
 english_words_dictionary = CustomFunctions.english_dict

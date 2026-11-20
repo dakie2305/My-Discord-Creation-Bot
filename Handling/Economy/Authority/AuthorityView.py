@@ -2,6 +2,8 @@ import discord
 from discord.ui import Button, View
 from Handling.Economy.Profile import ProfileMongoManager
 from Handling.Economy.Profile.ProfileClass import Profile
+from CustomEnum.UserEnum import UserId
+
 
 class AuthorityView(discord.ui.View):
     def __init__(self, user: discord.Member, data: Profile):
@@ -18,7 +20,7 @@ class AuthorityView(discord.ui.View):
     async def yes_button(self, interaction: discord.Interaction, button: Button):
         if interaction.user.id == self.target_user.id and interaction.user.id != interaction.guild.owner_id:
             #Nếu tự bầu thì phải tự counter bản thân nếu không phải server owner
-            self.no_votes.add(1257713292445618239)
+            self.no_votes.add(UserId.CREATION_2.value)
         user = interaction.user
         # Nếu user đã bầu Không thì xoá khỏi list No votes
         if user.id in self.no_votes:
@@ -29,7 +31,7 @@ class AuthorityView(discord.ui.View):
         # Nếu là chủ server và tự vote cho mình => kết luôn
         if user.id == self.target_user.id and user.id == interaction.guild.owner_id:
             self.vote_concluded = True
-            self.yes_votes.add(1257713292445618239)
+            self.yes_votes.add(UserId.CREATION_2.value)
             await self.conclude_vote(interaction)
             return
         

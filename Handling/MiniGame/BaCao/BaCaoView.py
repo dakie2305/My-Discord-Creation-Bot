@@ -8,6 +8,7 @@ import random
 from Handling.Misc.UtilitiesFunctionsEconomy import UtilitiesFunctions
 import asyncio
 from datetime import datetime, timedelta
+from CustomEnum.UserEnum import UserId
 
 
 class PlayerCardInfo:
@@ -323,7 +324,7 @@ class BaCaoView(discord.ui.View):
     ):
         if is_player_win == None:
             return
-        if player.user.id == 1257713292445618239:
+        if player.user.id == UserId.CREATION_2.value:
             # Này là bot creation 2
             if self.so_tien == None:
                 return

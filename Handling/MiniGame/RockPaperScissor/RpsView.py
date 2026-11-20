@@ -5,10 +5,9 @@ from typing import List, Optional
 import random
 import Handling.MiniGame.RockPaperScissor.RpsMongoManager as RpsMongoManager
 import CustomFunctions
-from CustomEnum.SlashEnum import SlashCommand
-from CustomEnum.EmojiEnum import EmojiCreation2
 import Handling.Economy.Profile.ProfileMongoManager as ProfileMongoManager
 from Handling.Economy.Profile.ProfileClass import Profile
+from CustomEnum.UserEnum import UserId
 
 class RPSView(discord.ui.View):
     def __init__(self, player_1: discord.Member, player_2: discord.Member, embed: discord.Embed):
@@ -53,7 +52,7 @@ class RPSView(discord.ui.View):
 
         # Nếu player 2 là bot thì liền tạo choice cho bot
         # Bot sẽ có tỷ lệ thắng 80%, 15% tỷ lệ hoà, và 5% thua 
-        if self.player_2.id == 1257713292445618239 or self.player_2.id == 1257305865124581416:
+        if self.player_2.id == UserId.CREATION_2.value or self.player_2.id == UserId.CREATION_1.value:
             bot_choice = self.get_bot_choice(choice)
             self.choices[self.player_2.id] = bot_choice
         
