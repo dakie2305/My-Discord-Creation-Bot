@@ -4,8 +4,6 @@ import os
 from CustomEnum.EmojiEnum import EmojiCreation2
 from dotenv import load_dotenv
 import CustomFunctions
-
-# import google.generativeai as genai
 from discord.ext import commands, tasks
 from discord import app_commands
 from Handling.Economy.Global import GlobalMongoManager
@@ -685,6 +683,15 @@ client = discord.Client(intents=intents)
 @bot.event
 async def on_ready():
     print(f"We have logged in as {bot.user}")
+    # 1. Leave all existing unauthorized guilds
+    for guild in list(bot.guilds):
+        if guild.id not in ALLOWED_GUILDS:
+            try:
+                await guild.leave()
+                print(f"Left unauthorized guild: {guild.name} ({guild.id})")
+                await asyncio.sleep(1)  # Prevents hitting Discord rate limits
+            except discord.HTTPException as e:
+                print(f"Failed to leave {guild.name} ({guild.id}): {e}")
 
     if CustomFunctions.check_if_dev_mode() == False:
         # Tạm tắt
@@ -899,6 +906,30 @@ async def on_guild_remove(guild: discord.Guild):
         f"Bot {bot.user.display_name} removed from guild {guild.name}. Deleted all related collection"
     )
 
+@bot.event
+async def on_guild_join(guild: discord.Guild):
+    if guild.id in ALLOWED_GUILDS:
+            return
+    # Find the first text channel where the bot has permission to send messages
+    target_channel = next(
+        (
+            ch for ch in guild.text_channels
+            if ch.permissions_for(guild.me).send_messages
+        ),
+        None,
+    )
+    if target_channel:
+        try:
+            await target_channel.send(
+                "Bot này hiện chỉ hoạt động tại server **True Heavens** và sẽ tự động rời khỏi server này."
+            )
+        except discord.HTTPException:
+            pass
+    try:
+        await guild.leave()
+        print(f"Left unauthorized guild: {guild.name} ({guild.id})")
+    except discord.HTTPException as e:
+        print(f"Failed to leave {guild.name} ({guild.id}): {e}")
 
 @bot.event
 async def on_member_update(before: discord.Member, after: discord.Member):
@@ -967,7 +998,7 @@ init_extension = [
     "cogs.misc.SnipeCog",
     "cogs.misc.DonationCog",
 ]
-
+ALLOWED_GUILDS = [TrueHeavenEnum.TRUE_HEAVENS_SERVER_ID.value]
 bot_token = os.getenv("BOT_TOKEN_NO2")
 if CustomFunctions.check_if_dev_mode():
     bot_token = os.getenv("BOT_TOKEN_NO2_DEV")

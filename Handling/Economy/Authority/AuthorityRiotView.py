@@ -1,5 +1,6 @@
 import discord
 from discord.ui import Button, View
+from CustomEnum import UserEnum
 from Handling.Economy.Profile import ProfileMongoManager
 from Handling.Economy.Profile.ProfileClass import Profile
 from CustomEnum.EmojiEnum import EmojiCreation2
@@ -21,7 +22,7 @@ class AuthorityRiotView(discord.ui.View):
     async def yes_button(self, interaction: discord.Interaction, button: Button):
         if interaction.user.id == self.target_user.id:
             #Nếu tự bầu thì phải tự counter bản thân
-            self.no_votes.add(1257713292445618239)
+            self.no_votes.add(UserEnum.UserEnum.CREATION_2.value)
         user = interaction.user
         # Nếu user đã bầu Không thì xoá khỏi list No votes
         if user.id in self.no_votes:
